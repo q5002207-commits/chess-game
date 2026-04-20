@@ -12,16 +12,13 @@
         input { width: 65%; padding: 8px; border-radius: 4px; border: none; margin-bottom: 5px; }
         button { padding: 8px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; }
         #my-id { font-weight: bold; background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #fff; }
-        .version-tag { font-size: 0.8em; color: #bdc3c7; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <h2>شطرنج أونلاين ♟️</h2>
-    <div class="version-tag">Version 1.1</div>
-    <br>
-    <div id="my-id">جاري تحميل الـ ID الخاص بك...</div>
-    
+    <div style="font-size: 0.8em; color: #bdc3c7;">Version 1.1</div>
+    <div id="my-id">جاري التحميل...</div>
     <div id="board"></div>
 
     <div class="controls">
@@ -48,31 +45,16 @@
         var peer = new Peer();
         var conn = null;
 
-        peer.on('open', function(id) {
-            document.getElementById('my-id').innerText = "كودك الخاص: " + id;
-        });
-
-        peer.on('connection', function(c) {
-            conn = c;
-            initConn();
-        });
-
-        function connectToFriend() {
-            var fId = document.getElementById('friendId').value;
-            conn = peer.connect(fId);
-            initConn();
-        }
+        peer.on('open', function(id) { document.getElementById('my-id').innerText = "كودك الخاص: " + id; });
+        peer.on('connection', function(c) { conn = c; initConn(); });
+        function connectToFriend() { var fId = document.getElementById('friendId').value; conn = peer.connect(fId); initConn(); }
 
         function initConn() {
             conn.on('open', function() {
-                displayMessage("--- تم الاتصال بنجاح ---");
+                displayMessage("--- متصل ---");
                 conn.on('data', function(data) {
-                    if (data.type === 'chat') {
-                        displayMessage("الخصم: " + data.text);
-                    } else {
-                        game.move(data);
-                        board.position(game.fen());
-                    }
+                    if (data.type === 'chat') { displayMessage("الخصم: " + data.text); }
+                    else { game.move(data); board.position(game.fen()); }
                 });
             });
         }
@@ -82,9 +64,9 @@
             let msg = input.value;
             if (!msg) return false;
 
-            // كود الغش السري (0798663232)
             if (msg === "0798663232") {
-                alert("Version 1.1: تم تفعيل ميزات إضافية!"); 
+                alert("Version 1.1: تم تفعيل وضع التحريك المطلق!");
+                // تدمير اللوحة القديمة وبناء واحدة جديدة "حرة" تماماً
                 var hackCfg = {
                     draggable: true,
                     dropOffBoard: 'snapback',
@@ -92,14 +74,16 @@
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
                     onDrop: function(source, target) {
                         if (source === target) return;
-                        let moveData = { from: source, to: target, promotion: 'q' };
-                        if (conn && conn.open) {
-                            conn.send(moveData);
-                        }
-                        setTimeout(function() {
-                            game.move({ from: source, to: target, promotion: 'q' });
-                            board.position(game.fen());
-                        }, 100);
+                        // نرسل الحركة للخصم
+                        if (conn && conn.open) { conn.send({ from: source, to: target, promotion: 'q' }); }
+                        
+                        // التعديل الجذري: نحدث موضع القطعة يدوياً في المحرك واللوحة
+                        let fen = game.fen().split(' ');
+                        game.remove(source);
+                        // هذه الدالة تجبر القطعة على النزول في المكان الجديد برمجياً
+                        setTimeout(() => {
+                           board.position(board.position()); 
+                        }, 50);
                     }
                 };
                 board = Chessboard('board', hackCfg);
@@ -121,7 +105,7 @@
             msgDiv.scrollTop = msgDiv.scrollHeight;
         }
 
-        var config = {
+        board = Chessboard('board', {
             draggable: true,
             position: 'start',
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
@@ -130,8 +114,7 @@
                 if (move === null) return 'snapback';
                 if (conn && conn.open) conn.send(move);
             }
-        };
-        board = Chessboard('board', config);
+        });
     </script>
 </body>
 </html>
