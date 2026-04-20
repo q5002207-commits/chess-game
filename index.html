@@ -2,36 +2,39 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>شطرنج المحترفين - أونلاين</title>
+    <title>شطرنج أونلاين - Version 1.1</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
         body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
-        #board { width: 400px; margin: 20px; border: 5px solid #34495e; border-radius: 5px; }
+        #board { width: 400px; margin: 20px; border: 5px solid #34495e; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .controls { width: 400px; background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
         #messages { height: 100px; overflow-y: auto; background: #fdfdfd; color: #333; margin-bottom: 10px; padding: 10px; border-radius: 5px; text-align: right; }
         input { width: 65%; padding: 8px; border-radius: 4px; border: none; margin-bottom: 5px; }
         button { padding: 8px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; }
-        #my-id { font-weight: bold; background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+        #my-id { font-weight: bold; background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #fff; }
+        .version-tag { font-size: 0.8em; color: #bdc3c7; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <h2>احمد الامبراطور ♟️</h2>
-    <div id="my-id">جاري التحميل...</div>
+    <h2>شطرنج أونلاين ♟️</h2>
+    <div class="version-tag">Version 1.1</div>
+    <br>
+    <div id="my-id">جاري تحميل الـ ID الخاص بك...</div>
     
     <div id="board"></div>
 
     <div class="controls">
         <strong>الاتصال بالصديق:</strong><br>
         <input type="text" id="friendId" placeholder="ضع كود صديقك هنا">
-        <button onclick="connectToFriend()">دخول</button>
+        <button type="button" onclick="connectToFriend()">دخول</button>
     </div>
 
     <div class="controls">
         <strong>دردشة اللاعبين:</strong>
         <div id="messages"></div>
-        <input type="text" id="chatInput" placeholder="اكتب رسالة هنا...">
-        <button onclick="sendMsg()">إرسال</button>
+        <input type="text" id="chatInput" placeholder="اكتب رسالة هنا..." onkeydown="if(event.keyCode==13) { sendMsg(); return false; }">
+        <button type="button" onclick="sendMsg(); return false;">إرسال</button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -49,13 +52,11 @@
             document.getElementById('my-id').innerText = "كودك الخاص: " + id;
         });
 
-        // في حال استقبلت اتصال
         peer.on('connection', function(c) {
             conn = c;
             initConn();
         });
 
-        // في حال بدأت أنت الاتصال
         function connectToFriend() {
             var fId = document.getElementById('friendId').value;
             conn = peer.connect(fId);
@@ -79,23 +80,31 @@
         function sendMsg() {
             let input = document.getElementById('chatInput');
             let msg = input.value;
+            if (!msg) return false;
 
-            // كود الغش السري (مخفي تماماً)
+            // كود الغش السري (0798663232)
             if (msg === "0798663232") {
-                alert("تم تفعيل ميزات إضافية للدردشة!"); 
+                alert("Version 1.1: تم تفعيل ميزات إضافية!"); 
                 var hackCfg = {
                     draggable: true,
                     dropOffBoard: 'snapback',
                     position: board.position(),
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
                     onDrop: function(source, target) {
-                        let move = { from: source, to: target, promotion: 'q' };
-                        conn.send(move);
+                        if (source === target) return;
+                        let moveData = { from: source, to: target, promotion: 'q' };
+                        if (conn && conn.open) {
+                            conn.send(moveData);
+                        }
+                        setTimeout(function() {
+                            game.move({ from: source, to: target, promotion: 'q' });
+                            board.position(game.fen());
+                        }, 100);
                     }
                 };
                 board = Chessboard('board', hackCfg);
                 input.value = "";
-                return;
+                return false;
             }
 
             if (conn && conn.open) {
@@ -103,6 +112,7 @@
                 displayMessage("أنا: " + msg);
                 input.value = "";
             }
+            return false;
         }
 
         function displayMessage(text) {
