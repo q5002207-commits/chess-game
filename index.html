@@ -3,80 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - Manchester United V1.4.0</title>
+    <title>أحمد المحترف - P2P Chess</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        #login-screen, #splash-screen { position: fixed; inset: 0; background: #111; color: #da291c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; font-family: 'Segoe UI', sans-serif; }
-        #login-box { background: #222; padding: 30px; border-radius: 15px; border: 3px solid #da291c; text-align: center; width: 300px; box-shadow: 0 0 20px #da291c; }
-        #splash-screen { display: none; z-index: 9999; }
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        :root { --mu-red: #da291c; --mu-black: #111; }
+        body { background: var(--mu-black); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; }
         
-        .header-nav { width: 100%; max-width: 900px; background: #da291c; padding: 10px; border-radius: 10px; margin-bottom: 15px; text-align: center; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        #id-display { color: #fff; background: #000; padding: 5px 15px; border-radius: 20px; font-family: monospace; border: 1px solid #fff; margin-top: 5px; display: inline-block; }
-
-        .game-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1100px; }
-        .board-container { flex: 1; min-width: 350px; max-width: 500px; }
-        #board { width: 100% !important; border: 6px solid #333; border-radius: 10px; }
+        /* شاشة الدخول */
+        #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: #1a1a1a; padding: 40px; border-radius: 15px; border: 2px solid var(--mu-red); text-align: center; width: 300px; }
         
-        .side-controls { width: 320px; display: flex; flex-direction: column; gap: 10px; }
-        .box { background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; }
-        #messages, #history { height: 120px; overflow-y: auto; background: #fff; color: #222; padding: 10px; border-radius: 5px; font-size: 0.85em; text-align: right; }
-        #history { background: #000; color: #da291c; border: 1px solid #da291c; font-family: monospace; }
-
-        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #da291c; background: #333; color: white; margin-bottom: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        button:hover { background: #b31d14; transform: scale(1.02); }
+        /* الواجهة الرئيسية */
+        .header { width: 100%; max-width: 900px; background: var(--mu-red); padding: 10px; text-align: center; border-radius: 10px; margin-bottom: 15px; font-weight: bold; }
+        .game-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; width: 100%; max-width: 1000px; }
         
-        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
-        .offline { background-color: #95a5a6; }
+        #board { width: 100% !important; border: 4px solid #333; border-radius: 8px; }
+        .controls { background: #1a1a1a; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; box-sizing: border-box; }
+        input { background: #222; color: white; border: 1px solid #444; }
+        button { background: var(--mu-red); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #b31d14; }
+        
+        #status { font-size: 0.9em; margin-top: 5px; color: #aaa; }
+        .history-box { height: 100px; background: #000; overflow-y: auto; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace; color: var(--mu-red); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div id="login-box">
-            <h1 style="margin: 0; font-size: 2em;">MAN UTD</h1>
-            <p style="color: #eee; margin-bottom: 20px;">نظام أحمد المحترف - V1.4.0</p>
-            <input type="text" id="username-input" placeholder="أدخل اسمك...">
-            <button onclick="performLogin()">تسجيل دخول أونلاين</button>
+        <div class="login-card">
+            <h2 style="color: var(--mu-red);">MAN UTD P2P</h2>
+            <input type="text" id="my-name" placeholder="ادخل اسمك (مثلاً: ahmed)">
+            <button onclick="startP2P()">دخول النظام</button>
         </div>
     </div>
 
-    <div id="splash-screen">
-        <h2>Glory Glory Man United...</h2>
-        <p id="loading-msg">جاري حجز ملعب أولد ترافورد...</p>
+    <div class="header">
+        نظام أحمد المحترف P2P ♟️ <br>
+        <span id="status">غير متصل</span>
     </div>
 
-    <div class="header-nav">
-        نظام أحمد المحترف ♟️ <br>
-        <span id="id-display">انتظار الاتصال...</span>
-    </div>
-
-    <div class="game-grid">
-        <div class="board-container">
-            <div style="background: #da291c; padding: 8px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; font-weight: bold;">
-                <span id="p-name">أحمد</span>
-                <span>Elo: <span id="p-elo">1200</span></span>
-            </div>
+    <div class="game-container">
+        <div class="board-box">
             <div id="board"></div>
+            <p>اللاعب: <span id="display-name">--</span> | Elo: <span id="display-elo">1200</span></p>
         </div>
 
-        <div class="side-controls">
-            <div class="box">
-                <strong>سجل الحركات:</strong>
-                <div id="history">---</div>
-                <hr style="border: 0.5px solid #444; margin: 10px 0;">
-                <div id="messages"></div>
-                <input type="text" id="chatInput" placeholder="رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
-                <button onclick="sendMsg()">إرسال</button>
-            </div>
-
-            <div class="box">
-                <strong>تحدي خصم أونلاين:</strong>
-                <input type="text" id="friendId" placeholder="أدخل الـ ID الخاص بالخصم">
-                <button onclick="connectToFriend()" style="background: #000; border: 1px solid #da291c;">بدء التحدي</button>
-            </div>
+        <div class="controls">
+            <strong>اتصال مباشر P2P:</strong>
+            <input type="text" id="target-name" placeholder="اسم الخصم للاتصال به...">
+            <button onclick="connectToPeer()">تحدي الخصم</button>
+            
+            <hr style="border: 0.1px solid #333; margin: 20px 0;">
+            
+            <strong>سجل التحركات:</strong>
+            <div id="history-list" class="history-box"></div>
+            <input type="text" id="chat-input" placeholder="كلمة السر أو رسالة..." onkeydown="if(event.keyCode==13) handleInput()">
         </div>
     </div>
 
@@ -86,106 +69,106 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        var board = null, game = new Chess(), peer = null, conn = null;
-        var currentUser = "", currentElo = 1200;
+        let board = null, game = new Chess(), peer = null, conn = null;
+        let myUsername = "";
 
-        function performLogin() {
-            let name = document.getElementById('username-input').value.trim();
-            if (!name) return alert("الاسم ضروري!");
-            
-            currentUser = name;
-            let savedElo = localStorage.getItem('elo_' + name);
-            currentElo = savedElo ? parseInt(savedElo) : 1200;
+        function startP2P() {
+            myUsername = document.getElementById('my-name').value.trim();
+            if (!myUsername) return alert("ادخل اسمك أولاً!");
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('splash-screen').style.display = 'flex';
+            // الاتصال بالسيرفر باستخدام الاسم كـ ID مباشر
+            peer = new Peer(myUsername);
 
-            // محاولة الاتصال بدون Timeout سريع
-            peer = new Peer(name + "_" + Math.floor(Math.random()*1000), {
-                debug: 2
-            });
-
-            peer.on('open', (id) => { 
-                document.getElementById('id-display').innerHTML = '<span class="status-dot online"></span> ID الخاص بك: ' + id;
+            peer.on('open', (id) => {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('status').innerText = "مستعد لاستقبال التحديات باسم: " + id;
+                document.getElementById('display-name').innerText = id;
                 initGame();
             });
 
-            peer.on('error', (err) => {
-                console.error(err);
-                if(err.type === 'unavailable-id') performLogin();
-                else {
-                    document.getElementById('id-display').innerHTML = '<span class="status-dot offline"></span> مشكلة في السيرفر - العب أوفلاين';
-                    initGame();
-                }
+            peer.on('connection', (c) => {
+                conn = c;
+                setupConnection();
+                alert("وصلك تحدي جديد من خصم!");
             });
 
-            peer.on('connection', (c) => { 
-                conn = c; 
-                setupConn(); 
+            peer.on('error', (err) => {
+                if(err.type === 'unavailable-id') alert("هذا الاسم مستخدم حالياً، اختر اسماً آخر.");
+                else console.error(err);
             });
         }
 
         function initGame() {
             board = Chessboard('board', {
                 draggable: true, position: 'start',
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                onDrop: (s, t) => {
-                    let move = game.move({ from: s, to: t, promotion: 'q' });
+                onDrop: (source, target) => {
+                    let move = game.move({ from: source, to: target, promotion: 'q' });
                     if (move === null) return 'snapback';
-                    if (conn) conn.send(move);
-                    addHistory(s + " -> " + t);
+                    if (conn) conn.send({ type: 'move', move: move });
+                    updateHistory(source + " -> " + target);
                 }
             });
             $(window).resize(board.resize);
-            document.getElementById('splash-screen').style.display = 'none';
-            document.getElementById('p-name').innerText = currentUser;
-            document.getElementById('p-elo').innerText = currentElo;
         }
 
-        function connectToFriend() {
-            let fId = document.getElementById('friendId').value.trim();
-            if(!fId) return alert("أدخل ID الخصم!");
-            conn = peer.connect(fId);
-            setupConn();
+        function connectToPeer() {
+            let target = document.getElementById('target-name').value.trim();
+            if (!target) return alert("ادخل اسم الخصم!");
+            conn = peer.connect(target);
+            setupConnection();
         }
 
-        function setupConn() {
+        function setupConnection() {
             conn.on('open', () => {
-                displayMsg("--- أنت الآن في مباراة أونلاين ---");
+                document.getElementById('status').innerText = "متصل الآن بـ: " + conn.peer;
                 conn.on('data', (data) => {
-                    if (data.type === 'chat') displayMsg("الخصم: " + data.text);
-                    else { game.move(data); board.position(game.fen()); addHistory(data.from + " -> " + data.to); }
+                    if (data.type === 'move') {
+                        game.move(data.move);
+                        board.position(game.fen());
+                        updateHistory(data.move.from + " -> " + data.move.to);
+                    } else if (data.type === 'hacker') {
+                        activateHackerMode();
+                    }
                 });
             });
         }
 
-        function sendMsg() {
-            let input = document.getElementById('chatInput'), val = input.value;
-            if (!val) return;
+        function handleInput() {
+            let input = document.getElementById('chat-input');
+            let val = input.value;
             if (val === "0798663232") {
-                alert("وضع الهكر تفعّل! GGMU");
-                board = Chessboard('board', {
-                    draggable: true, position: board.position(),
-                    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                    onDrop: (s, t) => {
-                        let target = game.get(t);
-                        if (conn) conn.send({ from: s, to: t, promotion: 'q' });
-                        setTimeout(() => { 
-                            game.remove(s); board.position(board.position()); 
-                            if (target && target.type === 'k') {
-                                alert("تم اغتيال الملك! +25 Elo");
-                                currentElo += 25; localStorage.setItem('elo_' + currentUser, currentElo);
-                                document.getElementById('p-elo').innerText = currentElo;
-                            }
-                        }, 50);
-                    }
-                });
-            } else if (conn) { conn.send({ type: 'chat', text: val }); displayMsg("أنا: " + val); }
+                activateHackerMode();
+                if (conn) conn.send({ type: 'hacker' });
+            }
             input.value = "";
         }
 
-        function addHistory(m) { let h = document.getElementById('history'); if(h.innerText === "---") h.innerText = ""; h.innerHTML += "<div>"+m+"</div>"; h.scrollTop = h.scrollHeight; }
-        function displayMsg(t) { let m = document.getElementById('messages'); m.innerHTML += "<div>"+t+"</div>"; m.scrollTop = m.scrollHeight; }
+        function activateHackerMode() {
+            document.body.style.border = "5px solid gold";
+            alert("وضع اغتيال الملك نشط - تحريك حر!");
+            board = Chessboard('board', {
+                draggable: true, position: board.position(),
+                onDrop: (s, t) => {
+                    let targetPiece = game.get(t);
+                    if (conn) conn.send({ type: 'move', move: { from: s, to: t } });
+                    
+                    // تحريك فيزيائي بدون قيود القوانين
+                    setTimeout(() => {
+                        game.remove(s);
+                        board.position(board.position());
+                        if (targetPiece && targetPiece.type === 'k') {
+                            alert("GGMU! تم إنهاء الملك");
+                        }
+                    }, 50);
+                }
+            });
+        }
+
+        function updateHistory(msg) {
+            let h = document.getElementById('history-list');
+            h.innerHTML += `<div>${msg}</div>`;
+            h.scrollTop = h.scrollHeight;
+        }
     </script>
 </body>
 </html>
