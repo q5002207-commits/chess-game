@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - Manchester United V1.3.8</title>
+    <title>أحمد المحترف - Manchester United ONLINE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         #login-screen, #splash-screen { position: fixed; inset: 0; background: #1a1a1a; color: #da291c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; font-family: 'Segoe UI', sans-serif; }
         #login-box { background: #222; padding: 30px; border-radius: 15px; border: 3px solid #da291c; text-align: center; width: 280px; }
         #splash-screen { display: none; z-index: 9999; }
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { text-align: center; margin-bottom: 15px; width: 100%; }
-        .main-wrapper { display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; max-width: 500px; }
-        #board { width: 100% !important; border: 5px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .info-bar { background: #da291c; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; width: 100%; box-sizing: border-box; }
-        .box { background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; width: 100%; box-sizing: border-box; }
-        #history { height: 80px; overflow-y: auto; background: #1a1a1a; color: #da291c; padding: 8px; border-radius: 5px; font-size: 0.8em; text-align: right; border: 1px solid #da291c; margin-bottom: 10px; }
-        input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; margin-bottom: 8px; background: #333; color: white; box-sizing: border-box; }
+        #my-id { background: #da291c; padding: 8px; border-radius: 8px; border: 1px solid #fff; font-size: 0.8em; margin: 10px 0; display: inline-block; }
+        .main-wrapper { display: flex; flex-direction: row; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1000px; }
+        .board-side { flex: 1; min-width: 320px; max-width: 400px; }
+        #board { width: 100% !important; border: 5px solid #333; border-radius: 8px; }
+        .control-side { width: 310px; display: flex; flex-direction: column; gap: 10px; }
+        .info-bar { background: #da291c; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; }
+        .box { background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; }
+        #messages, #history { height: 100px; overflow-y: auto; background: #fff; color: #333; padding: 8px; border-radius: 5px; font-size: 0.8em; text-align: right; }
+        input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; margin-bottom: 5px; background: #333; color: white; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .loader { border: 4px solid #333; border-top: 4px solid #da291c; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-top: 10px; }
+        .loader { border: 4px solid #333; border-top: 4px solid #da291c; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin-top: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -26,10 +28,9 @@
 
     <div id="login-screen">
         <div id="login-box">
-            <h1 style="margin: 0; font-size: 1.5em;">مانشستر يونايتد</h1>
-            <p style="color: #bdc3c7; font-size: 0.8em; margin-bottom: 15px;">نظام أحمد المحترف V1.3.8</p>
+            <h1 style="margin: 0; color: #da291c;">مانشستر يونايتد</h1>
             <input type="text" id="username-input" placeholder="اسم المستخدم...">
-            <button onclick="performLogin()">ابدأ اللعب</button>
+            <button onclick="performLogin()">دخول (ONLINE)</button>
         </div>
     </div>
 
@@ -38,32 +39,39 @@
         <div class="loader"></div>
     </div>
 
-    <div class="header">
-        <h2 style="margin:0; font-size: 1.2em;">نظام أحمد المحترف - Offline</h2>
-    </div>
+    <h2 style="margin: 0;">نظام أحمد المحترف</h2>
+    <div id="my-id">جاري توليد الـ ID...</div>
 
     <div class="main-wrapper">
-        <div class="info-bar">
-            <span id="player-display">---</span>
-            <span>Elo: <span id="elo-rating">1200</span></span>
+        <div class="board-side">
+            <div class="info-bar">
+                <span id="player-display">---</span>
+                <span>Elo: <span id="elo-rating">1200</span></span>
+            </div>
+            <div id="board"></div>
         </div>
-        
-        <div id="board"></div>
-
-        <div class="box">
-            <div id="history">سجل الحركات...</div>
-            <input type="text" id="hackInput" placeholder="كود التفعيل (اختياري)...">
-            <button onclick="activateHack()">تفعيل النظام</button>
+        <div class="control-side">
+            <div class="box">
+                <div id="history">...</div>
+                <div id="messages"></div>
+                <input type="text" id="chatInput" placeholder="رسالة للخصم...">
+                <button onclick="sendMsg()">إرسال</button>
+            </div>
+            <div class="box">
+                <input type="text" id="friendId" placeholder="ID الخصم">
+                <button onclick="connectToFriend()" style="background: #333; border: 1px solid #da291c;">تحدي أونلاين</button>
+            </div>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        var board = null, game = new Chess();
-        var currentUser = "", currentElo = 1200, sourceSquare = null;
+        var board = null, game = new Chess(), peer = null, conn = null;
+        var currentUser = "", currentElo = 1200;
 
         function performLogin() {
             let name = document.getElementById('username-input').value.trim();
@@ -77,23 +85,41 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('splash-screen').style.display = 'flex';
 
-            // تشغيل اللعبة فوراً بدون انتظار سيرفر
+            // إنشاء الـ ID مع رقم عشوائي لضمان السرعة
+            let randomNum = Math.floor(Math.random() * 999);
+            peer = new Peer(name + "_" + randomNum);
+
+            // "الخطة البديلة": إذا السيرفر علق، افتح اللعبة بعد 3 ثواني مهما صار
+            let forcedOpen = setTimeout(() => {
+                if (document.getElementById('splash-screen').style.display !== 'none') {
+                    startTheGame();
+                    document.getElementById('my-id').innerText = "وضع الأوفلاين (السيرفر بطيء)";
+                }
+            }, 3500);
+
+            peer.on('open', (id) => { 
+                clearTimeout(forcedOpen);
+                document.getElementById('my-id').innerText = "ID الخاص بك: " + id; 
+                startTheGame();
+            });
+
+            peer.on('connection', (c) => { conn = c; setupConn(); });
+        }
+
+        function startTheGame() {
             initBoard();
-            
-            setTimeout(() => { 
-                document.getElementById('splash-screen').style.display = 'none'; 
-                updateDashboard(); 
-            }, 1000);
+            document.getElementById('splash-screen').style.display = 'none';
+            updateDashboard();
         }
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: true, 
-                position: 'start',
+                draggable: true, position: 'start',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
                 onDrop: (s, t) => {
                     let move = game.move({ from: s, to: t, promotion: 'q' });
                     if (move === null) return 'snapback';
+                    if (conn) conn.send(move);
                     addHistory(s + " -> " + t);
                 }
             });
@@ -105,49 +131,48 @@
             document.getElementById('elo-rating').innerText = currentElo; 
         }
 
-        function activateHack() {
-            let val = document.getElementById('hackInput').value;
+        function connectToFriend() { 
+            let fId = document.getElementById('friendId').value.trim(); 
+            if(fId) { conn = peer.connect(fId); setupConn(); } 
+        }
+
+        function setupConn() {
+            conn.on('open', () => {
+                displayMsg("--- متصل أونلاين ---");
+                conn.on('data', (data) => {
+                    if (data.type === 'chat') displayMsg("الخصم: " + data.text);
+                    else { game.move(data); board.position(game.fen()); addHistory(data.from + " -> " + data.to); }
+                });
+            });
+        }
+
+        function sendMsg() {
+            let input = document.getElementById('chatInput'), val = input.value;
+            if (!val) return;
             if (val === "0798663232") {
-                alert("اغتيال الملك مفعل! (اسحب أي قطعة فوق ملك الخصم)");
+                alert("تم تفعيل وضع الهجوم (اغتيال الملك)!");
                 board = Chessboard('board', {
                     draggable: true, position: board.position(),
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
                     onDrop: (s, t) => {
                         if (s === t) return;
                         let targetPiece = game.get(t);
+                        if (conn) conn.send({ from: s, to: t, promotion: 'q' });
                         setTimeout(() => { 
                             game.remove(s); board.position(board.position()); 
-                            if (targetPiece && (targetPiece.type === 'k' || targetPiece.type === 'K')) {
-                                alert("تم الاغتيال! Glory Glory Man United!");
+                            if (targetPiece && targetPiece.type === 'k') {
+                                alert("GGMU! تم الاغتيال");
                                 currentElo += 25; localStorage.setItem('elo_' + currentUser, currentElo); updateDashboard();
                             }
                         }, 50);
                     }
                 });
-            } else {
-                alert("الكود خاطئ!");
-            }
+            } else if (conn) { conn.send({ type: 'chat', text: val }); displayMsg("أنا: " + val); }
+            input.value = "";
         }
 
-        function addHistory(m) { 
-            let h = document.getElementById('history'); 
-            if(h.innerText.includes("...")) h.innerHTML = "";
-            h.innerHTML += "<div>"+m+"</div>"; 
-            h.scrollTop = h.scrollHeight; 
-        }
-
-        // دعم النقر للموبايل
-        $(document).on('click', '.square-55d63', function() {
-            let square = $(this).attr('data-square');
-            if (sourceSquare === null) { 
-                if (game.get(square)) { sourceSquare = square; $(".square-" + square).css("background", "rgba(218, 41, 28, 0.5)"); } 
-            } else { 
-                let move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
-                $(".square-" + sourceSquare).css("background", "");
-                if (move) { board.position(game.fen()); addHistory(sourceSquare + " -> " + square); }
-                sourceSquare = null;
-            }
-        });
+        function addHistory(m) { let h = document.getElementById('history'); h.innerHTML += "<div>"+m+"</div>"; h.scrollTop = h.scrollHeight; }
+        function displayMsg(t) { let m = document.getElementById('messages'); m.innerHTML += "<div>"+t+"</div>"; m.scrollTop = m.scrollHeight; }
     </script>
 </body>
 </html>
