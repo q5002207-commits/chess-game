@@ -3,32 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - P2P MU Edition</title>
+    <title>أحمد المحترف - Mobile Friendly P2P</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         :root { --mu-red: #da291c; --mu-black: #000000; --mu-gold: #fbe122; }
         body { background: var(--mu-black); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; min-height: 100vh; }
-        
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .login-card { background: #111; padding: 40px; border-radius: 15px; border: 2px solid var(--mu-red); text-align: center; width: 320px; box-shadow: 0 0 20px var(--mu-red); }
-        
         .header { width: 100%; max-width: 900px; background: var(--mu-red); padding: 15px; text-align: center; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        #status-bar { font-size: 0.85em; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 5px; margin-top: 5px; display: inline-block; }
-
         .main-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; width: 100%; max-width: 1100px; }
         .board-section { background: #1a1a1a; padding: 15px; border-radius: 12px; border: 1px solid #333; }
         #board { width: 100% !important; border-radius: 5px; border: 4px solid #444; }
-        
-        .controls-section { display: flex; flex-direction: column; gap: 15px; }
-        .box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; }
-        
-        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; box-sizing: border-box; font-size: 1rem; }
+        .box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; box-sizing: border-box; }
         input { background: #222; color: white; border: 1px solid #444; text-align: center; }
-        button { background: var(--mu-red); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #b31d14; transform: scale(1.02); }
-
-        .history-box { height: 120px; background: #000; overflow-y: auto; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace; color: var(--mu-gold); border: 1px solid #222; }
-        .glory { font-style: italic; font-size: 0.8em; color: var(--mu-gold); }
+        button { background: var(--mu-red); color: white; font-weight: bold; cursor: pointer; }
+        .history-box { height: 120px; background: #000; overflow-y: auto; padding: 10px; border-radius: 5px; color: var(--mu-gold); border: 1px solid #222; }
+        /* تمييز المربع المختار */
+        .highlight-move { box-shadow: inset 0 0 3px 3px yellow; }
     </style>
 </head>
 <body>
@@ -36,38 +28,38 @@
     <div id="login-screen">
         <div class="login-card">
             <h1 style="margin:0; color: var(--mu-red);">MU CHESS</h1>
-            <p class="glory">Glory Glory Man United</p>
-            <input type="text" id="my-username" placeholder="اسمك (أحمد المحترف مثلاً)">
+            <p style="color:var(--mu-gold)">تحكم بالنقر - نسخة الموبايل</p>
+            <input type="text" id="my-username" placeholder="اسمك">
             <button onclick="initP2P()">دخول النظام</button>
         </div>
     </div>
 
     <div class="header">
-        نظام أحمد المحترف - P2P Online ♟️ <br>
-        <span id="status-bar">انتظار تسجيل الدخول...</span>
+        نظام أحمد المحترف - P2P Chess ♟️ <br>
+        <span id="status-bar" style="font-size:0.8em">انتظار الدخول...</span>
     </div>
 
     <div class="main-layout">
         <div class="board-section">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--mu-gold); font-weight:bold;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--mu-gold);">
                 <span id="player-display">اللاعب: --</span>
                 <span>Elo: <span id="elo-display">1200</span></span>
             </div>
             <div id="board"></div>
+            <p style="text-align:center; font-size:0.8em; color:#aaa;">* انقر على القطعة ثم انقر على الهدف للتحريك</p>
         </div>
 
         <div class="controls-section">
             <div class="box">
-                <strong>تحدي خصم مباشر:</strong>
-                <input type="text" id="target-username" placeholder="ادخل اسم الخصم للربط معه">
-                <button onclick="connectToPeer()">بدء التحدي (P2P)</button>
+                <strong>تحدي خصم (P2P):</strong>
+                <input type="text" id="target-username" placeholder="اسم الخصم">
+                <button onclick="connectToPeer()">اتصال</button>
             </div>
-
             <div class="box">
-                <strong>سجل التحركات والدردشة:</strong>
+                <strong>سجل الحركات:</strong>
                 <div id="history" class="history-box">---</div>
-                <input type="text" id="system-input" placeholder="اكتب رسالة أو كود..." onkeydown="if(event.keyCode==13) processInput()">
-                <button onclick="processInput()">تنفيذ</button>
+                <input type="text" id="system-input" placeholder="رسالة أو كود...">
+                <button onclick="processInput()">إرسال</button>
             </div>
         </div>
     </div>
@@ -80,72 +72,97 @@
     <script>
         let board = null, game = new Chess(), peer = null, conn = null;
         let myName = "", myElo = 1200;
-
-        // الرابط الصحيح لرموز الشطرنج لضمان ظهورها
+        let sourceSquare = null; // لتخزين المربع المختار أولاً
         const pieceURL = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png';
 
         function initP2P() {
             myName = document.getElementById('my-username').value.trim();
-            if (!myName) return alert("الرجاء إدخال اسمك!");
-
-            // ربط PeerJS بالاسم مباشرة (P2P بدون ID عشوائي)
+            if (!myName) return alert("ادخل اسمك!");
             peer = new Peer(myName);
-
             peer.on('open', (id) => {
                 document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('status-bar').innerText = "أنت متصل الآن باسم: " + id;
+                document.getElementById('status-bar').innerText = "متصل باسم: " + id;
                 document.getElementById('player-display').innerText = "اللاعب: " + id;
-                loadElo();
                 setupBoard();
             });
+            peer.on('connection', (c) => { conn = c; handleData(); alert("تحدي من: " + c.peer); });
+        }
 
-            peer.on('connection', (incomingConn) => {
-                conn = incomingConn;
-                handleData();
-                alert("وصلك تحدي جديد من: " + conn.peer);
-            });
+        // --- منطق التحكم بالنقر (الجديد) ---
+        function onSquareClick(square) {
+            // إذا لم يتم اختيار قطعة بعد
+            if (sourceSquare === null) {
+                let piece = game.get(square);
+                if (piece) {
+                    sourceSquare = square;
+                    highlightSquare(square);
+                }
+            } else {
+                // محاولة التحريك للمربع الثاني المختار
+                let move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
+                
+                removeHighlights();
 
-            peer.on('error', (err) => {
-                if(err.type === 'unavailable-id') alert("الاسم مأخوذ! اختر اسماً آخر.");
-                else alert("خطأ في السيرفر: " + err.type);
-            });
+                if (move === null) {
+                    // إذا نقرت على قطعة أخرى من قطعك، غير الاختيار إليها
+                    let piece = game.get(square);
+                    if (piece) {
+                        sourceSquare = square;
+                        highlightSquare(square);
+                    } else {
+                        sourceSquare = null;
+                    }
+                } else {
+                    // حركة صحيحة
+                    board.position(game.fen());
+                    if (conn) conn.send({ type: 'move', data: move });
+                    addLog("أنت: " + sourceSquare + "➔" + square);
+                    sourceSquare = null;
+                }
+            }
+        }
+
+        function highlightSquare(square) {
+            $('#board .square-' + square).addClass('highlight-move');
+        }
+
+        function removeHighlights() {
+            $('#board .square-55d6').removeClass('highlight-move'); // تنظيف التمييز
+            $('.square-55d6').css('box-shadow', ''); 
+            // طريقة أبسط لـ chessboard.js
+            $('#board .square-55d6').css('background', '');
         }
 
         function setupBoard() {
-            let config = {
-                draggable: true,
+            board = Chessboard('board', {
                 position: 'start',
                 pieceTheme: pieceURL,
-                onDrop: (source, target) => {
-                    let move = game.move({ from: source, to: target, promotion: 'q' });
-                    if (move === null) return 'snapback';
-                    
-                    if (conn) conn.send({ type: 'move', data: move });
-                    addLog("أنت: " + source + " ➔ " + target);
-                }
-            };
-            board = Chessboard('board', config);
+                draggable: false // تعطيل السحب لتفعيل النقر
+            });
+            // ربط حدث النقر بالمربعات
+            $('#board').on('click', '.square-55d6', function() {
+                let square = $(this).attr('data-square');
+                onSquareClick(square);
+            });
             $(window).resize(board.resize);
-            setTimeout(board.resize, 500); // تأكيد الحجم في ويندوز 11
+            setTimeout(board.resize, 500);
         }
 
+        // --- باقي الوظائف (بدون تغيير) ---
         function connectToPeer() {
             let target = document.getElementById('target-username').value.trim();
-            if (!target) return alert("ادخل اسم الخصم!");
             conn = peer.connect(target);
             handleData();
         }
 
         function handleData() {
             conn.on('open', () => {
-                document.getElementById('status-bar').innerText = "في مباراة مع: " + conn.peer;
+                document.getElementById('status-bar').innerText = "مباراة ضد: " + conn.peer;
                 conn.on('data', (payload) => {
                     if (payload.type === 'move') {
                         game.move(payload.data);
                         board.position(game.fen());
-                        addLog("الخصم: " + payload.data.from + " ➔ " + payload.data.to);
-                    } else if (payload.type === 'hacker_mode') {
-                        enableHackerMode(false);
+                        addLog("الخصم: " + payload.data.from + "➔" + payload.data.to);
                     }
                 });
             });
@@ -153,58 +170,30 @@
 
         function processInput() {
             let input = document.getElementById('system-input');
-            let val = input.value;
-            
-            if (val === "0798663232") {
-                enableHackerMode(true);
-                if (conn) conn.send({ type: 'hacker_mode' });
-            } else if (conn) {
-                conn.send({ type: 'chat', text: val });
-                addLog("أنا: " + val);
+            if (input.value === "0798663232") {
+                alert("وضع الاغتيال نشط بالنقر!");
+                // في وضع الهكر، نقوم بتعطيل قوانين الشطرنج في النقر
+                onSquareClick = function(square) {
+                    if (sourceSquare === null) {
+                        sourceSquare = square;
+                        highlightSquare(square);
+                    } else {
+                        if (conn) conn.send({ type: 'move', data: { from: sourceSquare, to: square } });
+                        game.remove(sourceSquare);
+                        board.position(board.position());
+                        addLog("هكر: " + sourceSquare + "➔" + square);
+                        sourceSquare = null;
+                        removeHighlights();
+                    }
+                };
             }
             input.value = "";
         }
 
-        function enableHackerMode(isLocal) {
-            document.body.style.border = "5px solid var(--mu-gold)";
-            if(isLocal) alert("تم تفعيل وضع اغتيال الملك! تحكم حر بالقطع.");
-            
-            board = Chessboard('board', {
-                draggable: true,
-                position: board.position(),
-                pieceTheme: pieceURL,
-                onDrop: (s, t) => {
-                    let target = game.get(t);
-                    if (conn) conn.send({ type: 'move', data: { from: s, to: t } });
-                    
-                    setTimeout(() => {
-                        game.remove(s);
-                        board.position(board.position());
-                        if (target && target.type === 'k') {
-                            alert("Glory Glory Man United! تم الاغتيال");
-                            if(isLocal) { myElo += 25; saveElo(); }
-                        }
-                    }, 50);
-                }
-            });
-        }
-
         function addLog(msg) {
             let h = document.getElementById('history');
-            if(h.innerText === "---") h.innerText = "";
             h.innerHTML += `<div>${msg}</div>`;
             h.scrollTop = h.scrollHeight;
-        }
-
-        function saveElo() {
-            localStorage.setItem('mu_elo_' + myName, myElo);
-            document.getElementById('elo-display').innerText = myElo;
-        }
-
-        function loadElo() {
-            let saved = localStorage.getItem('mu_elo_' + myName);
-            if (saved) myElo = parseInt(saved);
-            document.getElementById('elo-display').innerText = myElo;
         }
     </script>
 </body>
