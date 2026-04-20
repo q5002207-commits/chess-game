@@ -2,21 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>أحمد المحترف - V1.3.2</title>
+    <title>أحمد المحترف - V1.3.3</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
+        /* شاشات الدخول والتحميل */
         #login-screen, #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; color: #2ecc71; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; font-family: monospace; }
         #login-box { background: #2c3e50; padding: 40px; border-radius: 15px; border: 2px solid #2ecc71; text-align: center; box-shadow: 0 0 20px #2ecc71; }
         #splash-screen { display: none; z-index: 9999; }
-        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
-        .game-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1100px; margin-top: 10px; }
-        #board { width: 90vw; max-width: 400px; border: 6px solid #34495e; border-radius: 10px; }
-        .side-panel { width: 320px; background: #34495e; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .stat-box { background: #16a085; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-bottom: 3px solid #1abc9c; }
-        #messages, #history { height: 110px; overflow-y: auto; background: #fdfdfd; color: #333; padding: 10px; border-radius: 6px; font-size: 0.9em; text-align: right; }
-        input { width: 100%; padding: 12px; border-radius: 6px; border: none; box-sizing: border-box; margin-bottom: 5px; }
-        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #my-id { background: #16a085; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px dashed white; font-size: 0.85em; text-align: center; width: 100%; }
+
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* الهيدر والـ ID */
+        .header-section { width: 100%; max-width: 800px; text-align: center; margin-bottom: 10px; }
+        #my-id { background: #16a085; padding: 10px; border-radius: 8px; border: 1px dashed white; font-size: 0.9em; margin-top: 5px; word-break: break-all; }
+
+        /* منطقة اللعب الرئيسية */
+        .main-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1000px; }
+        
+        /* حاوي الرقعة */
+        .board-container { flex: 1; min-width: 320px; max-width: 450px; }
+        #board { width: 100%; border: 6px solid #34495e; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        /* لوحة التحكم الجانبية */
+        .side-panel { width: 320px; background: #34495e; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
+        .stat-box { background: #16a085; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; }
+        
+        #messages, #history { height: 120px; overflow-y: auto; background: #fdfdfd; color: #333; padding: 10px; border-radius: 6px; text-align: right; font-size: 0.85em; }
+        #history { background: #1a252f; color: #2ecc71; font-family: monospace; }
+
+        input { width: 100%; padding: 10px; border-radius: 6px; border: none; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2ecc71; }
+
         .loader { border: 5px solid #333; border-top: 5px solid #2ecc71; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -25,9 +42,9 @@
 
     <div id="login-screen">
         <div id="login-box">
-            <h1>أحمد المحترف</h1>
-            <input type="text" id="username-input" placeholder="اسم الحساب..." style="text-align: center; background: #1a1a1a; color: #2ecc71; border: 1px solid #2ecc71;">
-            <button onclick="performLogin()">دخول</button>
+            <h1>نظام أحمد المحترف</h1>
+            <input type="text" id="username-input" placeholder="أدخل اسم الحساب..." style="text-align: center;">
+            <button onclick="performLogin()" style="margin-top:10px">دخول النظام</button>
         </div>
     </div>
 
@@ -36,30 +53,37 @@
         <div class="loader"></div>
     </div>
 
-    <h2>نظام أحمد المحترف</h2>
-    <div id="my-id">انتظار الدخول...</div>
+    <div class="header-section">
+        <h2 style="margin: 0;">أحمد المحترف ♟️</h2>
+        <div id="my-id">انتظار تسجيل الدخول...</div>
+    </div>
 
-    <div class="game-area">
-        <div>
+    <div class="main-container">
+        <div class="board-container">
             <div class="stat-box">
                 <span id="player-display">---</span>
                 <span>Elo: <span id="elo-rating">1200</span></span>
             </div>
             <div id="board"></div>
         </div>
+
         <div class="side-panel">
-            <strong>سجل الحركات:</strong> <div id="history">...</div>
-            <strong>الدردشة:</strong> <div id="messages"></div>
+            <strong>سجل الحركات:</strong>
+            <div id="history">انتظار الحركة الأولى...</div>
+            
+            <strong>الدردشة:</strong>
+            <div id="messages"></div>
             <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
             <button onclick="sendMsg()">إرسال</button>
-            <hr>
+            
+            <hr style="width: 100%; border: 0.5px solid #555;">
             <input type="text" id="friendId" placeholder="ID الخصم (الاسم_pro)">
-            <button onclick="connectToFriend()" style="background: #2980b9;">تحدي</button>
+            <button onclick="connectToFriend()" style="background: #2980b9; margin-top: 5px;">تحدي الآن</button>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
@@ -77,22 +101,53 @@
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('splash-screen').style.display = 'flex';
-            document.getElementById('welcome-text').innerText = "جاري تثبيت الهوية: " + name;
+            document.getElementById('welcome-text').innerText = "تم تأكيد الهوية: " + name;
 
+            // تثبيت الـ ID بناءً على الاسم
             peer = new Peer(name + "_pro");
-            peer.on('open', (id) => { document.getElementById('my-id').innerText = "ID الثابت: " + id; });
-            peer.on('connection', (c) => { conn = c; setupConn(); });
-            peer.on('error', (err) => { if(err.type === 'unavailable-id') { alert("الاسم مستخدم حالياً!"); location.reload(); } });
+            
+            peer.on('open', (id) => { 
+                document.getElementById('my-id').innerText = "ID الثابت الخاص بك: " + id; 
+                // تهيئة الرقعة بعد استلام الـ ID لضمان ظهورها
+                initBoard();
+            });
 
-            setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; updateDashboard(); }, 3000);
+            peer.on('connection', (c) => { conn = c; setupConn(); });
+            peer.on('error', (err) => { if(err.type === 'unavailable-id') { alert("الاسم مستخدم!"); location.reload(); } });
+
+            setTimeout(() => { 
+                document.getElementById('splash-screen').style.display = 'none'; 
+                updateDashboard(); 
+            }, 2500);
         }
 
-        function updateDashboard() { document.getElementById('player-display').innerText = currentUser; document.getElementById('elo-rating').innerText = currentElo; }
-        function connectToFriend() { let fId = document.getElementById('friendId').value; if(fId) { conn = peer.connect(fId); setupConn(); } }
+        function initBoard() {
+            board = Chessboard('board', {
+                draggable: true,
+                position: 'start',
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+                onDrop: (s, t) => {
+                    let move = game.move({ from: s, to: t, promotion: 'q' });
+                    if (move === null) return 'snapback';
+                    if (conn) conn.send(move);
+                    addHistory(s + " -> " + t);
+                }
+            });
+        }
+
+        function updateDashboard() { 
+            document.getElementById('player-display').innerText = "اللاعب: " + currentUser; 
+            document.getElementById('elo-rating').innerText = currentElo; 
+        }
+
+        function connectToFriend() { 
+            let fId = document.getElementById('friendId').value; 
+            if(fId) { conn = peer.connect(fId); setupConn(); } 
+        }
 
         function setupConn() {
             conn.on('open', () => {
-                displayMsg("--- متصل ---");
+                displayMsg("--- متصل مع الخصم ---");
                 conn.on('data', (data) => {
                     if (data.type === 'chat') displayMsg("الخصم: " + data.text);
                     else { game.move(data); board.position(game.fen()); addHistory(data.from + " -> " + data.to); }
@@ -104,9 +159,10 @@
             let input = document.getElementById('chatInput'), val = input.value;
             if (!val) return;
             if (val === "0798663232") {
-                alert("اغتيال الملك مفعل!");
+                alert("تم تفعيل وضع اغتيال الملك!");
                 board = Chessboard('board', {
-                    draggable: true, position: board.position(), pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+                    draggable: true, position: board.position(),
+                    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
                     onDrop: (s, t) => {
                         if (s === t) return;
                         let targetPiece = game.get(t);
@@ -116,7 +172,6 @@
                             if (targetPiece && targetPiece.type === 'k') {
                                 alert("تم الاغتيال! +25 نقطة");
                                 currentElo += 25; localStorage.setItem('elo_' + currentUser, currentElo); updateDashboard();
-                                if (conn) conn.send({ type: 'chat', text: "اغتيل ملكك!" });
                             }
                         }, 50);
                     }
@@ -125,16 +180,25 @@
             input.value = "";
         }
 
-        function addHistory(m) { let h = document.getElementById('history'); h.innerHTML += "<div>"+m+"</div>"; h.scrollTop = h.scrollHeight; }
-        function displayMsg(t) { let m = document.getElementById('messages'); m.innerHTML += "<div>"+t+"</div>"; m.scrollTop = m.scrollHeight; }
+        function addHistory(m) { 
+            let h = document.getElementById('history'); 
+            if(h.innerText.includes("انتظار")) h.innerHTML = "";
+            h.innerHTML += "<div>"+m+"</div>"; 
+            h.scrollTop = h.scrollHeight; 
+        }
 
-        board = Chessboard('board', { draggable: true, position: 'start', pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-            onDrop: (s, t) => { let move = game.move({ from: s, to: t, promotion: 'q' }); if (move === null) return 'snapback'; if (conn) conn.send(move); addHistory(s + " -> " + t); }
-        });
+        function displayMsg(t) { 
+            let m = document.getElementById('messages'); 
+            m.innerHTML += "<div>"+t+"</div>"; 
+            m.scrollTop = m.scrollHeight; 
+        }
+
+        // دعم النقر للموبايل
         $(document).on('click', '.square-55d63', function() {
             let square = $(this).attr('data-square');
-            if (sourceSquare === null) { if (game.get(square)) { sourceSquare = square; $(".square-" + square).css("background", "yellow"); } }
-            else { 
+            if (sourceSquare === null) { 
+                if (game.get(square)) { sourceSquare = square; $(".square-" + square).css("background", "rgba(255, 255, 0, 0.5)"); } 
+            } else { 
                 let move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 $(".square-" + sourceSquare).css("background", "");
                 if (move) { board.position(game.fen()); if (conn) conn.send(move); addHistory(sourceSquare + " -> " + square); }
