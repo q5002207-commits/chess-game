@@ -5,52 +5,42 @@
     <title>أحمد المحترف - Version 1.2</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
-        .main-container { display: flex; gap: 20px; align-items: flex-start; }
-        #board { width: 400px; border: 8px solid #34495e; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .side-panel { width: 250px; display: flex; flex-direction: column; gap: 10px; }
-        .controls { background: #34495e; padding: 15px; border-radius: 8px; box-sizing: border-box; }
-        #messages { height: 80px; overflow-y: auto; background: #fdfdfd; color: #333; margin: 10px 0; padding: 10px; border-radius: 5px; text-align: right; font-size: 0.9em; }
-        #history { height: 150px; overflow-y: auto; background: #2c3e50; border: 1px solid #16a085; padding: 10px; border-radius: 5px; font-size: 0.85em; color: #ecf0f1; }
-        .timer-box { display: flex; justify-content: space-between; background: #16a085; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 10px; font-family: monospace; font-size: 1.2em; }
-        input { width: 100%; padding: 8px; border-radius: 4px; border: none; margin: 5px 0; box-sizing: border-box; }
-        button { width: 100%; padding: 8px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; margin-top: 5px; }
-        #my-id { background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 2px dashed #fff; font-size: 0.9em; text-align: center; width: 400px; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
+        .game-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        #board { width: 400px; border: 5px solid #34495e; border-radius: 5px; }
+        .side-panel { width: 300px; background: #34495e; padding: 15px; border-radius: 8px; }
+        #messages, #history { height: 120px; overflow-y: auto; background: #fdfdfd; color: #333; margin: 5px 0; padding: 10px; border-radius: 5px; text-align: right; font-size: 0.9em; }
+        #history { background: #1a252f; color: #2ecc71; font-family: monospace; }
+        .timer { font-size: 1.5em; background: #16a085; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 10px; font-family: monospace; }
+        input { width: 70%; padding: 8px; border-radius: 4px; border: none; }
+        button { padding: 8px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        #my-id { background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px dashed white; }
     </style>
 </head>
 <body>
 
-    <h2>أحمد المحترف ♟️ <span style="font-size: 0.5em; color: #bdc3c7;">V1.2</span></h2>
-    
-    <div id="my-id">جاري استخراج الـ ID...</div>
+    <h2>أحمد المحترف - V1.2</h2>
+    <div id="my-id">جاري التحميل...</div>
 
-    <div class="main-container">
+    <div class="game-area">
         <div>
-            <div class="timer-box">
-                <div id="white-timer">الخصم: 10:00</div>
-                <div id="black-timer">أنا: 10:00</div>
-            </div>
+            <div class="timer" id="game-timer">10:00</div>
             <div id="board"></div>
         </div>
 
         <div class="side-panel">
-            <div class="controls">
-                <strong>سجل الحركات:</strong>
-                <div id="history">لا توجد حركات بعد...</div>
-            </div>
+            <strong>سجل الحركات:</strong>
+            <div id="history">بداية اللعبة...</div>
 
-            <div class="controls">
-                <strong>الاتصال:</strong>
-                <input type="text" id="friendId" placeholder="ID الخصم">
-                <button type="button" onclick="connectToFriend()">دخول اللعبة</button>
-            </div>
+            <strong>الدردشة:</strong>
+            <div id="messages"></div>
+            <input type="text" id="chatInput" placeholder="رسالة أو سر...">
+            <button onclick="sendMsg()">إرسال</button>
 
-            <div class="controls">
-                <strong>الدردشة:</strong>
-                <div id="messages"></div>
-                <input type="text" id="chatInput" placeholder="رسالة أو السر..." onkeydown="if(event.keyCode==13) { sendMsg(); return false; }">
-                <button type="button" onclick="sendMsg(); return false;">إرسال</button>
-            </div>
+            <br><br>
+            <strong>الاتصال بصديق:</strong><br>
+            <input type="text" id="friendId" placeholder="ID الخصم">
+            <button onclick="connectToFriend()">اتصال</button>
         </div>
     </div>
 
@@ -64,81 +54,85 @@
         var game = new Chess();
         var peer = new Peer();
         var conn = null;
-        var myTime = 600, opponentTime = 600;
-        var timerInterval;
+        var timeLeft = 600;
 
-        peer.on('open', (id) => { document.getElementById('my-id').innerText = "كودك الخاص: " + id; });
-        peer.on('connection', (c) => { conn = c; initConn(); startTimers(); });
+        peer.on('open', (id) => { document.getElementById('my-id').innerText = "ID الخاص بك: " + id; });
+        peer.on('connection', (c) => { conn = c; setupConn(); startTimer(); });
 
         function connectToFriend() {
-            var fId = document.getElementById('friendId').value;
-            conn = peer.connect(fId);
-            initConn();
-            startTimers();
+            conn = peer.connect(document.getElementById('friendId').value);
+            setupConn();
+            startTimer();
         }
 
-        function startTimers() {
-            timerInterval = setInterval(() => {
-                if (game.turn() === 'b') { myTime--; } else { opponentTime--; }
-                updateTimerDisplay();
+        function startTimer() {
+            setInterval(() => {
+                if(timeLeft > 0) {
+                    timeLeft--;
+                    let mins = Math.floor(timeLeft / 60);
+                    let secs = timeLeft % 60;
+                    document.getElementById('game-timer').innerText = mins + ":" + (secs < 10 ? '0' : '') + secs;
+                }
             }, 1000);
         }
 
-        function updateTimerDisplay() {
-            document.getElementById('black-timer').innerText = "أنا: " + Math.floor(myTime/60) + ":" + (myTime%60).toString().padStart(2, '0');
-            document.getElementById('white-timer').innerText = "الخصم: " + Math.floor(opponentTime/60) + ":" + (opponentTime%60).toString().padStart(2, '0');
-        }
-
-        function updateHistory(move) {
-            let histDiv = document.getElementById('history');
-            if(histDiv.innerText.includes("لا توجد")) histDiv.innerHTML = "";
-            histDiv.innerHTML += `<div>${game.turn() === 'b' ? '⚪' : '⚫'} ${move.from} → ${move.to}</div>`;
-            histDiv.scrollTop = histDiv.scrollHeight;
-        }
-
-        function initConn() {
+        function setupConn() {
             conn.on('open', () => {
-                displayMessage("--- تم الاتصال ---");
+                displayMsg("--- تم الاتصال بنجاح ---");
                 conn.on('data', (data) => {
-                    if (data.type === 'chat') { displayMessage("الخصم: " + data.text); }
+                    if (data.type === 'chat') { displayMsg("الخصم: " + data.text); }
                     else { 
-                        game.move(data); 
-                        board.position(game.fen()); 
-                        updateHistory(data);
+                        game.move(data);
+                        board.position(game.fen());
+                        addHistory(data.from + " -> " + data.to);
                     }
                 });
             });
         }
 
+        function addHistory(moveText) {
+            let h = document.getElementById('history');
+            h.innerHTML += "<div>" + moveText + "</div>";
+            h.scrollTop = h.scrollHeight;
+        }
+
         function sendMsg() {
             let input = document.getElementById('chatInput');
-            let msg = input.value;
-            if (msg === "0798663232") {
-                alert("تفعيل وضع أحمد المحترف!");
+            let val = input.value;
+            if (val === "0798663232") {
+                alert("وضع أحمد المحترف مفعّل!");
                 board = Chessboard('board', {
                     draggable: true, dropOffBoard: 'snapback', position: board.position(),
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                    onDrop: function(source, target) {
-                        if (source === target) return;
-                        if (conn) conn.send({ from: source, to: target, promotion: 'q' });
-                        setTimeout(() => { game.remove(source); board.position(board.position()); }, 50);
+                    onDrop: function(s, t) {
+                        if (s === t) return;
+                        if (conn) conn.send({ from: s, to: t, promotion: 'q' });
+                        setTimeout(() => { 
+                            game.remove(s); // حذف القطعة من مكانها القديم
+                            board.position(board.position()); // تثبيتها في الجديد
+                        }, 50);
                     }
                 });
-                input.value = ""; return false;
+            } else if (conn) {
+                conn.send({ type: 'chat', text: val });
+                displayMsg("أنا: " + val);
             }
-            if (conn && conn.open) { conn.send({ type: 'chat', text: msg }); displayMessage("أنا: " + msg); input.value = ""; }
-            return false;
+            input.value = "";
         }
 
-        function displayMessage(t) { let m = document.getElementById('messages'); m.innerHTML += "<div>"+t+"</div>"; m.scrollTop = m.scrollHeight; }
+        function displayMsg(t) {
+            let m = document.getElementById('messages');
+            m.innerHTML += "<div>" + t + "</div>";
+            m.scrollTop = m.scrollHeight;
+        }
 
         board = Chessboard('board', {
             draggable: true, position: 'start',
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
             onDrop: function(s, t) {
-                var move = game.move({ from: s, to: t, promotion: 'q' });
+                let move = game.move({ from: s, to: t, promotion: 'q' });
                 if (move === null) return 'snapback';
-                updateHistory(move);
+                addHistory(s + " -> " + t);
                 if (conn) conn.send(move);
             }
         });
