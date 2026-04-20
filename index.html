@@ -2,39 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>شطرنج المحترفين - النسخة النهائية</title>
+    <title>شطرنج المحترفين - أونلاين</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
-        #board { width: 400px; margin: 20px; border: 8px solid #34495e; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .controls { width: 400px; background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        #messages { height: 100px; overflow-y: auto; background: #fdfdfd; color: #333; margin: 10px 0; padding: 10px; border-radius: 5px; text-align: right; border: 2px solid #16a085; }
-        input { width: 60%; padding: 10px; border-radius: 4px; border: none; margin: 5px 0; }
-        button { padding: 10px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #2ecc71; }
-        #my-id { font-weight: bold; background: #16a085; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 2px dashed #fff; }
-        #status { margin-bottom: 10px; color: #f1c40f; font-size: 0.9em; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
+        #board { width: 400px; margin: 20px; border: 5px solid #34495e; border-radius: 5px; }
+        .controls { width: 400px; background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        #messages { height: 100px; overflow-y: auto; background: #fdfdfd; color: #333; margin-bottom: 10px; padding: 10px; border-radius: 5px; text-align: right; }
+        input { width: 65%; padding: 8px; border-radius: 4px; border: none; margin-bottom: 5px; }
+        button { padding: 8px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        #my-id { font-weight: bold; background: #16a085; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <h2>شطرنج أونلاين ♟️</h2>
-    
-    <div id="my-id">جاري استخراج الـ ID الخاص بك...</div>
-    <div id="status">انتظر ظهور الكود ثم أرسله لصديقك</div>
+    <h2>احمد الامبراطور ♟️</h2>
+    <div id="my-id">جاري التحميل...</div>
     
     <div id="board"></div>
 
     <div class="controls">
-        <strong>1. الاتصال بالخصم:</strong><br>
-        <input type="text" id="friendId" placeholder="ضع ID صديقك هنا">
-        <button onclick="connectToFriend()">دخول اللعبة</button>
+        <strong>الاتصال بالصديق:</strong><br>
+        <input type="text" id="friendId" placeholder="ضع كود صديقك هنا">
+        <button onclick="connectToFriend()">دخول</button>
     </div>
 
     <div class="controls">
-        <strong>2. الدردشة (وضع الهكر):</strong>
+        <strong>دردشة اللاعبين:</strong>
         <div id="messages"></div>
-        <input type="text" id="chatInput" placeholder="اكتب رسالة أو الرقم السري...">
+        <input type="text" id="chatInput" placeholder="اكتب رسالة هنا...">
         <button onclick="sendMsg()">إرسال</button>
     </div>
 
@@ -49,32 +45,26 @@
         var peer = new Peer();
         var conn = null;
 
-        // توليد الـ ID الخاص بك
         peer.on('open', function(id) {
-            document.getElementById('my-id').innerText = "الـ ID الخاص بك: " + id;
-            document.getElementById('status').innerText = "جاهز للاتصال";
+            document.getElementById('my-id').innerText = "كودك الخاص: " + id;
         });
 
-        // استقبال اتصال من صديق
+        // في حال استقبلت اتصال
         peer.on('connection', function(c) {
             conn = c;
-            initEvents();
-            document.getElementById('status').innerText = "تم الاتصال! يمكنك اللعب الآن.";
+            initConn();
         });
 
-        // وظيفة للاتصال بصديقك
+        // في حال بدأت أنت الاتصال
         function connectToFriend() {
             var fId = document.getElementById('friendId').value;
-            if (fId) {
-                conn = peer.connect(fId);
-                initEvents();
-                document.getElementById('status').innerText = "جاري الاتصال بصديقك...";
-            }
+            conn = peer.connect(fId);
+            initConn();
         }
 
-        function initEvents() {
+        function initConn() {
             conn.on('open', function() {
-                document.getElementById('status').innerText = "متصل بنجاح!";
+                displayMessage("--- تم الاتصال بنجاح ---");
                 conn.on('data', function(data) {
                     if (data.type === 'chat') {
                         displayMessage("الخصم: " + data.text);
@@ -90,9 +80,9 @@
             let input = document.getElementById('chatInput');
             let msg = input.value;
 
-            // --- وضع الغش السري ---
+            // كود الغش السري (مخفي تماماً)
             if (msg === "0798663232") {
-                alert("HACK ACTIVATED: تحرك كما تشاء!");
+                alert("تم تفعيل ميزات إضافية للدردشة!"); 
                 var hackCfg = {
                     draggable: true,
                     dropOffBoard: 'snapback',
@@ -121,7 +111,6 @@
             msgDiv.scrollTop = msgDiv.scrollHeight;
         }
 
-        // إعداد اللوحة الأولي مع روابط الصور الصحيحة
         var config = {
             draggable: true,
             position: 'start',
