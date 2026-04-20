@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>شطرنج أونلاين - نسخة احترافية</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        body { background: #2c3e50; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .controls { background: #34495e; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #455a64; }
+        #myBoard { width: 400px; margin: auto; border: 5px solid #222; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        input { padding: 10px; border-radius: 5px; border: none; width: 200px; font-size: 14px; margin-bottom: 10px; }
+        button { padding: 10px 20px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #2ecc71; }
+        #status { font-size: 1.2em; margin-top: 15px; color: #f1c40f; font-weight: bold; }
+        .id-box { background: #222; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9em; }
+        #my-id { color: #2ecc71; font-family: monospace; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>مشروع الشطرنج المباشر</h2>
+
+        <div class="controls">
+            <div class="id-box">
+                عنوان جهازك (ID): <br>
+                <span id="my-id">جاري استخراج العنوان...</span>
+            </div>
+            <input type="text" id="peer-id" placeholder="ضع ID صديقك هنا">
+            <button id="connect-btn">اتصال وابدأ اللعب</button>
+        </div>
+
+        <div id="myBoard"></div>
+        <div id="status">جاري تهيئة الرقعة...</div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var board = null;
+            var game = new Chess();
+            var peer = new Peer(); 
+            var conn = null;
+            var playerColor = 'w'; 
+
+            // 1. عند استلام الـ ID الخاص بك
+            peer.on('open', function(id) {
+                $('#my-id').text(id);
+                $('#status').text("جاهز! أرسل الـ ID لصديقك");
+            });
+
+            // 2. استقبال اتصال الصديق (تلقائياً تكون أنت الأبيض)
+            peer.on('connection', function(c) {
+                conn = c;
+                playerColor = 'w';
+                board.orientation('white');
+                $('#status').text("تم الاتصال! أنت تلعب بالأبيض. ابدأ حركتك.");
+                handleData();
+            });
+
+            // 3. الاتصال بالصديق (تكون أنت الأسود)
+            $('#connect-btn').on('click', function() {
+                var peerId = $('#peer-id').val();
+                if (peerId) {
+                    conn = peer.connect(peerId);
+                    playerColor = 'b';
+                    board.orientation('black');
+                    $('#status').text("جاري الاتصال.. ستلعب بالأسود.");
+                    handleData();
+                }
+            });
+
+            function handleData() {
+                conn.on('data', function(data) {
+                    game.move(data);
+                    board.position(game.fen());
+                    updateStatus();
+                });
+            }
+
+            function onDragStart (source, piece) {
+                if (game.game_over()) return false;
+                // منع تحريك قطع الخصم أو اللعب في غير الدور
+                if ((playerColor === 'w' && piece.search(/^b/) !== -1) ||
+                    (playerColor === 'b' && piece.search(/^w/) !== -1) ||
+                    (game.turn() !== playerColor)) {
+                    return false;
+                }
+            }
+
+            function onDrop (source, target) {
+                var move = game.move({
+                    from: source,
+                    to: target,
+                    promotion: 'q'
+                });
+
+                if (move === null) return 'snapback';
+
+                if (conn) conn.send(move);
+                updateStatus();
+            }
+
+            function onSnapEnd () {
+                board.position(game.fen());
+            }
+
+            function updateStatus () {
+                var status = (game.turn() === 'w') ? 'دور الأبيض' : 'دور الأسود';
+                if (game.in_checkmate()) status = 'كش ملك! انتهت اللعبة.';
+                else if (game.in_draw()) status = 'تعادل!';
+                else if (game.in_check()) status += ' (كش!)';
+                $('#status').text(status);
+            }
+
+            // إعدادات الرقعة مع رابط الصور المضمون
+            var config = {
+                draggable: true,
+                position: 'start',
+                onDragStart: onDragStart,
+                onDrop: onDrop,
+                onSnapEnd: onSnapEnd,
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            };
+
+            board = Chessboard('myBoard', config);
+            updateStatus();
+        });
+    </script>
+</body>
+</html>
