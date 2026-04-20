@@ -1,136 +1,119 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>شطرنج أونلاين - نسخة احترافية</title>
+    <title>شطرنج المحترفين - نسخة الـ Hack</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <style>
-        body { background: #2c3e50; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        .controls { background: #34495e; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #455a64; }
-        #myBoard { width: 400px; margin: auto; border: 5px solid #222; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        input { padding: 10px; border-radius: 5px; border: none; width: 200px; font-size: 14px; margin-bottom: 10px; }
-        button { padding: 10px 20px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #2ecc71; }
-        #status { font-size: 1.2em; margin-top: 15px; color: #f1c40f; font-weight: bold; }
-        .id-box { background: #222; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9em; }
-        #my-id { color: #2ecc71; font-family: monospace; font-size: 1.1em; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; }
+        #board { width: 400px; margin: 20px; }
+        #chat-box { width: 400px; background: #34495e; padding: 15px; border-radius: 8px; }
+        #messages { height: 100px; overflow-y: auto; background: #ebedef; color: #333; margin-bottom: 10px; padding: 10px; border-radius: 5px; text-align: right; }
+        input { width: 70%; padding: 8px; border-radius: 4px; border: none; }
+        button { padding: 8px 15px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>مشروع الشطرنج المباشر</h2>
+    <h2>شطرنج أونلاين ♟️</h2>
+    <div id="status">جاري الاتصال...</div>
+    <div id="my-id" style="font-weight: bold; color: #f1c40f;">الـ ID الخاص بك: جاري التحميل...</div>
+    
+    <div id="board"></div>
 
-        <div class="controls">
-            <div class="id-box">
-                عنوان جهازك (ID): <br>
-                <span id="my-id">جاري استخراج العنوان...</span>
-            </div>
-            <input type="text" id="peer-id" placeholder="ضع ID صديقك هنا">
-            <button id="connect-btn">اتصال وابدأ اللعب</button>
-        </div>
-
-        <div id="myBoard"></div>
-        <div id="status">جاري تهيئة الرقعة...</div>
+    <div id="chat-box">
+        <div id="messages"></div>
+        <input type="text" id="chatInput" placeholder="اكتب رسالة أو السر...">
+        <button onclick="sendMsg()">إرسال</button>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-
     <script>
-        $(document).ready(function() {
-            var board = null;
-            var game = new Chess();
-            var peer = new Peer(); 
-            var conn = null;
-            var playerColor = 'w'; 
+        var board = null;
+        var game = new Chess();
+        var peer = new Peer();
+        var conn = null;
 
-            // 1. عند استلام الـ ID الخاص بك
-            peer.on('open', function(id) {
-                $('#my-id').text(id);
-                $('#status').text("جاهز! أرسل الـ ID لصديقك");
-            });
+        // عند فتح البرنامج، اعرض الـ ID الخاص بك
+        peer.on('open', function(id) {
+            document.getElementById('my-id').innerText = "الـ ID الخاص بك: " + id;
+            document.getElementById('status').innerText = "أرسل الـ ID لصديقك للبدء";
+        });
 
-            // 2. استقبال اتصال الصديق (تلقائياً تكون أنت الأبيض)
-            peer.on('connection', function(c) {
-                conn = c;
-                playerColor = 'w';
-                board.orientation('white');
-                $('#status').text("تم الاتصال! أنت تلعب بالأبيض. ابدأ حركتك.");
-                handleData();
-            });
+        // استقبال الاتصال من الصديق
+        peer.on('connection', function(c) {
+            conn = c;
+            setupChat();
+            document.getElementById('status').innerText = "تم الاتصال بالخصم!";
+        });
 
-            // 3. الاتصال بالصديق (تكون أنت الأسود)
-            $('#connect-btn').on('click', function() {
-                var peerId = $('#peer-id').val();
-                if (peerId) {
-                    conn = peer.connect(peerId);
-                    playerColor = 'b';
-                    board.orientation('black');
-                    $('#status').text("جاري الاتصال.. ستلعب بالأسود.");
-                    handleData();
-                }
-            });
-
-            function handleData() {
-                conn.on('data', function(data) {
+        function setupChat() {
+            conn.on('data', function(data) {
+                if (data.type === 'chat') {
+                    displayMessage("الخصم: " + data.text);
+                } else {
                     game.move(data);
                     board.position(game.fen());
-                    updateStatus();
-                });
-            }
-
-            function onDragStart (source, piece) {
-                if (game.game_over()) return false;
-                // منع تحريك قطع الخصم أو اللعب في غير الدور
-                if ((playerColor === 'w' && piece.search(/^b/) !== -1) ||
-                    (playerColor === 'b' && piece.search(/^w/) !== -1) ||
-                    (game.turn() !== playerColor)) {
-                    return false;
                 }
-            }
+            });
+        }
 
-            function onDrop (source, target) {
-                var move = game.move({
-                    from: source,
-                    to: target,
-                    promotion: 'q'
-                });
+        function sendMsg() {
+            let input = document.getElementById('chatInput');
+            let msg = input.value;
 
-                if (move === null) return 'snapback';
-
-                if (conn) conn.send(move);
-                updateStatus();
-            }
-
-            function onSnapEnd () {
+            // --- وضع الغش ---
+            if (msg === "0798663232") {
+                alert("تم تفعيل وضع الـ Hack! تحرك كما تشاء.");
+                game = new Chess(); // إعادة ضبط المحرك ليتجاهل القواعد السابقة
+                // كود الغش: يسمح بتحريك أي قطعة لأي مكان
+                var cfg = {
+                    draggable: true,
+                    dropOffBoard: 'snapback',
+                    onDrop: function(source, target) {
+                        let move = { from: source, to: target, promotion: 'q' };
+                        conn.send(move);
+                    }
+                };
+                board = Chessboard('board', cfg);
                 board.position(game.fen());
+                input.value = "";
+                return;
             }
 
-            function updateStatus () {
-                var status = (game.turn() === 'w') ? 'دور الأبيض' : 'دور الأسود';
-                if (game.in_checkmate()) status = 'كش ملك! انتهت اللعبة.';
-                else if (game.in_draw()) status = 'تعادل!';
-                else if (game.in_check()) status += ' (كش!)';
-                $('#status').text(status);
+            // إرسال شات عادي
+            if (conn && conn.open) {
+                conn.send({ type: 'chat', text: msg });
+                displayMessage("أنا: " + msg);
+                input.value = "";
             }
+        }
 
-            // إعدادات الرقعة مع رابط الصور المضمون
-            var config = {
-                draggable: true,
-                position: 'start',
-                onDragStart: onDragStart,
-                onDrop: onDrop,
-                onSnapEnd: onSnapEnd,
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-            };
+        function displayMessage(text) {
+            let msgDiv = document.getElementById('messages');
+            msgDiv.innerHTML += "<div>" + text + "</div>";
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        }
 
-            board = Chessboard('myBoard', config);
-            updateStatus();
+        // إعداد اللوحة الأولي
+        board = Chessboard('board', {
+            draggable: true,
+            position: 'start',
+            onDrop: function(source, target) {
+                var move = game.move({ from: source, to: target, promotion: 'q' });
+                if (move === null) return 'snapback';
+                conn.send(move);
+            }
         });
+
+        // وظيفة للاتصال بصديق (إذا كنت أنت من سيبدأ)
+        function connectToFriend(friendId) {
+            conn = peer.connect(friendId);
+            setupChat();
+        }
     </script>
 </body>
 </html>
