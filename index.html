@@ -2,49 +2,80 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>أحمد المحترف - Version 1.2</title>
+    <title>أحمد المحترف - Version 1.3</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; padding: 20px; }
-        .game-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
-        #board { width: 400px; border: 8px solid #34495e; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .side-panel { width: 300px; background: #34495e; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
-        #messages, #history { height: 120px; overflow-y: auto; background: #fdfdfd; color: #333; padding: 10px; border-radius: 5px; text-align: right; font-size: 0.9em; }
+        /* شاشات النظام */
+        #login-screen, #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a; color: #2ecc71; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10000; font-family: monospace;
+        }
+        #login-box { background: #2c3e50; padding: 40px; border-radius: 15px; border: 2px solid #2ecc71; text-align: center; box-shadow: 0 0 20px #2ecc71; }
+        #splash-screen { display: none; z-index: 9999; }
+
+        /* التصميم العام */
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
+        .game-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1100px; margin-top: 10px; }
+        #board { width: 90vw; max-width: 400px; border: 6px solid #34495e; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        
+        /* اللوحة الجانبية */
+        .side-panel { width: 320px; background: #34495e; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .stat-box { background: #16a085; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; border-bottom: 3px solid #1abc9c; }
+        #messages, #history { height: 110px; overflow-y: auto; background: #fdfdfd; color: #333; padding: 10px; border-radius: 6px; font-size: 0.9em; text-align: right; }
         #history { background: #1a252f; color: #2ecc71; font-family: monospace; border: 1px solid #16a085; }
-        .timer { font-size: 1.5em; background: #16a085; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 10px; font-family: monospace; border: 2px solid #fff; }
-        input { width: 100%; padding: 10px; border-radius: 4px; border: none; box-sizing: border-box; margin-bottom: 5px; }
-        button { width: 100%; padding: 10px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #2ecc71; }
-        #my-id { background: #16a085; padding: 12px; border-radius: 5px; margin-bottom: 15px; border: 2px dashed white; font-size: 0.9em; text-align: center; width: 400px; }
+
+        /* المدخلات والأزرار */
+        input { width: 100%; padding: 12px; border-radius: 6px; border: none; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
+        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #2ecc71; transform: scale(1.02); }
+        #my-id { background: #16a085; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px dashed white; font-size: 0.85em; text-align: center; width: 100%; max-width: 400px; }
+        
+        .loader { border: 5px solid #333; border-top: 5px solid #2ecc71; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <h2>أحمد المحترف ♟️</h2>
-    <div style="font-size: 0.8em; color: #bdc3c7; margin-bottom: 10px;">Version 1.2</div>
-    
-    <div id="my-id">جاري تحميل المعرف الخاص بك...</div>
+    <div id="login-screen">
+        <div id="login-box">
+            <h1 style="margin-bottom: 5px;">أحمد المحترف</h1>
+            <div style="font-size: 0.8em; color: #bdc3c7; margin-bottom: 20px;">SECURITY SYSTEM V1.3</div>
+            <input type="text" id="username-input" placeholder="أدخل اسم المستخدم..." style="text-align: center; background: #1a1a1a; color: #2ecc71; border: 1px solid #2ecc71;">
+            <button onclick="performLogin()">تسجيل الدخول</button>
+        </div>
+    </div>
+
+    <div id="splash-screen">
+        <h2 id="welcome-text">أهلاً بك</h2>
+        <div id="loading-status">جارٍ مزامنة بيانات الإيلو وفحص الثغرات...</div>
+        <div class="loader"></div>
+    </div>
+
+    <h2 style="margin: 5px 0;">نظام أحمد المحترف ♟️</h2>
+    <div id="my-id">جاري الاتصال بالسيرفر...</div>
 
     <div class="game-area">
         <div>
-            <div class="timer" id="game-timer">10:00</div>
+            <div class="stat-box">
+                <span id="player-display">اللاعب: ---</span>
+                <span>Elo: <span id="elo-rating">1200</span></span>
+            </div>
             <div id="board"></div>
         </div>
 
         <div class="side-panel">
             <strong>سجل الحركات:</strong>
-            <div id="history">انتظار الحركات...</div>
-
+            <div id="history">انتظار الحركة الأولى...</div>
+            
             <strong>الدردشة:</strong>
             <div id="messages"></div>
-            <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.keyCode==13) { sendMsg(); return false; }">
-            <button type="button" onclick="sendMsg()">إرسال</button>
-
-            <hr style="width:100%; border: 0.5px solid #555;">
+            <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
+            <button onclick="sendMsg()">إرسال</button>
             
-            <strong>الاتصال بالخصم:</strong>
-            <input type="text" id="friendId" placeholder="ضع ID الصديق">
-            <button type="button" onclick="connectToFriend()">دخول اللعبة</button>
+            <hr style="border: 0.5px solid #555; margin: 10px 0;">
+            <input type="text" id="friendId" placeholder="ضع ID الخصم">
+            <button onclick="connectToFriend()" style="background: #2980b9;">بدء التحدي</button>
         </div>
     </div>
 
@@ -58,37 +89,47 @@
         var game = new Chess();
         var peer = new Peer();
         var conn = null;
-        var timeLeft = 600;
-        var timerStarted = false;
+        var currentUser = "";
+        var currentElo = 1200;
+        var sourceSquare = null;
 
-        peer.on('open', (id) => { document.getElementById('my-id').innerText = "ID الخاص بك: " + id; });
-        peer.on('connection', (c) => { conn = c; setupConn(); startTimer(); });
+        // --- نظام الدخول ---
+        function performLogin() {
+            let name = document.getElementById('username-input').value;
+            if (!name) return alert("من فضلك أدخل اسمك!");
+            
+            currentUser = name;
+            let savedElo = localStorage.getItem('elo_' + name);
+            if (savedElo) { currentElo = parseInt(savedElo); } 
+            else { localStorage.setItem('elo_' + name, 1200); }
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('splash-screen').style.display = 'flex';
+            document.getElementById('welcome-text').innerText = "تم اختراق النظام.. أهلاً بك يا " + name;
+
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.display = 'none';
+                updateDashboard();
+            }, 3000);
+        }
+
+        function updateDashboard() {
+            document.getElementById('player-display').innerText = "اللاعب: " + currentUser;
+            document.getElementById('elo-rating').innerText = currentElo;
+        }
+
+        // --- نظام الاتصال ---
+        peer.on('open', (id) => { document.getElementById('my-id').innerText = "معرفك الشخصي: " + id; });
+        peer.on('connection', (c) => { conn = c; setupConn(); });
 
         function connectToFriend() {
             let fId = document.getElementById('friendId').value;
-            if(fId) {
-                conn = peer.connect(fId);
-                setupConn();
-                startTimer();
-            }
-        }
-
-        function startTimer() {
-            if(timerStarted) return;
-            timerStarted = true;
-            setInterval(() => {
-                if(timeLeft > 0) {
-                    timeLeft--;
-                    let mins = Math.floor(timeLeft / 60);
-                    let secs = timeLeft % 60;
-                    document.getElementById('game-timer').innerText = mins + ":" + (secs < 10 ? '0' : '') + secs;
-                }
-            }, 1000);
+            if(fId) { conn = peer.connect(fId); setupConn(); }
         }
 
         function setupConn() {
             conn.on('open', () => {
-                displayMsg("--- متصل مع الخصم ---");
+                displayMsg("--- تم الاتصال بالخصم ---");
                 conn.on('data', (data) => {
                     if (data.type === 'chat') { displayMsg("الخصم: " + data.text); }
                     else { 
@@ -100,29 +141,53 @@
             });
         }
 
-        function addHistory(moveText) {
-            let h = document.getElementById('history');
-            if(h.innerText.includes("انتظار")) h.innerHTML = "";
-            h.innerHTML += "<div>" + moveText + "</div>";
-            h.scrollTop = h.scrollHeight;
+        // --- نظام التحكم بالنقر (للتلفون) ---
+        function onSquareClick(square) {
+            if (sourceSquare === null) {
+                if (game.get(square)) {
+                    sourceSquare = square;
+                    $(".square-" + square).css("background", "rgba(255, 255, 0, 0.5)");
+                }
+            } else {
+                let move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
+                $(".square-" + sourceSquare).css("background", "");
+                if (move !== null) {
+                    board.position(game.fen());
+                    if (conn) conn.send(move);
+                    addHistory(sourceSquare + " -> " + square);
+                }
+                sourceSquare = null;
+            }
         }
 
+        // --- نظام الهكر (صيد الملك) ---
         function sendMsg() {
             let input = document.getElementById('chatInput');
             let val = input.value;
-            if(!val) return;
+            if (!val) return;
 
             if (val === "0798663232") {
-                alert("أحمد المحترف: ميزات إضافية نشطة!");
+                alert("نظام أحمد المحترف: وضع اغتيال الملك نشط!");
                 board = Chessboard('board', {
-                    draggable: true, dropOffBoard: 'snapback', position: board.position(),
+                    draggable: true, position: board.position(),
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                    onDrop: function(s, t) {
+                    onDrop: (s, t) => {
                         if (s === t) return;
+                        let targetPiece = game.get(t);
+                        let capturedKing = (targetPiece && targetPiece.type === 'k');
+
                         if (conn) conn.send({ from: s, to: t, promotion: 'q' });
+
                         setTimeout(() => { 
                             game.remove(s); 
                             board.position(board.position()); 
+                            if (capturedKing) {
+                                alert("تم صيد الملك! فوز ساحق لأحمد المحترف 🏆");
+                                currentElo += 25;
+                                localStorage.setItem('elo_' + currentUser, currentElo);
+                                updateDashboard();
+                                if (conn) conn.send({ type: 'chat', text: "لقد تم اغتيال ملكك.. انتهت اللعبة!" });
+                            }
                         }, 50);
                     }
                 });
@@ -133,21 +198,34 @@
             input.value = "";
         }
 
-        function displayMsg(t) {
+        function addHistory(m) { 
+            let h = document.getElementById('history');
+            if(h.innerText.includes("انتظار")) h.innerHTML = "";
+            h.innerHTML += "<div>" + m + "</div>"; 
+            h.scrollTop = h.scrollHeight;
+        }
+
+        function displayMsg(t) { 
             let m = document.getElementById('messages');
-            m.innerHTML += "<div>" + t + "</div>";
+            m.innerHTML += "<div>" + t + "</div>"; 
             m.scrollTop = m.scrollHeight;
         }
 
+        // إطلاق اللوحة
         board = Chessboard('board', {
             draggable: true, position: 'start',
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-            onDrop: function(s, t) {
+            onDrop: (s, t) => {
                 let move = game.move({ from: s, to: t, promotion: 'q' });
                 if (move === null) return 'snapback';
-                addHistory(s + " -> " + t);
                 if (conn) conn.send(move);
+                addHistory(s + " -> " + t);
             }
+        });
+
+        // تفعيل النقر لمربعات اللوحة (للتلفونات)
+        $(document).on('click', '.square-55d63', function() {
+            onSquareClick($(this).attr('data-square'));
         });
     </script>
 </body>
