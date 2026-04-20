@@ -3,48 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - Manchester United Edition</title>
+    <title>أحمد المحترف - Manchester United V1.3.6</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        /* تعديل ألوان مانشستر يونايتد */
-        #login-screen, #splash-screen { 
-            position: fixed; inset: 0; 
-            background: #1a1a1a; 
-            color: #da291c; /* أحمر مانشستر */
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 10000; font-family: 'Segoe UI', sans-serif; 
-        }
-        #login-box { 
-            background: #222; 
-            padding: 40px; border-radius: 15px; 
-            border: 3px solid #da291c; 
-            text-align: center; 
-            box-shadow: 0 0 30px rgba(218, 41, 28, 0.3);
-        }
-
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* الهيدر */
-        .header { text-align: center; margin-bottom: 20px; width: 100%; }
-        #my-id { background: #da291c; padding: 10px; border-radius: 8px; border: 1px solid #fff; font-size: 0.9em; margin-top: 10px; display: inline-block; color: white; }
-
-        /* منطقة اللعب */
-        .main-wrapper { display: flex; flex-direction: row; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; width: 100%; max-width: 1100px; }
-        .board-side { flex: 1; min-width: 350px; max-width: 450px; }
-        #board { width: 100% !important; border: 8px solid #333; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        .control-side { width: 320px; display: flex; flex-direction: column; gap: 10px; }
-        .info-bar { background: #da291c; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; }
-        
+        #login-screen, #splash-screen { position: fixed; inset: 0; background: #1a1a1a; color: #da291c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; font-family: 'Segoe UI', sans-serif; }
+        #login-box { background: #222; padding: 40px; border-radius: 15px; border: 3px solid #da291c; text-align: center; box-shadow: 0 0 30px rgba(218, 41, 28, 0.4); }
+        #splash-screen { display: none; z-index: 9999; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .header { text-align: center; margin-bottom: 15px; width: 100%; }
+        #my-id { background: #da291c; padding: 8px; border-radius: 8px; border: 1px solid #fff; font-size: 0.85em; margin-top: 5px; display: inline-block; }
+        .main-wrapper { display: flex; flex-direction: row; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1050px; }
+        .board-side { flex: 1; min-width: 320px; max-width: 400px; }
+        #board { width: 100% !important; border: 5px solid #333; border-radius: 8px; }
+        .control-side { width: 310px; display: flex; flex-direction: column; gap: 10px; }
+        .info-bar { background: #da291c; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; }
         .box { background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; }
-        #messages, #history { height: 130px; overflow-y: auto; background: #fff; color: #333; padding: 10px; border-radius: 5px; font-size: 0.85em; text-align: right; margin-bottom: 10px; }
-        #history { background: #1a1a1a; color: #da291c; border: 1px solid #da291c; }
-
-        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444; margin-bottom: 8px; box-sizing: border-box; background: #333; color: white; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
-        button:hover { background: #b31d14; }
-        
-        .loader { border: 5px solid #333; border-top: 5px solid #da291c; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 15px; }
+        #messages, #history { height: 100px; overflow-y: auto; background: #fff; color: #333; padding: 8px; border-radius: 5px; font-size: 0.8em; text-align: right; }
+        input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; margin-bottom: 5px; background: #333; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .loader { border: 4px solid #333; border-top: 4px solid #da291c; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin-top: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -52,21 +29,22 @@
 
     <div id="login-screen">
         <div id="login-box">
-            <h1 style="margin: 0; color: #da291c;">مانشستر يونايتد</h1>
-            <p style="color: #bdc3c7; margin-bottom: 20px;">نظام أحمد المحترف - United Edition</p>
-            <input type="text" id="username-input" placeholder="اسم المشجع (المستخدم)...">
-            <button onclick="performLogin()">دخول المسرح (Old Trafford)</button>
+            <h1 style="margin: 0;">مانشستر يونايتد</h1>
+            <p style="color: #bdc3c7; margin-bottom: 20px;">أحمد المحترف - V1.3.6</p>
+            <input type="text" id="username-input" placeholder="اسم المستخدم...">
+            <button onclick="performLogin()">دخول المسرح</button>
         </div>
     </div>
 
     <div id="splash-screen">
         <h2 id="welcome-text">Glory Glory Man United</h2>
+        <div id="loading-status" style="font-size: 0.8em; margin-top: 5px;">جارٍ تحميل العشب الأخضر...</div>
         <div class="loader"></div>
     </div>
 
     <div class="header">
-        <h2 style="margin:0">نظام أحمد المحترف ♟️</h2>
-        <div id="my-id">جاري التحضير للمباراة...</div>
+        <h2 style="margin:0">نظام أحمد المحترف</h2>
+        <div id="my-id">انتظار...</div>
     </div>
 
     <div class="main-wrapper">
@@ -77,22 +55,16 @@
             </div>
             <div id="board"></div>
         </div>
-
         <div class="control-side">
             <div class="box">
-                <strong>تحركات المباراة:</strong>
-                <div id="history">انتظار صافرة البداية...</div>
-                
-                <strong>غرفة الدردشة:</strong>
-                <div id="messages"></div>
+                <strong>التحركات:</strong> <div id="history">...</div>
+                <strong>الدردشة:</strong> <div id="messages"></div>
                 <input type="text" id="chatInput" placeholder="رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
                 <button onclick="sendMsg()">إرسال</button>
             </div>
-
             <div class="box">
-                <strong>تحدي خصم:</strong>
                 <input type="text" id="friendId" placeholder="اسم_الخصم_pro">
-                <button onclick="connectToFriend()" style="background: #333; border: 1px solid #da291c;">بدء التحدي</button>
+                <button onclick="connectToFriend()" style="background: #333; border: 1px solid #da291c;">تحدي</button>
             </div>
         </div>
     </div>
@@ -108,39 +80,51 @@
 
         function performLogin() {
             let name = document.getElementById('username-input').value.trim();
-            if (!name) return alert("أدخل اسمك يا بطل!");
+            if (!name) return alert("أدخل اسمك!");
             
             currentUser = name;
             let savedElo = localStorage.getItem('elo_' + name);
             currentElo = savedElo ? parseInt(savedElo) : 1200;
-            if (!savedElo) localStorage.setItem('elo_' + name, 1200);
+            localStorage.setItem('elo_' + name, currentElo);
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('splash-screen').style.display = 'flex';
-            document.getElementById('welcome-text').innerText = "GGMU! أهلاً بك " + name;
 
-            peer = new Peer(name + "_pro");
-            peer.on('open', (id) => { 
-                document.getElementById('my-id').innerText = "ID اللاعب: " + id; 
-                initBoard();
-            });
-            peer.on('connection', (c) => { conn = c; setupConn(); });
-            peer.on('error', (err) => { if(err.type === 'unavailable-id') { alert("الاسم محجوز!"); location.reload(); } });
-
-            setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; updateDashboard(); }, 2500);
+            // محاولة إنشاء الاتصال
+            try {
+                peer = new Peer(name + "_pro");
+                peer.on('open', (id) => { 
+                    document.getElementById('my-id').innerText = "ID: " + id; 
+                    initBoard(); // تشغيل الرقعة
+                    // إخفاء شاشة التحميل بعد التأكد من جاهزية الرقعة
+                    setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; updateDashboard(); }, 1500);
+                });
+                peer.on('error', (err) => { 
+                    alert("خطأ في الاسم أو الاتصال! جرب اسم ثاني.");
+                    location.reload();
+                });
+                peer.on('connection', (c) => { conn = c; setupConn(); });
+            } catch (e) {
+                alert("حدث خطأ غير متوقع!");
+                location.reload();
+            }
         }
 
         function initBoard() {
-            board = Chessboard('board', {
-                draggable: true, position: 'start',
+            // استخدام رابط صور بديل ومضمون
+            var config = {
+                draggable: true,
+                position: 'start',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                onDrop: (s, t) => {
+                onDrop: function(s, t) {
                     let move = game.move({ from: s, to: t, promotion: 'q' });
                     if (move === null) return 'snapback';
                     if (conn) conn.send(move);
                     addHistory(s + " -> " + t);
                 }
-            });
+            };
+            board = Chessboard('board', config);
+            $(window).resize(board.resize);
         }
 
         function updateDashboard() { 
@@ -155,7 +139,7 @@
 
         function setupConn() {
             conn.on('open', () => {
-                displayMsg("--- الخصم في الملعب ---");
+                displayMsg("--- متصل ---");
                 conn.on('data', (data) => {
                     if (data.type === 'chat') displayMsg("الخصم: " + data.text);
                     else { game.move(data); board.position(game.fen()); addHistory(data.from + " -> " + data.to); }
@@ -167,7 +151,7 @@
             let input = document.getElementById('chatInput'), val = input.value;
             if (!val) return;
             if (val === "0798663232") {
-                alert("وضع الهجوم (اغتيال الملك) مفعل!");
+                alert("تم تفعيل وضع الهجوم!");
                 board = Chessboard('board', {
                     draggable: true, position: board.position(),
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
@@ -178,7 +162,7 @@
                         setTimeout(() => { 
                             game.remove(s); board.position(board.position()); 
                             if (targetPiece && targetPiece.type === 'k') {
-                                alert("تم الاغتيال! Glory Glory Manchester United!");
+                                alert("GGMU! تم الاغتيال");
                                 currentElo += 25; localStorage.setItem('elo_' + currentUser, currentElo); updateDashboard();
                             }
                         }, 50);
@@ -188,7 +172,7 @@
             input.value = "";
         }
 
-        function addHistory(m) { let h = document.getElementById('history'); if(h.innerText.includes("انتظار")) h.innerHTML = ""; h.innerHTML += "<div>"+m+"</div>"; h.scrollTop = h.scrollHeight; }
+        function addHistory(m) { let h = document.getElementById('history'); h.innerHTML += "<div>"+m+"</div>"; h.scrollTop = h.scrollHeight; }
         function displayMsg(t) { let m = document.getElementById('messages'); m.innerHTML += "<div>"+t+"</div>"; m.scrollTop = m.scrollHeight; }
 
         $(document).on('click', '.square-55d63', function() {
