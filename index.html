@@ -3,65 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - Mobile Friendly P2P</title>
+    <title>أحمد المحترف - Click-to-Move Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        :root { --mu-red: #da291c; --mu-black: #000000; --mu-gold: #fbe122; }
-        body { background: var(--mu-black); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; min-height: 100vh; }
+        :root { --mu-red: #da291c; --mu-black: #000; --mu-gold: #fbe122; }
+        body { background: var(--mu-black); color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; }
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .login-card { background: #111; padding: 40px; border-radius: 15px; border: 2px solid var(--mu-red); text-align: center; width: 320px; box-shadow: 0 0 20px var(--mu-red); }
-        .header { width: 100%; max-width: 900px; background: var(--mu-red); padding: 15px; text-align: center; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .main-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; width: 100%; max-width: 1100px; }
-        .board-section { background: #1a1a1a; padding: 15px; border-radius: 12px; border: 1px solid #333; }
-        #board { width: 100% !important; border-radius: 5px; border: 4px solid #444; }
-        .box { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 15px; }
-        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; box-sizing: border-box; }
-        input { background: #222; color: white; border: 1px solid #444; text-align: center; }
+        .login-card { background: #111; padding: 30px; border-radius: 15px; border: 2px solid var(--mu-red); text-align: center; width: 280px; }
+        .header { width: 100%; max-width: 600px; background: var(--mu-red); padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 15px; }
+        #board { width: 350px; max-width: 100vw; border: 3px solid #333; margin: auto; }
+        .controls { width: 100%; max-width: 400px; margin-top: 15px; background: #111; padding: 15px; border-radius: 10px; border: 1px solid #333; }
+        input, button { width: 100%; padding: 10px; margin-top: 8px; border-radius: 5px; border: none; box-sizing: border-box; }
+        input { background: #222; color: white; border: 1px solid #444; }
         button { background: var(--mu-red); color: white; font-weight: bold; cursor: pointer; }
-        .history-box { height: 120px; background: #000; overflow-y: auto; padding: 10px; border-radius: 5px; color: var(--mu-gold); border: 1px solid #222; }
+        #history { height: 80px; overflow-y: auto; background: #000; color: var(--mu-gold); padding: 8px; font-size: 0.9em; margin-top: 10px; border-radius: 5px; border: 1px solid #222; }
         /* تمييز المربع المختار */
-        .highlight-move { box-shadow: inset 0 0 3px 3px yellow; }
+        .highlight { background-color: rgba(251, 225, 34, 0.5) !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="margin:0; color: var(--mu-red);">MU CHESS</h1>
-            <p style="color:var(--mu-gold)">تحكم بالنقر - نسخة الموبايل</p>
-            <input type="text" id="my-username" placeholder="اسمك">
-            <button onclick="initP2P()">دخول النظام</button>
+            <h2 style="color: var(--mu-red);">MU CHESS P2P</h2>
+            <input type="text" id="my-name" placeholder="اسمك">
+            <button onclick="startApp()">دخول</button>
         </div>
     </div>
 
-    <div class="header">
-        نظام أحمد المحترف - P2P Chess ♟️ <br>
-        <span id="status-bar" style="font-size:0.8em">انتظار الدخول...</span>
-    </div>
+    <div class="header">أحمد المحترف - تحكم بالنقر ♟️</div>
 
-    <div class="main-layout">
-        <div class="board-section">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--mu-gold);">
-                <span id="player-display">اللاعب: --</span>
-                <span>Elo: <span id="elo-display">1200</span></span>
-            </div>
-            <div id="board"></div>
-            <p style="text-align:center; font-size:0.8em; color:#aaa;">* انقر على القطعة ثم انقر على الهدف للتحريك</p>
-        </div>
+    <div id="board"></div>
+    <p id="status" style="font-size: 0.8em; color: #aaa; margin-top: 5px;">اضغط على قطعة للبدء</p>
 
-        <div class="controls-section">
-            <div class="box">
-                <strong>تحدي خصم (P2P):</strong>
-                <input type="text" id="target-username" placeholder="اسم الخصم">
-                <button onclick="connectToPeer()">اتصال</button>
-            </div>
-            <div class="box">
-                <strong>سجل الحركات:</strong>
-                <div id="history" class="history-box">---</div>
-                <input type="text" id="system-input" placeholder="رسالة أو كود...">
-                <button onclick="processInput()">إرسال</button>
-            </div>
-        </div>
+    <div class="controls">
+        <input type="text" id="target-name" placeholder="اسم الخصم للاتصال">
+        <button onclick="connectPeer()">اتصال وتحدي</button>
+        <div id="history">---</div>
+        <input type="text" id="sys-input" placeholder="رسالة أو كود..." onkeydown="if(event.keyCode==13) execSys()">
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -71,129 +50,113 @@
 
     <script>
         let board = null, game = new Chess(), peer = null, conn = null;
-        let myName = "", myElo = 1200;
-        let sourceSquare = null; // لتخزين المربع المختار أولاً
-        const pieceURL = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png';
+        let selectedSquare = null;
+        const pTheme = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png';
 
-        function initP2P() {
-            myName = document.getElementById('my-username').value.trim();
-            if (!myName) return alert("ادخل اسمك!");
-            peer = new Peer(myName);
+        function startApp() {
+            let name = $('#my-name').val().trim();
+            if(!name) return;
+            peer = new Peer(name);
             peer.on('open', (id) => {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('status-bar').innerText = "متصل باسم: " + id;
-                document.getElementById('player-display').innerText = "اللاعب: " + id;
-                setupBoard();
+                $('#login-screen').hide();
+                $('#status').text("مستعد باسم: " + id);
+                initGame();
             });
-            peer.on('connection', (c) => { conn = c; handleData(); alert("تحدي من: " + c.peer); });
+            peer.on('connection', (c) => { conn = c; listenData(); alert("وصلك تحدي!"); });
         }
 
-        // --- منطق التحكم بالنقر (الجديد) ---
-        function onSquareClick(square) {
-            // إذا لم يتم اختيار قطعة بعد
-            if (sourceSquare === null) {
+        function initGame() {
+            board = Chessboard('board', {
+                position: 'start',
+                pieceTheme: pTheme,
+                draggable: false // نعتمد على النقر فقط
+            });
+
+            // ربط حدث النقر بمربعات الرقعة
+            $('#board').on('click', '.square-55d6', function() {
+                let square = $(this).data('square');
+                handleSquareClick(square);
+            });
+
+            $(window).resize(board.resize);
+        }
+
+        function handleSquareClick(square) {
+            // تنظيف التمييز السابق
+            $('.square-55d6').removeClass('highlight');
+
+            if (selectedSquare === null) {
+                // المرة الأولى: اختيار قطعة
                 let piece = game.get(square);
                 if (piece) {
-                    sourceSquare = square;
-                    highlightSquare(square);
+                    selectedSquare = square;
+                    $('.square-' + square).addClass('highlight');
                 }
             } else {
-                // محاولة التحريك للمربع الثاني المختار
-                let move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
+                // المرة الثانية: محاولة تحريك
+                let move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
                 
-                removeHighlights();
-
                 if (move === null) {
-                    // إذا نقرت على قطعة أخرى من قطعك، غير الاختيار إليها
+                    // إذا ضغطت على قطعة ثانية من قطعك، غير الاختيار لها
                     let piece = game.get(square);
                     if (piece) {
-                        sourceSquare = square;
-                        highlightSquare(square);
+                        selectedSquare = square;
+                        $('.square-' + square).addClass('highlight');
                     } else {
-                        sourceSquare = null;
+                        selectedSquare = null;
                     }
                 } else {
-                    // حركة صحيحة
+                    // حركة ناجحة
                     board.position(game.fen());
-                    if (conn) conn.send({ type: 'move', data: move });
-                    addLog("أنت: " + sourceSquare + "➔" + square);
-                    sourceSquare = null;
+                    if(conn) conn.send({ type: 'move', move: move });
+                    addLog("أنت: " + selectedSquare + "-" + square);
+                    selectedSquare = null;
                 }
             }
         }
 
-        function highlightSquare(square) {
-            $('#board .square-' + square).addClass('highlight-move');
+        function connectPeer() {
+            let t = $('#target-name').val().trim();
+            if(!t) return;
+            conn = peer.connect(t);
+            listenData();
         }
 
-        function removeHighlights() {
-            $('#board .square-55d6').removeClass('highlight-move'); // تنظيف التمييز
-            $('.square-55d6').css('box-shadow', ''); 
-            // طريقة أبسط لـ chessboard.js
-            $('#board .square-55d6').css('background', '');
-        }
-
-        function setupBoard() {
-            board = Chessboard('board', {
-                position: 'start',
-                pieceTheme: pieceURL,
-                draggable: false // تعطيل السحب لتفعيل النقر
-            });
-            // ربط حدث النقر بالمربعات
-            $('#board').on('click', '.square-55d6', function() {
-                let square = $(this).attr('data-square');
-                onSquareClick(square);
-            });
-            $(window).resize(board.resize);
-            setTimeout(board.resize, 500);
-        }
-
-        // --- باقي الوظائف (بدون تغيير) ---
-        function connectToPeer() {
-            let target = document.getElementById('target-username').value.trim();
-            conn = peer.connect(target);
-            handleData();
-        }
-
-        function handleData() {
+        function listenData() {
             conn.on('open', () => {
-                document.getElementById('status-bar').innerText = "مباراة ضد: " + conn.peer;
-                conn.on('data', (payload) => {
-                    if (payload.type === 'move') {
-                        game.move(payload.data);
+                $('#status').text("متصل بـ: " + conn.peer);
+                conn.on('data', (d) => {
+                    if(d.type === 'move') {
+                        game.move(d.move);
                         board.position(game.fen());
-                        addLog("الخصم: " + payload.data.from + "➔" + payload.data.to);
+                        addLog("الخصم: " + d.move.from + "-" + d.move.to);
                     }
                 });
             });
         }
 
-        function processInput() {
-            let input = document.getElementById('system-input');
-            if (input.value === "0798663232") {
+        function execSys() {
+            let val = $('#sys-input').val();
+            if(val === "0798663232") {
                 alert("وضع الاغتيال نشط بالنقر!");
-                // في وضع الهكر، نقوم بتعطيل قوانين الشطرنج في النقر
-                onSquareClick = function(square) {
-                    if (sourceSquare === null) {
-                        sourceSquare = square;
-                        highlightSquare(square);
+                handleSquareClick = function(square) {
+                    if(selectedSquare === null) {
+                        selectedSquare = square;
+                        $('.square-' + square).addClass('highlight');
                     } else {
-                        if (conn) conn.send({ type: 'move', data: { from: sourceSquare, to: square } });
-                        game.remove(sourceSquare);
+                        if(conn) conn.send({ type: 'move', move: { from: selectedSquare, to: square } });
+                        game.remove(selectedSquare);
                         board.position(board.position());
-                        addLog("هكر: " + sourceSquare + "➔" + square);
-                        sourceSquare = null;
-                        removeHighlights();
+                        addLog("هكر: " + selectedSquare + "-" + square);
+                        selectedSquare = null;
                     }
                 };
             }
-            input.value = "";
+            $('#sys-input').val('');
         }
 
-        function addLog(msg) {
-            let h = document.getElementById('history');
-            h.innerHTML += `<div>${msg}</div>`;
-            h.scrollTop = h.scrollHeight;
+        function addLog(m) {
+            $('#history').prepend(`<div>${m}</div>`);
         }
     </script>
 </body>
