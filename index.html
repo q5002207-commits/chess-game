@@ -14,11 +14,12 @@
         .piece-417db[data-piece="bK"], .piece-417db[data-piece="wK"] { 
             border-radius: 50% !important; 
             border: 2px solid #fff !important;
+            box-shadow: 0 0 5px white;
         }
 
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-top: 15px; width: 100%; max-width: 400px; border: 1px solid #333; }
         input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: none; font-weight: bold; }
-        input { background: #252525; color: white; border: 1px solid #444; }
+        input { background: #252525; color: white; border: 1px solid #444; text-align: center; }
         button { background: #da291c; color: white; cursor: pointer; }
         #my-id { color: #0f0; font-family: monospace; margin-bottom: 5px; text-align: center; }
     </style>
@@ -45,15 +46,11 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w';
 
-        // دالة تبديل الصور البرمجية
+        // دالة تبديل الصور البرمجية - الرابط المباشر الصحيح
         function customPieceTheme(piece) {
-            // استبدال الملك الأسود (bK) بالرابط المباشر اللي بعته
-            if (piece === 'bK') {
-                return 'https://i.ibb.co/PG8HsK3M/king-black.jpg';
-            }
-            // إذا بدك صورتك تكون الملك الأبيض (wK) حط رابطك هون
-            if (piece === 'wK') {
-                return 'https://chessboardjs.com/img/chesspieces/wikipedia/wK.png'; 
+            // استبدال الملك الأبيض والأسود بصورة صاحبك المباشرة
+            if (piece === 'bK' || piece === 'wK') {
+                return 'https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg';
             }
             // باقي القطع عادية
             return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + piece + '.png';
