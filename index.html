@@ -3,57 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف - النسخة المستقرة</title>
+    <title>نظام أحمد المحترف - النسخة الذهبية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        #login-screen { position: fixed; inset: 0; background: #111; color: #da291c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; }
-        #login-box { background: #222; padding: 30px; border-radius: 15px; border: 3px solid #da291c; text-align: center; width: 280px; }
-        .header-nav { width: 100%; max-width: 900px; background: #da291c; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center; font-weight: bold; }
-        #id-display { background: #000; padding: 5px 12px; border-radius: 15px; font-size: 0.8em; margin-top: 8px; display: inline-block; border: 1px solid #fff; color: #fff; }
-        .main-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1000px; }
-        .board-side { flex: 1; min-width: 320px; max-width: 450px; }
-        #board { width: 100% !important; border: 6px solid #333; border-radius: 10px; }
-        .control-side { width: 300px; display: flex; flex-direction: column; gap: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; max-width: 800px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #my-id-box { background: #000; color: #fff; padding: 8px 15px; border-radius: 20px; display: inline-block; margin-top: 10px; border: 1px solid #fff; font-family: monospace; font-size: 1.1em; }
+        .game-area { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1000px; }
+        .board-container { flex: 1; min-width: 320px; max-width: 450px; }
+        #board { width: 100% !important; border: 5px solid #333; border-radius: 10px; }
+        .side-bar { width: 320px; display: flex; flex-direction: column; gap: 15px; }
         .box { background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; }
-        #messages, #history { height: 110px; overflow-y: auto; background: #fff; color: #333; padding: 10px; border-radius: 5px; font-size: 0.85em; text-align: right; }
-        #history { background: #111; color: #da291c; border: 1px solid #da291c; }
-        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #da291c; background: #333; color: white; margin-bottom: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #messages, #history { height: 120px; overflow-y: auto; background: #fff; color: #222; padding: 10px; border-radius: 6px; font-size: 0.9em; text-align: right; }
+        #history { background: #111; color: #da291c; border: 1px solid #da291c; font-family: monospace; }
+        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #da291c; background: #333; color: white; margin-bottom: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        button:hover { background: #b31d14; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div id="login-box">
-            <h1 style="margin: 0;">مانشستر يونايتد</h1>
-            <input type="text" id="username-input" placeholder="اسم المستخدم...">
-            <button onclick="performLogin()">دخول اللعبة</button>
-        </div>
+    <div class="header">
+        <h2 style="margin:0;">نظام أحمد المحترف ♟️</h2>
+        <div id="my-id-box">جاري الاتصال بالسيرفر...</div>
     </div>
 
-    <div class="header-nav">
-        نظام أحمد المحترف - النسخة الأصلية ♟️ <br>
-        <div id="id-display">جاري توليد الكود...</div>
-    </div>
-
-    <div class="main-container">
-        <div class="board-side">
+    <div class="game-area">
+        <div class="board-container">
+            <div style="background:#da291c; padding:8px; border-radius:10px 10px 0 0; font-weight:bold; text-align:center;">رقعة الشطرنج</div>
             <div id="board"></div>
         </div>
-        <div class="control-side">
+
+        <div class="side-bar">
             <div class="box">
-                <strong>الحركات:</strong>
+                <strong>سجل الحركات:</strong>
                 <div id="history">---</div>
+                <hr style="border:0.5px solid #444; margin:10px 0;">
                 <strong>الدردشة:</strong>
                 <div id="messages"></div>
-                <input type="text" id="chatInput" placeholder="رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
+                <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeydown="if(event.keyCode==13) sendMsg()">
                 <button onclick="sendMsg()">إرسال</button>
             </div>
+
             <div class="box">
-                <strong>تحدي صديق:</strong>
+                <strong>تحدي صديق أونلاين:</strong>
                 <input type="text" id="friendId" placeholder="أدخل ID الخصم">
-                <button onclick="connectToFriend()" style="background: #000; border: 1px solid #da291c;">اتصال أونلاين</button>
+                <button onclick="connectToFriend()" style="background:#000; border:1px solid #da291c;">بدء التحدي</button>
             </div>
         </div>
     </div>
@@ -66,63 +61,56 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
 
-        function performLogin() {
-            let name = document.getElementById('username-input').value.trim();
-            if (!name) return alert("أدخل اسمك أولاً!");
-            
-            document.getElementById('login-screen').style.display = 'none';
-            
-            // توليد ID عشوائي زي ما طلبت
-            let randomID = name + "_" + Math.floor(Math.random() * 1000);
+        // تشغيل النظام فوراً عند فتح الصفحة
+        window.onload = function() {
+            // توليد ID عشوائي يبدأ بكلمة Ahmed
+            let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(randomID);
 
-            peer.on('open', (id) => { 
-                // تحديث النص فوراً عشان ما يضل "انتظار"
-                document.getElementById('id-display').innerText = "كود الخاص بك: " + id; 
-                initBoard(); 
+            peer.on('open', (id) => {
+                document.getElementById('my-id-box').innerText = "ID الخاص بك: " + id;
+                initBoard();
             });
 
-            peer.on('connection', (c) => { 
-                conn = c; 
-                setupConn(); 
+            peer.on('connection', (c) => {
+                conn = c;
+                setupConn();
             });
-            
+
             peer.on('error', (err) => {
-                alert("حدث خطأ في الاتصال، حاول تحديث الصفحة.");
+                console.error(err);
+                document.getElementById('my-id-box').innerText = "خطأ في الاتصال! أعد التحميل";
             });
-        }
+        };
 
         function initBoard() {
-            var config = {
+            board = Chessboard('board', {
                 draggable: true,
                 position: 'start',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-                onDrop: onDrop
-            };
-            board = Chessboard('board', config);
+                onDrop: (source, target) => {
+                    let move = game.move({ from: source, to: target, promotion: 'q' });
+                    if (move === null) return 'snapback';
+                    if (conn) conn.send(move);
+                    addHistory(source + " -> " + target);
+                }
+            });
             $(window).resize(board.resize);
-        }
-
-        function onDrop(source, target) {
-            let move = game.move({ from: source, to: target, promotion: 'q' });
-            if (move === null) return 'snapback';
-            if (conn) conn.send(move);
-            addHistory(source + " -> " + target);
         }
 
         function connectToFriend() {
             let fId = document.getElementById('friendId').value.trim();
-            if(fId) { 
-                conn = peer.connect(fId); 
-                setupConn(); 
+            if(fId) {
+                conn = peer.connect(fId);
+                setupConn();
             } else {
-                alert("يرجى إدخال ID الخصم");
+                alert("يرجى إدخال ID الخصم أولاً");
             }
         }
 
         function setupConn() {
             conn.on('open', () => {
-                displayMsg("--- تم الاتصال بنجاح ---");
+                displayMsg("--- تم الاتصال بالخصم! العب الآن ---");
                 conn.on('data', (data) => {
                     if (data.type === 'chat') {
                         displayMsg("الخصم: " + data.text);
@@ -137,24 +125,24 @@
 
         function sendMsg() {
             let input = document.getElementById('chatInput'), val = input.value;
-            if (val && conn) { 
-                conn.send({ type: 'chat', text: val }); 
-                displayMsg("أنا: " + val); 
+            if (val && conn) {
+                conn.send({ type: 'chat', text: val });
+                displayMsg("أنا: " + val);
                 input.value = "";
             }
         }
 
-        function addHistory(m) { 
-            let h = document.getElementById('history'); 
-            if(h.innerText === "---") h.innerText = ""; 
-            h.innerHTML += "<div>"+m+"</div>"; 
-            h.scrollTop = h.scrollHeight; 
+        function addHistory(m) {
+            let h = document.getElementById('history');
+            if(h.innerText === "---") h.innerText = "";
+            h.innerHTML += "<div>"+m+"</div>";
+            h.scrollTop = h.scrollHeight;
         }
 
-        function displayMsg(t) { 
-            let m = document.getElementById('messages'); 
-            m.innerHTML += "<div>"+t+"</div>"; 
-            m.scrollTop = m.scrollHeight; 
+        function displayMsg(t) {
+            let m = document.getElementById('messages');
+            m.innerHTML += "<div>"+t+"</div>";
+            m.scrollTop = m.scrollHeight;
         }
     </script>
 </body>
