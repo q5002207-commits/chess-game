@@ -3,39 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - الربط المضمون</title>
+    <title>نظام أحمد المحترف - شطرنج P2P</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        * { touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { width: 100%; max-width: 450px; background: #da291c; padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
-        #my-id-box { background: #000; color: #fff; padding: 5px 12px; border-radius: 20px; border: 1px solid #fff; font-family: monospace; font-size: 0.8em; margin-top: 5px; display: inline-block; }
-        #board { width: 95vw !important; max-width: 450px !important; border: 4px solid #333; border-radius: 8px; position: relative; }
-        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background: rgba(46, 204, 113, 0.7); border-radius: 50%; z-index: 100; pointer-events: none; }
-        .highlight-chosen { background: rgba(218, 41, 28, 0.6) !important; box-shadow: inset 0 0 10px #000; }
-        .controls { width: 95vw; max-width: 450px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .box { background: #222; padding: 12px; border-radius: 10px; border: 1px solid #444; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #da291c; background: #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 5px; cursor: pointer; }
+        * { touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3); }
+        #my-id-box { background: #000; color: #00ff00; padding: 6px 15px; border-radius: 20px; border: 1px solid #da291c; font-family: monospace; font-size: 0.9em; margin-top: 8px; display: inline-block; cursor: pointer; }
+        #board { width: 95vw !important; max-width: 400px !important; border: 5px solid #333; border-radius: 8px; }
+        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 100; }
+        .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
+        .controls { width: 95vw; max-width: 400px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; outline: none; }
+        input:focus { border-color: #da291c; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        .status-bar { font-size: 0.9em; color: #bbb; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h4 style="margin:0;">نظام أحمد المحترف ♟️</h4>
+        <h3 style="margin:0;">♟️ نظام أحمد المحترف ♟️</h3>
         <div id="my-id-box">جاري الاتصال بالسيرفر...</div>
+        <div class="status-bar" id="game-status">بانتظار المنافس...</div>
     </div>
 
     <div id="board"></div>
 
     <div class="controls">
         <div class="box">
-            <input type="text" id="friendId" placeholder="أدخل ID صاحبك هنا">
-            <button onclick="connectToFriend()" style="background:#000; border:1px solid #da291c;">إرسال طلب تحدي</button>
+            <input type="text" id="friendId" placeholder="أدخل ID الخصم">
+            <button onclick="connectToFriend()">تحدي هذا اللاعب</button>
         </div>
-        <div class="box">
-            <input type="text" id="chatInput" placeholder="أرسل رسالة...">
-            <button onclick="sendMsg()">إرسال</button>
+        <div class="box" style="display: flex; gap: 5px;">
+            <input type="text" id="chatInput" placeholder="رسالة سريعة..." style="margin-bottom:0;">
+            <button onclick="sendMsg()" style="width: 80px; background: #444;">إرسال</button>
         </div>
     </div>
 
@@ -47,58 +51,68 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var sourceSquare = null;
+        var myColor = 'w'; // الافتراضي أبيض
 
         window.onload = function() {
-            // توليد ID عشوائي
-            let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 8999);
             peer = new Peer(randomID);
 
             peer.on('open', (id) => {
-                document.getElementById('my-id-box').innerText = "الـ ID تبعك: " + id;
+                document.getElementById('my-id-box').innerText = "ID الخاص بك: " + id;
                 initBoard();
             });
 
-            // أهم جزء: استقبال الاتصال من صاحبك
             peer.on('connection', (incomingConn) => {
                 conn = incomingConn;
+                myColor = 'w'; // من يستقبل الاتصال هو الأبيض
                 setupConn();
-                alert("صاحبك دخل التحدي! ابدأ اللعب.");
+                alert("اتصل خصمك بك! أنت تلعب بالأبيض.");
             });
         };
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false,
+                draggable: false, // نستخدم النقر بدلاً من السحب للموبايل
                 position: 'start',
+                orientation: 'white',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
+
             $(window).resize(board.resize);
-            
-            $(document).on('touchstart click', '.square-55d63', function(e) {
+
+            // تحسين النقر للموبايل والكمبيوتر
+            $(document).on('click touchstart', '.square-55d63', function(e) {
                 e.preventDefault();
-                handleAction($(this).attr('data-square'));
+                let square = $(this).attr('data-square');
+                handleAction(square);
             });
         }
 
         function handleAction(square) {
+            // منع اللاعب من تحريك قطع الخصم في دوره
+            if (game.turn() !== myColor) return;
+
             if (sourceSquare === null) {
                 var piece = game.get(square);
-                if (piece && piece.color === game.turn()) {
+                if (piece && piece.color === myColor) {
                     sourceSquare = square;
                     drawHints(square);
                 }
             } else {
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
+                
                 if (move) {
                     board.position(game.fen());
+                    updateStatus();
                     if (conn && conn.open) {
-                        conn.send({ type: 'move', move: move }); // إرسال الحركة بشكل صحيح
+                        conn.send({ type: 'move', move: move });
                     }
                     sourceSquare = null;
                     clearHints();
                 } else {
+                    // إذا ضغط على قطعة أخرى من قطعه، يغير الاختيار
                     var piece = game.get(square);
-                    if (piece && piece.color === game.turn()) {
+                    if (piece && piece.color === myColor) {
                         sourceSquare = square;
                         drawHints(square);
                     } else {
@@ -113,27 +127,41 @@
             let fId = document.getElementById('friendId').value.trim();
             if(fId) {
                 conn = peer.connect(fId);
+                myColor = 'b'; // من يطلب الاتصال هو الأسود
+                board.orientation('black');
                 setupConn();
-            } else {
-                alert("اكتب الـ ID تبع صاحبك أول");
             }
         }
 
         function setupConn() {
             conn.on('open', () => {
-                console.log("Connected to: " + conn.peer);
+                document.getElementById('game-status').innerText = "متصل الآن - ابدأ اللعب";
                 conn.on('data', (data) => {
                     if (data.type === 'chat') {
-                        alert("صاحبك بقولك: " + data.text);
+                        alert("الخصم: " + data.text);
                     } else if (data.type === 'move') {
                         game.move(data.move);
                         board.position(game.fen());
+                        updateStatus();
                     }
                 });
             });
-            
-            conn.on('close', () => { alert("صاحبك طلع من اللعبة."); });
-            conn.on('error', (err) => { alert("صار مشكلة بالاتصال."); });
+            conn.on('close', () => { alert("انقطع الاتصال بالخصم."); });
+        }
+
+        function updateStatus() {
+            let status = "";
+            let moveColor = (game.turn() === 'w') ? "الأبيض" : "الأسود";
+
+            if (game.in_checkmate()) {
+                status = "كش ملك! الفائز: " + (game.turn() === 'w' ? "الأسود" : "الأبيض");
+            } else if (game.in_draw()) {
+                status = "تعادل!";
+            } else {
+                status = "دور: " + moveColor;
+                if (game.in_check()) status += " (كش!)";
+            }
+            document.getElementById('game-status').innerText = status;
         }
 
         function drawHints(sq) {
@@ -144,7 +172,9 @@
             });
         }
 
-        function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
+        function clearHints() { 
+            $('.square-55d63').removeClass('possible-move highlight-chosen'); 
+        }
 
         function sendMsg() {
             let input = document.getElementById('chatInput'), val = input.value;
