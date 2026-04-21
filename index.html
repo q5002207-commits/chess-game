@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بطولة أحمد المحترف - نسخة مكافحة الهروب</title>
+    <title>بطولة أحمد المحترف - وقت وتصنيف</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
         #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; font-size: 0.8em; }
+        
+        /* تصميم الساعات */
+        .clocks-container { display: flex; width: 100%; max-width: 400px; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        .clock { flex: 1; background: #1e1e1e; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #333; font-family: monospace; font-size: 1.5em; transition: 0.3s; }
+        .active-clock { border-color: #0f0; box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); color: #0f0; }
+
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
         .leaderboard-box { width: 100%; max-width: 400px; background: #1e1e1e; margin-top: 15px; border-radius: 12px; border: 1px solid #333; overflow: hidden; }
         .leaderboard-title { background: #333; padding: 10px; text-align: center; font-weight: bold; color: #ffcc00; }
@@ -33,10 +39,15 @@
         <div id="my-id">جاري الاتصال...</div>
     </div>
 
+    <div class="clocks-container">
+        <div id="opp-clock" class="clock">10:00</div>
+        <div id="my-clock" class="clock">10:00</div>
+    </div>
+
     <div id="board"></div>
 
     <div class="leaderboard-box">
-        <div class="leaderboard-title">جدول الترتيب (مضاد للهروب)</div>
+        <div class="leaderboard-title">جدول الترتيب (مضاد للهروب + وقت)</div>
         <table>
             <thead>
                 <tr><th>اللاعب</th><th>النقاط</th><th>الوضع</th></tr>
@@ -63,15 +74,17 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
-        var gameStarted = false; // مراقبة إذا اللعبة بدأت فعلاً
+        var gameStarted = false;
+        
+        // إعدادات الوقت (10 دقائق لكل لاعب)
+        var myTime = 600, oppTime = 600, timerInterval = null;
 
         var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك للبطولة:", "أحمد المحترف") || "لاعب مجهول";
         localStorage.setItem('p_name', myName);
         document.getElementById('my-name-display').innerText = myName;
 
         var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
-        var oppElo = 1200;
-        var oppName = "الخصم";
+        var oppElo = 1200, oppName = "الخصم";
 
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
@@ -84,6 +97,47 @@
             bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
+        function formatTime(s) {
+            let mins = Math.floor(s / 60);
+            let secs = s % 60;
+            return (mins < 10 ? '0' : '') + mins + ":" + (secs < 10 ? '0' : '') + secs;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameStarted) return;
+                if (game.turn() === myColor) {
+                    myTime--;
+                    document.getElementById('my-clock').innerText = formatTime(myTime);
+                    document.getElementById('my-clock').classList.add('active-clock');
+                    document.getElementById('opp-clock').classList.remove('active-clock');
+                    if (myTime <= 0) finalizeGame("time_lose");
+                } else {
+                    oppTime--;
+                    document.getElementById('opp-clock').innerText = formatTime(oppTime);
+                    document.getElementById('opp-clock').classList.add('active-clock');
+                    document.getElementById('my-clock').classList.remove('active-clock');
+                    if (oppTime <= 0) finalizeGame("time_win");
+                }
+            }, 1000);
+        }
+
+        function finalizeGame(result) {
+            clearInterval(timerInterval);
+            gameStarted = false;
+            if (result === "win" || result === "time_win" || result === "escaped") {
+                myElo += 25;
+                let msg = result === "escaped" ? "الخصم هرب! فزت بـ 25 نقطة." : (result === "win" ? "كش ملك! فزت بـ 25 نقطة." : "خلص وقت الخصم! فزت بـ 25 نقطة.");
+                alert(msg);
+            } else {
+                myElo -= 25;
+                let msg = result === "time_lose" ? "خلص وقتك! خسرت 25 نقطة." : "حظ أوفر، خسرت 25 نقطة.";
+                alert(msg);
+            }
+            updateUI();
+        }
+
         function updateUI() {
             document.getElementById('my-elo-display').innerText = myElo;
             document.getElementById('opp-elo-display').innerText = oppElo;
@@ -91,13 +145,10 @@
             localStorage.setItem('p_elo', myElo);
         }
 
-        // --- نظام مكافحة الهروب (التعديل الجديد) ---
         window.onbeforeunload = function() {
             if (gameStarted && !game.game_over()) {
-                myElo -= 25; // خصم النقاط فوراً
-                localStorage.setItem('p_elo', myElo);
+                myElo -= 25; localStorage.setItem('p_elo', myElo);
                 if (conn) conn.send({ type: 'opponent_escaped' });
-                return "لقد انسحبت من المباراة وتم خصم 25 نقطة!";
             }
         };
 
@@ -112,6 +163,7 @@
             peer.on('connection', (c) => { 
                 conn = c; myColor = 'w'; gameStarted = true; setupConn(); 
                 document.getElementById('opp-status').innerText = "متصل";
+                startTimer();
             });
         };
 
@@ -124,7 +176,7 @@
         }
 
         function handleAction(square) {
-            if (game.turn() !== myColor || game.game_over()) return;
+            if (!gameStarted || game.turn() !== myColor || game.game_over()) return;
             if (sourceSquare === null) {
                 var p = game.get(square);
                 if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
@@ -133,8 +185,8 @@
                 if (move) {
                     board.position(game.fen());
                     document.getElementById("moveSound").play();
-                    if (conn) conn.send({ type: 'move', move: move });
-                    checkGameOver();
+                    if (conn) conn.send({ type: 'move', move: move, time: myTime });
+                    if (game.in_checkmate()) finalizeGame("win");
                     sourceSquare = null; clearHints();
                 } else {
                     var p = game.get(square);
@@ -144,32 +196,17 @@
             }
         }
 
-        function checkGameOver() {
-            if (game.in_checkmate()) {
-                gameStarted = false; // انتهت اللعبة بسلام
-                let winner = game.turn() === myColor ? "lose" : "win";
-                if (winner === "win") { myElo += 25; alert("كفو! فزت بـ 25 نقطة."); } 
-                else { myElo -= 25; alert("حظ أوفر، خسرت 25 نقطة."); }
-                updateUI();
-            }
-        }
-
         function setupConn() {
             conn.on('open', () => { conn.send({ type: 'info', name: myName, elo: myElo }); });
             conn.on('data', (d) => {
                 if(d.type === 'info') { oppName = d.name; oppElo = d.elo; updateUI(); }
                 if(d.type === 'move') {
-                    game.move(d.move);
-                    board.position(game.fen());
+                    game.move(d.move); board.position(game.fen());
+                    oppTime = d.time; // مزامنة الوقت
                     document.getElementById("moveSound").play();
-                    checkGameOver();
+                    if (game.in_checkmate()) finalizeGame("lose");
                 }
-                if(d.type === 'opponent_escaped') {
-                    gameStarted = false;
-                    myElo += 25; // الخصم هرب، أنت تأخذ النقاط
-                    updateUI();
-                    alert("الخصم انسحب! تم منحك 25 نقطة.");
-                }
+                if(d.type === 'opponent_escaped') finalizeGame("escaped");
             });
         }
 
@@ -185,6 +222,7 @@
                 conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); 
                 gameStarted = true; setupConn();
                 document.getElementById('opp-status').innerText = "متصل";
+                startTimer();
             }
         }
     </script>
