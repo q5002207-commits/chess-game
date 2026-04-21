@@ -3,21 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ملعب أحمد المحترف - الإصدار الذهبي</title>
+    <title>ملعب أحمد المحترف - المواجهة الكبرى</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
         #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; }
+        
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
+        
+        /* اللون الأخضر (تلميحات الحركة) */
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
-        img[data-piece="wK"], img[src*="wK"], img[data-piece="wN"], img[src*="wN"] { border-radius: 50% !important; border: 2px solid white !important; }
+
+        /* --- تجميل الصور الدائرية لجميع الملوك والحصان --- */
+        img[data-piece="wK"], img[src*="wK"], img[data-piece="bK"], img[src*="bK"], img[data-piece="wN"], img[src*="wN"] { 
+            border-radius: 50% !important; 
+            border: 2px solid white !important; 
+        }
+
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; text-align: center; outline: none; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { background: #b02016; }
     </style>
 </head>
 <body>
@@ -42,8 +52,11 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
-        var kingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';
-        var knightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';
+        
+        // --- روابط الملوك والحصان ---
+        var whiteKingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';  // صورة صاحبك (الملك الأبيض - عشان الصليب)
+        var blackKingPic = 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg';  // صورتك أنت (الملك الأسود)
+        var whiteKnightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';  // صورة الحصان الأبيض
 
         window.onload = function() {
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -52,8 +65,7 @@
                 document.getElementById('my-id').innerText = "ID: " + id; 
                 initBoard(); 
             });
-            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); alert("اتصل الخصم!"); });
-            peer.on('error', (err) => { alert("مشكلة في السيرفر: " + err.type); });
+            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); alert("متصل! أنت تلعب بالأبيض."); });
         };
 
         function initBoard() {
@@ -61,12 +73,23 @@
                 draggable: false, 
                 position: 'start',
                 pieceTheme: function(p) {
-                    if (p === 'wK') return kingPic;
-                    if (p === 'wN') return knightPic;
+                    // تبديل الملك الأبيض (عشان الصليب)
+                    if (p === 'wK') return whiteKingPic;
+                    
+                    // تبديل الملك الأسود بصورتك
+                    if (p === 'bK') return blackKingPic;
+                    
+                    // تبديل الحصان الأبيض
+                    if (p === 'wN') return whiteKnightPic;
+                    
+                    // باقي القطع بضلوا زي ما هم
                     return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
                 }
             });
-            $(document).on('click touchstart', '.square-55d63', function() { handleAction($(this).attr('data-square')); });
+            $(window).resize(board.resize);
+            $(document).on('click touchstart', '.square-55d63', function() {
+                handleAction($(this).attr('data-square'));
+            });
         }
 
         function handleAction(square) {
@@ -91,11 +114,33 @@
         function drawHints(sq) {
             clearHints();
             $('.square-' + sq).addClass('highlight-chosen');
-            game.moves({ square: sq, verbose: true }).forEach(m => { $('.square-' + m.to).addClass('possible-move'); });
+            game.moves({ square: sq, verbose: true }).forEach(m => {
+                $('.square-' + m.to).addClass('possible-move');
+            });
         }
+
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-        function connectToFriend() { let fId = document.getElementById('friendId').value; if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); } }
-        function setupConn() { conn.on('open', () => { conn.on('data', (d) => { if(d.type === 'move') { game.move(d.move); board.position(game.fen()); } }); }); }
+
+        function connectToFriend() {
+            let fId = document.getElementById('friendId').value;
+            if(fId) { 
+                conn = peer.connect(fId); 
+                myColor = 'b'; 
+                board.orientation('black'); 
+                setupConn(); 
+            }
+        }
+
+        function setupConn() {
+            conn.on('open', () => {
+                conn.on('data', (d) => {
+                    if(d.type === 'move') {
+                        game.move(d.move);
+                        board.position(game.fen());
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
