@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ملعب أحمد المحترف - المواجهة الكبرى</title>
+    <title>ملعب أحمد المحترف - التشكيلة الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
         #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; }
-        
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
         
-        /* اللون الأخضر (تلميحات الحركة) */
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
 
-        /* --- تجميل الصور الدائرية لجميع الملوك والحصان --- */
-        img[data-piece="wK"], img[src*="wK"], img[data-piece="bK"], img[src*="bK"], img[data-piece="wN"], img[src*="wN"] { 
+        /* تجميل الصور المخصصة وجعلها دائرية */
+        img[data-piece="wK"], img[src*="wK"], 
+        img[data-piece="bK"], img[src*="bK"], 
+        img[data-piece="wN"], img[src*="wN"],
+        img[data-piece="bQ"], img[src*="bQ"] { 
             border-radius: 50% !important; 
             border: 2px solid white !important; 
         }
@@ -53,10 +54,11 @@
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
         
-        // --- روابط الملوك والحصان ---
-        var whiteKingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';  // صورة صاحبك (الملك الأبيض - عشان الصليب)
-        var blackKingPic = 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg';  // صورتك أنت (الملك الأسود)
-        var whiteKnightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';  // صورة الحصان الأبيض
+        // --- روابط الصور المباشرة ---
+        var whiteKingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';  // صورة صاحبك
+        var blackKingPic = 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg';  // صورتك (الملك)
+        var whiteKnightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';  // الحصان الأبيض
+        var blackQueenPic = 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg'; // الوزير الأسود الجديد
 
         window.onload = function() {
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -73,16 +75,10 @@
                 draggable: false, 
                 position: 'start',
                 pieceTheme: function(p) {
-                    // تبديل الملك الأبيض (عشان الصليب)
                     if (p === 'wK') return whiteKingPic;
-                    
-                    // تبديل الملك الأسود بصورتك
                     if (p === 'bK') return blackKingPic;
-                    
-                    // تبديل الحصان الأبيض
                     if (p === 'wN') return whiteKnightPic;
-                    
-                    // باقي القطع بضلوا زي ما هم
+                    if (p === 'bQ') return blackQueenPic; // تفعيل صورة الوزير الأسود
                     return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
                 }
             });
@@ -118,26 +114,15 @@
                 $('.square-' + m.to).addClass('possible-move');
             });
         }
-
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-
         function connectToFriend() {
             let fId = document.getElementById('friendId').value;
-            if(fId) { 
-                conn = peer.connect(fId); 
-                myColor = 'b'; 
-                board.orientation('black'); 
-                setupConn(); 
-            }
+            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); }
         }
-
         function setupConn() {
             conn.on('open', () => {
                 conn.on('data', (d) => {
-                    if(d.type === 'move') {
-                        game.move(d.move);
-                        board.position(game.fen());
-                    }
+                    if(d.type === 'move') { game.move(d.move); board.position(game.fen()); }
                 });
             });
         }
