@@ -10,15 +10,14 @@
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         #my-id-box { background: #000; color: #0f0; padding: 5px 10px; border-radius: 10px; font-family: monospace; font-size: 0.9em; border: 1px solid #da291c; }
-        
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
         
         /* اللون الأخضر (تلميحات النقلات) */
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
 
-        /* جعل وجه صاحبك دائري ونظيف */
-        img[data-piece="wK"] { 
+        /* --- القفل النهائي لصورة صاحبك (الملك الأبيض) --- */
+        img[src*="wK.png"], img[data-piece="wK"] { 
             content: url('https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg') !important;
             border-radius: 50% !important; 
             border: 2px solid white !important; 
@@ -65,12 +64,15 @@
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, // نستخدم النقر فقط
+                draggable: false, 
                 position: 'start',
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+                // الموتور الاحتياطي للصور
+                pieceTheme: function(p) {
+                    if (p === 'wK') return 'https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg';
+                    return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
+                }
             });
 
-            // تفعيل نظام النقر
             $(document).on('click touchstart', '.square-55d63', function() {
                 handleAction($(this).attr('data-square'));
             });
@@ -78,29 +80,19 @@
 
         function handleAction(square) {
             if (game.turn() !== myColor) return;
-
             if (sourceSquare === null) {
                 var p = game.get(square);
-                if (p && p.color === myColor) {
-                    sourceSquare = square;
-                    drawHints(square);
-                }
+                if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
             } else {
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 if (move) {
                     board.position(game.fen());
                     if (conn) conn.send({ type: 'move', move: move });
-                    sourceSquare = null;
-                    clearHints();
+                    sourceSquare = null; clearHints();
                 } else {
                     var p = game.get(square);
-                    if (p && p.color === myColor) {
-                        sourceSquare = square;
-                        drawHints(square);
-                    } else {
-                        sourceSquare = null;
-                        clearHints();
-                    }
+                    if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
+                    else { sourceSquare = null; clearHints(); }
                 }
             }
         }
@@ -112,21 +104,15 @@
                 $('.square-' + m.to).addClass('possible-move');
             });
         }
-
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-
         function connectToFriend() {
             let fId = document.getElementById('friendId').value;
             if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); }
         }
-
         function setupConn() {
             conn.on('open', () => {
                 conn.on('data', (d) => {
-                    if(d.type === 'move') {
-                        game.move(d.move);
-                        board.position(game.fen());
-                    }
+                    if(d.type === 'move') { game.move(d.move); board.position(game.fen()); }
                 });
             });
         }
