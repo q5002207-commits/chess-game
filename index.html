@@ -3,56 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - نسخة النقاط الخضراء</title>
+    <title>أحمد المحترف - الربط المضمون</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
         .header { width: 100%; max-width: 450px; background: #da291c; padding: 10px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
         #my-id-box { background: #000; color: #fff; padding: 5px 12px; border-radius: 20px; border: 1px solid #fff; font-family: monospace; font-size: 0.8em; margin-top: 5px; display: inline-block; }
-
-        /* --- أهم جزء: إظهار اللون الأخضر --- */
-        .possible-move::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px; /* حجم النقطة */
-            height: 20px;
-            background: rgba(46, 204, 113, 0.7); /* لون أخضر واضح */
-            border-radius: 50%;
-            z-index: 100;
-            pointer-events: none;
-        }
-        
-        /* تلوين المربع اللي اخترته */
-        .highlight-chosen {
-            background: rgba(218, 41, 28, 0.6) !important;
-            box-shadow: inset 0 0 10px #000;
-        }
-
         #board { width: 95vw !important; max-width: 450px !important; border: 4px solid #333; border-radius: 8px; position: relative; }
+        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background: rgba(46, 204, 113, 0.7); border-radius: 50%; z-index: 100; pointer-events: none; }
+        .highlight-chosen { background: rgba(218, 41, 28, 0.6) !important; box-shadow: inset 0 0 10px #000; }
         .controls { width: 95vw; max-width: 450px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
         .box { background: #222; padding: 12px; border-radius: 10px; border: 1px solid #444; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #da291c; background: #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 5px; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h4 style="margin:0;">نظام أحمد المحترف ♟️</h4>
-        <div id="my-id-box">جاري الاتصال...</div>
+        <div id="my-id-box">جاري الاتصال بالسيرفر...</div>
     </div>
 
     <div id="board"></div>
 
     <div class="controls">
         <div class="box">
-            <input type="text" id="friendId" placeholder="ID الخصم">
-            <button onclick="connectToFriend()" style="background:#000; border:1px solid #da291c;">تحدي أونلاين</button>
+            <input type="text" id="friendId" placeholder="أدخل ID صاحبك هنا">
+            <button onclick="connectToFriend()" style="background:#000; border:1px solid #da291c;">إرسال طلب تحدي</button>
         </div>
         <div class="box">
             <input type="text" id="chatInput" placeholder="أرسل رسالة...">
@@ -70,25 +49,34 @@
         var sourceSquare = null;
 
         window.onload = function() {
+            // توليد ID عشوائي
             let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(randomID);
-            peer.on('open', (id) => { document.getElementById('my-id-box').innerText = "ID: " + id; initBoard(); });
-            peer.on('connection', (c) => { conn = c; setupConn(); });
+
+            peer.on('open', (id) => {
+                document.getElementById('my-id-box').innerText = "الـ ID تبعك: " + id;
+                initBoard();
+            });
+
+            // أهم جزء: استقبال الاتصال من صاحبك
+            peer.on('connection', (incomingConn) => {
+                conn = incomingConn;
+                setupConn();
+                alert("صاحبك دخل التحدي! ابدأ اللعب.");
+            });
         };
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, // عطلنا السحب عشان ما يضارب مع اللمس
+                draggable: false,
                 position: 'start',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
             $(window).resize(board.resize);
             
-            // تفعيل اللمس والنقر
             $(document).on('touchstart click', '.square-55d63', function(e) {
                 e.preventDefault();
-                var square = $(this).attr('data-square');
-                handleAction(square);
+                handleAction($(this).attr('data-square'));
             });
         }
 
@@ -103,7 +91,9 @@
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 if (move) {
                     board.position(game.fen());
-                    if (conn) conn.send(move);
+                    if (conn && conn.open) {
+                        conn.send({ type: 'move', move: move }); // إرسال الحركة بشكل صحيح
+                    }
                     sourceSquare = null;
                     clearHints();
                 } else {
@@ -119,37 +109,49 @@
             }
         }
 
-        function drawHints(sq) {
-            clearHints();
-            $('.square-' + sq).addClass('highlight-chosen');
-            var moves = game.moves({ square: sq, verbose: true });
-            moves.forEach(m => {
-                $('.square-' + m.to).addClass('possible-move');
-            });
-        }
-
-        function clearHints() {
-            $('.square-55d63').removeClass('possible-move highlight-chosen');
-        }
-
         function connectToFriend() {
             let fId = document.getElementById('friendId').value.trim();
-            if(fId) { conn = peer.connect(fId); setupConn(); }
+            if(fId) {
+                conn = peer.connect(fId);
+                setupConn();
+            } else {
+                alert("اكتب الـ ID تبع صاحبك أول");
+            }
         }
 
         function setupConn() {
             conn.on('open', () => {
-                alert("تم الاتصال!");
+                console.log("Connected to: " + conn.peer);
                 conn.on('data', (data) => {
-                    if (data.type === 'chat') alert("رسالة: " + data.text);
-                    else { game.move(data); board.position(game.fen()); }
+                    if (data.type === 'chat') {
+                        alert("صاحبك بقولك: " + data.text);
+                    } else if (data.type === 'move') {
+                        game.move(data.move);
+                        board.position(game.fen());
+                    }
                 });
+            });
+            
+            conn.on('close', () => { alert("صاحبك طلع من اللعبة."); });
+            conn.on('error', (err) => { alert("صار مشكلة بالاتصال."); });
+        }
+
+        function drawHints(sq) {
+            clearHints();
+            $('.square-' + sq).addClass('highlight-chosen');
+            game.moves({ square: sq, verbose: true }).forEach(m => {
+                $('.square-' + m.to).addClass('possible-move');
             });
         }
 
+        function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
+
         function sendMsg() {
             let input = document.getElementById('chatInput'), val = input.value;
-            if (val && conn) { conn.send({ type: 'chat', text: val }); input.value = ""; }
+            if (val && conn && conn.open) {
+                conn.send({ type: 'chat', text: val });
+                input.value = "";
+            }
         }
     </script>
 </body>
