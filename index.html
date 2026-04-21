@@ -3,35 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ملعب أحمد المحترف - نسخة الصوت</title>
+    <title>بطولة أحمد المحترف - Elo Chess</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
-        #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
+        #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; font-size: 0.8em; }
+
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
-        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
-        .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
-        img[class^="piece"], img[src*="postimg"] { border-radius: 50% !important; border: 2px solid white !important; }
+        
+        /* جدول الترتيب */
+        .leaderboard-box { width: 100%; max-width: 400px; background: #1e1e1e; margin-top: 15px; border-radius: 12px; border: 1px solid #333; overflow: hidden; }
+        .leaderboard-title { background: #333; padding: 10px; text-align: center; font-weight: bold; color: #ffcc00; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #2a2a2a; }
+        th { background: #252525; color: #aaa; font-size: 0.8em; }
+        .highlight-me { color: #0f0; font-weight: bold; }
+
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; text-align: center; outline: none; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        
+        /* القطع المخصصة */
+        img[class^="piece"], img[src*="postimg"] { border-radius: 50% !important; border: 2px solid white !important; }
+        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; }
+        .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h3 style="margin:0;">♟️ ملعب أحمد المحترف ♟️</h3>
-        <div id="my-id">جاري الاتصال...</div>
+        <h3 style="margin:0;">🏆 بطولة أحمد المحترف 🏆</h3>
+        <div id="my-id">جاري الاتصال بالسيرفر...</div>
     </div>
 
     <div id="board"></div>
 
+    <div class="leaderboard-box">
+        <div class="leaderboard-title">جدول الترتيب المباشر</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>اللاعب</th>
+                    <th>نقاط Elo</th>
+                    <th>الوضع</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <tr class="highlight-me">
+                    <td id="my-name-display">أنت</td>
+                    <td id="my-elo-display">1200</td>
+                    <td>متصل</td>
+                </tr>
+                <tr>
+                    <td id="opp-name-display">بانتظار خصم...</td>
+                    <td id="opp-elo-display">1200</td>
+                    <td id="opp-status">بعيد</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="controls box">
         <input type="text" id="friendId" placeholder="أدخل ID الخصم">
-        <button onclick="connectToFriend()">تحدي الآن</button>
+        <button onclick="connectToFriend()">إرسال طلب تحدي</button>
     </div>
 
     <audio id="moveSound" src="https://images.chesscomfiles.com/chess-themes/sounds/_standard/default/move-self.mp3" preload="auto"></audio>
@@ -44,7 +82,15 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
-        var moveAudio = document.getElementById("moveSound");
+
+        // --- نظام الأسماء والنقاط ---
+        var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك للبطولة:", "أحمد المحترف") || "لاعب مجهول";
+        localStorage.setItem('p_name', myName);
+        document.getElementById('my-name-display').innerText = myName;
+
+        var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
+        var oppElo = 1200;
+        var oppName = "الخصم";
 
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
@@ -57,29 +103,37 @@
             bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
+        function updateUI() {
+            document.getElementById('my-elo-display').innerText = myElo;
+            document.getElementById('opp-elo-display').innerText = oppElo;
+            document.getElementById('opp-name-display').innerText = oppName;
+            localStorage.setItem('p_elo', myElo);
+        }
+
         window.onload = function() {
+            updateUI();
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(randomId);
-            peer.on('open', (id) => { document.getElementById('my-id').innerText = "ID: " + id; initBoard(); });
-            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); alert("متصل بالأبيض!"); });
+            peer.on('open', (id) => { 
+                document.getElementById('my-id').innerText = "ID الخاص بك: " + id; 
+                initBoard(); 
+            });
+            peer.on('connection', (c) => { 
+                conn = c; myColor = 'w'; setupConn(); 
+                document.getElementById('opp-status').innerText = "متصل";
+            });
         };
-
-        function playSound() {
-            moveAudio.currentTime = 0;
-            moveAudio.play();
-        }
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, 
-                position: 'start',
-                pieceTheme: function(p) { return pics[p] ? pics[p] : 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'; }
+                draggable: false, position: 'start',
+                pieceTheme: (p) => pics[p] ? pics[p] : 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
             });
             $(document).on('click touchstart', '.square-55d63', function() { handleAction($(this).attr('data-square')); });
         }
 
         function handleAction(square) {
-            if (game.turn() !== myColor) return;
+            if (game.turn() !== myColor || game.game_over()) return;
             if (sourceSquare === null) {
                 var p = game.get(square);
                 if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
@@ -87,8 +141,9 @@
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 if (move) {
                     board.position(game.fen());
-                    playSound(); // تشغيل الصوت عند تحريك قطعتك
+                    document.getElementById("moveSound").play();
                     if (conn) conn.send({ type: 'move', move: move });
+                    checkGameOver();
                     sourceSquare = null; clearHints();
                 } else {
                     var p = game.get(square);
@@ -98,24 +153,52 @@
             }
         }
 
+        function checkGameOver() {
+            if (game.in_checkmate()) {
+                let winner = game.turn() === myColor ? "lose" : "win";
+                if (winner === "win") { myElo += 25; alert("كفو! فزت بـ 25 نقطة."); } 
+                else { myElo -= 25; alert("حظ أوفر، خسرت 25 نقطة."); }
+                updateUI();
+            }
+        }
+
+        function setupConn() {
+            // إرسال الاسم والنقاط للطرف الآخر فور الاتصال
+            conn.on('open', () => {
+                conn.send({ type: 'info', name: myName, elo: myElo });
+            });
+
+            conn.on('data', (d) => {
+                if(d.type === 'info') {
+                    oppName = d.name;
+                    oppElo = d.elo;
+                    updateUI();
+                }
+                if(d.type === 'move') {
+                    game.move(d.move);
+                    board.position(game.fen());
+                    document.getElementById("moveSound").play();
+                    checkGameOver();
+                }
+            });
+        }
+
         function drawHints(sq) {
             clearHints();
             $('.square-' + sq).addClass('highlight-chosen');
             game.moves({ square: sq, verbose: true }).forEach(m => { $('.square-' + m.to).addClass('possible-move'); });
         }
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-        function connectToFriend() { let fId = document.getElementById('friendId').value; if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); } }
         
-        function setupConn() {
-            conn.on('open', () => {
-                conn.on('data', (d) => {
-                    if(d.type === 'move') {
-                        game.move(d.move);
-                        board.position(game.fen());
-                        playSound(); // تشغيل الصوت عند وصول حركة الخصم
-                    }
-                });
-            });
+        function connectToFriend() {
+            let fId = document.getElementById('friendId').value;
+            if(fId) { 
+                conn = peer.connect(fId); 
+                myColor = 'b'; 
+                board.orientation('black'); 
+                setupConn();
+                document.getElementById('opp-status').innerText = "متصل";
+            }
         }
     </script>
 </body>
