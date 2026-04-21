@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ملعب أحمد المحترف - التشكيلة الكاملة</title>
+    <title>ملعب أحمد المحترف - النسخة الملكية الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -15,11 +15,8 @@
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
 
-        /* تجميل الصور المخصصة وجعلها دائرية */
-        img[data-piece="wK"], img[src*="wK"], 
-        img[data-piece="bK"], img[src*="bK"], 
-        img[data-piece="wN"], img[src*="wN"],
-        img[data-piece="bQ"], img[src*="bQ"] { 
+        /* جعل جميع القطع المخصصة دائرية ببرواز أبيض */
+        img[class^="piece"], img[src*="postimg"] { 
             border-radius: 50% !important; 
             border: 2px solid white !important; 
         }
@@ -35,7 +32,7 @@
 
     <div class="header">
         <h3 style="margin:0;">♟️ ملعب أحمد المحترف ♟️</h3>
-        <div id="my-id">جاري الاتصال بالسيرفر...</div>
+        <div id="my-id">جاري الاتصال...</div>
     </div>
 
     <div id="board"></div>
@@ -54,11 +51,14 @@
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
         
-        // --- روابط الصور المباشرة ---
-        var whiteKingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';  // صورة صاحبك
-        var blackKingPic = 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg';  // صورتك (الملك)
-        var whiteKnightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';  // الحصان الأبيض
-        var blackQueenPic = 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg'; // الوزير الأسود الجديد
+        // --- روابط الصور المباشرة (Postimages) ---
+        var pics = {
+            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',      // ملك أبيض (صاحبك)
+            wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg', // وزير أبيض (جديد)
+            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg',      // حصان أبيض
+            bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg', // ملك أسود (أنت)
+            bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg'  // وزير أسود
+        };
 
         window.onload = function() {
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -75,14 +75,10 @@
                 draggable: false, 
                 position: 'start',
                 pieceTheme: function(p) {
-                    if (p === 'wK') return whiteKingPic;
-                    if (p === 'bK') return blackKingPic;
-                    if (p === 'wN') return whiteKnightPic;
-                    if (p === 'bQ') return blackQueenPic; // تفعيل صورة الوزير الأسود
+                    if (pics[p]) return pics[p];
                     return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
                 }
             });
-            $(window).resize(board.resize);
             $(document).on('click touchstart', '.square-55d63', function() {
                 handleAction($(this).attr('data-square'));
             });
