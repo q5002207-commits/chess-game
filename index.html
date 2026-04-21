@@ -11,6 +11,18 @@
         .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3); }
         #my-id-box { background: #000; color: #00ff00; padding: 6px 15px; border-radius: 20px; border: 1px solid #da291c; font-family: monospace; font-size: 0.9em; margin-top: 8px; display: inline-block; cursor: pointer; }
         #board { width: 95vw !important; max-width: 400px !important; border: 5px solid #333; border-radius: 8px; }
+        
+        /* --- تعديل أحمد لصور الأصحاب --- */
+        /* استبدال صورة الملك الأبيض بالرابط اللي جبناه */
+        img[data-piece="wK"] {
+            content: url('https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg') !important;
+            border-radius: 50%; /* لجعل الصورة دائرية */
+            border: 1px solid white;
+        }
+        
+        /* إذا بدك تبدل الملك الأسود مستقبلاً استخدم السطر اللي تحت */
+        /* img[data-piece="bK"] { content: url('رابط_صورة_الخصم') !important; border-radius: 50%; } */
+        
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 100; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
         .controls { width: 95vw; max-width: 400px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -51,7 +63,7 @@
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var sourceSquare = null;
-        var myColor = 'w'; // الافتراضي أبيض
+        var myColor = 'w'; 
 
         window.onload = function() {
             let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 8999);
@@ -64,7 +76,7 @@
 
             peer.on('connection', (incomingConn) => {
                 conn = incomingConn;
-                myColor = 'w'; // من يستقبل الاتصال هو الأبيض
+                myColor = 'w'; 
                 setupConn();
                 alert("اتصل خصمك بك! أنت تلعب بالأبيض.");
             });
@@ -72,15 +84,15 @@
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, // نستخدم النقر بدلاً من السحب للموبايل
+                draggable: false, 
                 position: 'start',
                 orientation: 'white',
+                // السطر التالي هو المسؤول عن شكل القطع الأصلية
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
 
             $(window).resize(board.resize);
 
-            // تحسين النقر للموبايل والكمبيوتر
             $(document).on('click touchstart', '.square-55d63', function(e) {
                 e.preventDefault();
                 let square = $(this).attr('data-square');
@@ -89,7 +101,6 @@
         }
 
         function handleAction(square) {
-            // منع اللاعب من تحريك قطع الخصم في دوره
             if (game.turn() !== myColor) return;
 
             if (sourceSquare === null) {
@@ -100,7 +111,6 @@
                 }
             } else {
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
-                
                 if (move) {
                     board.position(game.fen());
                     updateStatus();
@@ -110,7 +120,6 @@
                     sourceSquare = null;
                     clearHints();
                 } else {
-                    // إذا ضغط على قطعة أخرى من قطعه، يغير الاختيار
                     var piece = game.get(square);
                     if (piece && piece.color === myColor) {
                         sourceSquare = square;
@@ -127,7 +136,7 @@
             let fId = document.getElementById('friendId').value.trim();
             if(fId) {
                 conn = peer.connect(fId);
-                myColor = 'b'; // من يطلب الاتصال هو الأسود
+                myColor = 'b'; 
                 board.orientation('black');
                 setupConn();
             }
@@ -152,15 +161,9 @@
         function updateStatus() {
             let status = "";
             let moveColor = (game.turn() === 'w') ? "الأبيض" : "الأسود";
-
-            if (game.in_checkmate()) {
-                status = "كش ملك! الفائز: " + (game.turn() === 'w' ? "الأسود" : "الأبيض");
-            } else if (game.in_draw()) {
-                status = "تعادل!";
-            } else {
-                status = "دور: " + moveColor;
-                if (game.in_check()) status += " (كش!)";
-            }
+            if (game.in_checkmate()) { status = "كش ملك! الفائز: " + (game.turn() === 'w' ? "الأسود" : "الأبيض"); }
+            else if (game.in_draw()) { status = "تعادل!"; }
+            else { status = "دور: " + moveColor; if (game.in_check()) status += " (كش!)"; }
             document.getElementById('game-status').innerText = status;
         }
 
@@ -172,9 +175,7 @@
             });
         }
 
-        function clearHints() { 
-            $('.square-55d63').removeClass('possible-move highlight-chosen'); 
-        }
+        function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
 
         function sendMsg() {
             let input = document.getElementById('chatInput'), val = input.value;
