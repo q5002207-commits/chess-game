@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - التصنيف العالمي</title>
+    <title>بطولة أحمد المحترف - نسخة مكافحة الهروب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -11,20 +11,16 @@
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.4); }
         #my-id { color: #0f0; font-family: monospace; font-weight: bold; margin-top: 5px; font-size: 0.8em; }
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
-        
-        /* جدول الترتيب العالمي */
         .leaderboard-box { width: 100%; max-width: 400px; background: #1e1e1e; margin-top: 15px; border-radius: 12px; border: 1px solid #333; overflow: hidden; }
         .leaderboard-title { background: #333; padding: 10px; text-align: center; font-weight: bold; color: #ffcc00; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: center; border-bottom: 1px solid #2a2a2a; }
         th { background: #252525; color: #aaa; font-size: 0.8em; }
-        .highlight-me { background: rgba(0, 255, 0, 0.1); color: #0f0; font-weight: bold; }
-
+        .highlight-me { color: #0f0; font-weight: bold; }
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; text-align: center; outline: none; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        
         img[class^="piece"], img[src*="postimg"] { border-radius: 50% !important; border: 2px solid white !important; }
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
@@ -33,24 +29,22 @@
 <body>
 
     <div class="header">
-        <h3 style="margin:0;">🏆 لوحة شرف أحمد المحترف 🏆</h3>
+        <h3 style="margin:0;">🏆 تصنيف أحمد المحترف 🏆</h3>
         <div id="my-id">جاري الاتصال...</div>
     </div>
 
     <div id="board"></div>
 
     <div class="leaderboard-box">
-        <div class="leaderboard-title">التصنيف العالمي للاعبين</div>
+        <div class="leaderboard-title">جدول الترتيب (مضاد للهروب)</div>
         <table>
             <thead>
-                <tr>
-                    <th>الترتيب</th>
-                    <th>اللاعب</th>
-                    <th>النقاط (Elo)</th>
-                </tr>
+                <tr><th>اللاعب</th><th>النقاط</th><th>الوضع</th></tr>
             </thead>
-            <tbody id="global-leaderboard">
-                </tbody>
+            <tbody id="leaderboard-body">
+                <tr class="highlight-me"><td id="my-name-display">أنت</td><td id="my-elo-display">1200</td><td>متصل</td></tr>
+                <tr><td id="opp-name-display">بانتظار خصم...</td><td id="opp-elo-display">1200</td><td id="opp-status">بعيد</td></tr>
+            </tbody>
         </table>
     </div>
 
@@ -61,35 +55,23 @@
 
     <audio id="moveSound" src="https://images.chesscomfiles.com/chess-themes/sounds/_standard/default/move-self.mp3" preload="auto"></audio>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        // إعدادات Firebase من الصورة التي أرفقتها
-        const firebaseConfig = {
-            apiKey: "AIzaSyCPwvvC0WaqLDEHe9O_o2b3mFbGe8vcNKs",
-            authDomain: "ahmed-chess.firebaseapp.com",
-            projectId: "ahmed-chess",
-            storageBucket: "ahmed-chess.firebasestorage.app",
-            messagingSenderId: "356031293516",
-            appId: "1:356031293516:web:18010386688a374e31ece9",
-            measurementId: "G-F2GKH6TSFJ",
-            databaseURL: "https://ahmed-chess-default-rtdb.firebaseio.com/" // تأكد أن الرابط ينتهي بـ firebaseio.com
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
         var board = null, game = new Chess(), peer = null, conn = null;
-        var myColor = 'w', sourceSquare = null, gameStarted = false;
+        var myColor = 'w', sourceSquare = null;
+        var gameStarted = false; // مراقبة إذا اللعبة بدأت فعلاً
 
-        var myName = localStorage.getItem('p_name') || prompt("اسمك في البطولة العالمية:") || "لاعب";
+        var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك للبطولة:", "أحمد المحترف") || "لاعب مجهول";
         localStorage.setItem('p_name', myName);
+        document.getElementById('my-name-display').innerText = myName;
+
         var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
+        var oppElo = 1200;
+        var oppName = "الخصم";
 
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
@@ -102,39 +84,35 @@
             bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
-        // تحديث البيانات في Firebase والجدول
-        function syncAndListen() {
-            database.ref('players/' + myName).set({ name: myName, elo: myElo });
+        function updateUI() {
+            document.getElementById('my-elo-display').innerText = myElo;
+            document.getElementById('opp-elo-display').innerText = oppElo;
+            document.getElementById('opp-name-display').innerText = oppName;
             localStorage.setItem('p_elo', myElo);
-
-            database.ref('players').orderByChild('elo').on('value', (snapshot) => {
-                let html = '';
-                let players = [];
-                snapshot.forEach(child => { players.push(child.val()); });
-                players.reverse();
-                players.forEach((p, index) => {
-                    let isMe = p.name === myName ? 'class="highlight-me"' : '';
-                    html += `<tr ${isMe}><td>${index + 1}</td><td>${p.name}</td><td>${p.elo}</td></tr>`;
-                });
-                document.getElementById('global-leaderboard').innerHTML = html;
-            });
         }
 
+        // --- نظام مكافحة الهروب (التعديل الجديد) ---
         window.onbeforeunload = function() {
             if (gameStarted && !game.game_over()) {
-                myElo -= 25;
-                database.ref('players/' + myName).update({ elo: myElo });
+                myElo -= 25; // خصم النقاط فوراً
                 localStorage.setItem('p_elo', myElo);
-                if (conn) conn.send({ type: 'escape' });
+                if (conn) conn.send({ type: 'opponent_escaped' });
+                return "لقد انسحبت من المباراة وتم خصم 25 نقطة!";
             }
         };
 
         window.onload = function() {
-            syncAndListen();
+            updateUI();
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(randomId);
-            peer.on('open', (id) => { document.getElementById('my-id').innerText = "ID: " + id; initBoard(); });
-            peer.on('connection', (c) => { conn = c; myColor = 'w'; gameStarted = true; setupConn(); });
+            peer.on('open', (id) => { 
+                document.getElementById('my-id').innerText = "ID الخاص بك: " + id; 
+                initBoard(); 
+            });
+            peer.on('connection', (c) => { 
+                conn = c; myColor = 'w'; gameStarted = true; setupConn(); 
+                document.getElementById('opp-status').innerText = "متصل";
+            });
         };
 
         function initBoard() {
@@ -168,25 +146,29 @@
 
         function checkGameOver() {
             if (game.in_checkmate()) {
-                gameStarted = false;
-                if (game.turn() !== myColor) { myElo += 25; alert("فزت! +25"); } 
-                else { myElo -= 25; alert("خسرت! -25"); }
-                database.ref('players/' + myName).update({ elo: myElo });
-                localStorage.setItem('p_elo', myElo);
+                gameStarted = false; // انتهت اللعبة بسلام
+                let winner = game.turn() === myColor ? "lose" : "win";
+                if (winner === "win") { myElo += 25; alert("كفو! فزت بـ 25 نقطة."); } 
+                else { myElo -= 25; alert("حظ أوفر، خسرت 25 نقطة."); }
+                updateUI();
             }
         }
 
         function setupConn() {
+            conn.on('open', () => { conn.send({ type: 'info', name: myName, elo: myElo }); });
             conn.on('data', (d) => {
+                if(d.type === 'info') { oppName = d.name; oppElo = d.elo; updateUI(); }
                 if(d.type === 'move') {
-                    game.move(d.move); board.position(game.fen());
+                    game.move(d.move);
+                    board.position(game.fen());
                     document.getElementById("moveSound").play();
                     checkGameOver();
                 }
-                if(d.type === 'escape') {
-                    gameStarted = false; myElo += 25;
-                    database.ref('players/' + myName).update({ elo: myElo });
-                    alert("انسحب الخصم! حصلت على 25 نقطة.");
+                if(d.type === 'opponent_escaped') {
+                    gameStarted = false;
+                    myElo += 25; // الخصم هرب، أنت تأخذ النقاط
+                    updateUI();
+                    alert("الخصم انسحب! تم منحك 25 نقطة.");
                 }
             });
         }
@@ -199,7 +181,11 @@
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
         function connectToFriend() {
             let fId = document.getElementById('friendId').value;
-            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); gameStarted = true; setupConn(); }
+            if(fId) { 
+                conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); 
+                gameStarted = true; setupConn();
+                document.getElementById('opp-status').innerText = "متصل";
+            }
         }
     </script>
 </body>
