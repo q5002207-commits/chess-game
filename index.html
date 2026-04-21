@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ملعب أحمد المحترف - الإصدار الذهبي</title>
+    <title>ملعب أحمد المحترف - الإصدار الذهبي v2.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -17,9 +17,8 @@
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
 
-        /* تثبيت وجه صاحبك مكان الملك الأبيض (wK) وجعله دائري */
-        img[data-piece="wK"], img[src*="wK"] { 
-            content: url('https://i.postimg.cc/m27HgYdg/king-black.jpg') !important;
+        /* تجميل الصور الدائرية (الملك والحصان) */
+        img[data-piece="wK"], img[src*="wK"], img[data-piece="wN"], img[src*="wN"] { 
             border-radius: 50% !important; 
             border: 2px solid white !important; 
         }
@@ -46,14 +45,17 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <script src="https://chessjs.com/chess.js"></script>
+    <script src="https://chessboardjs.com/img/chesspieces/wikipedia/chessboard-1.0.0.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
-        var friendPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';
+        
+        // الروابط المباشرة للصور
+        var kingPic = 'https://i.postimg.cc/m27HgYdg/king-black.jpg';  // صورة الملك
+        var knightPic = 'https://i.postimg.cc/d31K4Kx9/download.jpg';  // صورة الحصان الجديد
 
         window.onload = function() {
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -70,7 +72,13 @@
                 draggable: false, 
                 position: 'start',
                 pieceTheme: function(p) {
-                    if (p === 'wK') return friendPic;
+                    // تبديل الملك الأبيض (عشان الصليب)
+                    if (p === 'wK') return kingPic;
+                    
+                    // تبديل الحصان الأبيض بالصورة الجديدة
+                    if (p === 'wN') return knightPic;
+                    
+                    // باقي القطع بضلوا زي ما هم
                     return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
                 }
             });
