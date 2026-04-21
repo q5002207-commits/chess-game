@@ -3,55 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام أحمد المحترف - شطرنج P2P</title>
+    <title>نظام أحمد المحترف - شطرنج الأصحاب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        * { touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3); }
-        #my-id-box { background: #000; color: #00ff00; padding: 6px 15px; border-radius: 20px; border: 1px solid #da291c; font-family: monospace; font-size: 0.9em; margin-top: 8px; display: inline-block; cursor: pointer; }
+        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
+        body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         #board { width: 95vw !important; max-width: 400px !important; border: 5px solid #333; border-radius: 8px; }
         
-        /* --- تعديل أحمد لصور الأصحاب --- */
-        /* استبدال صورة الملك الأبيض بالرابط اللي جبناه */
+        /* --- استبدال الملك الأبيض بصورة صاحبك المباشرة --- */
         img[data-piece="wK"] {
             content: url('https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg') !important;
-            border-radius: 50%; /* لجعل الصورة دائرية */
-            border: 1px solid white;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
-        
-        /* إذا بدك تبدل الملك الأسود مستقبلاً استخدم السطر اللي تحت */
-        /* img[data-piece="bK"] { content: url('رابط_صورة_الخصم') !important; border-radius: 50%; } */
         
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 100; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
-        .controls { width: 95vw; max-width: 400px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; outline: none; }
-        input:focus { border-color: #da291c; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
-        .status-bar { font-size: 0.9em; color: #bbb; margin-top: 5px; }
+        .controls { width: 95vw; max-width: 400px; margin-top: 15px; }
+        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 10px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h3 style="margin:0;">♟️ نظام أحمد المحترف ♟️</h3>
-        <div id="my-id-box">جاري الاتصال بالسيرفر...</div>
-        <div class="status-bar" id="game-status">بانتظار المنافس...</div>
+        <h3 style="margin:0;">♟️ ملعب أحمد المحترف ♟️</h3>
+        <div id="my-id-box" style="color:#0f0; font-family:monospace; margin-top:5px;">جاري الاتصال...</div>
     </div>
 
     <div id="board"></div>
 
     <div class="controls">
         <div class="box">
-            <input type="text" id="friendId" placeholder="أدخل ID الخصم">
-            <button onclick="connectToFriend()">تحدي هذا اللاعب</button>
-        </div>
-        <div class="box" style="display: flex; gap: 5px;">
-            <input type="text" id="chatInput" placeholder="رسالة سريعة..." style="margin-bottom:0;">
-            <button onclick="sendMsg()" style="width: 80px; background: #444;">إرسال</button>
+            <input type="text" id="friendId" placeholder="ID الخصم">
+            <button onclick="connectToFriend()">تحدي</button>
         </div>
     </div>
 
@@ -61,129 +49,53 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        var board = null, game = new Chess(), peer = null, conn = null;
-        var sourceSquare = null;
-        var myColor = 'w'; 
+        var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w', sourceSquare = null;
 
         window.onload = function() {
-            let randomID = "Ahmed_" + Math.floor(1000 + Math.random() * 8999);
-            peer = new Peer(randomID);
-
-            peer.on('open', (id) => {
-                document.getElementById('my-id-box').innerText = "ID الخاص بك: " + id;
-                initBoard();
-            });
-
-            peer.on('connection', (incomingConn) => {
-                conn = incomingConn;
-                myColor = 'w'; 
-                setupConn();
-                alert("اتصل خصمك بك! أنت تلعب بالأبيض.");
-            });
+            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            peer = new Peer(id);
+            peer.on('open', (id) => { document.getElementById('my-id-box').innerText = "ID: " + id; initBoard(); });
+            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); alert("بدأ التحدي! أنت بالأبيض."); });
         };
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, 
-                position: 'start',
-                orientation: 'white',
-                // السطر التالي هو المسؤول عن شكل القطع الأصلية
+                draggable: false, position: 'start', orientation: 'white',
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
-
-            $(window).resize(board.resize);
-
-            $(document).on('click touchstart', '.square-55d63', function(e) {
-                e.preventDefault();
-                let square = $(this).attr('data-square');
-                handleAction(square);
-            });
+            $(document).on('click touchstart', '.square-55d63', function() { handleAction($(this).attr('data-square')); });
         }
 
         function handleAction(square) {
             if (game.turn() !== myColor) return;
-
             if (sourceSquare === null) {
-                var piece = game.get(square);
-                if (piece && piece.color === myColor) {
-                    sourceSquare = square;
-                    drawHints(square);
-                }
+                var p = game.get(square);
+                if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
             } else {
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 if (move) {
                     board.position(game.fen());
-                    updateStatus();
-                    if (conn && conn.open) {
-                        conn.send({ type: 'move', move: move });
-                    }
-                    sourceSquare = null;
-                    clearHints();
+                    if (conn) conn.send({ type: 'move', move: move });
+                    sourceSquare = null; clearHints();
                 } else {
-                    var piece = game.get(square);
-                    if (piece && piece.color === myColor) {
-                        sourceSquare = square;
-                        drawHints(square);
-                    } else {
-                        sourceSquare = null;
-                        clearHints();
-                    }
+                    var p = game.get(square);
+                    if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
+                    else { sourceSquare = null; clearHints(); }
                 }
             }
         }
 
         function connectToFriend() {
-            let fId = document.getElementById('friendId').value.trim();
-            if(fId) {
-                conn = peer.connect(fId);
-                myColor = 'b'; 
-                board.orientation('black');
-                setupConn();
-            }
+            let fId = document.getElementById('friendId').value;
+            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); }
         }
 
         function setupConn() {
-            conn.on('open', () => {
-                document.getElementById('game-status').innerText = "متصل الآن - ابدأ اللعب";
-                conn.on('data', (data) => {
-                    if (data.type === 'chat') {
-                        alert("الخصم: " + data.text);
-                    } else if (data.type === 'move') {
-                        game.move(data.move);
-                        board.position(game.fen());
-                        updateStatus();
-                    }
-                });
-            });
-            conn.on('close', () => { alert("انقطع الاتصال بالخصم."); });
+            conn.on('open', () => { conn.on('data', (d) => { if(d.type==='move'){ game.move(d.move); board.position(game.fen()); } }); });
         }
 
-        function updateStatus() {
-            let status = "";
-            let moveColor = (game.turn() === 'w') ? "الأبيض" : "الأسود";
-            if (game.in_checkmate()) { status = "كش ملك! الفائز: " + (game.turn() === 'w' ? "الأسود" : "الأبيض"); }
-            else if (game.in_draw()) { status = "تعادل!"; }
-            else { status = "دور: " + moveColor; if (game.in_check()) status += " (كش!)"; }
-            document.getElementById('game-status').innerText = status;
-        }
-
-        function drawHints(sq) {
-            clearHints();
-            $('.square-' + sq).addClass('highlight-chosen');
-            game.moves({ square: sq, verbose: true }).forEach(m => {
-                $('.square-' + m.to).addClass('possible-move');
-            });
-        }
-
+        function drawHints(sq) { clearHints(); $('.square-'+sq).addClass('highlight-chosen'); game.moves({square:sq, verbose:true}).forEach(m=>{$('.square-'+m.to).addClass('possible-move');}); }
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-
-        function sendMsg() {
-            let input = document.getElementById('chatInput'), val = input.value;
-            if (val && conn && conn.open) {
-                conn.send({ type: 'chat', text: val });
-                input.value = "";
-            }
-        }
     </script>
 </body>
 </html>
