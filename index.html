@@ -3,35 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - النسخة الأصلية</title>
+    <title>أحمد المحترف - النظام المتكامل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; color: white; box-shadow: 0 0 20px rgba(218, 41, 28, 0.5); }
+        /* واجهة الهكر */
+        #hacker-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
+            z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .matrix-text { font-size: 1.1em; text-shadow: 0 0 8px #0f0; margin: 5px; opacity: 0; animation: scan 0.2s forwards; }
+        @keyframes scan { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 10px; color: white; box-shadow: 0 0 15px rgba(218, 41, 28, 0.4); }
         .clocks-container { display: flex; width: 100%; max-width: 400px; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
-        .clock { flex: 1; background: #1a1a1a; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #333; font-family: monospace; font-size: 1.5em; color: #fff; }
-        .active-clock { border-color: #0f0; color: #0f0; text-shadow: 0 0 5px #0f0; }
+        .clock { flex: 1; background: #111; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #333; font-family: monospace; font-size: 1.4em; color: #fff; }
+        .active-clock { border-color: #0f0; color: #0f0; box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); }
 
-        #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #222; border-radius: 8px; }
-        .leaderboard-box { width: 100%; max-width: 400px; background: #111; margin-top: 15px; border-radius: 12px; border: 1px solid #444; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #333; }
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
+        
+        /* تمييز المربعات */
+        .highlight-sq { background: rgba(0, 255, 0, 0.3) !important; }
+        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; }
+
+        .leaderboard-box { width: 100%; max-width: 400px; background: #111; margin-top: 15px; border-radius: 12px; border: 1px solid #0f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #0f02; }
         
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; margin-bottom: 8px; text-align: center; outline: none; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* صور القطع الدائرية اللي اخترتها */
-        img[class^="piece"], img[src*="postimg"] { border-radius: 50% !important; border: 2px solid white !important; }
+        /* تجميل القطع */
+        img[class^="piece"] { border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
+    <div id="hacker-overlay">
+        <div id="matrix-console"></div>
+    </div>
+
     <div class="header">
         <h3 style="margin:0;">🏆 تصنيف أحمد المحترف 🏆</h3>
-        <div id="my-id" style="font-size: 0.8em; color: #aaa;">جاري الاتصال...</div>
+        <div id="my-id" style="font-size: 0.8em; color: #0f0; font-family: monospace;">جاري الاتصال...</div>
     </div>
 
     <div class="clocks-container">
@@ -52,8 +70,8 @@
     </div>
 
     <div class="controls">
-        <input type="text" id="friendId" placeholder="أدخل كود الصديق (ID)">
-        <button onclick="connectToFriend()">بدء اللعب الآن</button>
+        <input type="text" id="friendId" placeholder="أدخل كود الخصم (ID)">
+        <button onclick="connectToFriend()">شن الهجوم (بدء اللعب)</button>
     </div>
 
     <audio id="moveSound" src="https://images.chesscomfiles.com/chess-themes/sounds/_standard/default/move-self.mp3" preload="auto"></audio>
@@ -64,15 +82,32 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        var board = null, game = new Chess(), peer = null, conn = null;
-        var myColor = 'w', sourceSquare = null, gameStarted = false;
-        var myTime = 600, oppTime = 600, timerInterval = null;
+        // --- أنيميشن البداية ---
+        const lines = ["Initializing...", "Ahmed_Pro System Active.", "Bypassing Firewalls...", "Access Granted."];
+        let lIdx = 0;
+        function type() {
+            if (lIdx < lines.length) {
+                let d = document.createElement('div'); d.className = 'matrix-text'; d.innerText = "> " + lines[lIdx++];
+                document.getElementById('matrix-console').appendChild(d);
+                setTimeout(type, 400);
+            } else {
+                setTimeout(() => document.getElementById('hacker-overlay').style.display='none', 800);
+            }
+        }
+        type();
 
-        var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك:", "أحمد المحترف") || "لاعب";
+        // --- متغيرات اللعبة ---
+        var board = null, game = new Chess();
+        var peer = null, conn = null;
+        var myColor = 'w', sourceSquare = null, gameStarted = false;
+        var myTime = 600, oppTime = 600, timer = null;
+
+        var myName = localStorage.getItem('p_name') || prompt("اسم الشهرة:", "Hacker") || "Anonymous";
         localStorage.setItem('p_name', myName);
         var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
-        var oppElo = 1200, oppName = "خصم";
+        var oppElo = 1200, oppName = "Target";
 
+        // صور القطع المخصصة
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
             wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
@@ -84,6 +119,36 @@
             bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
+        function fmtTime(s) {
+            let m = Math.floor(s/60), ss = s%60;
+            return (m<10?'0':'')+m+":"+(ss<10?'0':'')+ss;
+        }
+
+        function startClock() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if(!gameStarted) return;
+                if(game.turn() === myColor) {
+                    myTime--; document.getElementById('my-clock').innerText = fmtTime(myTime);
+                    document.getElementById('my-clock').classList.add('active-clock');
+                    document.getElementById('opp-clock').classList.remove('active-clock');
+                    if(myTime <= 0) endGame("LOSE");
+                } else {
+                    oppTime--; document.getElementById('opp-clock').innerText = fmtTime(oppTime);
+                    document.getElementById('opp-clock').classList.add('active-clock');
+                    document.getElementById('my-clock').classList.remove('active-clock');
+                    if(oppTime <= 0) endGame("WIN");
+                }
+            }, 1000);
+        }
+
+        function endGame(res) {
+            clearInterval(timer); gameStarted = false;
+            if(res === "WIN") { myElo += 25; alert("تم الاختراق بنجاح! +25"); }
+            else { myElo -= 25; alert("فشل النظام. -25"); }
+            updateUI();
+        }
+
         function updateUI() {
             document.getElementById('my-elo-display').innerText = myElo;
             document.getElementById('opp-elo-display').innerText = oppElo;
@@ -91,82 +156,88 @@
             localStorage.setItem('p_elo', myElo);
         }
 
-        function finalizeGame(res) {
-            clearInterval(timerInterval);
-            gameStarted = false;
-            if (res === "win") {
-                myElo += 25; alert("مبروك! فزت بـ 25 نقطة");
-            } else if (res === "lose") {
-                myElo -= 25; alert("هاردلك! خسرت 25 نقطة");
-            }
-            updateUI();
-        }
-
         window.onload = function() {
             updateUI();
-            let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
-            peer = new Peer(randomId);
-            peer.on('open', (id) => { document.getElementById('my-id').innerText = "كودك الخاص: " + id; initBoard(); });
-            peer.on('connection', (c) => { 
-                conn = c; myColor = 'w'; gameStarted = true; setupConn(); 
-                document.getElementById('opp-status').innerText = "ONLINE";
-                startTimer();
+            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            peer = new Peer(id);
+            peer.on('open', (i) => { document.getElementById('my-id').innerText = "ID: " + i; initBoard(); });
+            peer.on('connection', (c) => {
+                conn = c; myColor = 'w'; gameStarted = true;
+                document.getElementById('opp-status').innerText = "CONNECTED";
+                setupConn(); startClock();
             });
         };
 
         function initBoard() {
             board = Chessboard('board', {
                 draggable: false, position: 'start',
-                pieceTheme: (p) => pics[p] ? pics[p] : 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
+                pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
             });
-            $(document).on('click touchstart', '.square-55d63', function() { handleAction($(this).attr('data-square')); });
+            // معالجة النقر بدقة
+            $(document).on('click touchstart', '.square-55d63', function(e) {
+                e.preventDefault();
+                handleMove($(this).attr('data-square'));
+            });
         }
 
-        function handleAction(square) {
+        function handleMove(sq) {
             if (!gameStarted || game.turn() !== myColor) return;
+
             if (sourceSquare === null) {
-                var p = game.get(square);
-                if (p && p.color === myColor) sourceSquare = square;
+                let p = game.get(sq);
+                if (p && p.color === myColor) {
+                    sourceSquare = sq;
+                    highlight(sq);
+                }
             } else {
-                var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
+                let move = game.move({ from: sourceSquare, to: sq, promotion: 'q' });
                 if (move) {
-                    board.position(game.fen()); document.getElementById("moveSound").play();
-                    if (conn) conn.send({ type: 'move', move: move });
-                    if (game.in_checkmate()) finalizeGame("win");
+                    board.position(game.fen());
+                    document.getElementById("moveSound").play();
+                    if(conn) conn.send({ type:'move', move:move, time:myTime });
+                    if(game.in_checkmate()) endGame("WIN");
                     sourceSquare = null;
-                } else { sourceSquare = null; }
+                    $('.square-55d63').removeClass('highlight-sq possible-move');
+                } else {
+                    let p = game.get(sq);
+                    if (p && p.color === myColor) {
+                        sourceSquare = sq;
+                        highlight(sq);
+                    } else {
+                        sourceSquare = null;
+                        $('.square-55d63').removeClass('highlight-sq possible-move');
+                    }
+                }
             }
         }
 
+        function highlight(sq) {
+            $('.square-55d63').removeClass('highlight-sq possible-move');
+            $('.square-' + sq).addClass('highlight-sq');
+            game.moves({ square: sq, verbose: true }).forEach(m => {
+                $('.square-' + m.to).addClass('possible-move');
+            });
+        }
+
         function setupConn() {
-            conn.on('open', () => { conn.send({ type: 'info', name: myName, elo: myElo }); });
+            conn.on('open', () => { conn.send({ type:'info', name:myName, elo:myElo }); });
             conn.on('data', (d) => {
                 if(d.type === 'info') { oppName = d.name; oppElo = d.elo; updateUI(); }
                 if(d.type === 'move') {
                     game.move(d.move); board.position(game.fen());
-                    document.getElementById("moveSound").play();
-                    if (game.in_checkmate()) finalizeGame("lose");
+                    oppTime = d.time; document.getElementById("moveSound").play();
+                    if(game.in_checkmate()) endGame("LOSE");
                 }
             });
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (!gameStarted) return;
-                if (game.turn() === myColor) myTime--; else oppTime--;
-                document.getElementById('my-clock').innerText = Math.floor(myTime/60) + ":" + (myTime%60 < 10 ? '0' : '') + myTime%60;
-                document.getElementById('opp-clock').innerText = Math.floor(oppTime/60) + ":" + (oppTime%60 < 10 ? '0' : '') + oppTime%60;
-            }, 1000);
-        }
-
         function connectToFriend() {
             let fId = document.getElementById('friendId').value;
-            if(fId) { 
-                conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); 
-                gameStarted = true; setupConn();
-                document.getElementById('opp-status').innerText = "ONLINE";
-                startTimer();
+            if(fId) {
+                conn = peer.connect(fId); myColor = 'b';
+                board.orientation('black'); gameStarted = true;
+                document.getElementById('opp-status').innerText = "CONNECTED";
+                setupConn(); startClock();
             }
         }
     </script>
