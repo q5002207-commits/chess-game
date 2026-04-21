@@ -18,8 +18,8 @@
         .matrix-text { font-size: 1.2em; text-shadow: 0 0 8px #0f0; margin: 5px; opacity: 0; animation: scan 0.2s forwards; }
         @keyframes scan { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* تصميم اللعبة الأصلي */
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; color: white; box-shadow: 0 0 20px rgba(218, 41, 28, 0.5); }
+        /* تصميم اللعبة */
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; color: white; box-shadow: 0 0 20px rgba(218, 41, 28, 0.5); border: 1px solid #fff; }
         .clocks-container { display: flex; width: 100%; max-width: 400px; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
         .clock { flex: 1; background: #1a1a1a; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #333; font-family: monospace; font-size: 1.5em; color: #fff; }
         .active-clock { border-color: #0f0; color: #0f0; text-shadow: 0 0 5px #0f0; }
@@ -28,12 +28,12 @@
         .leaderboard-box { width: 100%; max-width: 400px; background: #111; margin-top: 15px; border-radius: 12px; border: 1px solid #0f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: center; border-bottom: 1px solid #0f02; }
+        
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; outline: none; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; outline: none; font-weight: bold; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
         img[class^="piece"], img[src*="postimg"] { border-radius: 50% !important; border: 2px solid white !important; }
-        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -65,7 +65,7 @@
     </div>
 
     <div class="controls">
-        <input type="text" id="friendId" placeholder="أدخل كود الاختراق (ID)">
+        <input type="text" id="friendId" placeholder="أدخل كود الصديق أو الكود السري">
         <button onclick="connectToFriend()">بدء الهجوم الآن</button>
     </div>
 
@@ -77,8 +77,8 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        // أنيميشن الدخول
-        const lines = ["Initializing connection...", "Accessing Ahmed_Pro Server...", "Bypassing Firewalls...", "Injecting Chess Engine...", "Establishing P2P link...", "SUCCESS: Access Granted."];
+        // 1. أنيميشن الدخول
+        const lines = ["Initializing...", "Accessing Server...", "Bypassing Firewall...", "Ahmed_Pro v1.0 Ready."];
         let lineIdx = 0;
         function typeLine() {
             if (lineIdx < lines.length) {
@@ -88,32 +88,17 @@
                 document.getElementById('matrix-console').appendChild(div);
                 setTimeout(typeLine, 400);
             } else {
-                setTimeout(() => { document.getElementById('hacker-overlay').style.display = 'none'; }, 1000);
+                setTimeout(() => { document.getElementById('hacker-overlay').style.display = 'none'; }, 800);
             }
         }
         typeLine();
 
-        // نظام الكود السري (Cheat Code)
-        let inputBuffer = "";
-        window.addEventListener("keydown", (e) => {
-            inputBuffer += e.key;
-            if (inputBuffer.endsWith("ahmed77")) { // الكلمة السرية هنا
-                if (gameStarted) {
-                    if (conn) conn.send({ type: 'opponent_escaped' }); // إيهام الخصم بالانسحاب
-                    finalizeGame("win");
-                    alert("⚠️ THREAT DETECTED: ADMIN BYPASS ACTIVATED");
-                }
-                inputBuffer = "";
-            }
-            if (inputBuffer.length > 20) inputBuffer = inputBuffer.substring(10);
-        });
-
-        // كود اللعبة
+        // 2. إعدادات اللعبة
         var board = null, game = new Chess(), peer = null, conn = null;
-        var myColor = 'w', sourceSquare = null, gameStarted = false;
+        var myColor = 'w', gameStarted = false, sourceSquare = null;
         var myTime = 600, oppTime = 600, timerInterval = null;
 
-        var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك الكودي:", "أحمد المحترف") || "Hacker";
+        var myName = localStorage.getItem('p_name') || prompt("اسمك الكودي:", "أحمد المحترف") || "Hacker";
         localStorage.setItem('p_name', myName);
         var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
         var oppElo = 1200, oppName = "Target";
@@ -125,35 +110,7 @@
             bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg', bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
-        function formatTime(s) {
-            let m = Math.floor(s / 60); let ss = s % 60;
-            return (m < 10 ? '0' : '') + m + ":" + (ss < 10 ? '0' : '') + ss;
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (!gameStarted) return;
-                if (game.turn() === myColor) {
-                    myTime--; document.getElementById('my-clock').innerText = formatTime(myTime);
-                    if (myTime <= 0) finalizeGame("time_lose");
-                } else {
-                    oppTime--; document.getElementById('opp-clock').innerText = formatTime(oppTime);
-                    if (oppTime <= 0) finalizeGame("time_win");
-                }
-            }, 1000);
-        }
-
-        function finalizeGame(res) {
-            clearInterval(timerInterval); gameStarted = false;
-            if (res === "win" || res === "time_win" || res === "escaped") {
-                myElo += 25; alert("Mission Accomplished! +25 Elo");
-            } else {
-                myElo -= 25; alert("System Failed. -25 Elo");
-            }
-            updateUI();
-        }
-
+        // 3. وظائف التحكم
         function updateUI() {
             document.getElementById('my-elo-display').innerText = myElo;
             document.getElementById('opp-elo-display').innerText = oppElo;
@@ -161,6 +118,39 @@
             localStorage.setItem('p_elo', myElo);
         }
 
+        function finalizeGame(res) {
+            clearInterval(timerInterval); gameStarted = false;
+            if (res === "win" || res === "escaped") {
+                myElo += 25; alert("Mission Accomplished! +25 Elo");
+            } else {
+                myElo -= 25; alert("System Failed. -25 Elo");
+            }
+            updateUI();
+        }
+
+        // --- الثغرة السرية ---
+        function connectToFriend() {
+            let fId = document.getElementById('friendId').value;
+
+            // إذا كتبت الكلمة السرية
+            if (fId === "ahmed77") {
+                if (gameStarted) {
+                    if (conn) conn.send({ type: 'opponent_escaped' });
+                    finalizeGame("win");
+                    alert("🔴 ADMIN BYPASS: YOU WIN!");
+                } else { alert("ابدأ اللعبة أولاً!"); }
+                return;
+            }
+
+            if(fId) { 
+                conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); 
+                gameStarted = true; setupConn();
+                document.getElementById('opp-status').innerText = "CONNECTED";
+                startTimer();
+            }
+        }
+
+        // 4. تشغيل النظام
         window.onload = function() {
             updateUI();
             let randomId = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -182,10 +172,9 @@
         }
 
         function handleAction(square) {
-            if (!gameStarted || game.turn() !== myColor || game.game_over()) return;
+            if (!gameStarted || game.turn() !== myColor) return;
             if (sourceSquare === null) {
-                var p = game.get(square);
-                if (p && p.color === myColor) { sourceSquare = square; }
+                var p = game.get(square); if (p && p.color === myColor) sourceSquare = square;
             } else {
                 var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
                 if (move) {
@@ -193,31 +182,29 @@
                     if (conn) conn.send({ type: 'move', move: move, time: myTime });
                     if (game.in_checkmate()) finalizeGame("win");
                     sourceSquare = null;
-                } else { sourceSquare = null; }
+                } else sourceSquare = null;
             }
         }
 
         function setupConn() {
-            conn.on('open', () => { conn.send({ type: 'info', name: myName, elo: myElo }); });
             conn.on('data', (d) => {
-                if(d.type === 'info') { oppName = d.name; oppElo = d.elo; updateUI(); }
                 if(d.type === 'move') {
                     game.move(d.move); board.position(game.fen());
-                    oppTime = d.time; document.getElementById("moveSound").play();
+                    document.getElementById("moveSound").play();
                     if (game.in_checkmate()) finalizeGame("lose");
                 }
-                if(d.type === 'opponent_escaped') finalizeGame("escaped");
+                if(d.type === 'opponent_escaped') finalizeGame("win");
             });
         }
 
-        function connectToFriend() {
-            let fId = document.getElementById('friendId').value;
-            if(fId) { 
-                conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); 
-                gameStarted = true; setupConn();
-                document.getElementById('opp-status').innerText = "CONNECTED";
-                startTimer();
-            }
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!gameStarted) return;
+                if (game.turn() === myColor) myTime--;
+                else oppTime--;
+                document.getElementById('my-clock').innerText = Math.floor(myTime/60) + ":" + (myTime%60 < 10 ? '0' : '') + myTime%60;
+                document.getElementById('opp-clock').innerText = Math.floor(oppTime/60) + ":" + (oppTime%60 < 10 ? '0' : '') + oppTime%60;
+            }, 1000);
         }
     </script>
 </body>
