@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام أحمد المحترف - النسخة المستقرة</title>
+    <title>ملعب أحمد المحترف - النسخة المستقرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         #my-id-box { background: #000; color: #0f0; padding: 5px 10px; border-radius: 10px; font-family: monospace; font-size: 0.9em; border: 1px solid #da291c; }
+        
         #board { width: 380px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; position: relative; }
         
-        /* اللون الأخضر (تلميحات النقلات) */
+        /* اللون الأخضر وتلميحات الحركة */
         .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 999; pointer-events: none; }
         .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
 
-        /* --- القفل النهائي لصورة صاحبك (الملك الأبيض) --- */
-        img[src*="wK.png"], img[data-piece="wK"] { 
-            content: url('https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg') !important;
+        /* --- تثبيت صورة صاحبك من الرابط الجديد (الملك الأبيض) --- */
+        img[data-piece="wK"], img[src*="wK"] { 
+            content: url('https://i.postimg.cc/m27HgYdg/king-black.jpg') !important;
             border-radius: 50% !important; 
             border: 2px solid white !important; 
         }
@@ -66,9 +67,8 @@
             board = Chessboard('board', {
                 draggable: false, 
                 position: 'start',
-                // الموتور الاحتياطي للصور
                 pieceTheme: function(p) {
-                    if (p === 'wK') return 'https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg';
+                    if (p === 'wK') return 'https://i.postimg.cc/m27HgYdg/king-black.jpg';
                     return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png';
                 }
             });
@@ -104,18 +104,10 @@
                 $('.square-' + m.to).addClass('possible-move');
             });
         }
+
         function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
-        function connectToFriend() {
-            let fId = document.getElementById('friendId').value;
-            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); }
-        }
-        function setupConn() {
-            conn.on('open', () => {
-                conn.on('data', (d) => {
-                    if(d.type === 'move') { game.move(d.move); board.position(game.fen()); }
-                });
-            });
-        }
+        function connectToFriend() { let fId = document.getElementById('friendId').value; if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); } }
+        function setupConn() { conn.on('open', () => { conn.on('data', (d) => { if(d.type === 'move') { game.move(d.move); board.position(game.fen()); } }); }); }
     </script>
 </body>
 </html>
