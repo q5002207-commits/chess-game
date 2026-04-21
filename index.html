@@ -3,44 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام أحمد المحترف - شطرنج الأصحاب</title>
+    <title>أحمد المحترف - النسخة النهائية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
-        #board { width: 95vw !important; max-width: 400px !important; border: 5px solid #333; border-radius: 8px; }
-        
-        /* --- استبدال الملك الأبيض بصورة صاحبك المباشرة --- */
-        img[data-piece="wK"] {
-            content: url('https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg') !important;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-        
-        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; z-index: 100; }
-        .highlight-chosen { background: rgba(255, 255, 0, 0.5) !important; }
-        .controls { width: 95vw; max-width: 400px; margin-top: 15px; }
-        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 10px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; margin-bottom: 8px; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        body { background: #121212; color: white; display: flex; flex-direction: column; align-items: center; padding: 10px; }
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; }
+        #board { width: 380px; max-width: 95vw; border: 5px solid #333; margin-top: 15px; }
+        /* جعل أي صورة قطعة دائرية */
+        .piece-417db { border-radius: 50% !important; }
+        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-top: 15px; width: 100%; max-width: 400px; }
+        input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: none; font-weight: bold; }
+        button { background: #da291c; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h3 style="margin:0;">♟️ ملعب أحمد المحترف ♟️</h3>
-        <div id="my-id-box" style="color:#0f0; font-family:monospace; margin-top:5px;">جاري الاتصال...</div>
-    </div>
-
+    <div class="header">ملعب أحمد المحترف 🏟️</div>
     <div id="board"></div>
 
-    <div class="controls">
-        <div class="box">
-            <input type="text" id="friendId" placeholder="ID الخصم">
-            <button onclick="connectToFriend()">تحدي</button>
-        </div>
+    <div class="box">
+        <div id="my-id" style="color:#0f0; margin-bottom:10px;">جاري الاتصال...</div>
+        <input type="text" id="friendId" placeholder="ID الخصم">
+        <button onclick="connectToFriend()">تحدي الآن</button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -49,40 +33,33 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w', sourceSquare = null;
+        var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w';
+
+        // دالة "الموتور" لتبديل الصور
+        function customPieceTheme(piece) {
+            // إذا كانت القطعة هي الملك الأبيض (wK) حط صورة صاحبك
+            if (piece === 'wK') {
+                return 'https://i.ibb.co/Lh2W1Kk/r2JrKYT3.jpg';
+            }
+            // باقي القطع تضل زي ما هي من الموقع الأصلي
+            return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + piece + '.png';
+        }
 
         window.onload = function() {
-            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            let id = "Ahmed_" + Math.floor(Math.random() * 9999);
             peer = new Peer(id);
-            peer.on('open', (id) => { document.getElementById('my-id-box').innerText = "ID: " + id; initBoard(); });
-            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); alert("بدأ التحدي! أنت بالأبيض."); });
+            peer.on('open', (id) => { 
+                document.getElementById('my-id').innerText = "ID: " + id; 
+                initBoard();
+            });
+            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupConn(); });
         };
 
         function initBoard() {
             board = Chessboard('board', {
-                draggable: false, position: 'start', orientation: 'white',
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+                position: 'start',
+                pieceTheme: customPieceTheme // هون استخدمنا الموتور الجديد
             });
-            $(document).on('click touchstart', '.square-55d63', function() { handleAction($(this).attr('data-square')); });
-        }
-
-        function handleAction(square) {
-            if (game.turn() !== myColor) return;
-            if (sourceSquare === null) {
-                var p = game.get(square);
-                if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
-            } else {
-                var move = game.move({ from: sourceSquare, to: square, promotion: 'q' });
-                if (move) {
-                    board.position(game.fen());
-                    if (conn) conn.send({ type: 'move', move: move });
-                    sourceSquare = null; clearHints();
-                } else {
-                    var p = game.get(square);
-                    if (p && p.color === myColor) { sourceSquare = square; drawHints(square); }
-                    else { sourceSquare = null; clearHints(); }
-                }
-            }
         }
 
         function connectToFriend() {
@@ -91,11 +68,11 @@
         }
 
         function setupConn() {
-            conn.on('open', () => { conn.on('data', (d) => { if(d.type==='move'){ game.move(d.move); board.position(game.fen()); } }); });
+            conn.on('open', () => { 
+                alert("متصل!");
+                conn.on('data', (d) => { game.move(d.move); board.position(game.fen()); }); 
+            });
         }
-
-        function drawHints(sq) { clearHints(); $('.square-'+sq).addClass('highlight-chosen'); game.moves({square:sq, verbose:true}).forEach(m=>{$('.square-'+m.to).addClass('possible-move');}); }
-        function clearHints() { $('.square-55d63').removeClass('possible-move highlight-chosen'); }
     </script>
 </body>
 </html>
