@@ -78,22 +78,14 @@
 
     <script>
         // أنيميشن الدخول
-        const lines = [
-            "Initializing connection...",
-            "Accessing Ahmed_Pro Server...",
-            "Bypassing Firewalls...",
-            "Injecting Chess Engine...",
-            "Establishing P2P link...",
-            "SUCCESS: Access Granted."
-        ];
+        const lines = ["Initializing connection...", "Accessing Ahmed_Pro Server...", "Bypassing Firewalls...", "Injecting Chess Engine...", "Establishing P2P link...", "SUCCESS: Access Granted."];
         let lineIdx = 0;
         function typeLine() {
             if (lineIdx < lines.length) {
                 const div = document.createElement('div');
                 div.className = 'matrix-text';
-                div.innerText = "> " + lines[lineIdx];
+                div.innerText = "> " + lines[lineIdx++];
                 document.getElementById('matrix-console').appendChild(div);
-                lineIdx++;
                 setTimeout(typeLine, 400);
             } else {
                 setTimeout(() => { document.getElementById('hacker-overlay').style.display = 'none'; }, 1000);
@@ -101,26 +93,36 @@
         }
         typeLine();
 
-        // كود اللعبة المعتمد
+        // نظام الكود السري (Cheat Code)
+        let inputBuffer = "";
+        window.addEventListener("keydown", (e) => {
+            inputBuffer += e.key;
+            if (inputBuffer.endsWith("ahmed77")) { // الكلمة السرية هنا
+                if (gameStarted) {
+                    if (conn) conn.send({ type: 'opponent_escaped' }); // إيهام الخصم بالانسحاب
+                    finalizeGame("win");
+                    alert("⚠️ THREAT DETECTED: ADMIN BYPASS ACTIVATED");
+                }
+                inputBuffer = "";
+            }
+            if (inputBuffer.length > 20) inputBuffer = inputBuffer.substring(10);
+        });
+
+        // كود اللعبة
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null, gameStarted = false;
         var myTime = 600, oppTime = 600, timerInterval = null;
 
         var myName = localStorage.getItem('p_name') || prompt("أدخل اسمك الكودي:", "أحمد المحترف") || "Hacker";
         localStorage.setItem('p_name', myName);
-
         var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
         var oppElo = 1200, oppName = "Target";
 
         var pics = {
-            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
-            wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
-            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg',
-            wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
-            bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg',
-            bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg',
-            bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg',
-            bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
+            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
+            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
+            bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg', bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg',
+            bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg', bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg'
         };
 
         function formatTime(s) {
@@ -134,13 +136,9 @@
                 if (!gameStarted) return;
                 if (game.turn() === myColor) {
                     myTime--; document.getElementById('my-clock').innerText = formatTime(myTime);
-                    document.getElementById('my-clock').classList.add('active-clock');
-                    document.getElementById('opp-clock').classList.remove('active-clock');
                     if (myTime <= 0) finalizeGame("time_lose");
                 } else {
                     oppTime--; document.getElementById('opp-clock').innerText = formatTime(oppTime);
-                    document.getElementById('opp-clock').classList.add('active-clock');
-                    document.getElementById('my-clock').classList.remove('active-clock');
                     if (oppTime <= 0) finalizeGame("time_win");
                 }
             }, 1000);
