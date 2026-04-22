@@ -3,31 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - النسخة الأصلية</title>
+    <title>أحمد المحترف - نظام التحدي المطور</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
+        #hacker-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
+            z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 10px; color: white; }
         .clocks-container { display: flex; width: 100%; max-width: 400px; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
         .clock { flex: 1; background: #111; padding: 10px; border-radius: 8px; text-align: center; border: 2px solid #333; font-family: monospace; font-size: 1.4em; color: #fff; }
+        .active-clock { border-color: #0f0; color: #0f0; box-shadow: 0 0 10px #0f05; }
 
         #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
         .highlight-sq { background: rgba(0, 255, 0, 0.3) !important; }
+        .possible-move::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; background: rgba(0, 255, 0, 0.4); border-radius: 50%; }
 
+        .leaderboard-box { width: 100%; max-width: 400px; background: #111; margin-top: 15px; border-radius: 12px; border: 1px solid #0f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #0f02; }
+        
         .controls { width: 100%; max-width: 400px; margin-top: 15px; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:disabled { background: #555; cursor: not-allowed; }
 
+        /* جعل صورة صاحبك والقطع دائرية */
         img[class^="piece"] { border-radius: 50% !important; border: 1px solid white !important; }
     </style>
 </head>
 <body>
 
+    <div id="hacker-overlay">
+        <div id="matrix-console" style="color:#0f0; font-family:monospace;"></div>
+    </div>
+
     <div class="header">
-        <h3 style="margin:0;">🏆 أحمد المحترف 🏆</h3>
-        <div id="my-id" style="font-size: 0.8em; color: #0f0; font-family: monospace;">جاري الاتصال...</div>
+        <h3 style="margin:0;">🏆 اسرائيل و اقطع 🏆</h3>
+        <div id="my-id" style="font-size: 0.8em; color: #0f0; font-family: monospace;">جاري الاتصال بالسيرفر...</div>
     </div>
 
     <div class="clocks-container">
@@ -36,6 +53,15 @@
     </div>
 
     <div id="board"></div>
+
+    <div class="leaderboard-box">
+        <table>
+            <tbody id="leaderboard-body">
+                <tr style="color: #0f0;"><td>أنت</td><td id="my-elo-display">1200</td><td>ONLINE</td></tr>
+                <tr><td id="opp-name-display">الخصم</td><td id="opp-elo-display">1200</td><td id="opp-status">بانتظار تحدي</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="controls">
         <input type="text" id="friendId" placeholder="أدخل ID الخصم">
@@ -50,16 +76,49 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
+        // --- حماية النقاط ---
+        window.addEventListener('beforeunload', function (e) {
+            if (gameStarted && !game.game_over()) {
+                deductPoints(25);
+            }
+        });
+
+        function deductPoints(amount) {
+            let elo = parseInt(localStorage.getItem('p_elo')) || 1200;
+            localStorage.setItem('p_elo', Math.max(0, elo - amount));
+        }
+
+        // --- نظام الهكر ---
+        const lines = ["Decrypting Protocol...", "Ahmed_Pro System Online.", "Waiting for Node..."];
+        let lIdx = 0;
+        function type() {
+            if (lIdx < lines.length) {
+                let d = document.createElement('div'); d.innerText = "> " + lines[lIdx++];
+                document.getElementById('matrix-console').appendChild(d);
+                setTimeout(type, 500);
+            } else {
+                setTimeout(() => document.getElementById('hacker-overlay').style.display='none', 800);
+            }
+        }
+        type();
+
+        // --- الصور والمربعات ---
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null, gameStarted = false;
         var myTime = 600, oppTime = 600, timer = null;
 
+        var myName = localStorage.getItem('p_name') || prompt("اسمك الكودي:", "أحمد") || "Hacker";
+        localStorage.setItem('p_name', myName);
+        var myElo = parseInt(localStorage.getItem('p_elo')) || 1200;
+        var oppElo = 1200, oppName = "Target";
+
+        // إعداد الصور (صاحبك مكان الجندي الأسود bP)
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', 
             wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
             wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', 
             wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
-            bP: 'https://i.postimg.cc/Nj9dgQFv/download.jpg', // صورة صاحبك (الجنود السود)
+            bP: 'https://i.postimg.cc/Nj9dgQFv/download.jpg', // صورة صاحبك للجنود السود فقط
             bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg', 
             bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg',
             bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg', 
@@ -67,11 +126,93 @@
         };
 
         window.onload = function() {
+            updateUI();
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(id);
-            peer.on('open', (i) => { document.getElementById('my-id').innerText = "ID: " + i; initBoard(); });
-            peer.on('connection', (incomingConn) => { conn = incomingConn; setupConnListeners(); });
+            peer.on('open', (i) => { document.getElementById('my-id').innerText = "NODE_ID: " + i; initBoard(); });
+            peer.on('connection', (incomingConn) => {
+                conn = incomingConn;
+                setupConnListeners();
+            });
         };
+
+        function sendChallengeRequest() {
+            let fId = document.getElementById('friendId').value;
+            if(!fId) return alert("أدخل ID الخصم أولاً");
+            conn = peer.connect(fId);
+            myColor = 'b'; 
+            board.orientation('black');
+            setupConnListeners();
+            document.getElementById('attack-btn').innerText = "بانتظار الرد...";
+            document.getElementById('attack-btn').disabled = true;
+        }
+
+        function setupConnListeners() {
+            conn.on('open', () => {
+                if (myColor === 'w') {
+                    conn.send({ type: 'ask_challenge', name: myName, elo: myElo });
+                }
+            });
+
+            conn.on('data', (data) => {
+                if (data.type === 'ask_challenge') {
+                    if (confirm(`اللاعب ${data.name} (${data.elo}) يتحداك! هل تقبل؟`)) {
+                        oppName = data.name; oppElo = data.elo;
+                        conn.send({ type: 'accept_challenge', name: myName, elo: myElo });
+                        startGame();
+                    } else {
+                        conn.send({ type: 'reject_challenge' });
+                        conn.close();
+                    }
+                }
+                if (data.type === 'accept_challenge') {
+                    oppName = data.name; oppElo = data.elo;
+                    startGame();
+                }
+                if (data.type === 'reject_challenge') {
+                    alert("تم رفض طلب التحدي.");
+                    document.getElementById('attack-btn').innerText = "إرسال طلب تحدي";
+                    document.getElementById('attack-btn').disabled = false;
+                }
+                if (data.type === 'move') {
+                    game.move(data.move);
+                    board.position(game.fen());
+                    oppTime = data.time;
+                    document.getElementById("moveSound").play();
+                    if (game.in_checkmate()) finalizeGame("LOSE");
+                }
+            });
+
+            conn.on('close', () => {
+                if (gameStarted) {
+                    alert("الخصم انسحب! لقد فزت.");
+                    finalizeGame("WIN");
+                }
+            });
+        }
+
+        function startGame() {
+            gameStarted = true;
+            updateUI();
+            document.getElementById('opp-status').innerText = "IN BATTLE";
+            document.getElementById('attack-btn').style.display = 'none';
+            startClock();
+        }
+
+        function finalizeGame(res) {
+            clearInterval(timer);
+            if (!gameStarted) return;
+            gameStarted = false;
+            if (res === "WIN") {
+                myElo += 25;
+                alert("تم الفوز! +25 نقطة");
+            } else {
+                myElo -= 25;
+                alert("خسارة! -25 نقطة");
+            }
+            updateUI();
+            setTimeout(() => location.reload(), 2000);
+        }
 
         function initBoard() {
             board = Chessboard('board', {
@@ -94,52 +235,48 @@
                 if (move) {
                     board.position(game.fen());
                     document.getElementById("moveSound").play();
-                    if (conn) conn.send({ type: 'move', move: move });
+                    conn.send({ type: 'move', move: move, time: myTime });
+                    if (game.in_checkmate()) finalizeGame("WIN");
                     sourceSquare = null;
-                    $('.square-55d63').removeClass('highlight-sq');
+                    $('.square-55d63').removeClass('highlight-sq possible-move');
                 } else {
                     let p = game.get(sq);
                     if (p && p.color === myColor) { sourceSquare = sq; highlight(sq); }
-                    else { sourceSquare = null; $('.square-55d63').removeClass('highlight-sq'); }
+                    else { sourceSquare = null; $('.square-55d63').removeClass('highlight-sq possible-move'); }
                 }
             }
         }
 
         function highlight(sq) {
-            $('.square-55d63').removeClass('highlight-sq');
+            $('.square-55d63').removeClass('highlight-sq possible-move');
             $('.square-' + sq).addClass('highlight-sq');
+            game.moves({ square: sq, verbose: true }).forEach(m => { $('.square-' + m.to).addClass('possible-move'); });
         }
 
-        function setupConnListeners() {
-            conn.on('data', (data) => {
-                if (data.type === 'ask') {
-                    if (confirm("وصلك تحدي جديد! هل تقبل؟")) {
-                        conn.send({ type: 'accept' });
-                        startGame();
-                    }
+        function startClock() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (game.turn() === myColor) {
+                    myTime--; document.getElementById('my-clock').innerText = fmtT(myTime);
+                    document.getElementById('my-clock').classList.add('active-clock');
+                    document.getElementById('opp-clock').classList.remove('active-clock');
+                    if(myTime <= 0) finalizeGame("LOSE");
+                } else {
+                    oppTime--; document.getElementById('opp-clock').innerText = fmtT(oppTime);
+                    document.getElementById('opp-clock').classList.add('active-clock');
+                    document.getElementById('my-clock').classList.remove('active-clock');
+                    if(oppTime <= 0) finalizeGame("WIN");
                 }
-                if (data.type === 'accept') startGame();
-                if (data.type === 'move') {
-                    game.move(data.move);
-                    board.position(game.fen());
-                    document.getElementById("moveSound").play();
-                }
-            });
+            }, 1000);
         }
 
-        function sendChallengeRequest() {
-            let fId = document.getElementById('friendId').value;
-            if(!fId) return;
-            conn = peer.connect(fId);
-            myColor = 'b';
-            board.orientation('black');
-            conn.on('open', () => conn.send({ type: 'ask' }));
-            setupConnListeners();
-        }
+        function fmtT(s) { let m=Math.floor(s/60), ss=s%60; return (m<10?'0':'')+m+":"+(ss<10?'0':'')+ss; }
 
-        function startGame() {
-            gameStarted = true;
-            document.getElementById('attack-btn').innerText = "في معركة الآن";
+        function updateUI() {
+            document.getElementById('my-elo-display').innerText = myElo;
+            document.getElementById('opp-elo-display').innerText = oppElo;
+            document.getElementById('opp-name-display').innerText = oppName;
+            localStorage.setItem('p_elo', myElo);
         }
     </script>
 </body>
