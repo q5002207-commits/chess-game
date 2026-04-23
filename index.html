@@ -3,65 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام أحمد المحترف V4 - الأونلاين</title>
+    <title>بوابة أحمد المحترف - النسخة النهائية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
         /* القائمة الرئيسية */
-        .menu-btn { display: block; width: 100%; max-width: 350px; padding: 20px; margin: 10px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.2em; cursor: pointer; text-align: center; font-weight: bold; }
-        .menu-btn:hover { background: #da291c; box-shadow: 0 0 15px #da291c; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 10px; border-radius: 10px; text-align: center; color: white; margin-bottom: 10px; font-weight: bold; }
+        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
+        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
+        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
+        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; }
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; font-weight: bold; }
 
-        /* الشطرنج والصور */
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 10px; }
-        /* هذا الجزء يضمن ظهور صور الشباب بشكل دائري وواضح */
-        .piece-417db { width: 100%; height: 100%; border-radius: 50% !important; border: 2px solid #fff !important; object-fit: cover; }
-        
+        /* الشطرنج والصور المخصصة */
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
+        .piece-417db { width: 100%; height: 100%; border-radius: 50% !important; border: 2px solid white !important; object-fit: cover; }
+        .highlight-selected { background: rgba(255, 255, 0, 0.3) !important; }
         .highlight-possible { position: relative; }
-        .highlight-possible::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background: rgba(0, 255, 0, 0.6); border-radius: 50%; z-index: 999; pointer-events: none; }
-        .highlight-selected { background: rgba(255, 255, 0, 0.4) !important; }
+        .highlight-possible::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: rgba(0, 255, 0, 0.5); border-radius: 50%; pointer-events: none; z-index: 100; }
 
-        /* المافيا */
-        .mafia-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; text-align: center; cursor: pointer; }
-        .role-display { display: none; font-size: 1.5em; font-weight: bold; color: #ff0000; }
+        /* المافيا - التعديل الجديد للوضوح */
+        .mafia-card { background: #1a1a1a; padding: 25px; margin: 10px 0; border-radius: 10px; border: 2px solid #444; text-align: center; cursor: pointer; transition: 0.3s; opacity: 1; }
+        .role-display { display: none; color: #00ff00; font-size: 1.8em; font-weight: bold; text-shadow: 0 0 10px #00ff00; }
+        .locked { opacity: 0.1 !important; pointer-events: none; }
         
+        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; text-align: center; width: 100%; }
         .hidden { display: none; }
-        .locked { opacity: 0.1; pointer-events: none; }
-        input { width: 100%; padding: 12px; margin: 5px 0; background: #000; color: #0f0; border: 1px solid #da291c; border-radius: 8px; text-align: center; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #da291c; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="main-menu">
-        <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO HUB</h1>
-        <button class="menu-btn" onclick="showGame('chess')">♟️ شطرنج (صور الشباب + دليل)</button>
-        <button class="menu-btn" onclick="showGame('mafia_hand')">🃏 موزع مافيا (يدوي)</button>
-        <button class="menu-btn" onclick="showGame('mafia_online')" style="border-color: #0055ff;">🌐 مافيا أونلاين (قريباً)</button>
+        <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO SYSTEM</h1>
+        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
+        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (10+)</button>
     </div>
 
     <div id="chess-section" class="hidden">
-        <button onclick="location.reload()" style="background:#333; color:white; border:none; padding:8px 20px; border-radius:5px; cursor:pointer;">🏠 القائمة</button>
-        <div class="header">ID الخاص بك: <span id="my-id">...</span></div>
+        <button class="back-home" onclick="location.reload()">🏠 خروج</button>
+        <div class="header">ID: <span id="my-id">...</span></div>
         <div id="board"></div>
         <div style="width:100%; max-width:400px; margin-top:15px;">
-            <input type="text" id="friendId" placeholder="أدخل ID الخصم">
-            <button onclick="connectToFriend()" style="background:#da291c; color:white; width:100%; padding:12px; border:none; border-radius:8px; font-weight:bold;">بدء التحدي ⚔️</button>
+            <input type="text" id="friendId" placeholder="ID الخصم">
+            <button onclick="sendChallengeRequest()">بدء التحدي ⚔️</button>
         </div>
     </div>
 
     <div id="mafia-section" class="hidden">
-        <button onclick="location.reload()" style="background:#333; color:white; border:none; padding:8px 20px; border-radius:5px; cursor:pointer;">🏠 القائمة</button>
-        <div class="header">موزع الأدوار الذكي (10+)</div>
-        <div id="mafia-setup" style="width:100%; max-width:350px;">
+        <button class="back-home" onclick="location.reload()">🏠 خروج</button>
+        <div class="header">نظام المافيا المطور</div>
+        <div id="mafia-setup" style="width:100%; max-width:400px;">
             <input type="text" id="playerName" placeholder="اسم اللاعب">
-            <button onclick="addPlayer()" style="background:#0055ff; color:white; width:100%; padding:10px; border:none; margin-top:5px;">إضافة لاعب</button>
-            <div id="player-list" style="margin:15px 0; color:#888; font-size:0.9em;"></div>
-            <button onclick="distributeRoles()" style="background:green; color:white; width:100%; padding:15px; border:none; font-weight:bold;">توزيع الأدوار</button>
+            <button onclick="addPlayer()">إضافة لاعب +</button>
+            <div id="player-list" style="margin:15px; color:#0f0;"></div>
+            <button style="background:green;" onclick="distributeRoles()">توزيع الأدوار</button>
         </div>
         <div id="mafia-display" class="hidden">
-            <div id="narrator-box" style="background:#da291c; color:white; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px; font-weight:bold;"></div>
+            <div id="narrator-name"></div>
             <div id="cards-container" style="width:350px;"></div>
         </div>
     </div>
@@ -75,121 +76,94 @@
         function showGame(g) {
             $('#main-menu').addClass('hidden');
             if(g === 'chess') { $('#chess-section').removeClass('hidden'); initChess(); }
-            else if(g === 'mafia_hand') { $('#mafia-section').removeClass('hidden'); }
-            else { alert("جاري العمل على برمجة نظام الأونلاين الجماعي..."); location.reload(); }
+            else { $('#mafia-section').removeClass('hidden'); }
         }
 
-        // --- الشطرنج مع حل مشكلة الصور ---
+        // --- الشطرنج ---
         var board = null, game = new Chess(), peer = null, conn = null;
-        var myColor = 'w', selectedSq = null;
-
-        // مصفوفة صور الشباب (تأكد من الروابط)
+        var myColor = 'w', sourceSquare = null;
         var pics = {
-            'wK': 'https://i.postimg.cc/m27HgYdg/king-black.jpg',
-            'wQ': 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
-            'wN': 'https://i.postimg.cc/d31K4Kx9/download.jpg',
-            'wB': 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
-            'bK': 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg',
-            'bQ': 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg',
-            'bN': 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg',
-            'bB': 'https://i.postimg.cc/RVRx2dfm/download.jpg',
+            'wK': 'https://i.postimg.cc/m27HgYdg/king-black.jpg', 'wQ': 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
+            'wN': 'https://i.postimg.cc/d31K4Kx9/download.jpg', 'wB': 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
+            'bK': 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg', 'bQ': 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg',
+            'bN': 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg', 'bB:': 'https://i.postimg.cc/RVRx2dfm/download.jpg',
             'bP': 'https://i.postimg.cc/Nj9dgQFv/download.jpg'
         };
 
         function initChess() {
-            let id = "Ahmed_" + Math.floor(1000 + Math.random()*9000);
+            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(id);
             peer.on('open', i => $('#my-id').text(i));
-            peer.on('connection', c => { conn = c; myColor = 'w'; setupConn(); });
-
+            peer.on('connection', c => { conn = c; myColor = 'w'; listen(); });
             board = Chessboard('board', {
-                draggable: false,
-                position: 'start',
-                // دالة الصور المحسنة
-                pieceTheme: function(piece) {
-                    if (pics[piece]) {
-                        return pics[piece];
-                    }
-                    return 'https://chessboardjs.com/img/chesspieces/wikipedia/' + piece + '.png';
-                }
+                draggable: false, position: 'start',
+                pieceTheme: p => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/'+p+'.png'
             });
-
-            // تفعيل النقر
-            $(document).on('click', '.square-55d63', function() {
-                let sq = $(this).attr('data-square');
-                handleChessClick(sq);
-            });
+            $(document).on('click', '.square-55d63', function() { onSqClick($(this).attr('data-square')); });
         }
 
-        function handleChessClick(sq) {
-            $('.square-55d63').removeClass('highlight-possible highlight-selected');
-
-            if (selectedSq === null) {
+        function onSqClick(sq) {
+            $('.square-55d63').removeClass('highlight-selected highlight-possible');
+            if (sourceSquare === null) {
                 let p = game.get(sq);
                 if (p && p.color === myColor && p.color === game.turn()) {
-                    selectedSq = sq;
-                    $('.square-' + sq).addClass('highlight-selected');
-                    let moves = game.moves({ square: sq, verbose: true });
-                    moves.forEach(m => $('.square-' + m.to).addClass('highlight-possible'));
+                    sourceSquare = sq;
+                    $('.square-'+sq).addClass('highlight-selected');
+                    game.moves({square: sq, verbose: true}).forEach(m => $('.square-'+m.to).addClass('highlight-possible'));
                 }
             } else {
-                let move = game.move({ from: selectedSq, to: sq, promotion: 'q' });
-                if (move) {
-                    board.position(game.fen());
-                    if (conn) conn.send(move);
-                }
-                selectedSq = null;
+                let m = game.move({ from: sourceSquare, to: sq, promotion: 'q' });
+                if (m) { board.position(game.fen()); if(conn) conn.send(m); }
+                sourceSquare = null;
             }
         }
 
-        function connectToFriend() {
+        function sendChallengeRequest() {
             let fId = $('#friendId').val();
-            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupConn(); }
+            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); listen(); }
         }
 
-        function setupConn() {
-            conn.on('data', m => { game.move(m); board.position(game.fen()); });
-        }
+        function listen() { conn.on('data', d => { game.move(d); board.position(game.fen()); }); }
 
-        // --- المافيا (نفس منطقك 10+) ---
+        // --- المافيا (تم تعديل الوضوح) ---
         let players = [];
         function addPlayer() {
-            let n = $('#playerName').val();
-            if(n) { players.push(n); $('#player-list').append(n + " | "); $('#playerName').val(""); }
+            let p = $('#playerName').val();
+            if(p) { players.push(p); $('#player-list').append(p + " | "); $('#playerName').val(""); }
         }
 
         function distributeRoles() {
-            if(players.length < 4) return alert("لازم 4 لاعبين على الأقل!");
+            if(players.length < 4) return alert("4 لاعبين على الأقل!");
             let rIdx = Math.floor(Math.random() * players.length);
-            let narrator = players[rIdx];
-            let actives = players.filter((_, i) => i !== rIdx);
-            
+            let narrator = players[rIdx], actives = players.filter((_, i) => i !== rIdx);
             let roles = [];
-            if (actives.length >= 10) {
-                roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫", "دكتور 💉");
-            } else {
-                roles.push("مافيا 💀", "دكتور 💉");
-            }
+            if (actives.length >= 10) roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫", "دكتور 💉");
+            else roles.push("مافيا 💀", "دكتور 💉");
             while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
             roles.sort(() => Math.random() - 0.5);
 
             $('#mafia-setup').hide();
             $('#mafia-display').removeClass('hidden');
-            $('#narrator-box').text("🎤 الراوي: " + narrator);
+            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narrator}</div>`);
 
             actives.forEach((p, i) => {
                 let card = $(`<div class="mafia-card"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>`);
                 card.click(function() {
                     if($(this).hasClass('locked')) return;
+                    
+                    // التعديل المطلوب: جعل البطاقة واضحة جداً
                     $(this).find('strong').hide();
                     $(this).find('.role-display').show();
-                    $('.mafia-card').addClass('locked');
+                    $(this).css({ 'background': '#000', 'border-color': '#00ff00', 'opacity': '1' });
+                    
+                    $('.mafia-card').not(this).addClass('locked'); // تعتيم الباقي فقط
+                    
                     setTimeout(() => {
                         $(this).fadeOut(500, function() { 
                             $(this).css('visibility', 'hidden').show(); 
                             $('.mafia-card').removeClass('locked'); 
                         });
-                    }, 2500);
+                    }, 3000);
                 });
                 $('#cards-container').append(card);
             });
