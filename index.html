@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - النسخة الكاملة</title>
+    <title>بوابة أحمد المحترف V3</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -16,20 +16,19 @@
         #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; outline: none; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        img[class^="piece"] { border-radius: 50% !important; border: 1px solid white !important; }
-        .mafia-card { background: #1a1a1a; padding: 25px; margin: 10px 0; border-radius: 10px; border: 2px solid #444; text-align: center; cursor: pointer; position: relative; }
+        .mafia-card { background: #1a1a1a; padding: 25px; margin: 10px 0; border-radius: 10px; border: 2px solid #444; text-align: center; cursor: pointer; transition: 0.4s; }
         .role-display { display: none; color: #ff0000; font-size: 1.5em; font-weight: bold; }
-        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; text-align: center; width: 100%; }
+        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; text-align: center; width: 100%; }
         .hidden { display: none; }
-        .fade-out { opacity: 0; transform: scale(0.8); transition: 0.5s; }
-        .locked { pointer-events: none; opacity: 0.2; }
-        .highlight-sq { background: rgba(0, 255, 0, 0.4) !important; }
+        .fade-out { opacity: 0; transform: scale(0.8); pointer-events: none; }
+        .locked { opacity: 0.1; pointer-events: none; }
+        .highlight-sq { box-shadow: inset 0 0 10px 5px rgba(0, 255, 0, 0.7) !important; }
     </style>
 </head>
 <body>
 
     <div id="main-menu">
-        <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO SYSTEM</h1>
+        <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
         <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
         <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا</button>
     </div>
@@ -39,8 +38,8 @@
         <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3><div id="my-id">جاري الاتصال...</div></div>
         <div id="board"></div>
         <div style="width:100%; max-width:400px; margin-top:15px;">
-            <input type="text" id="friendId" placeholder="أدخل ID الخصم">
-            <button onclick="sendChallengeRequest()">بدء الهجوم (تحدي)</button>
+            <input type="text" id="friendId" placeholder="ID الخصم">
+            <button id="sendChallenge" onclick="sendChallengeRequest()">إرسال طلب تحدي</button>
         </div>
     </div>
 
@@ -50,8 +49,8 @@
         <div id="mafia-setup" style="width:100%; max-width:400px;">
             <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
             <button onclick="addMafiaPlayer()">إضافة لاعب +</button>
-            <div id="mafia-preview" style="margin:15px; color:#0f0; font-size: 0.9em;"></div>
-            <button style="background:green;" onclick="startMafiaDist()">توزيع الأدوار مخفي</button>
+            <div id="mafia-preview" style="margin:15px; color:#0f0;"></div>
+            <button style="background:green;" onclick="startMafiaDist()">توزيع الأدوار</button>
         </div>
         <div id="mafia-board" class="hidden" style="width:100%; max-width:400px;">
             <div id="narrator-name"></div>
@@ -65,8 +64,8 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
-        let isLocked = false;
         let mPlayers = [];
+        let isLocked = false;
 
         function showGame(type) {
             $('#main-menu').hide();
@@ -74,9 +73,10 @@
             else { $('#mafia-section').removeClass('hidden'); }
         }
 
-        // --- منطق الشطرنج ---
+        // --- Chess Logic ---
         var board = null, game = new Chess(), peer = null, conn = null;
         var myColor = 'w', sourceSquare = null;
+        
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
             wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
@@ -88,21 +88,26 @@
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(id);
             peer.on('open', (i) => { 
-                $('#my-id').text("ID الخاص بك: " + i);
+                $('#my-id').text("ID: " + i);
                 board = Chessboard('board', {
                     draggable: false, position: 'start',
                     pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
                 });
             });
-            peer.on('connection', (c) => { conn = c; myColor = 'w'; setupChessConn(); });
-            $(document).on('click', '.square-55d63', function() { handleChessClick($(this).data('square')); });
+            peer.on('connection', (c) => { conn = c; myColor = 'w'; listenForMoves(); });
+            
+            // إصلاح النقر: استخدام delegating event لضمان التقاط المربعات
+            $(document).on('click', '.square-55d63', function() {
+                let sq = $(this).attr('data-square');
+                handleMove(sq);
+            });
         }
 
-        function handleChessClick(sq) {
+        function handleMove(sq) {
             if (game.turn() !== myColor) return;
             if (sourceSquare === null) {
-                let piece = game.get(sq);
-                if (piece && piece.color === myColor) { sourceSquare = sq; $('.square-'+sq).addClass('highlight-sq'); }
+                let p = game.get(sq);
+                if (p && p.color === myColor) { sourceSquare = sq; $('.square-'+sq).addClass('highlight-sq'); }
             } else {
                 let move = game.move({ from: sourceSquare, to: sq, promotion: 'q' });
                 if (move) {
@@ -116,67 +121,64 @@
 
         function sendChallengeRequest() {
             let fId = $('#friendId').val();
-            if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupChessConn(); }
+            if(fId) { 
+                conn = peer.connect(fId); 
+                myColor = 'b'; 
+                board.orientation('black'); 
+                listenForMoves(); 
+                $('#sendChallenge').text("متصل ✅");
+            }
         }
 
-        function setupChessConn() {
+        function listenForMoves() {
             conn.on('data', (d) => { if(d.type === 'move') { game.move(d.move); board.position(game.fen()); } });
         }
 
-        // --- منطق المافيا ---
+        // --- Mafia Logic ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
-            if(n) { mPlayers.push(n); $('#mafia-preview').text("القائمة: " + mPlayers.join(" | ")); $('#mafiaPlayerName').val("").focus(); }
+            if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبون: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
         }
 
         function startMafiaDist() {
-            if(mPlayers.length < 5) return alert("لازم 5 لاعبين على الأقل (4 لاعبين + راوي)!");
-            
-            // اختيار الراوي
+            if(mPlayers.length < 5) return alert("اقل شي 5 لاعبين!");
             let narratorIdx = Math.floor(Math.random() * mPlayers.length);
-            let narratorName = mPlayers[narratorIdx];
-            let activePlayers = mPlayers.filter((_, i) => i !== narratorIdx);
+            let narrator = mPlayers[narratorIdx];
+            let actives = mPlayers.filter((_, i) => i !== narratorIdx);
             
-            // توزيع الأدوار
             let roles = [];
-            if(activePlayers.length >= 8) {
-                roles.push("مافيا 💀", "مافيا 💀", "دكتور 💉", "شرطي 👮");
-            } else {
-                roles.push("مافيا 💀", "دكتور 💉");
-            }
+            // توزيع عادل
+            roles.push("مافيا 💀");
+            roles.push("دكتور 💉");
+            if(actives.length >= 6) roles.push("شرطي 👮");
+            if(actives.length >= 8) roles.push("مافيا ثانٍ 💀");
             
-            while(roles.length < activePlayers.length) roles.push("مواطن 👨‍🌾");
+            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
             roles.sort(() => Math.random() - 0.5);
 
             $('#mafia-setup').hide();
             $('#mafia-board').removeClass('hidden');
-            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}</div>`);
+            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narrator}</div>`);
             
             let container = $('#mafia-cards-container');
             container.empty();
-            activePlayers.forEach((name, i) => {
-                let card = $(`
-                    <div class="mafia-card" id="mc-${i}">
-                        <strong class="p-name">${name}</strong>
-                        <div class="role-display">${roles[i]}</div>
-                    </div>
-                `);
-                
-                card.on('click', function() {
+            actives.forEach((p, i) => {
+                let card = $(`<div class="mafia-card" id="card-${i}"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>`);
+                card.click(function() {
                     if(isLocked) return;
                     isLocked = true;
                     $('.mafia-card').addClass('locked');
-                    $(this).removeClass('locked').find('.p-name').hide();
+                    $(this).removeClass('locked').find('strong').hide();
                     $(this).find('.role-display').fadeIn();
 
                     setTimeout(() => {
                         $(this).addClass('fade-out');
                         setTimeout(() => {
-                            $(this).css('visibility', 'hidden'); // يخفيها تماماً ولا يحذفها للحفاظ على الترتيب
+                            $(this).css('visibility', 'hidden');
                             isLocked = false;
                             $('.mafia-card').removeClass('locked');
                         }, 500);
-                    }, 3000); // 3 ثواني لمشاهدة الدور
+                    }, 3000);
                 });
                 container.append(card);
             });
