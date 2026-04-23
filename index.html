@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أحمد المحترف - النسخة النهائية</title>
+    <title>أحمد المحترف - النسخة الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
         #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
         .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px #da291c55; }
         .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
         
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; background: #444; }
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; }
         
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
+        /* ستايل المافيا */
         .mafia-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
-        .role-display { display: none; color: #ff0000; font-size: 1.4em; font-weight: bold; margin-top: 10px; }
+        .role-display { display: none; color: #ff0000; font-size: 1.4em; font-weight: bold; margin-top: 10px; text-shadow: 0 0 5px #000; }
         .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; }
         .hidden { display: none; }
         .fade-out { opacity: 0; transform: scale(0.8); pointer-events: none; transition: 0.5s; }
@@ -30,20 +31,20 @@
 <body>
 
     <div id="main-menu">
-        <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
-        <button class="menu-btn" onclick="showGame('chess')">♟️ شطرنج (صور ثابتة)</button>
-        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا الجديد</button>
+        <h1 style="color:#da291c; text-shadow: 0 0 10px #f00;">AHMED PRO SYSTEM</h1>
+        <button class="menu-btn" onclick="showGame('chess')">♟️ شطرنج (صور أصلية)</button>
+        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا المطور</button>
     </div>
 
     <div id="chess-section" class="hidden">
-        <button onclick="location.reload()" style="background:#333; margin-bottom:10px;">🏠 القائمة الرئيسية</button>
+        <button onclick="location.reload()" style="background:#333; margin-bottom:10px; width: 100%; max-width: 400px;">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3></div>
         <div id="board"></div>
     </div>
 
     <div id="mafia-section" class="hidden">
-        <button onclick="location.reload()" style="background:#333; margin-bottom:10px;">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🕵️‍♂️ موزع المافيا</h3></div>
+        <button onclick="location.reload()" style="background:#333; margin-bottom:10px; width: 100%; max-width: 400px;">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🕵️‍♂️ نظام المافيا</h3></div>
         <div id="mafia-setup" style="width:100%; max-width:400px;">
             <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
             <button onclick="addMafiaPlayer()">إضافة لاعب</button>
@@ -67,24 +68,27 @@
             $('#main-menu').hide();
             if(type === 'chess') { 
                 $('#chess-section').removeClass('hidden'); 
-                // استخدام سيرفر الصور الاحتياطي لـ Wikipedia
-                let config = {
+                // استخدام رابط الصور من Chess.com مباشرة لأنه الأضمن
+                var config = {
                     position: 'start',
                     draggable: true,
                     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
                 };
-                Chessboard('board', config); 
+                var board = Chessboard('board', config); 
+                // تحديث حجم البورد ليتناسب مع الموبايل
+                $(window).resize(board.resize);
             }
             else { $('#mafia-section').removeClass('hidden'); }
         }
 
+        // --- نظام المافيا ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
             if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
         }
 
         function startMafiaDist() {
-            if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
+            if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل (3 لاعبين + راوي)!");
             let narratorIdx = Math.floor(Math.random() * mPlayers.length);
             let narratorName = mPlayers[narratorIdx];
             let actives = mPlayers.filter((_, i) => i !== narratorIdx);
@@ -92,11 +96,11 @@
             let roles = [];
             let pCount = actives.length;
 
-            // تطبيق قانون أحمد المحترف
+            // تطبيق قوانينك:
             if (pCount >= 10) {
-                roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫");
+                roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); // 2 مافيا (واحد قتل وواحد تسكيت)
             } else {
-                roles.push("مافيا القتل 💀");
+                roles.push("مافيا القتل 💀"); // مافيا واحد فقط
             }
             
             roles.push("دكتور 💉");
