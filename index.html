@@ -9,6 +9,18 @@
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
+        /* شاشة الترحيب */
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 1s ease-out;
+        }
+        .welcome-title { color: #da291c; font-size: 2.5em; font-weight: bold; text-shadow: 0 0 20px #da291c; animation: pulse 1.5s infinite; }
+        .welcome-sub { color: #0f0; font-family: monospace; margin-top: 10px; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* القائمة الرئيسية */
         #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
         .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; text-align: center; }
         .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
@@ -35,7 +47,12 @@
 </head>
 <body>
 
-    <div id="main-menu">
+    <div id="welcome-screen">
+        <div class="welcome-title">AHMED PRO SYSTEM</div>
+        <div class="welcome-sub">جاري تحميل الأنظمة... [OK]</div>
+    </div>
+
+    <div id="main-menu" class="hidden">
         <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO SYSTEM</h1>
         <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
         <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (10+)</button>
@@ -73,6 +90,17 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
+        // كود شاشة الترحيب
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('#welcome-screen').css('opacity', '0');
+                setTimeout(function() {
+                    $('#welcome-screen').addClass('hidden');
+                    $('#main-menu').removeClass('hidden');
+                }, 1000);
+            }, 2000); // تظهر لمدة ثانيتين
+        });
+
         function showGame(g) {
             $('#main-menu').addClass('hidden');
             if(g === 'chess') { $('#chess-section').removeClass('hidden'); initChess(); }
@@ -98,7 +126,7 @@
                 draggable: false, position: 'start',
                 pieceTheme: p => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/'+p+'.png'
             });
-            $(document).on('click', '.square-55d63', function() { onSqClick($(this).attr('data-square')); });
+            $(document).off('click', '.square-55d63').on('click', '.square-55d63', function() { onSqClick($(this).attr('data-square')); });
         }
 
         function onSqClick(sq) {
