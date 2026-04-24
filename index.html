@@ -31,7 +31,6 @@
         
         .mafia-card { background: #1a1a1a; padding: 25px; margin: 10px 0; border-radius: 10px; border: 2px solid #444; text-align: center; cursor: pointer; }
         .role-display { display: none; color: #00ff00; font-size: 1.8em; font-weight: bold; }
-        .locked { opacity: 0.1 !important; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -45,14 +44,14 @@
             <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
             <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
             <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا اليدوي</button>
-            <button class="menu-btn" onclick="showGame('mafia_online')" style="border-color: #0055ff; color: #0055ff;">🌐 مافيا أونلاين (سيرفر دسكورد)</button>
+            <button class="menu-btn" onclick="showGame('online')" style="border-color: #0055ff; color: #0055ff;">🌐 مافيا أونلاين</button>
         </div>
 
-        <div id="mafia_online-section" class="hidden online-panel">
+        <div id="online-section" class="hidden online-panel">
             <button onclick="location.reload()" style="background:#333;">🏠 خروج</button>
             <div id="setup-online">
                 <input type="text" id="onName" placeholder="دخل اسمك">
-                <button onclick="startOnline(true)" style="background:#0055ff;">أنا الراوي (Host)</button>
+                <button onclick="startOnline(true)" style="background:#0055ff;">إنشاء غرفة (Host)</button>
                 <input type="text" id="roomID" placeholder="ID الغرفة">
                 <button onclick="startOnline(false)">انضمام</button>
                 <p id="my-peer-id" style="font-size:0.7em; color:#555;"></p>
@@ -107,7 +106,7 @@
             if(g === 'chess') initChess();
         }
 
-        // --- أونلاين (بدون مايك عشان ما يعلق) ---
+        // --- أونلاين ---
         let oPeer, oConns = [], isHost = false;
         function startOnline(host) {
             isHost = host;
@@ -128,8 +127,13 @@
             });
         }
         function distributeOnline() {
-            let rs = ["مافيا 💀", "دكتور 💉"];
-            while(rs.length < oConns.length) rs.push("مواطن 👨‍🌾");
+            let n = oConns.length;
+            let rs = [];
+            // نظام التوزيع اللي طلبته
+            if (n >= 10) { rs.push("مافيا واحد قتل 🔪", "مافيا تسكيت 🤫"); } 
+            else { rs.push("مافيا 💀"); }
+            rs.push("دكتور 💉");
+            while(rs.length < n) rs.push("مواطن 👨‍🌾");
             rs.sort(() => Math.random() - 0.5);
             oConns.forEach((c, i) => c.send({type: 'ROLE', role: rs[i]}));
             alert("تم التوزيع!");
