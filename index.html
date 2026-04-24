@@ -42,6 +42,26 @@
             color: #ffd966;
             font-family: monospace;
             margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .room-code-box span {
+            word-break: break-all;
+            font-size: 0.9rem;
+            letter-spacing: normal;
+        }
+        .copy-btn {
+            background: #2c6e2c;
+            padding: 8px 15px;
+            width: auto;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .copy-btn:active {
+            background: #1e4a1e;
         }
         .player-list-online {
             background: #0c0f16;
@@ -90,6 +110,24 @@
         }
         .secondary-btn {
             background: #2c2f36;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2e7d32;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            z-index: 999;
+            animation: fadeOut 2s ease forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
         }
     </style>
 </head>
@@ -147,12 +185,15 @@
                 <input type="text" id="hostPeerIdInput" placeholder="معرف المضيف (Peer ID)">
                 <button id="confirmOnlineJoinBtn">دخول الغرفة</button>
             </div>
-            <div class="footer" style="margin-top:15px; font-size:0.7rem;">🔗 بعد إنشاء الغرفة، شارك معرف المضيف مع أصدقائك</div>
+            <div class="footer" style="margin-top:15px; font-size:0.7rem;">🔗 بعد إنشاء الغرفة، اضغط على زر النسخ وشارك الرابط مع أصدقائك</div>
         </div>
 
         <!-- شاشة الغرفة -->
         <div id="onlineRoom" class="hidden online-mafia-container">
-            <div class="room-code-box">🆔 معرفك: <span id="myPeerIdDisplay">---</span></div>
+            <div class="room-code-box">
+                <span>🆔 معرفك: <strong id="myPeerIdDisplay">---</strong></span>
+                <button id="copyPeerIdBtn" class="copy-btn">📋 نسخ المعرف</button>
+            </div>
             <div style="display:flex; justify-content:space-between; margin:10px 0;">
                 <span>👥 اللاعبون: <span id="onlinePlayerCount">0</span></span>
                 <span id="hostStatusSpan">⭐ مضيف</span>
@@ -162,6 +203,7 @@
                 <button id="startOnlineGameBtn" class="secondary-btn">🎬 بدء اللعبة (4+ لاعبين)</button>
                 <button id="leaveOnlineRoomBtn" style="background:#3a2a2a;">🚪 مغادرة</button>
             </div>
+            <div class="footer" style="margin-top:12px; font-size:0.7rem;">💡 أرسل المعرف لأصدقائك ليتمكنوا من الانضمام</div>
         </div>
 
         <!-- شاشة اللعب -->
@@ -304,7 +346,7 @@
             });
         }
 
-        // ========== مافيا أون لاين (إضافة جديدة فقط، لم نلمس أي كود أصلي) ==========
+        // ========== مافيا أون لاين ==========
         let onlinePeer = null;
         let onlineConnections = [];
         let onlinePlayers = [];
@@ -313,13 +355,26 @@
         let myOnlinePeerId = null;
         let onlineGameStarted = false;
         let myOnlineRole = null;
-        let hasRevealedOnline = false;
 
         function initOnlineMafia() {
-            // إظهار شاشة اللوبي
             $('#onlineLobby').removeClass('hidden');
             $('#onlineRoom').addClass('hidden');
             $('#onlineGameplay').addClass('hidden');
+        }
+
+        // دالة نسخ النص
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("✅ تم نسخ المعرف: " + text);
+            }).catch(() => {
+                showToast("❌ فشل النسخ، حاول يدوياً");
+            });
+        }
+
+        function showToast(msg) {
+            let toast = $('<div class="toast-msg">' + msg + '</div>');
+            $('body').append(toast);
+            setTimeout(() => { toast.remove(); }, 2000);
         }
 
         // إنشاء غرفة
@@ -336,6 +391,11 @@
                 updateOnlineRoomUI();
                 $('#onlineLobby').addClass('hidden');
                 $('#onlineRoom').removeClass('hidden');
+                
+                // زر نسخ المعرف
+                $('#copyPeerIdBtn').off('click').on('click', function() {
+                    copyToClipboard(id);
+                });
                 
                 onlinePeer.on('connection', (conn) => {
                     setupOnlineConnection(conn);
@@ -374,7 +434,6 @@
             onlineConnections.push(conn);
             conn.on('open', () => {
                 if(!isHostOnline) {
-                    // إرسال بياناتي للمضيف
                     conn.send({ type: 'new-player', player: { peerId: myOnlinePeerId, name: myOnlineName } });
                 }
             });
@@ -447,19 +506,16 @@
                 alert("يحتاج 4 لاعبين على الأقل لبدء المافيا!");
                 return;
             }
-            // توزيع الأدوار حسب قانون أحمد
             let rolesList = [];
             let playerCount = onlinePlayers.length;
             if(playerCount >= 10) { rolesList.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); }
             else { rolesList.push("مافيا القتل 💀"); }
             rolesList.push("دكتور 💉");
             while(rolesList.length < playerCount) rolesList.push("مواطن 👨‍🌾");
-            // خلط
             for(let i = rolesList.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [rolesList[i], rolesList[j]] = [rolesList[j], rolesList[i]];
             }
-            // إرسال لكل لاعب دوره
             onlinePlayers.forEach((player, idx) => {
                 let role = rolesList[idx];
                 let connTarget = onlineConnections.find(c => c.peer === player.peerId);
