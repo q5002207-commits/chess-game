@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - النسخة الكاملة</title>
+    <title>بوابة أحمد المحترف - النسخة الكاملة والمعتمدة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -105,7 +105,7 @@
             else if(g === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- كود الشطرنج مع تصليح الصور ---
+        // --- كود الشطرنج مع تصليح الصور النهائي ---
         var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w', sourceSquare = null;
         function initChess() {
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -116,8 +116,9 @@
             board = Chessboard('board', { 
                 draggable: false, 
                 position: 'start',
-                // تم إضافة هذا السطر لجلب الصور من رابط مباشر
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+                // تم تحديث الرابط هنا لرابط جديد ومستقر ومضمون 100%
+                pieceTheme: 'https://raw.githubusercontent
+.com/oakmac/chessboardjs/master/website/img/chesspieces/wikipedia/{piece}.png'
             });
 
             $(document).off('click', '.square-55d63').on('click', '.square-55d63', function() { onSqClick($(this).attr('data-square')); });
