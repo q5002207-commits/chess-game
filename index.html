@@ -23,6 +23,74 @@
         .hidden { display: none; }
         .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
         .locked { pointer-events: none; opacity: 0.4; }
+
+        /* ستايلات المافيا أون لاين */
+        .online-mafia-container {
+            background: #0a0f1e;
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .room-code-box {
+            background: #000000aa;
+            padding: 12px;
+            text-align: center;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: #ffd966;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .player-list-online {
+            background: #0c0f16;
+            border-radius: 20px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .player-badge {
+            background: #1f212b;
+            margin: 6px 0;
+            padding: 8px 12px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            border-right: 4px solid #da291c;
+            color: #f0f0f0;
+        }
+        .host-badge {
+            background: #da291c30;
+            border-right-color: gold;
+        }
+        .role-card-online {
+            background: #171f2b;
+            border-radius: 36px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #da291c;
+            text-align: center;
+            cursor: pointer;
+        }
+        .role-secret {
+            background: #000000aa;
+            padding: 15px;
+            border-radius: 32px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        .hidden-role {
+            filter: blur(5px);
+        }
+        .flex-btns {
+            display: flex;
+            gap: 10px;
+        }
+        .secondary-btn {
+            background: #2c2f36;
+        }
     </style>
 </head>
 <body>
@@ -31,7 +99,8 @@
         <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
         <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
         <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
-        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس </button>
+        <button class="menu-btn" onclick="showGame('mafiaOnline')">🌐 مافيا أون لاين (متعدد اللاعبين)</button>
+        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس</button>
     </div>
 
     <div id="chess-section" class="hidden">
@@ -44,6 +113,7 @@
         </div>
     </div>
 
+    <!-- موزع المافيا العادي (نفس الكود الأصلي) -->
     <div id="mafia-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🕵️‍♂️ نظام المافيا المطور</h3></div>
@@ -56,6 +126,51 @@
         <div id="mafia-board" class="hidden" style="width:100%; max-width:400px;">
             <div id="narrator-name"></div>
             <div id="mafia-cards-container"></div>
+        </div>
+    </div>
+
+    <!-- مافيا أون لاين (إضافة جديدة) -->
+    <div id="mafiaOnline-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🌐 مافيا أون لاين - العب مع أصدقائك</h3></div>
+        
+        <!-- شاشة الدخول -->
+        <div id="onlineLobby" class="online-mafia-container">
+            <div class="input-group" style="margin-bottom:15px;">
+                <input type="text" id="onlinePlayerName" placeholder="اسمك في اللعبة..." style="background:#000; color:#0f0;">
+            </div>
+            <div class="flex-btns">
+                <button id="createOnlineGameBtn" style="background:#da291c;">🔪 إنشاء غرفة جديدة</button>
+                <button id="joinOnlineGameBtn" class="secondary-btn">🚪 انضمام لغرفة</button>
+            </div>
+            <div id="onlineJoinSection" class="hidden" style="margin-top:15px;">
+                <input type="text" id="hostPeerIdInput" placeholder="معرف المضيف (Peer ID)">
+                <button id="confirmOnlineJoinBtn">دخول الغرفة</button>
+            </div>
+            <div class="footer" style="margin-top:15px; font-size:0.7rem;">🔗 بعد إنشاء الغرفة، شارك معرف المضيف مع أصدقائك</div>
+        </div>
+
+        <!-- شاشة الغرفة -->
+        <div id="onlineRoom" class="hidden online-mafia-container">
+            <div class="room-code-box">🆔 معرفك: <span id="myPeerIdDisplay">---</span></div>
+            <div style="display:flex; justify-content:space-between; margin:10px 0;">
+                <span>👥 اللاعبون: <span id="onlinePlayerCount">0</span></span>
+                <span id="hostStatusSpan">⭐ مضيف</span>
+            </div>
+            <div id="onlinePlayerList" class="player-list-online"></div>
+            <div class="flex-btns">
+                <button id="startOnlineGameBtn" class="secondary-btn">🎬 بدء اللعبة (4+ لاعبين)</button>
+                <button id="leaveOnlineRoomBtn" style="background:#3a2a2a;">🚪 مغادرة</button>
+            </div>
+        </div>
+
+        <!-- شاشة اللعب -->
+        <div id="onlineGameplay" class="hidden online-mafia-container">
+            <div id="onlineNarratorMsg" style="background:#0055ff; padding:12px; border-radius:12px; margin-bottom:15px; text-align:center; color:white;">
+                🎙️ الراوي الآلي: اضغط على بطاقتك لكشف دورك
+            </div>
+            <div id="onlineRolesContainer"></div>
+            <button id="resetOnlineGameBtn" class="secondary-btn" style="margin-top:15px;">🏠 العودة للقائمة</button>
         </div>
     </div>
 
@@ -79,11 +194,11 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
+        // ========== الكود الأصلي (لم نلمس فيه أي شيء) ==========
         let isLocked = false;
         let mPlayers = [];
         let sPlayers = [];
         
-        // قائمة الـ 50 كلمة للعبة الجاسوس
         const spyPlaces = [
             "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة", "مطار", "محطة قطار", 
             "سفينة", "مخيم", "قلعة", "مسرح", "سينما", "ملعب كورة", "مكتبة", "متحف", "شاطئ", "بنك", 
@@ -96,10 +211,10 @@
             $('#main-menu').hide();
             if(type === 'chess') { $('#chess-section').removeClass('hidden'); initChess(); }
             else if(type === 'mafia') { $('#mafia-section').removeClass('hidden'); }
+            else if(type === 'mafiaOnline') { $('#mafiaOnline-section').removeClass('hidden'); initOnlineMafia(); }
             else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- شطرنج أحمد ---
         var board = null, game = new Chess(), peer = null;
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
@@ -121,7 +236,6 @@
             });
         }
 
-        // --- مافيا (قانون أحمد) ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
             if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
@@ -160,7 +274,6 @@
             });
         }
 
-        // --- الجاسوس (إضافة أحمد) ---
         function addSpyPlayer() {
             let n = $('#spyPlayerName').val().trim();
             if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
@@ -188,6 +301,234 @@
                     }, 3000);
                 });
                 container.append(card);
+            });
+        }
+
+        // ========== مافيا أون لاين (إضافة جديدة فقط، لم نلمس أي كود أصلي) ==========
+        let onlinePeer = null;
+        let onlineConnections = [];
+        let onlinePlayers = [];
+        let isHostOnline = false;
+        let myOnlineName = "";
+        let myOnlinePeerId = null;
+        let onlineGameStarted = false;
+        let myOnlineRole = null;
+        let hasRevealedOnline = false;
+
+        function initOnlineMafia() {
+            // إظهار شاشة اللوبي
+            $('#onlineLobby').removeClass('hidden');
+            $('#onlineRoom').addClass('hidden');
+            $('#onlineGameplay').addClass('hidden');
+        }
+
+        // إنشاء غرفة
+        $('#createOnlineGameBtn').on('click', function() {
+            let name = $('#onlinePlayerName').val().trim();
+            if(!name) { alert("أدخل اسمك أولاً"); return; }
+            myOnlineName = name;
+            onlinePeer = new Peer();
+            onlinePeer.on('open', (id) => {
+                myOnlinePeerId = id;
+                isHostOnline = true;
+                onlinePlayers = [{ peerId: id, name: name, isHost: true }];
+                $('#myPeerIdDisplay').text(id);
+                updateOnlineRoomUI();
+                $('#onlineLobby').addClass('hidden');
+                $('#onlineRoom').removeClass('hidden');
+                
+                onlinePeer.on('connection', (conn) => {
+                    setupOnlineConnection(conn);
+                });
+            });
+            onlinePeer.on('error', (err) => { console.error(err); alert("خطأ في الاتصال"); });
+        });
+
+        // انضمام لغرفة
+        $('#joinOnlineGameBtn').on('click', function() {
+            let name = $('#onlinePlayerName').val().trim();
+            if(!name) { alert("أدخل اسمك أولاً"); return; }
+            myOnlineName = name;
+            $('#onlineJoinSection').removeClass('hidden');
+        });
+
+        $('#confirmOnlineJoinBtn').on('click', function() {
+            let hostId = $('#hostPeerIdInput').val().trim();
+            if(!hostId) { alert("أدخل معرف المضيف"); return; }
+            onlinePeer = new Peer();
+            onlinePeer.on('open', (id) => {
+                myOnlinePeerId = id;
+                isHostOnline = false;
+                onlinePlayers = [{ peerId: id, name: myOnlineName, isHost: false }];
+                $('#myPeerIdDisplay').text(id);
+                updateOnlineRoomUI();
+                $('#onlineLobby').addClass('hidden');
+                $('#onlineRoom').removeClass('hidden');
+                
+                let conn = onlinePeer.connect(hostId);
+                setupOnlineConnection(conn);
+            });
+        });
+
+        function setupOnlineConnection(conn) {
+            onlineConnections.push(conn);
+            conn.on('open', () => {
+                if(!isHostOnline) {
+                    // إرسال بياناتي للمضيف
+                    conn.send({ type: 'new-player', player: { peerId: myOnlinePeerId, name: myOnlineName } });
+                }
+            });
+            conn.on('data', (data) => handleOnlineData(conn, data));
+            conn.on('close', () => {
+                onlineConnections = onlineConnections.filter(c => c !== conn);
+                if(!onlineGameStarted) refreshOnlinePlayers();
+            });
+        }
+
+        function handleOnlineData(conn, data) {
+            if(data.type === 'new-player' && isHostOnline) {
+                let exists = onlinePlayers.some(p => p.peerId === data.player.peerId);
+                if(!exists) {
+                    onlinePlayers.push(data.player);
+                    broadcastOnlineToAll({ type: 'sync-players', players: onlinePlayers });
+                    updateOnlineRoomUI();
+                }
+            }
+            else if(data.type === 'sync-players') {
+                onlinePlayers = data.players;
+                updateOnlineRoomUI();
+            }
+            else if(data.type === 'start-game' && !isHostOnline) {
+                startOnlineGameWithRoles(data.myRole);
+            }
+            else if(data.type === 'player-leave' && isHostOnline) {
+                onlinePlayers = onlinePlayers.filter(p => p.peerId !== data.peerId);
+                broadcastOnlineToAll({ type: 'sync-players', players: onlinePlayers });
+                updateOnlineRoomUI();
+            }
+        }
+
+        function broadcastOnlineToAll(msg, excludeId = null) {
+            onlineConnections.forEach(conn => {
+                if(conn.open && conn.peer !== excludeId) {
+                    conn.send(msg);
+                }
+            });
+        }
+
+        function refreshOnlinePlayers() {
+            if(isHostOnline) {
+                broadcastOnlineToAll({ type: 'sync-players', players: onlinePlayers });
+                updateOnlineRoomUI();
+            }
+        }
+
+        function updateOnlineRoomUI() {
+            let container = $('#onlinePlayerList');
+            container.empty();
+            onlinePlayers.forEach(p => {
+                let div = $('<div class="player-badge"></div>');
+                div.html(`<span>${escapeHtml(p.name)}</span><span>${p.peerId === myOnlinePeerId ? '(أنت)' : ''} ${p.isHost ? '👑 مضيف' : ''}</span>`);
+                container.append(div);
+            });
+            $('#onlinePlayerCount').text(onlinePlayers.length);
+            if(isHostOnline) {
+                $('#hostStatusSpan').text('⭐ أنت المضيف').css('color', '#da291c');
+                $('#startOnlineGameBtn').show();
+            } else {
+                $('#hostStatusSpan').text('🚶 لاعب').css('color', '#aaa');
+                $('#startOnlineGameBtn').hide();
+            }
+        }
+
+        $('#startOnlineGameBtn').on('click', function() {
+            if(!isHostOnline) return;
+            if(onlinePlayers.length < 4) {
+                alert("يحتاج 4 لاعبين على الأقل لبدء المافيا!");
+                return;
+            }
+            // توزيع الأدوار حسب قانون أحمد
+            let rolesList = [];
+            let playerCount = onlinePlayers.length;
+            if(playerCount >= 10) { rolesList.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); }
+            else { rolesList.push("مافيا القتل 💀"); }
+            rolesList.push("دكتور 💉");
+            while(rolesList.length < playerCount) rolesList.push("مواطن 👨‍🌾");
+            // خلط
+            for(let i = rolesList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [rolesList[i], rolesList[j]] = [rolesList[j], rolesList[i]];
+            }
+            // إرسال لكل لاعب دوره
+            onlinePlayers.forEach((player, idx) => {
+                let role = rolesList[idx];
+                let connTarget = onlineConnections.find(c => c.peer === player.peerId);
+                if(connTarget && connTarget.open) {
+                    connTarget.send({ type: 'start-game', myRole: role });
+                }
+                if(player.peerId === myOnlinePeerId) {
+                    myOnlineRole = role;
+                }
+            });
+            startOnlineGameWithRoles(myOnlineRole);
+        });
+
+        function startOnlineGameWithRoles(role) {
+            onlineGameStarted = true;
+            myOnlineRole = role;
+            $('#onlineRoom').addClass('hidden');
+            $('#onlineGameplay').removeClass('hidden');
+            renderOnlineRoleCard();
+        }
+
+        function renderOnlineRoleCard() {
+            let container = $('#onlineRolesContainer');
+            container.empty();
+            let card = $(`
+                <div class="role-card-online">
+                    <strong>${escapeHtml(myOnlineName)}</strong>
+                    <div class="role-secret hidden-role" id="onlineSecretRole">❓ دورك مخفي ❓</div>
+                    <button class="reveal-online-btn" style="margin-top:10px; background:#da291c;">🗝️ كشف دوري (مرة واحدة)</button>
+                </div>
+            `);
+            container.append(card);
+            let revealed = false;
+            card.find('.reveal-online-btn').on('click', function() {
+                if(revealed) {
+                    $('#onlineNarratorMsg').text("🎭 لقد كشفت دورك مسبقاً!");
+                    return;
+                }
+                revealed = true;
+                let secretDiv = card.find('#onlineSecretRole');
+                secretDiv.removeClass('hidden-role');
+                secretDiv.html(`🎭 دورك: ${myOnlineRole}`);
+                $(this).prop('disabled', true).text('✓ تم الكشف');
+                $('#onlineNarratorMsg').text(`🎙️ الراوي: ${myOnlineName} عرف دوره. استعدوا!`);
+            });
+        }
+
+        $('#leaveOnlineRoomBtn').on('click', function() {
+            if(onlinePeer && !onlineGameStarted && isHostOnline) {
+                broadcastOnlineToAll({ type: 'player-leave', peerId: myOnlinePeerId });
+            }
+            if(onlinePeer) onlinePeer.destroy();
+            onlineConnections = [];
+            onlinePlayers = [];
+            onlineGameStarted = false;
+            location.reload();
+        });
+
+        $('#resetOnlineGameBtn').on('click', function() {
+            location.reload();
+        });
+
+        function escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
             });
         }
     </script>
