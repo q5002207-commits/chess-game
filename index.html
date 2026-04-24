@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ar" dir="rtl">
 
@@ -110,7 +110,7 @@
 
             <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (10+)</button>
 
-            <button class="menu-btn" onclick="alert('جاري العمل على نظام الأونلاين الجماعي من عمك احمد!')" style="border-color: #0055ff; color: #0055ff;">🌐 مافيا أونلاين (قريباً)</button>
+            <button class="menu-btn" onclick="alert('جاري العمل على نظام الأونلاين الجماعي لعيون أحمد!')" style="border-color: #0055ff; color: #0055ff;">🌐 مافيا أونلاين (قريباً)</button>
 
         </div>
 
@@ -340,13 +340,13 @@
 
             $('#mafia-setup').hide(); $('#mafia-display').removeClass('hidden');
 
-            $('#narrator-name').html(<div style="background:#0055ff; color:white; padding:10px; border-radius:8px; margin-bottom:10px; text-align:center;">🎤 الراوي: ${n}</div>);
+            $('#narrator-name').html(`<div style="background:#0055ff; color:white; padding:10px; border-radius:8px; margin-bottom:10px; text-align:center;">🎤 الراوي: ${n}</div>`);
 
 
 
             actives.forEach((p, i) => {
 
-                let card = $(<div class="mafia-card"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>);
+                let card = $(`<div class="mafia-card"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>`);
 
                 card.click(function() {
 
@@ -376,4 +376,4 @@
 
 </body>
 
-</html>
+</html> 
