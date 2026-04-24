@@ -37,14 +37,14 @@
 
     <div id="welcome-screen">
         <div class="welcome-title">AHMED PRO SYSTEM</div>
-        <div class="welcome-sub">LOADING ALL SYSTEMS... [OK]</div>
+        <div class="welcome-sub">ALL SYSTEMS INITIALIZED... [OK]</div>
     </div>
 
     <div id="main-content" class="hidden">
         <div id="main-menu">
             <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO SYSTEM</h1>
             <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج أونلاين</button>
-            <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (محلي)</button>
+            <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا المحلي</button>
             <button class="menu-btn" onclick="showGame('spy')" style="border-color: #00ff00; color: #00ff00;">🔍 الجاسوس (أماكن وطبايخ)</button>
         </div>
 
@@ -53,7 +53,7 @@
             <div class="header">ID الخاص بك: <span id="my-id">...</span></div>
             <div id="board"></div>
             <div style="width:100%; max-width:400px; margin-top:15px;">
-                <input type="text" id="friendId" placeholder="أدخل ID الخصم">
+                <input type="text" id="friendId" placeholder="ID الخصم">
                 <button onclick="sendChallengeRequest()">بدء التحدي أونلاين ⚔️</button>
             </div>
         </div>
@@ -105,7 +105,7 @@
             else if(g === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- الشطرنج ---
+        // --- كود الشطرنج ---
         var board = null, game = new Chess(), peer = null, conn = null, myColor = 'w', sourceSquare = null;
         function initChess() {
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
@@ -132,7 +132,7 @@
         function sendChallengeRequest() { let fId = $('#friendId').val(); if(fId) { conn = peer.connect(fId); myColor = 'b'; board.orientation('black'); setupListen(); } }
         function setupListen() { conn.on('data', d => { game.move(d); board.position(game.fen()); }); }
 
-        // --- المافيا ---
+        // --- كود المافيا المحلي ---
         let players = [];
         function addPlayer() { let p = $('#playerName').val(); if(p) { players.push(p); $('#player-list').append(p + " | "); $('#playerName').val(""); } }
         function distributeMafiaRoles() {
@@ -152,9 +152,9 @@
             });
         }
 
-        // --- الجاسوس ---
+        // --- كود الجاسوس ---
         let spyPlayers = [];
-        let dataList = ["منسف", "شاورما", "مرسيدس G-Class", "تويوتا", "مطار", "مستشفى", "سبيستون", "كابتن ماجد", "برج خليفة", "مكة المكرمة", "بلايستيشن 5", "كارت شاشة RTX"];
+        let dataList = ["منسف", "شاورما", "تويوتا لاند كروزر", "مرسيدس", "مستشفى", "مطار", "سبيستون", "كونان", "بلايستيشن 5", "برج خليفة", "كيبورد ميكانيكال"];
         function addSpyPlayer() { let p = $('#spyPlayerName').val(); if(p) { spyPlayers.push(p); $('#spy-player-list').append(p + " | "); $('#spyPlayerName').val(""); } }
         function startSpyGame() {
             if(spyPlayers.length < 3) return alert("3 لاعبين على الأقل!");
