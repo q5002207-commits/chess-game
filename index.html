@@ -44,7 +44,7 @@
 
     <div id="welcome-screen">
         <div class="welcome-title">AHMED PRO SYSTEM</div>
-        <div class="welcome-sub">VOICE SYSTEM ENABLED... [OK]</div>
+        <div class="welcome-sub">STABILIZING SYSTEM... [OK]</div>
     </div>
 
     <div id="main-content" class="hidden">
@@ -122,26 +122,29 @@
 
     <script>
         $(document).ready(function() {
-            setTimeout(() => { $('#welcome-screen').fadeOut(800, () => $('#main-content').removeClass('hidden')); }, 1500);
+            setTimeout(() => { $('#welcome-screen').fadeOut(800, () => $('#main-content').removeClass('hidden')); }, 1000);
         });
 
         function showGame(g) {
             $('#main-menu').addClass('hidden');
             $(`#${g}-section`).removeClass('hidden');
             if(g === 'chess') initChess();
-            if(g === 'mafia_online') initOnlineCore();
+            if(g === 'mafia_online') initOnlineCore(); // لن يتم تشغيل المايك إلا هنا
         }
 
-        // --- المافيا أونلاين بصوت حقيقي ---
         let oPeer = null, oConns = [], oRole = "", oNames = {}, activeMics = [];
         let myStream = null;
         let nChoices = {k: '', s: ''};
 
         async function initOnlineCore() {
             try {
-                myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                myStream.getAudioTracks()[0].enabled = false; // ابدأ صامت
-            } catch (e) { alert("لازم تسمح بالميكروفون عشان الصوت يشتغل!"); }
+                // محاولة الحصول على المايك
+                myStream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(e => {
+                    console.log("المايك معطل أو تم رفضه");
+                    return null;
+                });
+                if(myStream) myStream.getAudioTracks()[0].enabled = false;
+            } catch (e) { console.log(e); }
 
             oPeer = new Peer("AHMED-PRO-" + Math.floor(1000 + Math.random()*9000));
             oPeer.on('open', id => $('#my-peer-id').text("ID: " + id));
@@ -163,7 +166,7 @@
         function handleData(d, conn) {
             if(d.type === 'JOIN') { 
                 oConns.push(conn); oNames[conn.peer] = d.name; 
-                oPeer.call(conn.peer, myStream); // اتصال صوتي فور الانضمام
+                if(myStream) oPeer.call(conn.peer, myStream);
                 updateNarratorUI();
             }
             if(d.type === 'ROLE') {
@@ -185,14 +188,18 @@
             }
         }
 
-        function beNarrator() { $('#setup-online').addClass('hidden'); $('#narrator-board').removeClass('hidden'); }
+        function beNarrator() { 
+            if(!$('#onName').val()) return alert("دخل اسمك أولاً");
+            $('#setup-online').addClass('hidden'); $('#narrator-board').removeClass('hidden'); 
+        }
         function joinGame() {
             let r = $('#roomID').val();
+            if(!r) return alert("دخل ID الغرفة");
             let c = oPeer.connect(r);
             c.on('open', () => {
                 c.send({type: 'JOIN', name: $('#onName').val()});
                 $('#setup-online').addClass('hidden'); $('#player-board').removeClass('hidden');
-                oPeer.call(r, myStream);
+                if(myStream) oPeer.call(r, myStream);
             });
             c.on('data', d => handleData(d, c));
         }
@@ -224,6 +231,7 @@
 
         function distributeOnline() {
             let rs = []; let n = oConns.length;
+            if(n < 3) return alert("بتحتاج 3 لاعبين على الأقل للأونلاين");
             if(n >= 10) rs.push("مافيا القتل 🔪", "مافيا التسكيت 🤫", "دكتور 💉");
             else rs.push("مافيا 💀", "دكتور 💉");
             while(rs.length < n) rs.push("مواطن 👨‍🌾");
@@ -241,10 +249,11 @@
                 $('#target-list').append(`<button onclick="sendChoice('${name}')">${name}</button>`);
             });
         }
-        function sendChoice(t) { oConns[0].send({type: 'CHOICE', role: oRole, target: t}); $('#p-actions').addClass('hidden'); }
+        function sendChoice(t) { oConns[0].send({type: 'CHOICE', role: oRole, target: t}); $('#p-actions').addClass('hidden'); alert("تم إرسال قرارك سرياً"); }
         function nightAction() {
-            if(nChoices.k === nChoices.s && nChoices.k !== '') alert("🛡️ عملية اغتيال فاشلة!");
-            else if(nChoices.k !== '') alert("💀 تم قتل: " + nChoices.k);
+            if(nChoices.k === nChoices.s && nChoices.k !== '') alert("🛡️ عملية اغتيال فاشلة! الدكتور حمى الشخص.");
+            else if(nChoices.k !== '') alert("💀 الراوي يعلن: تم قتل " + nChoices.k);
+            else alert("تمر الليلة بسلام...");
             nChoices = {k: '', s: ''};
         }
 
