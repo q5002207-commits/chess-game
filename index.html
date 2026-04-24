@@ -29,9 +29,9 @@
 
     <div id="main-menu">
         <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
-        <button class="menu-btn" onclick="showGame('chess')">♟️ شطرنج الغلابة </button>
+        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
         <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
-        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس</button>
+        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس (50 مكان)</button>
     </div>
 
     <div id="chess-section" class="hidden">
@@ -82,7 +82,15 @@
         let isLocked = false;
         let mPlayers = [];
         let sPlayers = [];
-        let places = ["مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة"];
+        
+        // قائمة الـ 50 كلمة للعبة الجاسوس
+        const spyPlaces = [
+            "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة", "مطار", "محطة قطار", 
+            "سفينة", "مخيم", "قلعة", "مسرح", "سينما", "ملعب كورة", "مكتبة", "متحف", "شاطئ", "بنك", 
+            "مركز شرطة", "إطفائية", "جامعة", "مختبر", "فضاء", "تحت البحر", "منجم", "صحراء", "قطب متجمد", "مزرعة", 
+            "قصر", "سجن", "ورشة", "صيدلية", "عيادة أسنان", "نادي رياضي", "صالون حلاقة", "مطعم شاورما", "منسف", "عرس", 
+            "جنازة", "مصنع", "شركة", "قاعدة عسكرية", "برج إيفل", "الأهرامات", "مول", "سوبر ماركت", "محطة بنزين", "غرفة نوم"
+        ];
 
         function showGame(type) {
             $('#main-menu').hide();
@@ -91,7 +99,7 @@
             else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- شطرنج ---
+        // --- شطرنج أحمد ---
         var board = null, game = new Chess(), peer = null;
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
@@ -107,14 +115,13 @@
             peer.on('open', (i) => { 
                 $('#my-id').text("ID: " + i); 
                 board = Chessboard('board', {
-                    draggable: true, 
-                    position: 'start', 
+                    draggable: true, position: 'start', 
                     pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
                 }); 
             });
         }
 
-        // --- مافيا ---
+        // --- مافيا (قانون أحمد) ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
             if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
@@ -126,13 +133,10 @@
             let narratorName = mPlayers[narratorIdx];
             let actives = mPlayers.filter((_, i) => i !== narratorIdx);
             let roles = [];
-            let pCount = actives.length;
-
-            if (pCount >= 10) { roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); } 
+            if (actives.length >= 10) { roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); } 
             else { roles.push("مافيا القتل 💀"); }
-            
             roles.push("دكتور 💉");
-            while(roles.length < pCount) roles.push("مواطن 👨‍🌾");
+            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
             roles.sort(() => Math.random() - 0.5);
 
             $('#mafia-setup').hide();
@@ -145,23 +149,18 @@
                 let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
                 card.click(function() {
                     if(isLocked) return;
-                    isLocked = true;
-                    $('.mafia-card').addClass('locked');
-                    $(this).removeClass('locked');
+                    isLocked = true; $('.mafia-card').addClass('locked'); $(this).removeClass('locked');
                     $(`#mpn-${i}`).hide(); $(`#mrl-${i}`).fadeIn();
                     setTimeout(() => { 
                         $(`#mc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { 
-                            $(`#mc-${i}`).css('visibility', 'hidden');
-                            isLocked = false; $('.mafia-card').removeClass('locked');
-                        }, 500); 
+                        setTimeout(() => { $(`#mc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.mafia-card').removeClass('locked'); }, 500); 
                     }, 3000);
                 });
                 container.append(card);
             });
         }
 
-        // --- جاسوس ---
+        // --- الجاسوس (إضافة أحمد) ---
         function addSpyPlayer() {
             let n = $('#spyPlayerName').val().trim();
             if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
@@ -169,29 +168,23 @@
 
         function startSpyDist() {
             if(sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
-            let place = places[Math.floor(Math.random() * places.length)];
+            let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
             let spyIdx = Math.floor(Math.random() * sPlayers.length);
             let roles = sPlayers.map((_, i) => (i === spyIdx ? "أنت الجاسوس 🕵️" : place));
 
             $('#spy-setup').hide();
             $('#spy-board').removeClass('hidden');
-            
             let container = $('#spy-cards-container');
             container.empty();
             sPlayers.forEach((p, i) => {
                 let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
                 card.click(function() {
                     if(isLocked) return;
-                    isLocked = true;
-                    $('.spy-card').addClass('locked');
-                    $(this).removeClass('locked');
+                    isLocked = true; $('.spy-card').addClass('locked'); $(this).removeClass('locked');
                     $(`#spn-${i}`).hide(); $(`#srl-${i}`).fadeIn();
                     setTimeout(() => { 
                         $(`#sc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { 
-                            $(`#sc-${i}`).css('visibility', 'hidden');
-                            isLocked = false; $('.spy-card').removeClass('locked');
-                        }, 500); 
+                        setTimeout(() => { $(`#sc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.spy-card').removeClass('locked'); }, 500); 
                     }, 3000);
                 });
                 container.append(card);
