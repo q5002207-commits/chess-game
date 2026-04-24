@@ -2,96 +2,77 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة أحمد المحترف - نسخة الـ 6 لاعبين</title>
     <style>
-        * { box-sizing: border-box; touch-action: manipulation; }
-        body { font-family: sans-serif; background: #000; color: #0f0; margin: 0; text-align: center; }
-        #main-menu { padding: 20px; }
-        .menu-btn { display: block; width: 90%; max-width: 300px; padding: 20px; margin: 15px auto; background: #111; border: 2px solid #da291c; color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; text-decoration: none; }
+        body { font-family: sans-serif; background: #000; color: #0f0; text-align: center; margin: 0; }
+        .panel { background: #111; border: 2px solid #da291c; padding: 20px; margin: 20px; border-radius: 15px; }
         .hidden { display: none !important; }
-        .panel { background: #111; border: 1px solid #444; padding: 15px; margin: 10px; border-radius: 10px; }
-        input { width: 80%; padding: 10px; margin: 5px; background: #000; color: #0f0; border: 1px solid #da291c; }
-        button { padding: 10px 20px; background: #da291c; color: #fff; border: none; cursor: pointer; border-radius: 5px; }
+        input { padding: 10px; background: #000; color: #0f0; border: 1px solid #da291c; margin: 5px; }
+        button { padding: 10px 20px; background: #da291c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .player-tag { background: #222; padding: 5px; margin: 5px; display: inline-block; border: 1px solid #0055ff; }
     </style>
 </head>
 <body>
 
-    <div id="main-menu">
-        <h1 style="color:#da291c">AHMED PRO SYSTEM</h1>
-        <button class="menu-btn" onclick="showSection('chess')">♟️ شطرنج</button>
-        <button class="menu-btn" onclick="showSection('mafia')">🕵️ مافيا يدوي</button>
-        <button class="menu-btn" onclick="showSection('online')" style="border-color:#0055ff">🌐 مافيا أونلاين (صوت)</button>
+    <h1 style="color:#da291c">AHMED PRO - MULTI TEST</h1>
+
+    <div id="setup-box" class="panel">
+        <input type="text" id="nick" placeholder="اسم اللاعب">
+        <br><br>
+        <button onclick="initGame(true)" style="background:#0055ff">إنشاء غرفة (الراوي)</button>
+        <hr>
+        <input type="text" id="rid" placeholder="رقم الغرفة">
+        <button onclick="initGame(false)">انضمام</button>
     </div>
 
-    <div id="online-sec" class="hidden panel">
-        <button onclick="location.reload()">🏠 خروج</button>
-        <h3>نظام المافيا المتطور</h3>
-        <div id="init-box">
-            <input type="text" id="nick" placeholder="اسمك">
-            <br>
-            <button onclick="startVoiceGame(true)" style="background:#0055ff">أنا الراوي (إنشاء)</button>
-            <hr>
-            <input type="text" id="rid" placeholder="ID الغرفة">
-            <button onclick="startVoiceGame(false)">انضمام للغرفة</button>
+    <div id="game-box" class="panel hidden">
+        <h2 id="room-id-display"></h2>
+        <div id="narrator-ui" class="hidden">
+            <h3>لوحة التحكم (الراوي)</h3>
+            <div id="connected-players"></div>
+            <button onclick="distributeRoles()" style="background:green">توزيع الأدوار على الجميع 🎲</button>
         </div>
         
-        <div id="game-box" class="hidden">
-            <p id="room-display" style="color:yellow"></p>
-            <div id="narrator-tools" class="hidden">
-                <div id="players-list"></div>
-                <button onclick="distribute()">توزيع الأدوار</button>
-            </div>
-            <div id="player-tools" class="hidden">
-                <h2 id="my-role">بانتظار التوزيع...</h2>
-                <div id="mic-indicator" style="padding:10px; border:1px solid #333">🎙️ المايك: صامت</div>
-            </div>
+        <div id="player-ui" class="hidden">
+            <h1 id="role-display" style="color:yellow">بانتظار التوزيع...</h1>
+            <div id="mic-status">🎙️ المايك: صامت</div>
         </div>
-    </div>
-
-    <div id="chess-sec" class="hidden">
-        <button onclick="location.reload()">🏠 خروج</button>
-        <div id="board" style="width: 350px; margin: auto;"></div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
     <script>
-        function showSection(s) {
-            $('#main-menu').addClass('hidden');
-            if(s === 'chess') $('#chess-sec').removeClass('hidden');
-            if(s === 'online') $('#online-sec').removeClass('hidden');
-        }
+        let peer, stream, conns = [], isHost = false;
 
-        let peer, stream, conns = [];
-
-        async function startVoiceGame(isHost) {
-            // طلب المايك فقط عند بدء اللعبة
+        async function initGame(host) {
+            isHost = host;
             try {
+                // طلب المايك
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getAudioTracks()[0].enabled = false; // ابدأ صامت دائماً
-            } catch (e) {
-                alert("لن يعمل الصوت لأنك لم تعطي صلاحية المايك");
-            }
+                stream.getAudioTracks()[0].enabled = false;
+            } catch (e) { console.log("المايك لم يفعل"); }
 
+            // إنشاء Peer ID عشوائي لكل صفحة عشان ما يصير تعارض
             peer = new Peer();
-            
+
             peer.on('open', id => {
-                $('#room-display').text("رقم الغرفة: " + id);
-                if(!isHost) {
+                $('#setup-box').addClass('hidden');
+                $('#game-box').removeClass('hidden');
+                if(isHost) {
+                    $('#room-id-display').text("ID الغرفة: " + id);
+                    $('#narrator-ui').removeClass('hidden');
+                } else {
+                    $('#room-id-display').text("جاري الانضمام...");
                     let c = peer.connect($('#rid').val());
-                    bindEvents(c);
+                    setupConnection(c);
+                    $('#player-ui').removeClass('hidden');
                 }
             });
 
-            peer.on('connection', c => {
-                bindEvents(c);
-            });
-
+            peer.on('connection', setupConnection);
+            
             peer.on('call', call => {
                 call.answer(stream);
                 call.on('stream', s => {
@@ -100,28 +81,56 @@
                     audio.play();
                 });
             });
-
-            $('#init-box').addClass('hidden');
-            $('#game-box').removeClass('hidden');
-            if(isHost) $('#narrator-tools').removeClass('hidden');
-            else $('#player-tools').removeClass('hidden');
         }
 
-        function bindEvents(c) {
+        function setupConnection(c) {
             c.on('open', () => {
-                if(c.peer !== peer.id) {
+                if(!isHost) {
+                    c.send({type: 'JOIN', name: $('#nick').val() || "لاعب مجهول"});
+                } else {
                     conns.push(c);
-                    c.send({type: 'JOIN', name: $('#nick').val()});
                     peer.call(c.peer, stream);
                 }
             });
-            c.on('data', d => {
-                if(d.type === 'MIC') {
-                    if(stream) stream.getAudioTracks()[0].enabled = d.state;
-                    $('#mic-indicator').text(d.state ? "🎙️ المايك: شغال!" : "🎙️ المايك: صامت");
-                    $('#mic-indicator').css('background', d.state ? 'blue' : 'none');
+
+            c.on('data', data => {
+                if(data.type === 'JOIN') {
+                    c.playerName = data.name;
+                    $('#connected-players').append(`<div class="player-tag">${data.name}</div>`);
+                }
+                if(data.type === 'ROLE') {
+                    $('#role-display').text("دورك هو: " + data.role);
+                    alert("أحمد، دورك طلع: " + data.role);
                 }
             });
+        }
+
+        function distributeRoles() {
+            if(conns.length === 0) return alert("ما في أحد دخل الغرفة لسه!");
+
+            let roles = [];
+            let n = conns.length;
+            
+            // نظام التوزيع (بناءً على طلبك السابق)
+            if (n >= 10) {
+                roles.push("مافيا قتل 🔪", "مافيا تسكيت 🤫", "دكتور 💉");
+            } else {
+                roles.push("مافيا 💀", "دكتور 💉");
+            }
+
+            while(roles.length < n) {
+                roles.push("مواطن 👨‍🌾");
+            }
+
+            // خلط الأدوار
+            roles.sort(() => Math.random() - 0.5);
+
+            // إرسال لكل متصل دوره
+            conns.forEach((conn, index) => {
+                conn.send({ type: 'ROLE', role: roles[index] });
+            });
+
+            alert("تم توزيع الأدوار على " + n + " لاعبين!");
         }
     </script>
 </body>
