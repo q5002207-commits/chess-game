@@ -99,7 +99,7 @@
             else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- شطرنج أحمد ---
+        // --- شطرنج أحمد مع الصوت ---
         var board = null, game = new Chess(), peer = null;
         var pics = {
             wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
@@ -109,6 +109,26 @@
             bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg', wP: 'https://chessboardjs.com/img/chesspieces/wikipedia/wP.png'
         };
 
+        // --- إعدادات الصوت (أضيفت بدون تعديل على شيء) ---
+        let moveSound = "https://voca.ro/1nj43yHErR5E";
+        let soundEnabled = false;
+
+        function playChessSound() {
+            if (!soundEnabled) return;
+            let audio = new Audio(moveSound);
+            audio.play().catch(e => console.log(""));
+        }
+
+        function enableSound() {
+            if (soundEnabled) return;
+            let test = new Audio(moveSound);
+            test.play().then(() => {
+                test.pause();
+                test.currentTime = 0;
+                soundEnabled = true;
+            }).catch(() => {});
+        }
+
         function initChess() {
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(id);
@@ -116,7 +136,19 @@
                 $('#my-id').text("ID: " + i); 
                 board = Chessboard('board', {
                     draggable: true, position: 'start', 
-                    pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
+                    pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png',
+                    onDragStart: function() { enableSound(); },
+                    onDrop: function(source, target) {
+                        if(!source || !target) return;
+                        playChessSound();
+                        let move = game.move({
+                            from: source,
+                            to: target,
+                            promotion: 'q'
+                        });
+                        if(move === null) return 'snapback';
+                        board.position(game.fen());
+                    }
                 }); 
             });
         }
