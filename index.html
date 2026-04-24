@@ -3,623 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏙️ المافيا أونلاين – راوي آلي | لعبة الأدوار الجماعية</title>
+    <title>بوابة أحمد المحترف - النسخة المعدلة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        * {
-            user-select: none;
-            box-sizing: border-box;
-            font-family: 'Cairo', 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(145deg, #0a0f1e 0%, #03060c 100%);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* الحاوية الرئيسية */
-        .game-container {
-            max-width: 550px;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(8px);
-            border-radius: 64px 48px 64px 48px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 2px #da291c40, 0 0 0 5px #0f0f0f;
-            padding: 20px 18px 30px;
-            transition: all 0.3s ease;
-            border: 1px solid #da291c;
-        }
-
-        /* هيدر المافيا */
-        .mafia-header {
-            text-align: center;
-            margin-bottom: 25px;
-            background: #0b0b0bdd;
-            padding: 12px;
-            border-radius: 50px;
-            border-right: 5px solid #da291c;
-            border-left: 5px solid #da291c;
-        }
-
-        .mafia-header h1 {
-            color: #ff3a2f;
-            text-shadow: 0 0 6px #ff0000aa;
-            font-size: 1.9rem;
-            margin: 5px 0;
-            letter-spacing: 2px;
-        }
-
-        .mafia-header p {
-            color: #bbb;
-            margin: 0;
-            font-size: 0.8rem;
-        }
-
-        /* شاشة الإعداد (إنشاء الغرفة/انضمام) */
-        .setup-panel {
-            background: #11161fe0;
-            border-radius: 32px;
-            padding: 20px;
-            margin-top: 10px;
-            border: 1px solid #da291c66;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-            direction: rtl;
-        }
-
-        .input-group label {
-            display: block;
-            color: #ffbc6e;
-            margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 14px 16px;
-            background: #000000aa;
-            border: 2px solid #da291c;
-            border-radius: 60px;
-            color: #fff;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.2s;
-            text-align: center;
-        }
-
-        input:focus {
-            border-color: #ff6642;
-            box-shadow: 0 0 12px #da291c;
-        }
-
-        button {
-            background: linear-gradient(95deg, #b71c1c, #da291c);
-            border: none;
-            padding: 14px 12px;
-            border-radius: 60px;
-            color: white;
-            font-weight: bold;
-            font-size: 1.1rem;
-            width: 100%;
-            margin-top: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px black;
-        }
-
-        button:active {
-            transform: scale(0.97);
-        }
-
-        .secondary-btn {
-            background: #2c2f36;
-            box-shadow: none;
-            border: 1px solid #da291c;
-        }
-
-        .player-list {
-            background: #0c0f16;
-            border-radius: 28px;
-            padding: 12px;
-            margin: 15px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .player-badge {
-            background: #1f212b;
-            margin: 6px 0;
-            padding: 8px 12px;
-            border-radius: 40px;
-            display: flex;
-            justify-content: space-between;
-            border-right: 4px solid #da291c;
-            color: #f0f0f0;
-        }
-
-        .player-badge span:first-child {
-            font-weight: bold;
-        }
-
-        .host-badge {
-            background: #da291c30;
-            border-right-color: gold;
-        }
-
-        .room-code {
-            background: #000000aa;
-            padding: 10px;
-            text-align: center;
-            border-radius: 40px;
-            font-size: 1.5rem;
-            letter-spacing: 4px;
-            font-weight: bold;
-            color: #ffd966;
-            font-family: monospace;
-        }
-
-        /* منطقة اللعب (الأدوار) */
-        .role-stage {
-            margin-top: 15px;
-        }
-
-        .waiting-message {
-            text-align: center;
-            background: #0f1722;
-            padding: 25px;
-            border-radius: 48px;
-            color: #ffb347;
-        }
-
-        .role-card {
-            background: #171f2b;
-            border-radius: 36px;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid #da291c;
-            transition: 0.2s;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .role-card strong {
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 8px;
-            color: #ffb347;
-        }
-
-        .role-secret {
-            font-size: 1.3rem;
-            background: #000000aa;
-            padding: 12px;
-            border-radius: 32px;
-            margin-top: 10px;
-            color: #fa8072;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .hidden-role {
-            filter: blur(5px);
-            transition: 0.2s;
-        }
-
-        .reveal-btn {
-            background: #3a3f4e;
-            margin-top: 4px;
-            font-size: 0.8rem;
-        }
-
-        .narrator-zone {
-            background: #000000bb;
-            padding: 14px;
-            border-radius: 40px;
-            margin: 15px 0;
-            border-right: 4px solid #dd3333;
-            color: #fff0c0;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 18px;
-            font-size: 0.7rem;
-            color: #777;
-        }
-
-        .flex-btns {
-            display: flex;
-            gap: 10px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .highlight {
-            color: #ff8866;
-        }
+        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
+        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
+        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        img[class^="piece"] { border-radius: 50% !important; border: 1px solid white !important; }
+        .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
+        .role-display { display: none; color: #ff0000; font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; }
+        .hidden { display: none; }
+        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        .locked { pointer-events: none; opacity: 0.4; }
     </style>
 </head>
 <body>
-<div class="game-container" id="appRoot">
-    <div class="mafia-header">
-        <h1>⚰️ المافيا أونلاين ⚰️</h1>
-        <p>🎭 راوي آلي | أدوار سرية | قتل ودفاع 🎭</p>
+
+    <div id="main-menu">
+        <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
+        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
+        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
+        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس </button>
     </div>
 
-    <!-- شاشة البداية: دخول أو استضافة -->
-    <div id="lobbyScreen">
-        <div class="setup-panel">
-            <div class="input-group">
-                <label>🎭 اسمك (الكنية في العصابة)</label>
-                <input type="text" id="playerNameInput" placeholder="مثل: 'أبو الشداد' أو 'سيف'..." maxlength="20">
-            </div>
-            <div class="flex-btns" style="gap:12px;">
-                <button id="createGameBtn">🔪 إنشاء غرفة جديدة</button>
-                <button id="joinGameBtn" class="secondary-btn">🚪 انضمام لغرفة</button>
-            </div>
-            <div id="joinSection" class="hidden" style="margin-top:15px;">
-                <div class="input-group">
-                    <label>🔑 رمز الغرفة (6 أحرف)</label>
-                    <input type="text" id="roomCodeJoin" placeholder="مثال: 3F7D2A" maxlength="6">
-                </div>
-                <button id="confirmJoinBtn">دخول الغرفة</button>
-            </div>
-        </div>
-        <div class="footer">🎲 صُممت بقانون أحمد – أدوار: مافيا، دكتور، مواطن + راوري آلي يحكي</div>
-    </div>
-
-    <!-- شاشة الغرفة (قبل بدء اللعبة) -->
-    <div id="roomScreen" class="hidden">
-        <div class="setup-panel">
-            <div style="text-align:center; margin-bottom:8px;">🃏 رقم الغرفة:</div>
-            <div class="room-code" id="roomCodeDisplay">------</div>
-            <div style="display:flex; justify-content:space-between; margin: 15px 0 8px;">
-                <span>👥 اللاعبون: <span id="playerCount">0</span></span>
-                <span id="hostBadge" style="color:#da291c;">⭐ المضيف</span>
-            </div>
-            <div id="playerListContainer" class="player-list"></div>
-            <div class="flex-btns">
-                <button id="startGameBtn" class="secondary-btn">🎬 بدء اللعبة (الراوي الآلي)</button>
-                <button id="leaveRoomBtn" class="secondary-btn" style="background:#3a2a2a;">🚪 مغادرة</button>
-            </div>
-            <div class="footer">يجب 4 لاعبين على الأقل لبدء المافيا 🔪</div>
+    <div id="chess-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3><div id="my-id" style="font-size:0.7em;">جاري الاتصال...</div></div>
+        <div id="board"></div>
+        <div style="width:100%; max-width:400px; margin-top:15px;">
+            <input type="text" id="friendId" placeholder="ID الخصم">
+            <button onclick="alert('طلب التحدي قيد التطوير')">إرسال طلب تحدي</button>
         </div>
     </div>
 
-    <!-- شاشة اللعب: عرض البطاقات والأدوار مع قفل النقر -->
-    <div id="gameplayScreen" class="hidden">
-        <div class="narrator-zone" id="narratorMessage">
-            🎙️ الراوي الآلي: تستعد العصابات... افتح بطاقتك لتعرف دورك
+    <div id="mafia-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🕵️‍♂️ نظام المافيا المطور</h3></div>
+        <div id="mafia-setup" style="width:100%; max-width:400px;">
+            <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
+            <button onclick="addMafiaPlayer()">إضافة لاعب</button>
+            <div id="mafia-preview" style="margin:10px; color:#888;"></div>
+            <button style="background:green;" onclick="startMafiaDist()">توزيع الأدوار + الراوي</button>
         </div>
-        <div id="rolesContainer" style="margin: 10px 0;"></div>
-        <button id="resetToLobbyBtn" class="secondary-btn" style="background:#222;">🏠 العودة إلى الردهة</button>
-        <div class="footer">🔒 كل لاعب يضغط على بطاقته ليكشف دوره – المعلومة سرية</div>
+        <div id="mafia-board" class="hidden" style="width:100%; max-width:400px;">
+            <div id="narrator-name"></div>
+            <div id="mafia-cards-container"></div>
+        </div>
     </div>
-</div>
 
-<script>
-    // ---------- نظام أونلاين مبسط باستخدام LocalStorage عبر التبويبات (محاكاة سحابية) ----------
-    // لكن لضمان عمل حقيقي "أونلاين" بين أجهزة مختلفة نستخدم LocalStorage + BroadcastChannel + وهم التزامن
-    // بما أن المطلوب "مافيا اون لاين" حقيقي (نظير إلى نظير عبر الخادم/التخزين المحلي) لا يوجد خلفية حقيقية WebSocket.
-    // لكن يمكن محاكاة غرف عبر localStorage + "storage" event + sync مع معرف الغرفة.
-    // لكن هذا يعمل فقط في نفس المتصفح/نفس الجهاز؟ لا! الحدث "storage" يعمل عبر التبويبات المختلفة ونفس المتصفح فقط.
-    // لتجربة حقيقية بين أجهزة مختلفة → يحتاج backend. سأقوم بعمل نظام يعتمد على IndexedDB واستضافة غرف عبر كائنات لكنها لن تنتقل بين الشبكات.
-    // لكن بما أنك طلبت "كود كامل تحويلي المافيا اون لاين ب كود منفصل" يمكن استخدام PeerJS/serverless? لكن أفضل: استخدام mock websocket عبر api مؤقت
-    // لكن الأفضل تقديم تجربة واقعية Real-time عبر WebRTC (PeerJS) ولكن أريد ضمان سهولة. سأبني النسخة بسيطة لكنها تعمل عبر  WebSocket محاكاة? 
-    // بدلاً من التعقيد سأستخدم بنية "غرفة ذاكرة التخزين" ولكن الأجهزة المختلفة تحتاج سيرفر. سأضيف دعم Peer-to-Peer عبر PeerJS لتوزيع الحالة
-    // ولكن الـ PeerJS يتطلب خادم signaling. غير مناسب للملف الواحد.
-    // الحل الأمثل هو بناء لعبة MAFIA ONLINE باستخدام "Firebase" لكن بدون حساب. سأعتمد على localStorage مع key للغرفة ولكن هذا لا يسمح لأجهزة مختلفة. 
-    // لكن العملاء يختلفون .. لذلك سأبني نظام "يدوي" انتقال الحالة عبر رمز وتحديث يدوي لضمان المعنى أونلاين. لا نريد الخداع.
-    // بدلاً من ذلك سأضيف مزامنة عبر BroadcastChannel (لنفس المتصفح) ولكن أضمن أن الكود يعمل "كامل" "متعدد اللاعبين" عبر استخدام آلية "استضافة خادم ذكي" .. لكن لا يوجد خادم خلفي.
-    // لإرضاء الطلب: سأحاكي اتصال بين اللاعبين باستخدام localStorage + التحديثات الدورية و تعيين المضيف هو من يبدأ التوزيع.
-    // لكن الاتصال بين الأجهزة لا يعمل. سأقوم بعمل لعبة مافيا أونلاين باستخدام PeerJS حقيقي ليكون أكثر واقعية.
-    // سأدمج PeerJS مع simple-peer? الأسهل: استخدام peerjs-server cloud مع room concept.
-    // سأبني نظام اتصال حقيقي متعدد اللاعبين عبر PeerJS DataConnection مع إنشاء الغرفة يدويًا وتبادل الرسائل.
-    // بسبب تعقيد الوقت سأقدم بديلاً رائعاً: لعبة مافيا مع نظام مضمون اونلاين باستخدام WebRTC DataChannel عبر PeerJS مع روابط غرفة محاكاة.
-    // سأستخدم PeerJS class + unique معرف الغرفة واستضافة الاتصالات.
-    let currentPeer = null;
-    let connections = []; // اتصالات اللاعبين الآخرين
-    let currentRoomId = null;
-    let isHost = false;
-    let myPlayerName = "";
-    let playersInRoom = []; // {peerId, name}
-    let gameStarted = false;
-    let myRole = null;
-    let rolesMapping = []; // توزيع الأدوار بعد البدء
-    let localPlayerId = null;
-    let hasRevealedRole = false; // لكل لاعب منع إعادة الكشف
+    <div id="spy-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🔍 لعبة الجاسوس</h3></div>
+        <div id="spy-setup" style="width:100%; max-width:400px;">
+            <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
+            <button onclick="addSpyPlayer()">إضافة لاعب</button>
+            <div id="spy-preview" style="margin:10px; color:#888;"></div>
+            <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
+        </div>
+        <div id="spy-board" class="hidden" style="width:100%; max-width:400px;">
+            <div id="spy-cards-container"></div>
+        </div>
+    </div>
 
-    // عناصر DOM
-    const lobbyScreen = document.getElementById('lobbyScreen');
-    const roomScreen = document.getElementById('roomScreen');
-    const gameplayScreen = document.getElementById('gameplayScreen');
-    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-    const playerListContainer = document.getElementById('playerListContainer');
-    const playerCountSpan = document.getElementById('playerCount');
-    const hostBadgeSpan = document.getElementById('hostBadge');
-    const startGameBtn = document.getElementById('startGameBtn');
-    const leaveRoomBtn = document.getElementById('leaveRoomBtn');
-    const createGameBtn = document.getElementById('createGameBtn');
-    const joinGameBtn = document.getElementById('joinGameBtn');
-    const joinSection = document.getElementById('joinSection');
-    const confirmJoinBtn = document.getElementById('confirmJoinBtn');
-    const roomCodeJoin = document.getElementById('roomCodeJoin');
-    const playerNameInput = document.getElementById('playerNameInput');
-    const resetToLobbyBtn = document.getElementById('resetToLobbyBtn');
-    const rolesContainer = document.getElementById('rolesContainer');
-    const narratorMessage = document.getElementById('narratorMessage');
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
-    // مساعدة
-    function generateRoomCode() {
-        return Math.random().toString(36).substring(2, 8).toUpperCase();
-    }
+    <script>
+        let isLocked = false;
+        let mPlayers = [];
+        let sPlayers = [];
+        
+        // قائمة الـ 50 كلمة للعبة الجاسوس
+        const spyPlaces = [
+            "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة", "مطار", "محطة قطار", 
+            "سفينة", "مخيم", "قلعة", "مسرح", "سينما", "ملعب كورة", "مكتبة", "متحف", "شاطئ", "بنك", 
+            "مركز شرطة", "إطفائية", "جامعة", "مختبر", "فضاء", "تحت البحر", "منجم", "صحراء", "قطب متجمد", "مزرعة", 
+            "قصر", "سجن", "ورشة", "صيدلية", "عيادة أسنان", "نادي رياضي", "صالون حلاقة", "مطعم شاورما", "منسف", "عرس", 
+            "جنازة", "مصنع", "شركة", "قاعدة عسكرية", "برج إيفل", "الأهرامات", "مول", "سوبر ماركت", "محطة بنزين", "غرفة نوم"
+        ];
 
-    // تهيئة PeerJS
-    function initPeer(onReady) {
-        if (currentPeer && !currentPeer.destroyed) {
-            if (onReady) onReady();
-            return;
+        function showGame(type) {
+            $('#main-menu').hide();
+            if(type === 'chess') { $('#chess-section').removeClass('hidden'); initChess(); }
+            else if(type === 'mafia') { $('#mafia-section').removeClass('hidden'); }
+            else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
-        const randomId = "mafia_" + Math.random().toString(36).substr(2, 8);
-        currentPeer = new Peer(randomId, {
-            host: '0.peerjs.com', port: 443, path: '/', secure: true
-        });
-        currentPeer.on('open', (id) => {
-            localPlayerId = id;
-            console.log("Peer ID:", id);
-            if (onReady) onReady(id);
-        });
-        currentPeer.on('error', (err) => {
-            console.error("Peer error:", err);
-            alert("خطأ في الاتصال، تأكد من الإنترنت وحاول مرة أخرى.");
-        });
-    }
 
-    // إنشاء غرفة (مضيف)
-    function createRoom(playerName) {
-        initPeer(() => {
-            const roomCode = generateRoomCode();
-            currentRoomId = roomCode;
-            isHost = true;
-            myPlayerName = playerName;
-            playersInRoom = [{ peerId: localPlayerId, name: playerName, isHost: true }];
-            updateRoomUI();
-            roomCodeDisplay.innerText = roomCode;
-            // بدء الاستماع للاتصالات الواردة
-            currentPeer.on('connection', (conn) => {
-                setupConnection(conn);
-            });
-            showRoomScreen();
-        });
-    }
-
-    function setupConnection(conn) {
-        conn.on('open', () => {
-            connections.push(conn);
-            conn.on('data', (data) => handleIncomingData(conn, data));
-            // إرسال قائمة اللاعبين الحالية للقادم الجديد
-            conn.send({ type: 'sync-players', players: playersInRoom, hostId: localPlayerId, roomId: currentRoomId });
-        });
-        conn.on('close', () => {
-            const idx = connections.indexOf(conn);
-            if (idx !== -1) connections.splice(idx, 1);
-            if (gameStarted) return;
-            refreshPlayersFromNetwork();
-        });
-    }
-
-    function handleIncomingData(conn, data) {
-        if (data.type === 'sync-players') {
-            // تحديث اللاعبين من المضيف
-            playersInRoom = data.players;
-            updateRoomUI();
-        } 
-        else if (data.type === 'new-player') {
-            if (!isHost) return;
-            // إضافة اللاعب الجديد
-            const exists = playersInRoom.some(p => p.peerId === data.player.peerId);
-            if (!exists) {
-                playersInRoom.push(data.player);
-                broadcastToAll({ type: 'sync-players', players: playersInRoom, hostId: localPlayerId });
-                updateRoomUI();
-            }
-        }
-        else if (data.type === 'start-game') {
-            if (!isHost) {
-                // استقبال بدء اللعبة وتوزيع الأدوار
-                startGameWithRoles(data.rolesDistribution, data.playerRole);
-            }
-        }
-        else if (data.type === 'player-leave') {
-            if (!isHost) return;
-            playersInRoom = playersInRoom.filter(p => p.peerId !== data.peerId);
-            broadcastToAll({ type: 'sync-players', players: playersInRoom, hostId: localPlayerId });
-            updateRoomUI();
-        }
-    }
-
-    function broadcastToAll(msg, excludePeerId = null) {
-        connections.forEach(conn => {
-            if (conn.open && conn.peer !== excludePeerId) {
-                conn.send(msg);
-            }
-        });
-    }
-
-    function joinRoom(roomCode, playerName) {
-        initPeer(() => {
-            currentRoomId = roomCode;
-            myPlayerName = playerName;
-            isHost = false;
-            // الاتصال بالمضيف (لابد من معرف peerId للمضيف) لكننا لا نعرفه. سنحاول التفاوض عبر نفس roomCode؟
-            // نحتاج إلى فكرة: المضيف يبث peerId؟ ولكن الأسهل: الاعتماد على رمز الغرفة كمعرف مسبق، المضيف ينتظر اتصالات واردة، اللاعب ينشئ اتصالاً.
-            // لكن لا نعرف peerId للمضيف. سأستخدم بروتوكول: المضيف بعد إنشاء الغرفة يعلن peerId له في roomCode؟ نعم نضيفه في roomCodeDisplay 
-            // للأسف ليس عملي. لذلك سأستخدم وظيفة discovery : بعد إنشاء الغرفة نعرض peerId المضيف بجانب الرمز. لكن سأبسط : جعل الانضمام يتطلب معرف المضيف يدويًا؟ 
-            // ليكن: عند إنشاء الغرفة، يعرض المضيف RoomCode + Peer Id. يجب على الآخرين كتابة PeerId المضيف.
-            // هذا قد يكون معقد لكنه عملي. لكن سنقوم بإصلاح: سأضيف مربع انضمام يتطلب "PeerId المضيف" مع رمز الغرفة اختياري.
-            // سأقوم بتعديل الواجهة: عند النقر انضمام يظهر حقل "معرف المضيف" و "رمز الغرفة". الأسهل والأكيد.
-            alert("للالتحاق بالغرفة: اطلب من المضيف مشاركة معرفه (Peer ID) الموجود أعلى الغرفة. سندمج الان.");
-            const hostPeerId = prompt("أدخل معرف المضيف (الموجود في غرفة المضيف بجانب رمز الغرفة):");
-            if (!hostPeerId) return;
-            const conn = currentPeer.connect(hostPeerId);
-            conn.on('open', () => {
-                setupConnection(conn);
-                conn.send({ type: 'new-player', player: { peerId: localPlayerId, name: playerName } });
-            });
-            conn.on('error', () => alert("فشل الاتصال بالمضيف"));
-            showRoomScreen();
-        });
-    }
-
-    function refreshPlayersFromNetwork() {
-        // طلب تحديث من المضيف (إذا لم يكن المضيف)
-        if (!isHost && connections.length) {
-            connections[0].send({ type: 'request-sync' });
-        }
-    }
-
-    function updateRoomUI() {
-        playerListContainer.innerHTML = "";
-        playersInRoom.forEach(p => {
-            const div = document.createElement('div');
-            div.className = `player-badge ${p.peerId === localPlayerId ? 'host-badge' : ''}`;
-            div.innerHTML = `<span>${escapeHtml(p.name)}</span><span>${p.peerId === localPlayerId ? '(أنت)' : ''} ${p.isHost ? '👑 مضيف' : ''}</span>`;
-            playerListContainer.appendChild(div);
-        });
-        playerCountSpan.innerText = playersInRoom.length;
-        if (isHost) {
-            hostBadgeSpan.innerText = "⭐ أنت المضيف";
-            startGameBtn.style.display = "block";
-        } else {
-            hostBadgeSpan.innerText = "🚶 لاعب";
-            startGameBtn.style.display = "none";
-        }
-    }
-
-    function showRoomScreen() {
-        lobbyScreen.classList.add('hidden');
-        roomScreen.classList.remove('hidden');
-        gameplayScreen.classList.add('hidden');
-    }
-
-    function startGameHost() {
-        if (!isHost) return;
-        if (playersInRoom.length < 4) {
-            alert("تحتاج 4 لاعبين على الأقل لبدء المافيا!");
-            return;
-        }
-        // توزيع الأدوار (قانون أحمد: مافيا, دكتور, مواطنين)
-        const playerNames = playersInRoom.map(p => p.name);
-        const rolesList = [];
-        const mafiaCount = playerNames.length >= 8 ? 2 : 1;
-        for (let i = 0; i < mafiaCount; i++) rolesList.push("🔪 مافيا (قتل)");
-        rolesList.push("💉 دكتور (ينقذ)");
-        while (rolesList.length < playerNames.length) rolesList.push("👨‍🌾 مواطن");
-        for (let i = rolesList.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [rolesList[i], rolesList[j]] = [rolesList[j], rolesList[i]];
-        }
-        // إرسال لكل لاعب دوره
-        playersInRoom.forEach((player, idx) => {
-            const roleAssigned = rolesList[idx];
-            const connTarget = connections.find(c => c.peer === player.peerId);
-            if (connTarget && connTarget.open) {
-                connTarget.send({ type: 'start-game', rolesDistribution: rolesList, playerRole: roleAssigned });
-            }
-            if (player.peerId === localPlayerId) {
-                myRole = roleAssigned;
-            }
-        });
-        // عرض واجهة اللعب للمضيف نفسه
-        startGameWithRoles(rolesList, myRole);
-    }
-
-    function startGameWithRoles(fullRoles, myAssignedRole) {
-        gameStarted = true;
-        myRole = myAssignedRole;
-        rolesMapping = fullRoles;
-        roomScreen.classList.add('hidden');
-        gameplayScreen.classList.remove('hidden');
-        renderRoleReveal();
-        narratorMessage.innerHTML = "🎙️ الراوي الآلي: بدأت جلسة المافيا! اضغط على بطاقتك لكشف دورك 🔮 (اللاعبون الآخرون لا يرونه)";
-    }
-
-    function renderRoleReveal() {
-        rolesContainer.innerHTML = "";
-        const card = document.createElement('div');
-        card.className = 'role-card';
-        card.innerHTML = `<strong>${escapeHtml(myPlayerName)}</strong><div id="roleSecretBox" class="role-secret hidden-role">❓ دورك مخفي ❓</div><button id="revealRoleBtn" class="reveal-btn">🗝️ كشف دوري (مرة واحدة)</button>`;
-        rolesContainer.appendChild(card);
-        const revealBtn = document.getElementById('revealRoleBtn');
-        const secretDiv = document.getElementById('roleSecretBox');
-        let revealed = false;
-        revealBtn.onclick = () => {
-            if (revealed) {
-                narratorMessage.innerHTML = "🎭 لقد كشفت دورك مسبقًا! لا يمكن إعادة الكشف.";
-                return;
-            }
-            revealed = true;
-            secretDiv.classList.remove('hidden-role');
-            secretDiv.innerHTML = `🎭 دورك: ${myRole}`;
-            revealBtn.disabled = true;
-            revealBtn.innerText = "✓ ظهر دورك";
-            narratorMessage.innerHTML = `🎙️ الراوي الآلي: اللاعب ${escapeHtml(myPlayerName)} عرف دوره. استعدوا للمراحل القادمة.`;
+        // --- شطرنج أحمد ---
+        var board = null, game = new Chess(), peer = null;
+        var pics = {
+            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
+            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
+            bP: 'https://i.postimg.cc/Nj9dgQFv/download.jpg', bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg',
+            bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg', bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg',
+            bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg', wP: 'https://chessboardjs.com/img/chesspieces/wikipedia/wP.png'
         };
-    }
 
-    function leaveGameRoom() {
-        if (currentPeer && !gameStarted) {
-            broadcastToAll({ type: 'player-leave', peerId: localPlayerId });
+        function initChess() {
+            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            peer = new Peer(id);
+            peer.on('open', (i) => { 
+                $('#my-id').text("ID: " + i); 
+                board = Chessboard('board', {
+                    draggable: true, position: 'start', 
+                    pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
+                }); 
+            });
         }
-        if (currentPeer) currentPeer.destroy();
-        currentPeer = null;
-        connections = [];
-        playersInRoom = [];
-        gameStarted = false;
-        isHost = false;
-        lobbyScreen.classList.remove('hidden');
-        roomScreen.classList.add('hidden');
-        gameplayScreen.classList.add('hidden');
-        location.reload(); // إعادة تحميل بسيطة لتجنب تعارض الحالة
-    }
 
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        // --- مافيا (قانون أحمد) ---
+        function addMafiaPlayer() {
+            let n = $('#mafiaPlayerName').val().trim();
+            if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
+        }
 
-    // Event Listeners
-    createGameBtn.onclick = () => {
-        const name = playerNameInput.value.trim();
-        if (!name) { alert("أدخل اسمك أولاً"); return; }
-        createRoom(name);
-    };
-    joinGameBtn.onclick = () => {
-        const name = playerNameInput.value.trim();
-        if (!name) { alert("أدخل اسمك أولاً"); return; }
-        const room = prompt("أدخل رمز الغرفة (من المضيف) واطلب PeerId المضيف يدوياً، أو اكتب 'ok' لاستخدام أسلوب المعرّف");
-        if (room) joinRoom(room, name);
-        else joinRoom(prompt("أدخل معرف المضيف (Peer ID):"), name);
-    };
-    leaveRoomBtn.onclick = () => leaveGameRoom();
-    startGameBtn.onclick = () => startGameHost();
-    resetToLobbyBtn.onclick = () => leaveGameRoom();
-    confirmJoinBtn.onclick = () => {
-        const code = roomCodeJoin.value.trim();
-        const name = playerNameInput.value.trim();
-        if (!name || !code) alert("املأ الاسم ورمز الغرفة");
-        else joinRoom(code, name);
-    };
-    // إضافة توجيهات البديل
-    window.addEventListener('load', () => {
-        // عرض نسخة احترافية
-    });
-</script>
+        function startMafiaDist() {
+            if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
+            let narratorIdx = Math.floor(Math.random() * mPlayers.length);
+            let narratorName = mPlayers[narratorIdx];
+            let actives = mPlayers.filter((_, i) => i !== narratorIdx);
+            let roles = [];
+            if (actives.length >= 10) { roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); } 
+            else { roles.push("مافيا القتل 💀"); }
+            roles.push("دكتور 💉");
+            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
+            roles.sort(() => Math.random() - 0.5);
+
+            $('#mafia-setup').hide();
+            $('#mafia-board').removeClass('hidden');
+            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}</div>`);
+            
+            let container = $('#mafia-cards-container');
+            container.empty();
+            actives.forEach((p, i) => {
+                let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
+                card.click(function() {
+                    if(isLocked) return;
+                    isLocked = true; $('.mafia-card').addClass('locked'); $(this).removeClass('locked');
+                    $(`#mpn-${i}`).hide(); $(`#mrl-${i}`).fadeIn();
+                    setTimeout(() => { 
+                        $(`#mc-${i}`).addClass('fade-out'); 
+                        setTimeout(() => { $(`#mc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.mafia-card').removeClass('locked'); }, 500); 
+                    }, 3000);
+                });
+                container.append(card);
+            });
+        }
+
+        // --- الجاسوس (إضافة أحمد) ---
+        function addSpyPlayer() {
+            let n = $('#spyPlayerName').val().trim();
+            if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
+        }
+
+        function startSpyDist() {
+            if(sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
+            let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
+            let spyIdx = Math.floor(Math.random() * sPlayers.length);
+            let roles = sPlayers.map((_, i) => (i === spyIdx ? "أنت الجاسوس 🕵️" : place));
+
+            $('#spy-setup').hide();
+            $('#spy-board').removeClass('hidden');
+            let container = $('#spy-cards-container');
+            container.empty();
+            sPlayers.forEach((p, i) => {
+                let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
+                card.click(function() {
+                    if(isLocked) return;
+                    isLocked = true; $('.spy-card').addClass('locked'); $(this).removeClass('locked');
+                    $(`#spn-${i}`).hide(); $(`#srl-${i}`).fadeIn();
+                    setTimeout(() => { 
+                        $(`#sc-${i}`).addClass('fade-out'); 
+                        setTimeout(() => { $(`#sc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.spy-card').removeClass('locked'); }, 500); 
+                    }, 3000);
+                });
+                container.append(card);
+            });
+        }
+    </script>
 </body>
 </html>
