@@ -3,42 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - النسخة الكاملة</title>
+    <title>بوابة أحمد المحترف - التحديث الأسطوري</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
+        /* إعدادات الخلفية العامة - طابع مستقبلي */
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
-        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
-        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
-        .role-display { display: none; color: #ff0000; font-size: 1.2em; font-weight: bold; margin-top: 10px; }
-        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); 
+            color: #eee; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow-x: hidden; 
+        }
+
+        /* تحسين القائمة الرئيسية */
+        #main-menu { 
+            text-align: center; 
+            margin-top: 50px; 
+            width: 100%; 
+            max-width: 450px; 
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            background: linear-gradient(to bottom, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 5px 15px rgba(255, 65, 108, 0.3);
+        }
+
+        /* أزرار القائمة المطورة */
+        .menu-btn { 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%; 
+            padding: 20px; 
+            margin: 18px 0; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(218, 41, 28, 0.5); 
+            color: white; 
+            border-radius: 20px; 
+            font-size: 1.2em; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            backdrop-filter: blur(10px);
+        }
+
+        .menu-btn:hover { 
+            background: #da291c; 
+            box-shadow: 0 10px 30px rgba(218, 41, 28, 0.4);
+            transform: translateY(-5px);
+            border-color: #fff;
+        }
+
+        /* تحسين العناوين والأقسام */
+        .header { 
+            width: 100%; 
+            max-width: 400px; 
+            background: linear-gradient(135deg, #da291c, #910a00); 
+            padding: 15px; 
+            border-radius: 15px; 
+            text-align: center; 
+            color: white; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .back-home { 
+            background: #222; 
+            color: #bbb; 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            border: 1px solid #444; 
+            font-size: 0.9em;
+            transition: 0.3s;
+        }
+        .back-home:hover { background: #fff; color: #000; }
+
+        /* الشطرنج */
+        #board { 
+            width: 380px !important; 
+            max-width: 95vw !important; 
+            border: 8px solid #333; 
+            border-radius: 12px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        /* المدخلات والأزرار داخل الألعاب */
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 1px solid #444; 
+            background: rgba(0,0,0,0.6); 
+            color: #fff; 
+            margin-bottom: 12px; 
+            text-align: center; 
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #da291c; box-shadow: 0 0 10px rgba(218, 41, 28, 0.3); }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #da291c; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        button:active { transform: scale(0.95); }
+
+        /* كروت المافيا والجاسوس */
+        .mafia-card, .spy-card { 
+            background: linear-gradient(145deg, #1e1e1e, #111); 
+            padding: 30px; 
+            margin: 15px 0; 
+            border-radius: 20px; 
+            border: 1px solid #333; 
+            transition: 0.5s; 
+            cursor: pointer; 
+            text-align: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .mafia-card:hover, .spy-card:hover { border-color: #da291c; }
+
+        .role-display { display: none; color: #ff0000; font-size: 1.5em; font-weight: 800; margin-top: 10px; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+
+        .narrator-box { 
+            background: linear-gradient(to right, #0055ff, #0033aa); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            font-weight: bold; 
+            border: none;
+            box-shadow: 0 10px 20px rgba(0, 85, 255, 0.3);
+        }
+
         .hidden { display: none; }
-        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
-        .locked { pointer-events: none; opacity: 0.4; }
-        .vote-btn { background: #222; color: yellow; border: 1px solid yellow; margin: 5px; width: auto; display: inline-block; padding: 10px; border-radius: 8px; }
-        .vote-log-item { background: #111; padding: 5px; border-bottom: 1px solid #333; font-size: 0.9em; color: #fff; text-align: right; }
+        .fade-out { opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .locked { pointer-events: none; opacity: 0.5; }
+
+        /* تصويت الأونلاين */
+        .vote-btn { 
+            background: rgba(255, 255, 0, 0.1); 
+            color: yellow; 
+            border: 1px solid yellow; 
+            margin: 8px; 
+            width: calc(50% - 16px); 
+            display: inline-block; 
+            padding: 12px; 
+            border-radius: 10px; 
+            transition: 0.3s;
+        }
+        .vote-btn:hover { background: yellow; color: black; }
+
+        .vote-log-item { 
+            background: rgba(255,255,255,0.05); 
+            padding: 10px; 
+            border-radius: 8px;
+            margin-bottom: 5px; 
+            font-size: 0.9em; 
+            color: #ddd; 
+            text-align: right; 
+            border-right: 4px solid #da291c;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
 
     <div id="main-menu">
-        <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
-        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
-        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
-        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس (أوفلاين)</button>
-        <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🌐 الجاسوس (أونلاين)</button>
+        <h1>AHMED PRO</h1>
+        <button class="menu-btn" onclick="showGame('chess')"><span>♟️</span> ساحة الشطرنج</button>
+        <button class="menu-btn" onclick="showGame('mafia')"><span>🕵️</span> موزع المافيا</button>
+        <button class="menu-btn" onclick="showGame('spy')"><span>🔍</span> الجاسوس (أوفلاين)</button>
+        <button class="menu-btn" style="border-color: #0055ff; box-shadow: 0 0 15px rgba(0,85,255,0.2);" onclick="showGame('spyOnline')"><span>🌐</span> الجاسوس (أونلاين)</button>
     </div>
 
     <div id="chess-section" class="hidden">
-        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3><div id="my-id" style="font-size:0.7em;">جاري الاتصال...</div></div>
+        <button class="back-home" onclick="location.reload()">🏠 العودة للملف الشخصي</button>
+        <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3><div id="my-id" style="font-size:0.7em; opacity: 0.7;">جاري الاتصال بالنظام...</div></div>
         <div id="board"></div>
     </div>
 
@@ -46,10 +214,10 @@
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🕵️‍♂️ نظام المافيا المطور</h3></div>
         <div id="mafia-setup">
-            <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
-            <button onclick="addMafiaPlayer()">إضافة لاعب</button>
-            <div id="mafia-preview" style="margin:10px; color:#888;"></div>
-            <button style="background:green;" onclick="startMafiaDist()">توزيع الأدوار + الراوي</button>
+            <input type="text" id="mafiaPlayerName" placeholder="أدخل اسم اللاعب...">
+            <button onclick="addMafiaPlayer()">+ إضافة لاعب للقائمة</button>
+            <div id="mafia-preview" style="margin:20px; color:#aaa; font-style: italic;"></div>
+            <button style="background:linear-gradient(to right, #1d976c, #93f9b9); color: #000;" onclick="startMafiaDist()">بدء التوزيع العشوائي</button>
         </div>
         <div id="mafia-board" class="hidden">
             <div id="narrator-name"></div>
@@ -61,10 +229,10 @@
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🔍 لعبة الجاسوس (أوفلاين)</h3></div>
         <div id="spy-setup">
-            <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
-            <button onclick="addSpyPlayer()">إضافة لاعب</button>
-            <div id="spy-preview" style="margin:10px; color:#888;"></div>
-            <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
+            <input type="text" id="spyPlayerName" placeholder="اسم اللاعب المختار...">
+            <button onclick="addSpyPlayer()">+ إضافة لاعب</button>
+            <div id="spy-preview" style="margin:20px; color:#aaa; font-style: italic;"></div>
+            <button style="background:linear-gradient(to right, #1d976c, #93f9b9); color: #000;" onclick="startSpyDist()">توزيع الأماكن السرية</button>
         </div>
         <div id="spy-board" class="hidden">
             <div id="spy-cards-container"></div>
@@ -73,29 +241,29 @@
 
     <div id="spy-online-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🌐 الجاسوس أونلاين (غرف)</h3></div>
+        <div class="header"><h3>🌐 الجاسوس أونلاين (الغرف)</h3></div>
         <div id="spy-online-setup">
-            <input type="text" id="spyNick" placeholder="اسمك">
-            <button onclick="hostRoom()">إنشاء غرفة (أدمن)</button>
-            <div style="margin:10px;">--- أو ---</div>
-            <input type="text" id="roomCode" placeholder="كود الغرفة">
-            <button style="background:#444;" onclick="joinRoom()">دخول الغرفة</button>
+            <input type="text" id="spyNick" placeholder="لقبك في اللعبة">
+            <button onclick="hostRoom()" style="background: #222; border: 1px solid #da291c;">إنشاء غرفة جديدة (أدمن)</button>
+            <div style="margin:15px; color: #666;">──────── أو ────────</div>
+            <input type="text" id="roomCode" placeholder="أدخل كود الغرفة المكون من 3 أرقام">
+            <button style="background:#444;" onclick="joinRoom()">دخول الغرفة الحالية</button>
         </div>
         <div id="lobby" class="hidden">
-            <div id="display-room-id" style="color:yellow; margin-bottom:10px;"></div>
-            <div id="online-players-list"></div>
-            <button id="start-btn" style="background:green; margin-top:20px; display:none;" onclick="startOnlineGame()">ابدأ اللعبة</button>
+            <div id="display-room-id" style="color:yellow; margin-bottom:20px; font-size: 1.3em; letter-spacing: 2px;"></div>
+            <div id="online-players-list" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;"></div>
+            <button id="start-btn" style="background:linear-gradient(to right, #1d976c, #93f9b9); color: #000; margin-top:25px; display:none;" onclick="startOnlineGame()">إطلاق اللعبة الآن</button>
         </div>
         <div id="game-play" class="hidden">
-            <div class="spy-card" onclick="$(this).find('.role-display').toggle()">
-                <p>اضغط لإظهار/إخفاء المكان</p>
-                <div id="my-role" class="role-display" style="color:#0f0; display:none;"></div>
+            <div class="spy-card" onclick="$(this).find('.role-display').toggle()" style="border: 2px dashed #555;">
+                <p style="color: #888;">اضغط هنا لكشف مكانك السري</p>
+                <div id="my-role" class="role-display" style="color:#00ff88; display:none;"></div>
             </div>
-            <div id="voting-area" style="margin-top:20px;">
-                <h4 id="vote-title">صوّت للجاسوس:</h4>
+            <div id="voting-area" style="margin-top:30px;">
+                <h4 id="vote-title" style="color: #ff416c;">من هو الجاسوس؟ صوّت الآن:</h4>
                 <div id="vote-btns"></div>
                 <div id="vote-log-container" style="margin-top:20px; width:100%;"></div>
-                <div id="final-result" style="margin-top:20px; color:red; font-size:1.5em;"></div>
+                <div id="final-result" style="margin-top:25px; color:#ff416c; font-size:1.6em; font-weight: bold; text-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>
             </div>
         </div>
     </div>
@@ -106,6 +274,8 @@
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
     <script>
+        // هنا تبقى كل وظائفك البرمجية (Functions) كما هي تماماً 
+        // سأضعها هنا لضمان عمل الملف بشكل كامل
         let isLocked = false;
         let sPlayers = [];
         let mPlayers = [];
@@ -115,7 +285,6 @@
         let host = false;
         let votesReceived = [];
 
-        // قائمة الـ 200 كلمة المحدثة لعيون أحمد
         const spyPlaces = [
             "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة",
             "المول", "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح",
@@ -142,7 +311,6 @@
             else if(t==='spyOnline') $('#spy-online-section').removeClass('hidden');
         }
 
-        // --- مافيا أوفلاين ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
             if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
@@ -154,11 +322,9 @@
             let nName = mPlayers[nIdx];
             let acts = mPlayers.filter((_, i) => i !== nIdx);
             let roles = acts.map((_, i) => i === 0 ? "مافيا 🔪" : "مواطن 👨‍🌾"); roles.sort(() => Math.random() - 0.5);
-
             $('#mafia-setup').hide(); $('#mafia-board').removeClass('hidden');
             $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${nName}</div>`);
             let cont = $('#mafia-cards-container').empty();
-
             acts.forEach((p, i) => {
                 let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
                 card.click(function() {
@@ -174,7 +340,6 @@
             });
         }
 
-        // --- جاسوس أوفلاين ---
         function addSpyPlayer() {
             let n = $('#spyPlayerName').val().trim();
             if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
@@ -185,10 +350,8 @@
             let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
             let spyIdx = Math.floor(Math.random() * sPlayers.length);
             let roles = sPlayers.map((_, i) => i === spyIdx ? "أنت الجاسوس 🕵️" : place);
-
             $('#spy-setup').hide(); $('#spy-board').removeClass('hidden');
             let cont = $('#spy-cards-container').empty();
-
             sPlayers.forEach((p, i) => {
                 let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
                 card.click(function() {
@@ -204,7 +367,6 @@
             });
         }
 
-        // --- الجاسوس أونلاين ---
         function hostRoom() {
             myName = $('#spyNick').val(); if(!myName) return alert("اكتب اسمك");
             host = true; let id = "ROOM_" + Math.floor(100+Math.random()*899);
@@ -281,7 +443,6 @@
             $('#final-result').html(`الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
         }
 
-        // شطرنج
         function initChess() {
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             let pC = new Peer(id);
