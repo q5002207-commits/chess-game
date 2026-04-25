@@ -7,6 +7,8 @@ button{background:#da291c;color:#fff;padding:12px;margin:5px;border:none;border-
 input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;border:1px solid #da291c}
 .hidden{display:none}
 .player-item{background:#222;padding:8px;margin:5px;border-radius:10px}
+.copy-area{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0}
+.copy-area span{background:#111;padding:10px;border-radius:8px;font-family:monospace;font-size:1.2rem;letter-spacing:2px}
 </style>
 </head>
 <body>
@@ -18,8 +20,12 @@ input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;bord
         <button id="join">🚪 انضمام للغرفة (تاب 2/3/4)</button>
     </div>
     <div id="room" class="hidden">
-        <div style="background:#111;padding:10px;border-radius:10px;margin:10px">
-            🆔 رمز الغرفة: <strong id="roomCode"></strong>
+        <div style="background:#111;padding:15px;border-radius:10px;margin:10px">
+            <div style="margin-bottom:8px">📋 رمز الغرفة (انسخه للتباب الأخرى):</div>
+            <div class="copy-area">
+                <span id="roomCode">------</span>
+                <button id="copyBtn" style="width:auto;padding:8px 20px">📋 نسخ</button>
+            </div>
         </div>
         <div id="players"></div>
         <div id="playerCount" style="margin:5px">👥 0 لاعب</div>
@@ -72,6 +78,12 @@ document.getElementById('create').onclick = () => {
     updatePlayers();
     lobby.classList.add('hidden');
     roomDiv.classList.remove('hidden');
+    
+    // زر النسخ
+    document.getElementById('copyBtn').onclick = () => {
+        navigator.clipboard.writeText(roomCode);
+        alert("✅ تم نسخ الرمز: " + roomCode);
+    };
     
     // بدء الاستماع للتغييرات
     startStorageListener();
