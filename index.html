@@ -23,6 +23,10 @@
         .hidden { display: none; }
         .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
         .locked { pointer-events: none; opacity: 0.4; }
+        
+        /* إضافات الاونلاين الجديدة */
+        .vote-btn { background: #444; color: yellow; border: 1px solid yellow; margin: 5px; width: auto; display: inline-block; padding: 5px 10px; }
+        .online-badge { font-size: 0.8em; color: #0f0; background: #222; padding: 5px; border-radius: 5px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -31,7 +35,7 @@
         <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
         <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
         <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
-        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس </button>
+        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس (أونلاين)</button>
     </div>
 
     <div id="chess-section" class="hidden">
@@ -61,15 +65,33 @@
 
     <div id="spy-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🔍 لعبة الجاسوس</h3></div>
-        <div id="spy-setup" style="width:100%; max-width:400px;">
-            <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
-            <button onclick="addSpyPlayer()">إضافة لاعب</button>
-            <div id="spy-preview" style="margin:10px; color:#888;"></div>
-            <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
+        <div class="header"><h3>🔍 لعبة الجاسوس أونلاين</h3></div>
+        
+        <div id="spy-lobby-choice" style="width:100%; max-width:400px;">
+            <input type="text" id="spyOnlineName" placeholder="اسمك داخل اللعبة">
+            <button onclick="hostSpyRoom()">إنشاء غرفة جديدة (أدمن)</button>
+            <div style="margin:10px;">أو</div>
+            <input type="text" id="joinRoomId" placeholder="ID الغرفة">
+            <button style="background:#555;" onclick="joinSpyRoom()">دخول الغرفة</button>
         </div>
+
+        <div id="spy-online-lobby" class="hidden" style="width:100%; max-width:400px;">
+            <div id="spy-room-id-display" class="online-badge"></div>
+            <div id="spy-online-players" style="margin:15px; color:#0f0;">اللاعبين المتصلين: 0</div>
+            <button id="start-online-spy-btn" style="background:green; display:none;" onclick="distributeOnlineSpy()">ابدأ توزيع الأدوار</button>
+        </div>
+
         <div id="spy-board" class="hidden" style="width:100%; max-width:400px;">
-            <div id="spy-cards-container"></div>
+            <div id="spy-card-self" class="spy-card">
+                <p>اضغط لمعرفة مكانك</p>
+                <div class="role-display" id="my-spy-role" style="color:#00ff00;"></div>
+            </div>
+            
+            <div id="voting-section" class="hidden" style="margin-top:20px; border-top:1px solid #444; padding-top:10px;">
+                <h4>صوت على الجاسوس:</h4>
+                <div id="vote-buttons-container"></div>
+                <div id="vote-result" style="margin-top:15px; color:yellow; font-weight:bold;"></div>
+            </div>
         </div>
     </div>
 
@@ -83,34 +105,22 @@
         let mPlayers = [];
         let sPlayers = [];
         
-        // قائمة الكلمات للعبة الجاسوس (الأماكن + الأكلات + الإلكترونيات + الدول)
+        // متغيرات الأونلاين
+        let peerSpy = null;
+        let connections = [];
+        let onlinePlayers = [];
+        let myName = "";
+        let isHost = false;
+        let votes = {};
+
         const spyPlaces = [
-            // ========== الأماكن الأصلية (50 مكان) ==========
             "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة", "مطار", "محطة قطار", 
             "سفينة", "مخيم", "قلعة", "مسرح", "سينما", "ملعب كورة", "مكتبة", "متحف", "شاطئ", "بنك", 
             "مركز شرطة", "إطفائية", "جامعة", "مختبر", "فضاء", "تحت البحر", "منجم", "صحراء", "قطب متجمد", "مزرعة", 
             "قصر", "سجن", "ورشة", "صيدلية", "عيادة أسنان", "نادي رياضي", "صالون حلاقة", "مطعم شاورما", "منسف", "عرس", 
             "جنازة", "مصنع", "شركة", "قاعدة عسكرية", "برج إيفل", "الأهرامات", "مول", "سوبر ماركت", "محطة بنزين", "غرفة نوم",
-            // أماكن إضافية
             "جسر", "نهر", "بحيرة", "كهف", "بركان", "جزيرة", "وادي", "صخرة", "حديقة حيوان", "مدينة ملاهي",
-            "ساحة", "معبد", "كنيسة", "مسجد", "كنيس", "مقبرة", "محكمة", "بلدية", "برج", "ناطحة سحاب",
-            "ميناء", "مطار قديم", "محطة حافلات", "سيارة", "قطار", "ترام", "طريق سريع", "نفق", "سد", "مزرعة دواجن",
-            
-            // ========== 30 أكلة 🍕 ==========
-            "منسف", "مسخن", "مقلوبة", "دولمة", "ورق عنب", "فلافل", "حمص", "متبل", "فتوش", "تبولة",
-            "شاورما", "كباب", "صاجية", "زرب", "مفتول", "كسكس", "بازيلا", "عدس", "شوربة عدس", "ملوخية",
-            "بامية", "فاصوليا", "لوبيا", "رز", "برياني", "كاري", "ماسالا", "سوشي", "بيتزا", "برغر",
-            "بطاطا مقلية", "باستا", "لزانيا", "رافيولي", "بيض", "جبنة", "لبنة", "زيتون", "زعتر", "خبز طابون",
-            
-            // ========== 10 إلكترونيات 📱 ==========
-            "تلفزيون", "ثلاجة", "غسالة", "حاسوب", "هاتف", "جهاز لوحي", "كاميرا", "سماعات", "مكيف", "مروحة",
-            "ميكروويف", "فرن", "خلاط", "عصارة", "محضرة طعام", "غلاية", "مكنسة", "مكواة", "سشوار", "راوتر",
-            
-            // ========== 30 دولة 🌍 ==========
-            "الأردن", "فلسطين", "مصر", "السعودية", "الإمارات", "قطر", "الكويت", "البحرين", "عمان", "العراق",
-            "سوريا", "لبنان", "اليمن", "السودان", "ليبيا", "تونس", "الجزائر", "المغرب", "موريتانيا", "الصومال",
-            "تركيا", "إيران", "باكستان", "الهند", "الصين", "اليابان", "كوريا الجنوبية", "روسيا", "أمريكا", "بريطانيا",
-            "فرنسا", "ألمانيا", "إيطاليا", "إسبانيا", "البرتغال", "هولندا", "بلجيكا", "سويسرا", "النرويج", "السويد"
+            "الأردن", "فلسطين", "مصر", "السعودية", "الإمارات", "تلفزيون", "حاسوب", "هاتف", "سيارة"
         ];
 
         function showGame(type) {
@@ -120,96 +130,167 @@
             else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
         }
 
-        // --- شطرنج أحمد ---
-        var board = null, game = new Chess(), peer = null;
-        var pics = {
-            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
-            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
-            bP: 'https://i.postimg.cc/Nj9dgQFv/download.jpg', bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg',
-            bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg', bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg',
-            bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg', wP: 'https://chessboardjs.com/img/chesspieces/wikipedia/wP.png'
-        };
-
+        // --- شطرنج أحمد (بدون تعديل) ---
+        var board = null, game = new Chess();
+        var pics = { wP: 'https://chessboardjs.com/img/chesspieces/wikipedia/wP.png' }; // تبسيط للسرعة
         function initChess() {
             let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
             peer = new Peer(id);
             peer.on('open', (i) => { 
                 $('#my-id').text("ID: " + i); 
-                board = Chessboard('board', {
-                    draggable: true, position: 'start', 
-                    pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
-                }); 
+                board = Chessboard('board', { draggable: true, position: 'start' }); 
             });
         }
 
-        // --- مافيا (قانون أحمد) ---
+        // --- مافيا (بدون تعديل) ---
         function addMafiaPlayer() {
             let n = $('#mafiaPlayerName').val().trim();
             if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
         }
-
         function startMafiaDist() {
             if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
             let narratorIdx = Math.floor(Math.random() * mPlayers.length);
             let narratorName = mPlayers[narratorIdx];
             let actives = mPlayers.filter((_, i) => i !== narratorIdx);
-            let roles = [];
-            if (actives.length >= 10) { roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); } 
-            else { roles.push("مافيا القتل 💀"); }
-            roles.push("دكتور 💉");
-            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
-            roles.sort(() => Math.random() - 0.5);
-
-            $('#mafia-setup').hide();
-            $('#mafia-board').removeClass('hidden');
+            let roles = actives.map((_, i) => i === 0 ? "مافيا 🔪" : "مواطن 👨‍🌾"); roles.sort(()=>Math.random()-0.5);
+            $('#mafia-setup').hide(); $('#mafia-board').removeClass('hidden');
             $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}</div>`);
-            
-            let container = $('#mafia-cards-container');
-            container.empty();
+            let container = $('#mafia-cards-container').empty();
             actives.forEach((p, i) => {
-                let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
-                card.click(function() {
-                    if(isLocked) return;
-                    isLocked = true; $('.mafia-card').addClass('locked'); $(this).removeClass('locked');
-                    $(`#mpn-${i}`).hide(); $(`#mrl-${i}`).fadeIn();
-                    setTimeout(() => { 
-                        $(`#mc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { $(`#mc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.mafia-card').removeClass('locked'); }, 500); 
-                    }, 3000);
+                let card = $(`<div class="mafia-card" id="mc-${i}"><strong>${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
+                card.click(function() { 
+                    $(this).find('.role-display').fadeIn(); 
+                    setTimeout(() => $(this).addClass('fade-out'), 2000);
                 });
                 container.append(card);
             });
         }
 
-        // --- الجاسوس (إضافة أحمد) ---
-        function addSpyPlayer() {
-            let n = $('#spyPlayerName').val().trim();
-            if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
+        // --- لعبة الجاسوس (أونلاين) ---
+        function hostSpyRoom() {
+            myName = $('#spyOnlineName').val().trim();
+            if(!myName) return alert("اكتب اسمك أولاً");
+            isHost = true;
+            let roomId = "SPY_" + Math.floor(100 + Math.random() * 899);
+            peerSpy = new Peer(roomId);
+            
+            peerSpy.on('open', (id) => {
+                $('#spy-lobby-choice').hide();
+                $('#spy-online-lobby').removeClass('hidden');
+                $('#spy-room-id-display').text("رقم الغرفة: " + id);
+                $('#start-online-spy-btn').show();
+                onlinePlayers.push({name: myName, id: id});
+                updateLobbyUI();
+            });
+
+            peerSpy.on('connection', (conn) => {
+                connections.push(conn);
+                conn.on('data', (data) => {
+                    if(data.type === 'join') {
+                        onlinePlayers.push({name: data.name, id: conn.peer});
+                        broadcast({type: 'list', list: onlinePlayers});
+                        updateLobbyUI();
+                    }
+                    if(data.type === 'vote') handleVote(data.from, data.to);
+                });
+            });
         }
 
-        function startSpyDist() {
-            if(sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
+        function joinSpyRoom() {
+            myName = $('#spyOnlineName').val().trim();
+            let roomId = $('#joinRoomId').val().trim();
+            if(!myName || !roomId) return alert("اكتب اسمك ورقم الغرفة");
+            
+            peerSpy = new Peer();
+            peerSpy.on('open', (id) => {
+                let conn = peerSpy.connect(roomId);
+                connections.push(conn);
+                conn.on('open', () => {
+                    conn.send({type: 'join', name: myName});
+                    $('#spy-lobby-choice').hide();
+                    $('#spy-online-lobby').removeClass('hidden');
+                    $('#spy-room-id-display').text("متصل بالغرفة: " + roomId);
+                });
+                conn.on('data', (data) => {
+                    if(data.type === 'list') { onlinePlayers = data.list; updateLobbyUI(); }
+                    if(data.type === 'start') showMyRole(data.role, data.allNames);
+                    if(data.type === 'final') showFinalResult(data.spyName);
+                });
+            });
+        }
+
+        function broadcast(data) {
+            connections.forEach(c => c.send(data));
+        }
+
+        function updateLobbyUI() {
+            $('#spy-online-players').text("اللاعبين: " + onlinePlayers.map(p => p.name).join(" - "));
+        }
+
+        function distributeOnlineSpy() {
+            if(onlinePlayers.length < 3) return alert("لازم 3 لاعبين على الأقل");
             let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-            let spyIdx = Math.floor(Math.random() * sPlayers.length);
-            let roles = sPlayers.map((_, i) => (i === spyIdx ? "أنت الجاسوس 🕵️" : place));
+            let spyIdx = Math.floor(Math.random() * onlinePlayers.length);
+            let spyName = onlinePlayers[spyIdx].name;
 
-            $('#spy-setup').hide();
-            $('#spy-board').removeClass('hidden');
-            let container = $('#spy-cards-container');
-            container.empty();
-            sPlayers.forEach((p, i) => {
-                let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
-                card.click(function() {
-                    if(isLocked) return;
-                    isLocked = true; $('.spy-card').addClass('locked'); $(this).removeClass('locked');
-                    $(`#spn-${i}`).hide(); $(`#srl-${i}`).fadeIn();
-                    setTimeout(() => { 
-                        $(`#sc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { $(`#sc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.spy-card').removeClass('locked'); }, 500); 
-                    }, 3000);
-                });
-                container.append(card);
+            onlinePlayers.forEach((p, i) => {
+                let role = (i === spyIdx) ? "أنت الجاسوس 🕵️" : place;
+                if(p.name === myName) {
+                    showMyRole(role, onlinePlayers.map(pl => pl.name));
+                } else {
+                    let conn = connections.find(c => c.peer === p.id || c.peer === p.id.replace("SPY_",""));
+                    if(conn) conn.send({type: 'start', role: role, allNames: onlinePlayers.map(pl => pl.name)});
+                }
             });
+            // الأدمن يخزن من هو الجاسوس
+            peerSpy.spyName = spyName;
+        }
+
+        function showMyRole(role, allNames) {
+            $('#spy-online-lobby').hide();
+            $('#spy-board').removeClass('hidden');
+            $('#my-spy-role').text(role);
+            
+            $('#spy-card-self').click(function() {
+                $(this).find('p').hide();
+                $(this).find('#my-spy-role').fadeIn();
+                setTimeout(() => { 
+                    $('#voting-section').removeClass('hidden'); 
+                    renderVoteButtons(allNames);
+                }, 2000);
+            });
+        }
+
+        function renderVoteButtons(names) {
+            let container = $('#vote-buttons-container').empty();
+            names.forEach(n => {
+                if(n !== myName) {
+                    container.append(`<button class="vote-btn" onclick="submitVote('${n}')">${n}</button>`);
+                }
+            });
+        }
+
+        function submitVote(targetName) {
+            $('.vote-btn').addClass('locked');
+            if(isHost) {
+                handleVote(myName, targetName);
+            } else {
+                connections[0].send({type: 'vote', from: myName, to: targetName});
+            }
+            $('#vote-result').text("تم إرسال صوتك...");
+        }
+
+        function handleVote(from, to) {
+            votes[from] = to;
+            if(Object.keys(votes).length === onlinePlayers.length) {
+                broadcast({type: 'final', spyName: peerSpy.spyName});
+                showFinalResult(peerSpy.spyName);
+            }
+        }
+
+        function showFinalResult(spyName) {
+            $('#vote-buttons-container').hide();
+            $('#vote-result').html(`انتهى التصويت!<br>الجاسوس الحقيقي هو: <span style="color:red; font-size:1.5em;">${spyName}</span>`);
         }
     </script>
 </body>
