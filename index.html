@@ -23,6 +23,7 @@
         .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
         .locked { pointer-events: none; opacity: 0.4; }
         .vote-btn { background: #222; color: yellow; border: 1px solid yellow; margin: 5px; width: auto; display: inline-block; padding: 10px; border-radius: 8px; }
+        .vote-log-item { background: #111; padding: 5px; border-bottom: 1px solid #333; font-size: 0.9em; color: #fff; }
     </style>
 </head>
 <body>
@@ -95,8 +96,9 @@
                 <div id="my-role" class="role-display" style="color:#0f0; display:none;"></div>
             </div>
             <div id="voting-area" style="margin-top:20px;">
-                <h4>صوّت للجاسوس:</h4>
+                <h4 id="vote-title">صوّت للجاسوس:</h4>
                 <div id="vote-btns"></div>
+                <div id="vote-log-container" style="margin-top:20px; text-align:right; width:100%;"></div>
                 <div id="final-result" style="margin-top:20px; color:red; font-size:1.5em;"></div>
             </div>
         </div>
@@ -115,7 +117,7 @@
         let players = [];
         let myName = "";
         let host = false;
-        let votesCount = 0;
+        let votesReceived = []; // لتخزين سجل التصويت
 
         const spyPlaces = ["مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف"];
 
@@ -145,7 +147,7 @@
             });
         }
 
-        // الأونلاين (الخيار الرابع)
+        // الأونلاين (مع إضافة سجل التصويت)
         function hostRoom() {
             myName = $('#spyNick').val(); if(!myName) return;
             host = true;
@@ -160,7 +162,7 @@
             peer.on('connection', c => {
                 c.on('data', d => {
                     if(d.type==='join') { players.push({name: d.name, id: c.peer}); broadcast({type:'list', list:players}); updateLobby(); }
-                    if(d.type==='vote') handleVote(d.spy);
+                    if(d.type==='vote') handleVote(d.voter, d.target);
                 });
             });
         }
@@ -177,7 +179,7 @@
                 c.on('data', d => {
                     if(d.type==='list') { players = d.list; updateLobby(); }
                     if(d.type==='start') startClientGame(d.role, d.names);
-                    if(d.type==='res') $('#final-result').text("الجاسوس هو: " + d.spy);
+                    if(d.type==='res') showFinalOnlineResults(d.spy, d.logs);
                 });
                 conns.push(c);
             });
@@ -190,6 +192,7 @@
             let place = spyPlaces[Math.floor(Math.random()*spyPlaces.length)];
             let spyIdx = Math.floor(Math.random()*players.length);
             peer.actualSpy = players[spyIdx].name;
+            votesReceived = [];
             players.forEach((p, i) => {
                 let role = (i===spyIdx) ? "أنت الجاسوس 🕵️" : place;
                 if(p.name === myName) startClientGame(role, players.map(pl=>pl.name));
@@ -202,25 +205,62 @@
 
         function startClientGame(role, names) {
             $('#lobby').hide(); $('#game-play').removeClass('hidden');
-            $('#my-role').text(role);
-            let btns = $('#vote-btns').empty();
+            $('#my-role').text(role); $('#vote-log-container').empty(); $('#final-result').empty();
+            let btns = $('#vote-btns').empty().show();
+            $('#vote-title').show();
             names.forEach(n => {
                 if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendVote('${n}')">${n}</button>`);
             });
         }
 
-        function sendVote(n) {
+        function sendVote(target) {
             $('.vote-btn').addClass('locked');
-            if(host) handleVote(); else peer.connections[Object.keys(peer.connections)[0]][0].send({type:'vote'});
+            if(host) handleVote(myName, target); 
+            else peer.connections[Object.keys(peer.connections)[0]][0].send({type:'vote', voter: myName, target: target});
         }
 
-        function handleVote() {
-            votesCount++;
-            if(votesCount >= players.length) {
-                let res = {type:'res', spy: peer.actualSpy};
+        function handleVote(voter, target) {
+            votesReceived.push(`${voter} صوّت لـ ${target}`);
+            if(votesReceived.length >= players.length) {
+                let res = {type:'res', spy: peer.actualSpy, logs: votesReceived};
                 broadcast(res);
-                $('#final-result').text("الجاسوس هو: " + peer.actualSpy);
+                showFinalOnlineResults(peer.actualSpy, votesReceived);
             }
+        }
+
+        function showFinalOnlineResults(spyName, logs) {
+            $('#vote-btns').hide();
+            $('#vote-title').hide();
+            let logHtml = "<strong>سجل التصويت:</strong><br>";
+            logs.forEach(l => logHtml += `<div class="vote-log-item">${l}</div>`);
+            $('#vote-log-container').html(logHtml);
+            $('#final-result').html(`الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
+        }
+        
+        // شطرنج (بدون تعديل)
+        function initChess() {
+            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
+            let pChess = new Peer(id);
+            pChess.on('open', (i) => { $('#my-id').text("ID: " + i); Chessboard('board', 'start'); });
+        }
+        function addMafiaPlayer() {
+            let n = $('#mafiaPlayerName').val().trim();
+            if(n) { mPlayers.push(n); $('#mafia-preview').text(mPlayers.join(" - ")); $('#mafiaPlayerName').val(""); }
+        }
+        function startMafiaDist() {
+            if(mPlayers.length < 4) return alert("4 لاعبين اقل شي");
+            let nIdx = Math.floor(Math.random()*mPlayers.length);
+            let nName = mPlayers[nIdx];
+            let acts = mPlayers.filter((_,i)=>i!==nIdx);
+            let roles = acts.map((_,i)=>i===0?"مافيا":"مواطن"); roles.sort(()=>Math.random()-0.5);
+            $('#mafia-setup').hide(); $('#mafia-board').removeClass('hidden');
+            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${nName}</div>`);
+            let cont = $('#mafia-cards-container').empty();
+            acts.forEach((p,i)=>{
+                let c = $(`<div class="mafia-card"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>`);
+                c.click(function(){ $(this).find('.role-display').show(); setTimeout(()=>$(this).addClass('fade-out'), 2000); });
+                cont.append(c);
+            });
         }
     </script>
 </body>
