@@ -20,7 +20,7 @@ input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;bord
     <h1 style="color:#da291c;">🌐 مافيا أون لاين - كامل</h1>
     
     <div id="lobby">
-        <input type="text" id="name" placeholder="اسمك">
+        <input type="text" id="name" placeholder="اسمك" autocomplete="off">
         <button id="create">🔪 إنشاء غرفة</button>
         <button id="join">🚪 انضمام</button>
         <div id="joinBox" class="hidden">
@@ -30,11 +30,11 @@ input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;bord
     </div>
     
     <div id="room" class="hidden">
-        <div>🆔 معرفك: <span id="myId"></span> <button id="copyBtn">نسخ</button></div>
+        <div style="background:#111;padding:8px;border-radius:8px;margin:8px">🆔 معرفك: <strong id="myId"></strong> <button id="copyBtn" style="width:auto;padding:2px 10px">نسخ</button></div>
         <div id="players"></div>
         <div id="playerCount">👥 0 لاعب</div>
-        <button id="startGame">بدء اللعبة (4+ لاعبين)</button>
-        <button id="leave">مغادرة</button>
+        <button id="startGame" style="background:#2e7d32">🎬 بدء اللعبة (4+ لاعبين)</button>
+        <button id="leave" style="background:#3a2a2a">🚪 مغادرة</button>
     </div>
     
     <div id="game" class="hidden">
@@ -183,6 +183,11 @@ function startGame(){
     }
 }
 
+// ========== عرض قائمة الأحياء للمافيا ==========
+function getAlivePlayersList(){
+    return players.filter(p => p.alive === true && p.id !== myId);
+}
+
 // ========== الليل - المافيا تختار ضحية ==========
 function startNight(){
     gamePhase="night";
@@ -191,13 +196,20 @@ function startNight(){
     document.getElementById('phase').innerHTML = "🌙 الليل - المافيا تقتل 🌙";
     document.getElementById('eventMsg').innerHTML = "🔪 المافيا تختار ضحيتها...";
     
-    console.log("دوري:", myRole);
-    console.log("أنا مافيا?", myRole=="مافيا");
-    console.log("اللاعبين:", players);
-    
     // فقط المافيا يشوفوا خيارات القتل
-    if(myRole == "مافيا" && players.find(p=>p.id==myId)?.alive!==false){
-        showKillPanel();
+    if(myRole == "مافيا" && players.find(p=>p.id==myId)?.alive===true){
+        let aliveTargets = getAlivePlayersList();
+        let html = '<div class="phase-banner" style="background:#c62828">🔪 اختر من تقتل هذه الليلة:</div>';
+        
+        if(aliveTargets.length === 0){
+            html += '<div class="phase-banner">⚠️ لا يوجد أهداف أحياء!</div>';
+        } else {
+            aliveTargets.forEach(target=>{
+                html += `<div class="vote-option" onclick="kill('${target.id}')">🔪 قتل: ${target.name}</div>`;
+            });
+        }
+        document.getElementById('actionPanel').innerHTML = html;
+        document.getElementById('eventMsg').innerHTML = `🔪 أنت مافيا! اختر ضحية من القائمة أعلاه (${aliveTargets.length} شخص حي غيرك)`;
     } else {
         document.getElementById('actionPanel').innerHTML='<div class="phase-banner">⏳ المافيا تختار الضحية...</div>';
     }
@@ -214,25 +226,10 @@ function startNight(){
     }
 }
 
-function showKillPanel(){
-    // جيب الأسماء الحية (عدا المافيا نفسها)
-    let targets = players.filter(p => p.alive !== false && p.id !== myId);
-    let html = '<div class="phase-banner" style="background:#c62828">🔪 اختر من تقتل هذه الليلة:</div>';
-    
-    if(targets.length === 0){
-        html += '<div class="phase-banner">لا يوجد أهداف!</div>';
-    } else {
-        targets.forEach(target=>{
-            html += `<div class="vote-option" onclick="kill('${target.id}')">🔪 قتل: ${target.name}</div>`;
-        });
-    }
-    document.getElementById('actionPanel').innerHTML = html;
-}
-
 window.kill = function(victimId){
     selectedVictim=victimId;
     broadcast('mafia_vote',{victim:victimId});
-    document.getElementById('actionPanel').innerHTML='<div class="phase-banner" style="background:#2e7d32">✅ تم اختيار الضحية</div>';
+    document.getElementById('actionPanel').innerHTML='<div class="phase-banner" style="background:#2e7d32">✅ تم اختيار الضحية: ' + players.find(p=>p.id==victimId)?.name + '</div>';
 };
 
 // ========== الدكتور يختار من يحمي ==========
@@ -244,8 +241,16 @@ function gotoDoctor(){
     document.getElementById('eventMsg').innerHTML = `💉 المافيا اختارت ضحيتها، الدكتور يقرر من يحمي...`;
     
     // فقط الدكتور يشوف خيارات الحماية
-    if(myRole == "دكتور" && players.find(p=>p.id==myId)?.alive!==false){
-        showProtectPanel();
+    if(myRole == "دكتور" && players.find(p=>p.id==myId)?.alive===true){
+        let aliveTargets = players.filter(p => p.alive === true);
+        let html = '<div class="phase-banner" style="background:#2e7d32">🛡️ اختر من تحمي هذه الليلة (نفسك أو غيرك):</div>';
+        
+        aliveTargets.forEach(target=>{
+            let isSelf = (target.id == myId) ? " (نفسك)" : "";
+            html += `<div class="vote-option" onclick="protect('${target.id}')">🛡️ حماية: ${target.name}${isSelf}</div>`;
+        });
+        document.getElementById('actionPanel').innerHTML = html;
+        document.getElementById('eventMsg').innerHTML = `💉 أنت الدكتور! اختر شخصاً تحميه من القائمة أعلاه`;
     } else {
         document.getElementById('actionPanel').innerHTML='<div class="phase-banner">⏳ الدكتور يختار من يحمي...</div>';
     }
@@ -261,21 +266,11 @@ function gotoDoctor(){
     }
 }
 
-function showProtectPanel(){
-    let targets = players.filter(p => p.alive !== false);
-    let html = '<div class="phase-banner" style="background:#2e7d32">🛡️ اختر من تحمي هذه الليلة (نفسك أو غيرك):</div>';
-    
-    targets.forEach(target=>{
-        let isSelf = (target.id == myId) ? " (نفسك)" : "";
-        html += `<div class="vote-option" onclick="protect('${target.id}')">🛡️ حماية: ${target.name}${isSelf}</div>`;
-    });
-    document.getElementById('actionPanel').innerHTML = html;
-}
-
 window.protect = function(protectId){
     selectedProtect=protectId;
     broadcast('doctor_protect',{protect:protectId});
-    document.getElementById('actionPanel').innerHTML='<div class="phase-banner" style="background:#2e7d32">✅ تم اختيار الشخص للحماية</div>';
+    let protectName = players.find(p=>p.id==protectId)?.name;
+    document.getElementById('actionPanel').innerHTML='<div class="phase-banner" style="background:#2e7d32">✅ تم اختيار الحماية لـ: ' + protectName + '</div>';
 };
 
 // ========== حل الليل ==========
@@ -286,7 +281,7 @@ function gotoResolve(){
     
     let isSaved = (selectedProtect === selectedVictim);
     
-    if(!isSaved && selectedVictim && players.find(p=>p.id==selectedVictim)?.alive!==false){
+    if(!isSaved && selectedVictim && players.find(p=>p.id==selectedVictim)?.alive===true){
         killed = selectedVictim;
         let pIndex = players.findIndex(p=>p.id==killed);
         if(pIndex!=-1) players[pIndex].alive=false;
@@ -314,13 +309,23 @@ function gotoResolve(){
 function startVote(){
     gamePhase="vote";
     votes={};
-    alivePlayers = players.filter(p=>p.alive!==false).map(p=>p.id);
+    alivePlayers = players.filter(p=>p.alive===true).map(p=>p.id);
     document.getElementById('phaseName').innerHTML = "☀️ النهار ☀️";
     document.getElementById('phase').innerHTML = "☀️ النهار - التصويت ☀️";
     document.getElementById('eventMsg').innerHTML = "🗳️ صوتوا على من تشتبهون به";
     
-    if(players.find(p=>p.id==myId)?.alive!==false){
-        showVotePanel();
+    if(players.find(p=>p.id==myId)?.alive===true){
+        let aliveTargets = players.filter(p => p.alive === true && p.id !== myId);
+        let html = '<div class="phase-banner" style="background:#ff9800">🗳️ صوت على المشتبه به:</div>';
+        
+        if(aliveTargets.length === 0){
+            html += '<div class="phase-banner">⚠️ لا يوجد أشخاص للتصويت!</div>';
+        } else {
+            aliveTargets.forEach(target=>{
+                html += `<div class="vote-option" onclick="vote('${target.id}')">🗳️ ${target.name}</div>`;
+            });
+        }
+        document.getElementById('actionPanel').innerHTML = html;
     } else {
         document.getElementById('actionPanel').innerHTML='<div class="phase-banner">⏳ أنت ميت... لا يمكنك التصويت</div>';
     }
@@ -351,38 +356,27 @@ function startVote(){
     }
 }
 
-function showVotePanel(){
-    let targets = players.filter(p => p.alive !== false && p.id !== myId);
-    let html = '<div class="phase-banner" style="background:#ff9800">🗳️ صوت على المشتبه به:</div>';
-    if(targets.length === 0){
-        html += '<div class="phase-banner">لا يوجد أشخاص للتصويت!</div>';
-    } else {
-        targets.forEach(target=>{
-            html += `<div class="vote-option" onclick="vote('${target.id}')">🗳️ ${target.name}</div>`;
-        });
-    }
-    document.getElementById('actionPanel').innerHTML = html;
-}
-
 window.vote = function(voteId){
     broadcast('vote_cast',{voter:myId,vote:voteId});
     document.getElementById('actionPanel').innerHTML='<div class="phase-banner" style="background:#2e7d32">✅ تم تسجيل صوتك</div>';
 };
 
 function checkWinner(){
-    let aliveMafia = players.filter(p=>p.alive!==false && p.role=="مافيا").length;
-    let aliveCitizens = players.filter(p=>p.alive!==false && p.role!="مافيا").length;
+    let aliveMafia = players.filter(p=>p.alive===true && p.role=="مافيا").length;
+    let aliveCitizens = players.filter(p=>p.alive===true && p.role!="مافيا").length;
     
     if(aliveMafia==0){
         document.getElementById('phase').innerHTML = "🏆 المواطنون فازوا! 🏆";
         document.getElementById('eventMsg').innerHTML = "🎉 تم القضاء على جميع المافيا 🎉";
         gamePhase="ended";
         if(voteTimer) clearTimeout(voteTimer);
+        if(nightTimer) clearTimeout(nightTimer);
     } else if(aliveMafia >= aliveCitizens){
         document.getElementById('phase').innerHTML = "🏆 المافيا فازت! 🏆";
         document.getElementById('eventMsg').innerHTML = "🔪 سيطرت المافيا على القرية 🔪";
         gamePhase="ended";
         if(voteTimer) clearTimeout(voteTimer);
+        if(nightTimer) clearTimeout(nightTimer);
     } else {
         setTimeout(()=>startNight(), 5000);
     }
