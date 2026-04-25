@@ -2,118 +2,172 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة أحمد المحترف - النسخة الصافية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة أحمد المحترف - النسخة الشاملة</title>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; text-align: center; margin: 0; padding: 10px; }
-        .header { color: #da291c; font-size: 24px; margin-bottom: 10px; }
+        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         
-        /* شطرنج مبسط وقوي */
-        #chess-board { 
-            display: grid; 
-            grid-template-columns: repeat(8, 1fr); 
-            width: 360px; height: 360px; 
-            margin: 20px auto; 
-            border: 4px solid #444; 
-        }
-        .square { 
-            width: 45px; height: 45px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 30px; cursor: pointer; 
-        }
+        /* القائمة الرئيسية */
+        #main-menu { text-align: center; margin-top: 30px; width: 100%; max-width: 400px; }
+        .menu-btn { display: block; width: 100%; padding: 20px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.3em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
+        
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
+        .back-home { background: #333; color: #fff; padding: 10px; border-radius: 8px; cursor: pointer; border: none; margin-bottom: 10px; width: 100%; }
+        .hidden { display: none; }
+
+        /* الشطرنج - نسخة الإيموجي الصافية */
+        #chess-board { display: grid; grid-template-columns: repeat(8, 1fr); width: 350px; height: 350px; margin: 10px auto; border: 3px solid #444; background: #222; }
+        .square { width: 43.75px; height: 43.75px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; }
         .white-sq { background: #eee; color: #000; }
         .black-sq { background: #888; color: #000; }
         .selected { background: #da291c !important; }
-        
-        .menu-btn { 
-            background: #da291c; color: #fff; border: none; 
-            padding: 15px 30px; border-radius: 10px; 
-            font-weight: bold; cursor: pointer; margin: 10px;
-        }
-        .hidden { display: none; }
+
+        /* المافيا والجاسوس */
+        input { width: 75%; padding: 12px; border-radius: 8px; border: 1px solid #da291c; background: #111; color: #fff; text-align: center; }
+        .add-btn { width: 20%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; }
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; margin-top: 15px; }
+        .game-card { background: #1a1a1a; padding: 20px; border-radius: 10px; border: 1px solid #444; text-align: center; cursor: pointer; min-height: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .role-text { color: #ff3a2f; display: none; }
+        .revealed { opacity: 0.4; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <h1 class="header">AHMED PRO SYSTEM</h1>
-
     <div id="main-menu">
-        <button class="menu-btn" onclick="openChess()">♟️ ابدأ الشطرنج (صور ثابتة)</button>
-        <p style="color: #666;">نسخة أحمد: صور الإيموجي مستحيل تختفي</p>
+        <h1 style="color:#da291c; text-shadow: 0 0 10px #da291c;">AHMED PRO SYSTEM</h1>
+        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
+        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
+        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس</button>
     </div>
 
     <div id="chess-section" class="hidden">
-        <button onclick="location.reload()" style="background:#333; color:white; border:none; padding:5px 15px; cursor:pointer;">🏠 القائمة الرئيسية</button>
-        <h3 id="status">دور اللاعب: الأبيض</h3>
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3 id="chess-turn">دور اللاعب: الأبيض</h3></div>
         <div id="chess-board"></div>
-        <p>اضغط على القطعة ثم على المربع الذي تريد الانتقال إليه</p>
+    </div>
+
+    <div id="mafia-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🕵️ نظام المافيا المطور</h3></div>
+        <div id="m-setup">
+            <input type="text" id="mIn" placeholder="اسم اللاعب...">
+            <button class="add-btn" onclick="addM()">+</button>
+            <div id="mList" style="margin:10px; color:#aaa;"></div>
+            <button class="menu-btn" onclick="startM()">توزيع الأدوار + الراوي</button>
+        </div>
+        <div id="m-board" class="card-grid"></div>
+    </div>
+
+    <div id="spy-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div class="header"><h3>🔍 لعبة الجاسوس (الأماكن)</h3></div>
+        <div id="s-setup">
+            <input type="text" id="sIn" placeholder="اسم اللاعب...">
+            <button class="add-btn" onclick="addS()">+</button>
+            <div id="sList" style="margin:10px; color:#aaa;"></div>
+            <button class="menu-btn" onclick="startS()">بدء توزيع الأماكن</button>
+        </div>
+        <div id="s-board" class="card-grid"></div>
     </div>
 
     <script>
-        const boardElement = document.getElementById('chess-board');
-        const statusElement = document.getElementById('status');
-        let selectedSquare = null;
+        let mPlayers = [];
+        let sPlayers = [];
+        let selectedSq = null;
         let turn = 'white';
 
-        // قطع الشطرنج (رموز نصية لا تحتاج لروابط صور)
-        const pieces = {
-            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-        };
+        function showGame(type) {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById(type + '-section').classList.remove('hidden');
+            if(type === 'chess') createChess();
+        }
 
-        const initialBoard = [
-            ['r','n','b','q','k','b','n','r'],
-            ['p','p','p','p','p','p','p','p'],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['P','P','P','P','P','P','P','P'],
-            ['R','N','B','Q','K','B','N','R']
+        // --- شطرنج أحمد ---
+        const pieces = { 'r':'♜','n':'♞','b':'♝','q':'♛','k':'♚','p':'♟','R':'♖','N':'♘','B':'♗','Q':'♕','K':'♔','P':'♙' };
+        let boardState = [
+            ['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],
+            ['','','','','','','',''],['','','','','','','',''],
+            ['','','','','','','',''],['','','','','','','',''],
+            ['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']
         ];
 
-        function openChess() {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('chess-section').classList.remove('hidden');
-            createBoard();
-        }
-
-        function createBoard() {
-            boardElement.innerHTML = '';
-            for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    const square = document.createElement('div');
-                    square.className = `square ${(r + c) % 2 === 0 ? 'white-sq' : 'black-sq'}`;
-                    square.dataset.row = r;
-                    square.dataset.col = c;
-                    square.innerText = pieces[initialBoard[r][c]] || '';
-                    square.onclick = () => handleSquareClick(r, c, square);
-                    boardElement.appendChild(square);
+        function createChess() {
+            const b = document.getElementById('chess-board');
+            b.innerHTML = '';
+            for(let r=0; r<8; r++) {
+                for(let c=0; c<8; c++) {
+                    const sq = document.createElement('div');
+                    sq.className = `square ${(r+c)%2===0?'white-sq':'black-sq'}`;
+                    sq.innerText = pieces[boardState[r][c]] || '';
+                    sq.onclick = () => {
+                        if(selectedSq) {
+                            boardState[r][c] = boardState[selectedSq.r][selectedSq.c];
+                            boardState[selectedSq.r][selectedSq.c] = '';
+                            selectedSq = null;
+                            turn = (turn==='white'?'black':'white');
+                            document.getElementById('chess-turn').innerText = `دور اللاعب: ${turn==='white'?'الأبيض':'الأسود'}`;
+                            createChess();
+                        } else if(boardState[r][c]) {
+                            selectedSq = {r, c};
+                            sq.classList.add('selected');
+                        }
+                    };
+                    b.appendChild(sq);
                 }
             }
         }
 
-        function handleSquareClick(r, c, el) {
-            if (selectedSquare) {
-                // تنفيذ الحركة
-                const prevR = selectedSquare.row;
-                const prevC = selectedSquare.col;
-                const piece = initialBoard[prevR][prevC];
+        // --- مافيا أحمد ---
+        function addM() { let v = document.getElementById('mIn').value; if(v){ mPlayers.push(v); document.getElementById('mList').innerText = mPlayers.join(" - "); document.getElementById('mIn').value = ""; } }
+        function startM() {
+            if(mPlayers.length < 4) return alert("لازم 4 لاعبين!");
+            let rIdx = Math.floor(Math.random()*mPlayers.length);
+            let narrator = mPlayers[rIdx];
+            let actives = mPlayers.filter((_,i)=>i!==rIdx);
+            let roles = [];
+            // تطبيق قانون أحمد
+            if(actives.length >= 10) roles.push("مافيا قتل 🔪", "مافيا تسكيت 🤫");
+            else roles.push("مافيا قتل 💀");
+            roles.push("دكتور 💉");
+            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
+            roles.sort(()=>Math.random()-0.5);
+            
+            document.getElementById('m-setup').innerHTML = `<div style="background:#0055ff; color:white; padding:10px; border-radius:10px; margin-bottom:10px;">🎤 الراوي: ${narrator}</div>`;
+            actives.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `<strong>${p}</strong><span class="role-text">${roles[i]}</span>`;
+                card.onclick = function() {
+                    this.querySelector('strong').style.display = 'none';
+                    this.querySelector('.role-text').style.display = 'block';
+                    setTimeout(()=>{ this.classList.add('revealed'); this.querySelector('.role-text').innerText = "تمت الرؤية ✅"; }, 2000);
+                };
+                document.getElementById('m-board').appendChild(card);
+            });
+        }
 
-                initialBoard[r][c] = piece;
-                initialBoard[prevR][prevC] = '';
-                
-                selectedSquare = null;
-                turn = (turn === 'white' ? 'black' : 'white');
-                statusElement.innerText = `دور اللاعب: ${turn === 'white' ? 'الأبيض' : 'الأسود'}`;
-                createBoard();
-            } else {
-                // اختيار قطعة
-                if (initialBoard[r][c] !== '') {
-                    selectedSquare = { row: r, col: c };
-                    el.classList.add('selected');
-                }
-            }
+        // --- جاسوس أحمد ---
+        const places = ["مطار", "مستشفى", "غابة", "فضاء", "سجن", "مدرسة", "مطعم", "عرس", "صحراء", "مختبر", "بنك", "سفينة"];
+        function addS() { let v = document.getElementById('sIn').value; if(v){ sPlayers.push(v); document.getElementById('sList').innerText = sPlayers.join(" - "); document.getElementById('sIn').value = ""; } }
+        function startS() {
+            if(sPlayers.length < 3) return alert("لازم 3 لاعبين!");
+            let pl = places[Math.floor(Math.random()*places.length)];
+            let sIdx = Math.floor(Math.random()*sPlayers.length);
+            document.getElementById('s-setup').classList.add('hidden');
+            sPlayers.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                let role = (i===sIdx) ? "أنت الجاسوس 🕵️" : pl;
+                card.innerHTML = `<strong>${p}</strong><span class="role-text" style="color:#0f0">${role}</span>`;
+                card.onclick = function() {
+                    this.querySelector('strong').style.display = 'none';
+                    this.querySelector('.role-text').style.display = 'block';
+                    setTimeout(()=>{ this.classList.add('revealed'); this.querySelector('.role-text').innerText = "تمت الرؤية ✅"; }, 2000);
+                };
+                document.getElementById('s-board').appendChild(card);
+            });
         }
     </script>
 </body>
