@@ -1,598 +1,88 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - النسخة المعدلة</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
-    <style>
-        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
-        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
-        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #222; border-radius: 8px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        img[class^="piece"] { border-radius: 50% !important; border: 1px solid white !important; }
-        .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
-        .role-display { display: none; color: #ff0000; font-size: 1.2em; font-weight: bold; margin-top: 10px; }
-        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; }
-        .hidden { display: none; }
-        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
-        .locked { pointer-events: none; opacity: 0.4; }
-
-        .online-mafia-container {
-            background: #0a0f1e;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-        .room-code-box {
-            background: #000000aa;
-            padding: 12px;
-            text-align: center;
-            border-radius: 40px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #ffd966;
-            font-family: monospace;
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .copy-btn {
-            background: #2c6e2c;
-            padding: 8px 15px;
-            width: auto;
-            font-size: 0.9rem;
-        }
-        .player-list-online {
-            background: #0c0f16;
-            border-radius: 20px;
-            padding: 10px;
-            margin: 10px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .player-badge {
-            background: #1f212b;
-            margin: 6px 0;
-            padding: 8px 12px;
-            border-radius: 40px;
-            display: flex;
-            justify-content: space-between;
-            border-right: 4px solid #da291c;
-            color: #f0f0f0;
-        }
-        .role-card-online {
-            background: #171f2b;
-            border-radius: 36px;
-            padding: 20px;
-            margin: 15px 0;
-            border: 1px solid #da291c;
-            text-align: center;
-        }
-        .role-secret {
-            background: #000000aa;
-            padding: 15px;
-            border-radius: 32px;
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-        .hidden-role {
-            filter: blur(5px);
-        }
-        .flex-btns {
-            display: flex;
-            gap: 10px;
-        }
-        .secondary-btn {
-            background: #2c2f36;
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2e7d32;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            z-index: 999;
-            animation: fadeOut 2s ease forwards;
-        }
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
-        }
-        .waiting-msg {
-            text-align: center;
-            color: #ffaa44;
-            padding: 20px;
-        }
-    </style>
+<html>
+<head><meta charset="UTF-8"><title>مافيا أون لاين - نسخة مبسطة</title>
+<style>
+body{background:#000;color:#0f0;font-family:Arial;padding:20px;text-align:center}
+button{background:#da291c;color:#fff;padding:12px;margin:5px;border:none;border-radius:10px;cursor:pointer}
+input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;border:1px solid #da291c}
+.hidden{display:none}
+.player-item{background:#222;padding:8px;margin:5px;border-radius:10px}
+</style>
 </head>
 <body>
-
-    <div id="main-menu">
-        <h1 style="color:#da291c;">AHMED PRO SYSTEM</h1>
-        <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
-        <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
-        <button class="menu-btn" onclick="showGame('mafiaOnline')">🌐 مافيا أون لاين (متعدد اللاعبين)</button>
-        <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس</button>
-    </div>
-
-    <div id="chess-section" class="hidden">
-        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🏆 شطرنج أحمد المحترف 🏆</h3><div id="my-id" style="font-size:0.7em;">جاري الاتصال...</div></div>
-        <div id="board"></div>
-        <div style="width:100%; max-width:400px; margin-top:15px;">
-            <input type="text" id="friendId" placeholder="ID الخصم">
-            <button onclick="alert('طلب التحدي قيد التطوير')">إرسال طلب تحدي</button>
+<div id="app">
+    <h1>🌐 مافيا أون لاين</h1>
+    <div id="lobby">
+        <input type="text" id="name" placeholder="اسمك">
+        <button id="create">🔪 إنشاء غرفة</button>
+        <button id="join">🚪 انضمام</button>
+        <div id="joinBox" class="hidden">
+            <input type="text" id="hostId" placeholder="معرف المضيف">
+            <button id="confirmJoin">دخول</button>
         </div>
     </div>
-
-    <div id="mafia-section" class="hidden">
-        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🕵️‍♂️ نظام المافيا المطور</h3></div>
-        <div id="mafia-setup" style="width:100%; max-width:400px;">
-            <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
-            <button onclick="addMafiaPlayer()">إضافة لاعب</button>
-            <div id="mafia-preview" style="margin:10px; color:#888;"></div>
-            <button style="background:green;" onclick="startMafiaDist()">توزيع الأدوار + الراوي</button>
-        </div>
-        <div id="mafia-board" class="hidden" style="width:100%; max-width:400px;">
-            <div id="narrator-name"></div>
-            <div id="mafia-cards-container"></div>
-        </div>
+    <div id="room" class="hidden">
+        <div>🆔 معرفك: <span id="myId"></span> <button id="copyBtn">نسخ</button></div>
+        <div id="players"></div>
+        <button id="startGame">بدء اللعبة (4+ لاعبين)</button>
+        <button id="leave">مغادرة</button>
     </div>
-
-    <!-- مافيا أون لاين -->
-    <div id="mafiaOnline-section" class="hidden">
-        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🌐 مافيا أون لاين - العب مع أصدقائك</h3></div>
-        
-        <div id="onlineLobby" class="online-mafia-container">
-            <input type="text" id="onlinePlayerName" placeholder="اسمك في اللعبة..." style="margin-bottom:15px;">
-            <div class="flex-btns">
-                <button id="createOnlineGameBtn">🔪 إنشاء غرفة جديدة</button>
-                <button id="joinOnlineGameBtn" class="secondary-btn">🚪 انضمام لغرفة</button>
-            </div>
-            <div id="onlineJoinSection" class="hidden" style="margin-top:15px;">
-                <input type="text" id="hostPeerIdInput" placeholder="معرف المضيف (Peer ID)">
-                <button id="confirmOnlineJoinBtn">دخول الغرفة</button>
-            </div>
-        </div>
-
-        <div id="onlineRoom" class="hidden online-mafia-container">
-            <div class="room-code-box">
-                <span>🆔 معرفك: <strong id="myPeerIdDisplay">---</strong></span>
-                <button id="copyPeerIdBtn" class="copy-btn">📋 نسخ</button>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin:10px 0;">
-                <span>👥 اللاعبون: <span id="onlinePlayerCount">0</span></span>
-                <span id="hostStatusSpan">⭐ مضيف</span>
-            </div>
-            <div id="onlinePlayerList" class="player-list-online"></div>
-            <div class="flex-btns">
-                <button id="startOnlineGameBtn">🎬 بدء اللعبة (4+ لاعبين)</button>
-                <button id="leaveOnlineRoomBtn" style="background:#3a2a2a;">🚪 مغادرة</button>
-            </div>
-        </div>
-
-        <div id="onlineGameplay" class="hidden online-mafia-container">
-            <div id="onlineNarratorMsg" style="background:#0055ff; padding:12px; border-radius:12px; margin-bottom:15px; text-align:center; color:white;">
-                🎙️ الراوي الآلي: اضغط على بطاقتك لكشف دورك
-            </div>
-            <div id="onlineRolesContainer"></div>
-            <button id="resetOnlineGameBtn" class="secondary-btn" style="margin-top:15px;">🏠 العودة للقائمة</button>
-        </div>
+    <div id="game" class="hidden">
+        <div id="phase"></div>
+        <div id="roleCard"></div>
+        <div id="actions"></div>
+        <button id="reset">رجوع</button>
     </div>
+</div>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script>
+let peer, conns=[], players=[], isHost=false, myId, myName, gameStarted=false, myRole;
+let lobby=document.getElementById('lobby'), roomDiv=document.getElementById('room'), gameDiv=document.getElementById('game');
+let nameInput=document.getElementById('name'), playersDiv=document.getElementById('players'), myIdSpan=document.getElementById('myId');
 
-    <div id="spy-section" class="hidden">
-        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-        <div class="header"><h3>🔍 لعبة الجاسوس</h3></div>
-        <div id="spy-setup" style="width:100%; max-width:400px;">
-            <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
-            <button onclick="addSpyPlayer()">إضافة لاعب</button>
-            <div id="spy-preview" style="margin:10px; color:#888;"></div>
-            <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
-        </div>
-        <div id="spy-board" class="hidden" style="width:100%; max-width:400px;">
-            <div id="spy-cards-container"></div>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-
-    <script>
-        // ========== الكود الأصلي ==========
-        let isLocked = false;
-        let mPlayers = [];
-        let sPlayers = [];
-        
-        const spyPlaces = [
-            "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "سوق", "حديقة", "مطار", "محطة قطار", 
-            "سفينة", "مخيم", "قلعة", "مسرح", "سينما", "ملعب كورة", "مكتبة", "متحف", "شاطئ", "بنك", 
-            "مركز شرطة", "إطفائية", "جامعة", "مختبر", "فضاء", "تحت البحر", "منجم", "صحراء", "قطب متجمد", "مزرعة", 
-            "قصر", "سجن", "ورشة", "صيدلية", "عيادة أسنان", "نادي رياضي", "صالون حلاقة", "مطعم شاورما", "منسف", "عرس", 
-            "جنازة", "مصنع", "شركة", "قاعدة عسكرية", "برج إيفل", "الأهرامات", "مول", "سوبر ماركت", "محطة بنزين", "غرفة نوم"
-        ];
-
-        function showGame(type) {
-            $('#main-menu').hide();
-            if(type === 'chess') { $('#chess-section').removeClass('hidden'); initChess(); }
-            else if(type === 'mafia') { $('#mafia-section').removeClass('hidden'); }
-            else if(type === 'mafiaOnline') { $('#mafiaOnline-section').removeClass('hidden'); initOnlineMafia(); }
-            else if(type === 'spy') { $('#spy-section').removeClass('hidden'); }
-        }
-
-        var board = null, game = new Chess(), peer = null;
-        var pics = {
-            wK: 'https://i.postimg.cc/m27HgYdg/king-black.jpg', wQ: 'https://i.postimg.cc/CxLfkvYW/813f791d-4209-474a-b3ae-32306e3d2632.jpg',
-            wN: 'https://i.postimg.cc/d31K4Kx9/download.jpg', wB: 'https://i.postimg.cc/jjn9q4WQ/download.jpg',
-            bP: 'https://i.postimg.cc/Nj9dgQFv/download.jpg', bK: 'https://i.postimg.cc/T19B8NZh/cbbe2978-b5df-45c8-ad43-05cfb6f57edb.jpg',
-            bQ: 'https://i.postimg.cc/HsbtBvqn/ca232a37-372a-45be-b758-6e90cd5f70a1.jpg', bN: 'https://i.postimg.cc/DwFRgXMy/5f98a3d6-1c49-4903-a9c0-8a1b8a2de568.jpg',
-            bB: 'https://i.postimg.cc/RVRx2dfm/download.jpg', wP: 'https://chessboardjs.com/img/chesspieces/wikipedia/wP.png'
-        };
-
-        function initChess() {
-            let id = "Ahmed_" + Math.floor(1000 + Math.random() * 9000);
-            peer = new Peer(id);
-            peer.on('open', (i) => { 
-                $('#my-id').text("ID: " + i); 
-                board = Chessboard('board', {
-                    draggable: true, position: 'start', 
-                    pieceTheme: (p) => pics[p] || 'https://chessboardjs.com/img/chesspieces/wikipedia/' + p + '.png'
-                }); 
-            });
-        }
-
-        function addMafiaPlayer() {
-            let n = $('#mafiaPlayerName').val().trim();
-            if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
-        }
-
-        function startMafiaDist() {
-            if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
-            let narratorIdx = Math.floor(Math.random() * mPlayers.length);
-            let narratorName = mPlayers[narratorIdx];
-            let actives = mPlayers.filter((_, i) => i !== narratorIdx);
-            let roles = [];
-            if (actives.length >= 10) { roles.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); } 
-            else { roles.push("مافيا القتل 💀"); }
-            roles.push("دكتور 💉");
-            while(roles.length < actives.length) roles.push("مواطن 👨‍🌾");
-            roles.sort(() => Math.random() - 0.5);
-
-            $('#mafia-setup').hide();
-            $('#mafia-board').removeClass('hidden');
-            $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}</div>`);
-            
-            let container = $('#mafia-cards-container');
-            container.empty();
-            actives.forEach((p, i) => {
-                let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
-                card.click(function() {
-                    if(isLocked) return;
-                    isLocked = true; $('.mafia-card').addClass('locked'); $(this).removeClass('locked');
-                    $(`#mpn-${i}`).hide(); $(`#mrl-${i}`).fadeIn();
-                    setTimeout(() => { 
-                        $(`#mc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { $(`#mc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.mafia-card').removeClass('locked'); }, 500); 
-                    }, 3000);
-                });
-                container.append(card);
-            });
-        }
-
-        function addSpyPlayer() {
-            let n = $('#spyPlayerName').val().trim();
-            if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
-        }
-
-        function startSpyDist() {
-            if(sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
-            let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-            let spyIdx = Math.floor(Math.random() * sPlayers.length);
-            let roles = sPlayers.map((_, i) => (i === spyIdx ? "أنت الجاسوس 🕵️" : place));
-
-            $('#spy-setup').hide();
-            $('#spy-board').removeClass('hidden');
-            let container = $('#spy-cards-container');
-            container.empty();
-            sPlayers.forEach((p, i) => {
-                let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
-                card.click(function() {
-                    if(isLocked) return;
-                    isLocked = true; $('.spy-card').addClass('locked'); $(this).removeClass('locked');
-                    $(`#spn-${i}`).hide(); $(`#srl-${i}`).fadeIn();
-                    setTimeout(() => { 
-                        $(`#sc-${i}`).addClass('fade-out'); 
-                        setTimeout(() => { $(`#sc-${i}`).css('visibility', 'hidden'); isLocked = false; $('.spy-card').removeClass('locked'); }, 500); 
-                    }, 3000);
-                });
-                container.append(card);
-            });
-        }
-
-        // ========== مافيا أون لاين (نسخة مصححة) ==========
-        let onlinePeer = null;
-        let onlineConnections = [];
-        let onlinePlayers = [];
-        let isHostOnline = false;
-        let myOnlineName = "";
-        let myOnlinePeerId = null;
-        let onlineGameStarted = false;
-        let myOnlineRole = null;
-
-        function initOnlineMafia() {
-            $('#onlineLobby').removeClass('hidden');
-            $('#onlineRoom').addClass('hidden');
-            $('#onlineGameplay').addClass('hidden');
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                let toast = $('<div class="toast-msg">✅ تم نسخ المعرف: ' + text + '</div>');
-                $('body').append(toast);
-                setTimeout(() => toast.remove(), 2000);
-            });
-        }
-
-        // إنشاء غرفة (مضيف)
-        $('#createOnlineGameBtn').on('click', function() {
-            let name = $('#onlinePlayerName').val().trim();
-            if(!name) { alert("أدخل اسمك أولاً"); return; }
-            myOnlineName = name;
-            onlinePeer = new Peer();
-            onlinePeer.on('open', (id) => {
-                myOnlinePeerId = id;
-                isHostOnline = true;
-                onlinePlayers = [{ peerId: id, name: name, isHost: true }];
-                $('#myPeerIdDisplay').text(id);
-                updateOnlineRoomUI();
-                $('#onlineLobby').addClass('hidden');
-                $('#onlineRoom').removeClass('hidden');
-                
-                $('#copyPeerIdBtn').off('click').on('click', function() {
-                    copyToClipboard(id);
-                });
-                
-                onlinePeer.on('connection', (conn) => {
-                    setupOnlineConnection(conn);
-                });
-            });
-            onlinePeer.on('error', (err) => { console.error(err); alert("خطأ في الاتصال"); });
-        });
-
-        // انضمام لغرفة
-        $('#joinOnlineGameBtn').on('click', function() {
-            let name = $('#onlinePlayerName').val().trim();
-            if(!name) { alert("أدخل اسمك أولاً"); return; }
-            myOnlineName = name;
-            $('#onlineJoinSection').removeClass('hidden');
-        });
-
-        $('#confirmOnlineJoinBtn').on('click', function() {
-            let hostId = $('#hostPeerIdInput').val().trim();
-            if(!hostId) { alert("أدخل معرف المضيف"); return; }
-            onlinePeer = new Peer();
-            onlinePeer.on('open', (id) => {
-                myOnlinePeerId = id;
-                isHostOnline = false;
-                onlinePlayers = [];
-                $('#myPeerIdDisplay').text(id);
-                $('#onlineLobby').addClass('hidden');
-                $('#onlineRoom').removeClass('hidden');
-                
-                let conn = onlinePeer.connect(hostId);
-                setupOnlineConnection(conn);
-            });
-        });
-
-        function setupOnlineConnection(conn) {
-            onlineConnections.push(conn);
-            conn.on('open', () => {
-                if(!isHostOnline) {
-                    // اللاعب العادي يرسل نفسه للمضيف
-                    conn.send({ 
-                        type: 'new-player', 
-                        player: { peerId: myOnlinePeerId, name: myOnlineName } 
-                    });
-                }
-            });
-            conn.on('data', (data) => handleOnlineData(conn, data));
-            conn.on('close', () => {
-                onlineConnections = onlineConnections.filter(c => c !== conn);
-                if(!onlineGameStarted && isHostOnline) {
-                    // إزالة اللاعب المنقطع من القائمة
-                    let disconnectedPeer = conn.peer;
-                    onlinePlayers = onlinePlayers.filter(p => p.peerId !== disconnectedPeer);
-                    broadcastOnlineToAll({ type: 'sync-players', players: onlinePlayers });
-                    updateOnlineRoomUI();
-                }
-            });
-        }
-
-        function handleOnlineData(conn, data) {
-            if(data.type === 'new-player' && isHostOnline) {
-                let exists = onlinePlayers.some(p => p.peerId === data.player.peerId);
-                if(!exists) {
-                    onlinePlayers.push(data.player);
-                    // إرسال القائمة المحدثة للجميع
-                    broadcastOnlineToAll({ type: 'sync-players', players: onlinePlayers });
-                    updateOnlineRoomUI();
-                }
-            }
-            else if(data.type === 'sync-players') {
-                onlinePlayers = data.players;
-                updateOnlineRoomUI();
-            }
-            else if(data.type === 'start-game' && !isHostOnline) {
-                // اللاعب العادي يستلم دوره ويبدأ اللعب
-                myOnlineRole = data.myRole;
-                startOnlineGameWithRoles();
-            }
-            else if(data.type === 'request-start' && isHostOnline) {
-                // طلب بدء اللعبة من المضيف
-                startGameDistribution();
-            }
-        }
-
-        function broadcastOnlineToAll(msg, excludeId = null) {
-            onlineConnections.forEach(conn => {
-                if(conn.open && conn.peer !== excludeId) {
-                    conn.send(msg);
-                }
-            });
-        }
-
-        function updateOnlineRoomUI() {
-            let container = $('#onlinePlayerList');
-            container.empty();
-            onlinePlayers.forEach(p => {
-                let div = $('<div class="player-badge"></div>');
-                div.html(`<span>${escapeHtml(p.name)}</span><span>${p.peerId === myOnlinePeerId ? '(أنت)' : ''} ${p.isHost ? '👑 مضيف' : ''}</span>`);
-                container.append(div);
-            });
-            $('#onlinePlayerCount').text(onlinePlayers.length);
-            if(isHostOnline) {
-                $('#hostStatusSpan').text('⭐ أنت المضيف').css('color', '#da291c');
-                $('#startOnlineGameBtn').show();
-            } else {
-                $('#hostStatusSpan').text('🚶 لاعب').css('color', '#aaa');
-                $('#startOnlineGameBtn').hide();
-            }
-        }
-
-        // توزيع الأدوار وبدء اللعبة (للمضيف)
-        function startGameDistribution() {
-            if(!isHostOnline) return;
-            if(onlinePlayers.length < 4) {
-                alert("يحتاج 4 لاعبين على الأقل لبدء المافيا!");
-                return;
-            }
-            
-            // توزيع الأدوار حسب قانون أحمد
-            let rolesList = [];
-            let playerCount = onlinePlayers.length;
-            if(playerCount >= 10) { rolesList.push("مافيا القتل 🔪", "مافيا التسكيت 🤫"); }
-            else { rolesList.push("مافيا القتل 💀"); }
-            rolesList.push("دكتور 💉");
-            while(rolesList.length < playerCount) rolesList.push("مواطن 👨‍🌾");
-            
-            // خلط الأدوار
-            for(let i = rolesList.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [rolesList[i], rolesList[j]] = [rolesList[j], rolesList[i]];
-            }
-            
-            // إرسال لكل لاعب دوره
-            onlinePlayers.forEach((player, idx) => {
-                let role = rolesList[idx];
-                let connTarget = onlineConnections.find(c => c.peer === player.peerId);
-                if(connTarget && connTarget.open) {
-                    connTarget.send({ type: 'start-game', myRole: role });
-                }
-                if(player.peerId === myOnlinePeerId) {
-                    myOnlineRole = role;
-                }
-            });
-            
-            // بدء اللعبة للمضيف
-            startOnlineGameWithRoles();
-        }
-
-        function startOnlineGameWithRoles() {
-            onlineGameStarted = true;
-            $('#onlineRoom').addClass('hidden');
-            $('#onlineGameplay').removeClass('hidden');
-            renderOnlineRoleCard();
-        }
-
-        function renderOnlineRoleCard() {
-            let container = $('#onlineRolesContainer');
-            container.empty();
-            
-            // عرض اسم اللاعب ودوره
-            let roleText = "";
-            if(myOnlineRole === "مافيا القتل 🔪" || myOnlineRole === "مافيا التسكيت 🤫") {
-                roleText = "🔪 مافيا - اطلع مع المافيا ليلاً";
-            } else if(myOnlineRole === "دكتور 💉") {
-                roleText = "💉 دكتور - تقدر تنقذ شخص كل ليلة";
-            } else {
-                roleText = "👨‍🌾 مواطن - صوت مع العدالة";
-            }
-            
-            let card = $(`
-                <div class="role-card-online">
-                    <strong style="font-size:1.3rem;">${escapeHtml(myOnlineName)}</strong>
-                    <div class="role-secret hidden-role" id="onlineSecretRole">❓ دورك مخفي ❓</div>
-                    <button class="reveal-online-btn" style="margin-top:10px; background:#da291c; padding:10px;">🗝️ كشف دوري (مرة واحدة)</button>
-                    <div style="margin-top:10px; font-size:0.8rem; color:#aaa;">${roleText}</div>
-                </div>
-            `);
-            container.append(card);
-            
-            let revealed = false;
-            card.find('.reveal-online-btn').on('click', function() {
-                if(revealed) {
-                    $('#onlineNarratorMsg').text("🎭 لقد كشفت دورك مسبقاً!");
-                    return;
-                }
-                revealed = true;
-                let secretDiv = card.find('#onlineSecretRole');
-                secretDiv.removeClass('hidden-role');
-                secretDiv.html(`🎭 دورك الحقيقي: ${myOnlineRole}`);
-                $(this).prop('disabled', true).text('✓ تم الكشف');
-                $('#onlineNarratorMsg').text(`🎙️ الراوي: ${myOnlineName} عرف دوره. استعدوا للعبة!`);
-            });
-        }
-
-        // زر بدء اللعبة (للمضيف فقط)
-        $('#startOnlineGameBtn').on('click', function() {
-            if(isHostOnline) {
-                startGameDistribution();
-            }
-        });
-
-        $('#leaveOnlineRoomBtn').on('click', function() {
-            if(onlinePeer) {
-                if(isHostOnline && !onlineGameStarted) {
-                    broadcastOnlineToAll({ type: 'player-leave', peerId: myOnlinePeerId });
-                }
-                onlinePeer.destroy();
-            }
-            onlineConnections = [];
-            onlinePlayers = [];
-            onlineGameStarted = false;
-            location.reload();
-        });
-
-        $('#resetOnlineGameBtn').on('click', function() {
-            location.reload();
-        });
-
-        function escapeHtml(str) {
-            if(!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if(m === '&') return '&amp;';
-                if(m === '<') return '&lt;';
-                if(m === '>') return '&gt;';
-                return m;
-            });
-        }
-    </script>
+document.getElementById('create').onclick=()=>{
+    myName=nameInput.value.trim(); if(!myName) return alert("ادخل اسمك");
+    peer=new Peer(); peer.on('open',id=>{myId=id; myIdSpan.innerText=id; isHost=true; players=[{id,name:myName,alive:true}]; updatePlayers(); lobby.classList.add('hidden'); roomDiv.classList.remove('hidden');
+        peer.on('connection',c=>{conns.push(c); c.on('data',d=>handleData(c,d)); c.on('close',()=>{conns=conns.filter(x=>x!==c); if(!gameStarted&&isHost){players=players.filter(p=>p.id!==c.peer); broadcast('sync',{players}); updatePlayers();}});});
+    });
+    document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(myId); alert("تم النسخ");};
+};
+document.getElementById('join').onclick=()=>{document.getElementById('joinBox').classList.remove('hidden');};
+document.getElementById('confirmJoin').onclick=()=>{
+    let hostId=document.getElementById('hostId').value.trim(); if(!hostId) return;
+    myName=nameInput.value.trim(); if(!myName) return;
+    peer=new Peer(); peer.on('open',id=>{myId=id; myIdSpan.innerText=id; isHost=false; players=[]; lobby.classList.add('hidden'); roomDiv.classList.remove('hidden');
+        let conn=peer.connect(hostId); conns.push(conn); conn.on('data',d=>handleData(conn,d));
+        conn.on('open',()=>{conn.send({type:'join',player:{id:myId,name:myName}});});
+    });
+};
+function handleData(conn,data){
+    if(data.type=='join' && isHost){ if(!players.find(p=>p.id==data.player.id)) players.push(data.player); broadcast('sync',{players}); updatePlayers();}
+    if(data.type=='sync'){ players=data.players; updatePlayers();}
+    if(data.type=='start' && !isHost){ myRole=data.role; startGame();}
+    if(data.type=='roles' && !isHost){}
+}
+function broadcast(type,data){conns.forEach(c=>{if(c.open)c.send({type,...data});});}
+function updatePlayers(){
+    playersDiv.innerHTML=players.map(p=>`<div class="player-item">${p.name} ${p.id==myId?'(أنت)':''} ${p.isHost?'👑':''}</div>`).join('');
+    document.getElementById('startGame').style.display=isHost?'block':'none';
+}
+document.getElementById('startGame').onclick=()=>{
+    if(!isHost) return; if(players.length<4){alert("لازم 4 لاعبين"); return;}
+    let roles=[]; if(players.length>=10) roles.push("مافيا","مافيا"); else roles.push("مافיא"); roles.push("دكتور"); while(roles.length<players.length) roles.push("مواطن");
+    for(let i=roles.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[roles[i],roles[j]]=[roles[j],roles[i]];}
+    players.forEach((p,idx)=>{let role=roles[idx]; let c=conns.find(x=>x.peer==p.id); if(c) c.send({type:'start',role}); if(p.id==myId) myRole=role;});
+    startGame();
+};
+function startGame(){
+    gameStarted=true; roomDiv.classList.add('hidden'); gameDiv.classList.remove('hidden');
+    document.getElementById('phase').innerHTML='<div style="background:#ff6600;padding:10px;">🎭 دورك: '+(myRole||'?')+'</div>';
+    document.getElementById('roleCard').innerHTML=`<div style="background:#222;padding:20px;border-radius:15px;"><strong>${myName}</strong><div id="secret" style="background:#000;padding:15px;margin:10px;filter:blur(5px)">❓ دورك مخفي</div><button id="reveal">كشف دوري</button></div>`;
+    let revealed=false;
+    document.getElementById('reveal').onclick=()=>{if(revealed)return; revealed=true; document.getElementById('secret').style.filter='none'; document.getElementById('secret').innerHTML=`🎭 انت ${myRole}`;};
+}
+document.getElementById('leave').onclick=()=>location.reload();
+document.getElementById('reset').onclick=()=>location.reload();
+</script>
 </body>
 </html>
