@@ -1,233 +1,84 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>مافيا أون لاين - نفس الجهاز</title>
+<head><meta charset="UTF-8"><title>مافيا أون لاين - أونلاين</title>
 <style>
 body{background:#000;color:#0f0;font-family:Arial;padding:20px;text-align:center}
 button{background:#da291c;color:#fff;padding:12px;margin:5px;border:none;border-radius:10px;cursor:pointer}
 input{padding:12px;margin:5px;border-radius:10px;background:#111;color:#0f0;border:1px solid #da291c}
 .hidden{display:none}
 .player-item{background:#222;padding:8px;margin:5px;border-radius:10px}
-.copy-area{display:flex;gap:10px;align-items:center;justify-content:center;margin:10px 0}
-.copy-area span{background:#111;padding:10px;border-radius:8px;font-family:monospace;font-size:1.2rem;letter-spacing:2px}
 </style>
 </head>
 <body>
 <div id="app">
-    <h1 style="color:#da291c;">🌐 مافيا أون لاين - نفس الجهاز</h1>
+    <h1 style="color:#da291c;">🌐 مافيا أون لاين</h1>
     <div id="lobby">
         <input type="text" id="name" placeholder="اسمك">
-        <button id="create">🔪 إنشاء غرفة (تاب 1)</button>
-        <button id="join">🚪 انضمام للغرفة (تاب 2/3/4)</button>
+        <button id="create">🔪 إنشاء غرفة</button>
+        <button id="join">🚪 انضمام</button>
+        <div id="joinBox" class="hidden">
+            <input type="text" id="hostId" placeholder="معرف المضيف">
+            <button id="confirmJoin">دخول</button>
+        </div>
     </div>
     <div id="room" class="hidden">
-        <div style="background:#111;padding:15px;border-radius:10px;margin:10px">
-            <div style="margin-bottom:8px">📋 رمز الغرفة (انسخه للتباب الأخرى):</div>
-            <div class="copy-area">
-                <span id="roomCode">------</span>
-                <button id="copyBtn" style="width:auto;padding:8px 20px">📋 نسخ</button>
-            </div>
-        </div>
+        <div>🆔 معرفك: <span id="myId"></span> <button id="copyBtn">نسخ</button></div>
         <div id="players"></div>
-        <div id="playerCount" style="margin:5px">👥 0 لاعب</div>
-        <button id="startGame" style="background:#2e7d32">🎬 بدء اللعبة (4+ لاعبين)</button>
-        <button id="leave" style="background:#3a2a2a">🚪 مغادرة</button>
+        <button id="startGame">بدء اللعبة (4+ لاعبين)</button>
+        <button id="leave">مغادرة</button>
     </div>
     <div id="game" class="hidden">
         <div id="phase"></div>
         <div id="roleCard"></div>
-        <button id="reset" style="background:#2c2f36;margin-top:15px">🏠 رجوع</button>
+        <button id="reset">رجوع</button>
     </div>
 </div>
-
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 <script>
-// ========== نظام localStorage للمزامنة بين التبابين ==========
-let players = [];
-let myName = "";
-let myId = Math.random().toString(36).substr(2, 8);
-let isHost = false;
-let roomCode = null;
-let gameStarted = false;
-let myRole = null;
+let peer, conns=[], players=[], isHost=false, myId, myName, gameStarted=false, myRole;
+let lobby=document.getElementById('lobby'), roomDiv=document.getElementById('room'), gameDiv=document.getElementById('game');
+let nameInput=document.getElementById('name'), playersDiv=document.getElementById('players'), myIdSpan=document.getElementById('myId');
 
-let lobby = document.getElementById('lobby');
-let roomDiv = document.getElementById('room');
-let gameDiv = document.getElementById('game');
-let nameInput = document.getElementById('name');
-let playersDiv = document.getElementById('players');
-let roomCodeSpan = document.getElementById('roomCode');
-
-// ========== إنشاء غرفة (المضيف) ==========
-document.getElementById('create').onclick = () => {
-    myName = nameInput.value.trim();
-    if (!myName) return alert("ادخل اسمك");
-    
-    roomCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-    isHost = true;
-    players = [{ id: myId, name: myName, isHost: true, alive: true, role: null }];
-    
-    // حفظ في localStorage
-    localStorage.setItem('mafia_room_' + roomCode, JSON.stringify({
-        host: myId,
-        players: players,
-        gameStarted: false,
-        roles: null
-    }));
-    localStorage.setItem('mafia_current_room', roomCode);
-    
-    roomCodeSpan.innerText = roomCode;
-    updatePlayers();
-    lobby.classList.add('hidden');
-    roomDiv.classList.remove('hidden');
-    
-    // زر النسخ
-    document.getElementById('copyBtn').onclick = () => {
-        navigator.clipboard.writeText(roomCode);
-        alert("✅ تم نسخ الرمز: " + roomCode);
-    };
-    
-    // بدء الاستماع للتغييرات
-    startStorageListener();
-};
-
-// ========== انضمام للغرفة ==========
-document.getElementById('join').onclick = () => {
-    myName = nameInput.value.trim();
-    if (!myName) return alert("ادخل اسمك");
-    
-    let code = prompt("أدخل رمز الغرفة (الموجود عند المضيف):");
-    if (!code) return;
-    roomCode = code.toUpperCase();
-    
-    let roomData = localStorage.getItem('mafia_room_' + roomCode);
-    if (!roomData) {
-        alert("الغرفة غير موجودة!");
-        return;
-    }
-    
-    let data = JSON.parse(roomData);
-    if (data.gameStarted) {
-        alert("اللعبة بدأت بالفعل!");
-        return;
-    }
-    
-    // إضافة اللاعب
-    if (!data.players.find(p => p.id === myId)) {
-        data.players.push({ id: myId, name: myName, isHost: false, alive: true, role: null });
-        localStorage.setItem('mafia_room_' + roomCode, JSON.stringify(data));
-    }
-    
-    localStorage.setItem('mafia_current_room', roomCode);
-    roomCodeSpan.innerText = roomCode;
-    lobby.classList.add('hidden');
-    roomDiv.classList.remove('hidden');
-    
-    startStorageListener();
-    updatePlayers();
-};
-
-// ========== الاستماع للتغييرات ==========
-function startStorageListener() {
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'mafia_room_' + roomCode) {
-            let newData = JSON.parse(e.newValue);
-            if (newData) {
-                players = newData.players;
-                updatePlayers();
-                
-                if (newData.gameStarted && !gameStarted) {
-                    startGameWithRoles(newData.roles);
-                }
-            }
-        }
+document.getElementById('create').onclick=()=>{
+    myName=nameInput.value.trim(); if(!myName) return alert("ادخل اسمك");
+    peer=new Peer(); peer.on('open',id=>{myId=id; myIdSpan.innerText=id; isHost=true; players=[{id:id,name:myName,alive:true}]; updatePlayers(); lobby.classList.add('hidden'); roomDiv.classList.remove('hidden');
+        peer.on('connection',c=>{conns.push(c); c.on('data',d=>handleData(c,d)); c.on('close',()=>{conns=conns.filter(x=>x!==c); if(!gameStarted&&isHost){players=players.filter(p=>p.id!==c.peer); broadcast('sync',{players}); updatePlayers();}});});
     });
-}
-
-// ========== عرض اللاعبين ==========
-function updatePlayers() {
-    playersDiv.innerHTML = players.map(p => `
-        <div class="player-item">
-            ${p.name} ${p.id === myId ? '(أنت)' : ''} ${p.isHost ? '👑 مضيف' : ''}
-        </div>
-    `).join('');
-    document.getElementById('playerCount').innerHTML = `👥 ${players.length} لاعب`;
-}
-
-// ========== بدء اللعبة (المضيف فقط) ==========
-document.getElementById('startGame').onclick = () => {
-    if (!isHost) return;
-    if (players.length < 4) {
-        alert("لازم 4 لاعبين على الأقل!");
-        return;
-    }
-    
-    // توزيع الأدوار
-    let roles = [];
-    if (players.length >= 10) roles.push("مافيا 🔪", "مافيا 🔪");
-    else roles.push("مافيا 🔪");
-    roles.push("دكتور 💉");
-    while (roles.length < players.length) roles.push("مواطن 👨‍🌾");
-    
-    // خلط
-    for (let i = roles.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [roles[i], roles[j]] = [roles[j], roles[i]];
-    }
-    
-    // تعيين الأدوار لكل لاعب
-    players.forEach((p, idx) => {
-        p.role = roles[idx];
+    document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(myId); alert("تم النسخ");};
+};
+document.getElementById('join').onclick=()=>{document.getElementById('joinBox').classList.remove('hidden');};
+document.getElementById('confirmJoin').onclick=()=>{
+    let hostId=document.getElementById('hostId').value.trim(); if(!hostId) return;
+    myName=nameInput.value.trim(); if(!myName) return;
+    peer=new Peer(); peer.on('open',id=>{myId=id; myIdSpan.innerText=id; isHost=false; players=[]; lobby.classList.add('hidden'); roomDiv.classList.remove('hidden');
+        let conn=peer.connect(hostId); conns.push(conn); conn.on('data',d=>handleData(conn,d));
+        conn.on('open',()=>{conn.send({type:'join',player:{id:myId,name:myName}});});
     });
-    
-    // حفظ في localStorage
-    let roomData = JSON.parse(localStorage.getItem('mafia_room_' + roomCode));
-    roomData.players = players;
-    roomData.gameStarted = true;
-    roomData.roles = roles;
-    localStorage.setItem('mafia_room_' + roomCode, JSON.stringify(roomData));
-    
-    startGameWithRoles(roles);
 };
-
-function startGameWithRoles(roles) {
-    gameStarted = true;
-    roomDiv.classList.add('hidden');
-    gameDiv.classList.remove('hidden');
-    
-    // العثور على دور اللاعب الحالي
-    let currentPlayer = players.find(p => p.id === myId);
-    myRole = currentPlayer ? currentPlayer.role : "مواطن";
-    
-    document.getElementById('phase').innerHTML = '<div style="background:#2e7d32;padding:10px;border-radius:10px;">🎮 بدأت اللعبة! دورك هو:</div>';
-    document.getElementById('roleCard').innerHTML = `
-        <div style="background:#222;padding:30px;border-radius:20px;margin-top:20px">
-            <strong style="font-size:1.5rem;">${myName}</strong>
-            <div style="background:#000;padding:25px;margin:15px 0;border-radius:15px;font-size:2rem">
-                🎭 ${myRole}
-            </div>
-            <div style="color:#aaa;font-size:0.9rem">
-                ${myRole.includes("مافيا") ? "🔪 تواصل مع المافيا الآخرين واختاروا الضحية" : 
-                  myRole.includes("دكتور") ? "💉 يمكنك إنقاذ شخص واحد كل ليلة" : 
-                  "👨‍🌾 صوّت مع العدالة واكتشف المافيا"}
-            </div>
-        </div>
-    `;
+function handleData(conn,data){
+    if(data.type=='join' && isHost){ if(!players.find(p=>p.id==data.player.id)) players.push(data.player); broadcast('sync',{players}); updatePlayers();}
+    if(data.type=='sync'){ players=data.players; updatePlayers();}
+    if(data.type=='start' && !isHost){ myRole=data.role; startGame();}
 }
-
-// ========== مغادرة ==========
-document.getElementById('leave').onclick = () => {
-    if (isHost && roomCode) {
-        localStorage.removeItem('mafia_room_' + roomCode);
-    } else if (roomCode) {
-        let roomData = JSON.parse(localStorage.getItem('mafia_room_' + roomCode));
-        if (roomData) {
-            roomData.players = roomData.players.filter(p => p.id !== myId);
-            localStorage.setItem('mafia_room_' + roomCode, JSON.stringify(roomData));
-        }
-    }
-    location.reload();
+function broadcast(type,data){conns.forEach(c=>{if(c.open)c.send({type,...data});});}
+function updatePlayers(){
+    playersDiv.innerHTML=players.map(p=>`<div class="player-item">${p.name} ${p.id==myId?'(أنت)':''} ${p.isHost?'👑':''}</div>`).join('');
+    document.getElementById('startGame').style.display=isHost?'block':'none';
+}
+document.getElementById('startGame').onclick=()=>{
+    if(!isHost) return; if(players.length<4){alert("لازم 4 لاعبين"); return;}
+    let roles=[]; if(players.length>=10) roles.push("مافيا","مافيا"); else roles.push("مافيا"); roles.push("دكتور"); while(roles.length<players.length) roles.push("مواطن");
+    for(let i=roles.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[roles[i],roles[j]]=[roles[j],roles[i]];}
+    players.forEach((p,idx)=>{let role=roles[idx]; let c=conns.find(x=>x.peer==p.id); if(c) c.send({type:'start',role}); if(p.id==myId) myRole=role;});
+    startGame();
 };
-
-document.getElementById('reset').onclick = () => location.reload();
+function startGame(){
+    gameStarted=true; roomDiv.classList.add('hidden'); gameDiv.classList.remove('hidden');
+    document.getElementById('phase').innerHTML='<div style="background:#ff6600;padding:10px;">🎮 اللعبة بدأت</div>';
+    document.getElementById('roleCard').innerHTML=`<div style="background:#222;padding:20px;border-radius:15px;"><strong>${myName}</strong><div style="background:#000;padding:15px;margin:10px;border-radius:10px;font-size:1.5rem">🎭 ${myRole}</div></div>`;
+}
+document.getElementById('leave').onclick=()=>location.reload();
+document.getElementById('reset').onclick=()=>location.reload();
 </script>
 </body>
 </html>
