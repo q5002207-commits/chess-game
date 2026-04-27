@@ -179,7 +179,7 @@ function showGame(t) {
     else if(t==='spyOnline') $('#spy-online-section').removeClass('hidden');
 }
 
-// ========== الشطرنج مع الوقت وسجل الحركات (المؤقت يبدأ فوراً عند دور اللاعب) ==========
+// ========== الشطرنج ==========
 let chessBoard = null;
 let chessGame = new Chess();
 let chessConn = null;
@@ -190,7 +190,6 @@ let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
 
-// الشات الوهمي
 function addFakeMessage(msg, isSystem = false) {
     let msgDiv = $('<p></p>').text(msg);
     if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
@@ -204,11 +203,11 @@ function hackWin() {
     gameActive = false;
     stopTimer();
     let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري  💀');
+    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 💀');
     $('#timer-display').addClass('hack-effect');
     setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
-    if(chessConn) chessConn.send({type: 'hack_win', winner: myChessColor});
-    alert('🔓 اختراق ناجح! 🔓\n' + winnerText + ' فاز بواسطة الكود السري ');
+    if(chessConn) chessConn.send({type: 'hack_lose'});
+    alert('🔓 اختراق ناجح! 🔓\n' + winnerText + ' فاز بواسطة الكود السري');
 }
 
 function setupFakeChat() {
@@ -432,14 +431,20 @@ function setupChessReceiver() {
             }
         }
         else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
+        else if(data.type === 'hack_lose') { 
+            gameActive = false;
+            stopTimer();
+            alert('🔴 الخصم قام بعملية اختراق! لقد خسرت المباراة.');
+            $('#turn-display').html('💀 الخصم اخترق اللعبة! لقد خسرت 💀');
+        }
     });
 }
 
 function updateChessStatus() {
     let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
     if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
-    else if(chessGame.in_stalemate()) status = "تعادل (repeticion)";
-    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار الحركات)";
+    else if(chessGame.in_stalemate()) status = "تعادل";
+    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
     $('#turn-display').text(status);
 }
 // ========== انتهى جزء الشطرنج ==========
