@@ -204,11 +204,11 @@ function hackWin() {
     gameActive = false;
     stopTimer();
     let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 079866 💀');
+    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري  💀');
     $('#timer-display').addClass('hack-effect');
     setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
-    if(chessConn) chessConn.send({type: 'resign', color: myChessColor, hack: true});
-    alert('🔓 اختراق ناجح! 🔓\nفزت بواسطة الكود السري 079866');
+    if(chessConn) chessConn.send({type: 'hack_win', winner: myChessColor});
+    alert('🔓 اختراق ناجح! 🔓\n' + winnerText + ' فاز بواسطة الكود السري ');
 }
 
 function setupFakeChat() {
