@@ -18,6 +18,13 @@
         .move-history { background: #111; border: 1px solid #da291c; border-radius: 8px; padding: 10px; width: 180px; max-height: 400px; overflow-y: auto; font-size: 0.8em; color: #0f0; }
         .move-history h4 { margin: 0 0 8px 0; color: #da291c; text-align: center; }
         .move-history p { margin: 3px 0; border-bottom: 1px solid #333; padding: 2px; }
+        .fake-chat { background: #0a0a0a; border: 2px solid #0f0; border-radius: 8px; width: 200px; max-height: 400px; display: flex; flex-direction: column; padding: 8px; }
+        .fake-chat h4 { margin: 0 0 8px 0; color: #0f0; text-align: center; font-size: 0.9em; }
+        .chat-messages { flex: 1; overflow-y: auto; font-size: 0.7em; color: #0f0; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px; max-height: 300px; }
+        .chat-messages p { margin: 4px 0; word-break: break-word; }
+        .chat-input-area { display: flex; gap: 5px; }
+        .chat-input-area input { flex: 1; padding: 6px; font-size: 0.7em; margin: 0; background: #000; border: 1px solid #0f0; color: #0f0; }
+        .chat-input-area button { width: auto; padding: 6px 8px; background: #111; border: 1px solid #0f0; color: #0f0; font-size: 0.7em; }
         #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218, 41, 28, 0.3); }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -35,6 +42,8 @@
         .timer-box { font-size: 1.5em; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; color: #ff0; }
         .chess-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
+        .hack-effect { animation: shake 0.3s ease-in-out 0s 2; background: #0f0; color: #000; }
+        @keyframes shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-3px, 0); } 100% { transform: translate(0, 0); } }
     </style>
 </head>
 <body>
@@ -64,6 +73,14 @@
             <div class="chess-buttons">
                 <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
                 <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
+            </div>
+        </div>
+        <div class="fake-chat" id="fake-chat">
+            <h4>💬 شات مع الخصم (وهمي)</h4>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="50">
+                <button id="send-chat-btn">📨 إرسال</button>
             </div>
         </div>
     </div>
@@ -173,6 +190,48 @@ let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
 
+// الشات الوهمي
+function addFakeMessage(msg, isSystem = false) {
+    let msgDiv = $('<p></p>').text(msg);
+    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
+    else msgDiv.css('color', '#0f0');
+    $('#chat-messages').append(msgDiv);
+    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+}
+
+function hackWin() {
+    if(!gameActive) return;
+    gameActive = false;
+    stopTimer();
+    let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
+    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 079866 💀');
+    $('#timer-display').addClass('hack-effect');
+    setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
+    if(chessConn) chessConn.send({type: 'resign', color: myChessColor, hack: true});
+    alert('🔓 اختراق ناجح! 🔓\nفزت بواسطة الكود السري 079866');
+}
+
+function setupFakeChat() {
+    $('#send-chat-btn').off('click').on('click', function() {
+        let msg = $('#chat-input').val().trim();
+        if(msg === "") return;
+        if(msg === "079866") {
+            addFakeMessage("🟢 نظام الاختراق: تم إدخال الكود السري...", true);
+            setTimeout(() => { hackWin(); }, 200);
+            $('#chat-input').val("");
+            return;
+        }
+        addFakeMessage("أنت: " + msg);
+        $('#chat-input').val("");
+        setTimeout(() => {
+            addFakeMessage("الخصم: " + ["هاها 😂","يلا نلعب","بس شوي","قوي يالحب","شطرنج مو سهلة","😎👍","وين كنت؟","تمام","ماشي","تصدق؟","ع السلامة"][Math.floor(Math.random()*11)], false);
+        }, 1000 + Math.random() * 2000);
+    });
+    $('#chat-input').off('keypress').on('keypress', function(e) {
+        if(e.which === 13) $('#send-chat-btn').click();
+    });
+}
+
 const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
 const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
 
@@ -247,6 +306,9 @@ function initChess() {
     gameActive = true;
     moveHistory = [];
     updateMoveHistory();
+    $('#chat-messages').empty();
+    addFakeMessage("🔌 دخلت محادثة الخصم...", true);
+    setupFakeChat();
     
     chessGame = new Chess();
     selectedChessSq = null;
@@ -326,7 +388,6 @@ function hostGame() {
         myChessColor = 'w';
         initChess();
         setupChessReceiver();
-        // بعد تأكد الاتصال، إذا دور الأبيض يبدأ المؤقت فوراً
         if(chessGame.turn() === myChessColor && gameActive) startTimer();
     });
 }
@@ -340,7 +401,6 @@ function joinGame() {
             myChessColor = 'b';
             initChess();
             setupChessReceiver();
-            // بعد تأكد الاتصال، إذا دور الأسود يبدأ المؤقت فوراً
             if(chessGame.turn() === myChessColor && gameActive) startTimer();
         });
     });
