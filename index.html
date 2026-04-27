@@ -66,6 +66,40 @@
             color: white;
             margin-bottom: 10px;
         }
+        .chess-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .chess-main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .move-history {
+            background: #111;
+            border: 1px solid #da291c;
+            border-radius: 8px;
+            padding: 10px;
+            width: 180px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.8em;
+            color: #0f0;
+        }
+        .move-history h4 {
+            margin: 0 0 8px 0;
+            color: #da291c;
+            text-align: center;
+        }
+        .move-history p {
+            margin: 3px 0;
+            border-bottom: 1px solid #333;
+            padding: 2px;
+        }
         #board {
             width: 380px !important;
             max-width: 95vw !important;
@@ -143,6 +177,9 @@
         .highlight-selected { background-color: rgba(255, 255, 0, 0.5) !important; }
         .highlight-hint { width: 16px; height: 16px; background: rgba(0, 255, 0, 0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
         .turn-box { margin-top: 15px; font-size: 1.2em; font-weight: bold; color: #fff; }
+        .timer-box { font-size: 1.5em; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; color: #ff0; }
+        .chess-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
     </style>
 </head>
 <body>
@@ -161,7 +198,20 @@
         <h3>🏆 شطرنج أحمد المحترف 🏆</h3>
         <div id="my-id" style="font-size:0.7em;"></div>
     </div>
-    <div id="board"></div>
+    <div class="chess-container">
+        <div class="move-history" id="move-history">
+            <h4>📜 سجل الحركات</h4>
+            <div id="history-list"></div>
+        </div>
+        <div class="chess-main">
+            <div class="timer-box" id="timer-display">⏱️ 00:25</div>
+            <div id="board"></div>
+            <div class="chess-buttons">
+                <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
+                <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
+            </div>
+        </div>
+    </div>
     <div id="chess-controls" class="controls" style="width:100%; max-width:400px; margin-top:20px; text-align:center;">
         <div id="setup-area">
             <button onclick="hostGame()">إنشاء طاولة (Host)</button>
@@ -287,19 +337,102 @@ function showGame(t) {
     else if(t==='spyOnline') $('#spy-online-section').removeClass('hidden');
 }
 
-// ========== الشطرنج من كودك الأول (كامل) ==========
+// ========== الشطرنج مع الوقت وسجل الحركات ==========
 let chessBoard = null;
 let chessGame = new Chess();
 let chessConn = null;
 let myChessColor = 'w';
 let selectedChessSq = null;
+let timerInterval = null;
+let timeLeft = 25;
+let gameActive = true;
+let moveHistory = [];
 
 const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
 const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
 
+function updateMoveHistory() {
+    let html = '';
+    moveHistory.forEach((move, idx) => {
+        html += `<p>${idx+1}. ${move}</p>`;
+    });
+    $('#history-list').html(html);
+    $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
+}
+
+function addMoveToHistory(move) {
+    let moveText = `${move.from} → ${move.to}`;
+    if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
+    moveHistory.push(moveText);
+    updateMoveHistory();
+}
+
+function stopTimer() {
+    if(timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function startTimer() {
+    stopTimer();
+    if(!gameActive) return;
+    if(chessGame.game_over()) return;
+    if(chessGame.turn() !== myChessColor) {
+        $('#timer-display').text('⏱️ انتظر دور الخصم');
+        return;
+    }
+    timeLeft = 25;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        if(!gameActive) return;
+        if(chessGame.turn() !== myChessColor) {
+            stopTimer();
+            $('#timer-display').text('⏱️ انتظر دور الخصم');
+            return;
+        }
+        if(chessGame.game_over()) {
+            stopTimer();
+            return;
+        }
+        timeLeft--;
+        updateTimerDisplay();
+        if(timeLeft <= 0) {
+            stopTimer();
+            gameActive = false;
+            let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
+            alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);
+            $('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);
+            if(chessConn) chessConn.send({type: 'timeout', loser: myChessColor});
+            $('#timer-display').text('💀 وقت منتهي');
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    let seconds = timeLeft;
+    let display = `⏱️ ${seconds.toString().padStart(2,'0')} ث`;
+    $('#timer-display').text(display);
+    if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
+    else $('#timer-display').css('color', '#ff0');
+}
+
+function endGame(message) {
+    gameActive = false;
+    stopTimer();
+    alert(message);
+    $('#turn-display').text(message);
+}
+
 function initChess() {
     $('#setup-area').show();
     $('#turn-display').text('انتظار اللاعب الآخر...');
+    gameActive = true;
+    moveHistory = [];
+    updateMoveHistory();
+    
+    chessGame = new Chess();
+    selectedChessSq = null;
     
     chessBoard = Chessboard('board', {
         draggable: false,
@@ -313,33 +446,56 @@ function initChess() {
     });
 
     $('#board').off('click').on('click', '.square-55d63', function() {
+        if(!gameActive) return;
+        if(chessGame.turn() !== myChessColor) return;
+        
         let sq = $(this).data('square');
-        if (chessGame.turn() !== myChessColor) return;
-
         let piece = chessGame.get(sq);
         
-        if (piece && piece.color === myChessColor) {
+        if(piece && piece.color === myChessColor) {
             $('.square-55d63').removeClass('highlight-selected');
             $('.highlight-hint').remove();
             selectedChessSq = sq;
             $(this).addClass('highlight-selected');
-            
             chessGame.moves({square: sq, verbose: true}).forEach(m => {
                 $('.square-' + m.to).append('<div class="highlight-hint"></div>');
             });
         } 
-        else if (selectedChessSq) {
+        else if(selectedChessSq) {
             let move = chessGame.move({ from: selectedChessSq, to: sq, promotion: 'q' });
-            if (move) {
+            if(move) {
+                addMoveToHistory(move);
                 chessBoard.position(chessGame.fen());
-                if (chessConn) chessConn.send({ f: selectedChessSq, t: sq });
+                if(chessConn) chessConn.send({ f: selectedChessSq, t: sq });
                 updateChessStatus();
+                stopTimer();
+                if(!chessGame.game_over()) startTimer();
+                else {
+                    endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
+                }
             }
             $('.square-55d63').removeClass('highlight-selected');
             $('.highlight-hint').remove();
             selectedChessSq = null;
         }
     });
+    
+    $('#resign-btn').off('click').on('click', function() {
+        if(!gameActive) return;
+        if(confirm('هل أنت متأكد من الانسحاب؟')) {
+            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`);
+            if(chessConn) chessConn.send({type: 'resign', color: myChessColor});
+        }
+    });
+    
+    $('#draw-btn').off('click').on('click', function() {
+        if(!gameActive) return;
+        if(confirm('طلب تعادل. انتظر رد الخصم...')) {
+            alert('تم إرسال طلب التعادل إلى الخصم');
+            if(chessConn) chessConn.send({type: 'draw_request'});
+        }
+    });
+    
     updateChessStatus();
 }
 
@@ -370,16 +526,44 @@ function joinGame() {
 
 function setupChessReceiver() {
     chessConn.on('data', data => {
-        chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
-        chessBoard.position(chessGame.fen());
-        updateChessStatus();
+        if(data.f && data.t) {
+            chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
+            addMoveToHistory({from: data.f, to: data.t, promotion: 'q'});
+            chessBoard.position(chessGame.fen());
+            updateChessStatus();
+            stopTimer();
+            if(!chessGame.game_over()) startTimer();
+            else {
+                endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
+            }
+        }
+        else if(data.type === 'timeout') {
+            endGame(`الخصم خسر because وقت انتهى!`);
+        }
+        else if(data.type === 'resign') {
+            endGame(`الخصم انسحب. فزت!`);
+        }
+        else if(data.type === 'draw_request') {
+            if(confirm('الخصم يطلب التعادل. هل توافق؟')) {
+                endGame('تعادل! انتهت المباراة بالتعادل.');
+                chessConn.send({type: 'draw_accept'});
+            } else {
+                chessConn.send({type: 'draw_reject'});
+            }
+        }
+        else if(data.type === 'draw_accept') {
+            endGame('تم قبول طلب التعادل! انتهت المباراة.');
+        }
     });
 }
 
 function updateChessStatus() {
     let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
-    if (chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
+    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
+    else if(chessGame.in_stalemate()) status = "تعادل (repeticion)";
+    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار الحركات)";
     $('#turn-display').text(status);
+    if(!chessGame.game_over() && gameActive && chessGame.turn() === myChessColor) startTimer();
 }
 // ========== انتهى جزء الشطرنج ==========
 
