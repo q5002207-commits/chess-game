@@ -44,7 +44,7 @@
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
         .hack-effect { animation: shake 0.3s ease-in-out 0s 2; background: #0f0; color: #000; }
         @keyframes shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-3px, 0); } 100% { transform: translate(0, 0); } }
-        .arrow-svg { position: absolute; pointer-events: none; z-index: 100; width: 45px; height: 45px; transition: 0.1s; filter: drop-shadow(0 0 3px #00ff00); }
+        .arrow-svg { position: absolute; pointer-events: none; z-index: 100; filter: drop-shadow(0 0 3px #00ff00); }
     </style>
 </head>
 <body>
@@ -170,8 +170,7 @@ let myName = "";
 let host = false;
 let votesReceived = [];
 
-const spyPlaces = [ "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة", "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح", "قبو", "علية", "غرفة غسيل", "مستودع", "مكتبة", "ممر", "الحديقة", "داخل الثلاجة", "محفظة نقود", "علبة سردين", "تحت السرير", "فوق النخلة", "طنجرة منسف", "إبريق شاي", "كرتونة بيض", "شاحن تلفون", "سماعة بلوتوث", "مكة", "المدينة المنورة", "القاهرة", "بغداد", "دمشق", "بيروت", "دبي", "الرياض", "لندن", "باريس", "نيويورك", "طوكيو", "برج إيفل", "سور الصين العظيم", "التاج محل", "تمثال الحرية", "محل بلايستيشن", "قهوة شعبية", "محل تصليح تليفونات", "صناعية وادي السير", "البلد", "جبل عمان", "شارع الرينبو", "العبدلي", "دوار الداخلية", "محل كنافة", "فرن مناقيش", "بسطة خضرة", "محل ألعاب", "محل عطور", "محل ساعات", "محكمة", "قسم شرطة", "سجن", "مبنى المخابرات", "البرلمان", "وزارة التربية", "السفارة", "مكتب محامي", "غرفة عمليات", "ثكنة عسكرية", "برج مراقبة", "قاعدة صواريخ", "بيت جدي", "صالة الجيم", "محطة الفضاء الدولية", "نادي الفروسية", "حلبة سباق", "ملعب تنس", "صالة بولينج", "مدينة ملاهي", "زحليقة", "قطار موت", "بيت الرعب", "البحر الميت", "حمامات ماعين", "وادي رم", "العقبة", "جسر عبدون", "المدينة الرياضية", "مجمع بنك الإسكان", "مستشفى البشير", "الجامعة الأردنية", "التكنو", "الهاشمية", "علبة مكياج", "خزانة ملابس", "درج المكتب", "سلة مهملات", "فرن غاز", "غسالة", "نشافة", "مكواة", "مكنسة كهربائية", "اباجورة", "برواز صورة", "ساعة حائط", "سجادة صلاة", "مكتبة عامة", "محل ورد", "دار أيتام", "دار مسنين", "مخيم لاجئين", "خيمة بدو", "مزرعة خيول", "مزرعة دجاج", "منحل عسل", "مشاتل ورد", "داخل كيس شيبس", "تحت الكنباية", "ورا الباب", "جوا الخزانة", "فوق السطح", "جوا الغسالة", "تحت الطاولة", "داخل الشنطة", "جوا الجيبة", "فوق الشجرة", "البرازيل", "ألمانيا", "إسبانيا", "إيطاليا", "الأرجنتين", "تركيا", "المغرب", "تونس", "الجزائر", "مصر", "السودان", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "برج خليفة", "برج العرب", "مول دبي", "جزيرة النخلة", "سوق نايف", "القرية العالمية",
-"مركز شرطة", "محكمة جنايات", "سجن رومان", "قصر ثقافة", "دار أوبرا", "مسرح صيفي", "سينما أون لاين", "مقهى إنترنت", "مكتب بريد", "شركة اتصالات", "بنك دم", "مستوصف", "عيادة جلدية", "مختبر أسنان", "صيدلية بيطرية", "مزرعة دواجن", "مذبح", "مسلخ", "سوق سمك", "سوق خضار مركزي", "بسطة فواكه", "محل حلويات شرقية", "مخبز تنور", "فرن صاج", "محل قهوة مختصة", "مقهى تراثي", "استراحة", "منتجع صحي", "ساونا", "جاكوزي", "مسبح أوليمبي", "حمام تركي", "مغارة" ];
+const spyPlaces = [ "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة", "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح", "قبو", "علية", "غرفة غسيل", "مستودع", "مكتبة", "ممر", "الحديقة", "داخل الثلاجة", "محفظة نقود", "علبة سردين", "تحت السرير", "فوق النخلة", "طنجرة منسف", "إبريق شاي", "كرتونة بيض", "شاحن تلفون", "سماعة بلوتوث", "مكة", "المدينة المنورة", "القاهرة", "بغداد", "دمشق", "بيروت", "دبي", "الرياض", "لندن", "باريس", "نيويورك", "طوكيو", "برج إيفل", "سور الصين العظيم", "التاج محل", "تمثال الحرية", "محل بلايستيشن", "قهوة شعبية", "محل تصليح تليفونات", "صناعية وادي السير", "البلد", "جبل عمان", "شارع الرينبو", "العبدلي", "دوار الداخلية", "محل كنافة", "فرن مناقيش", "بسطة خضرة", "محل ألعاب", "محل عطور", "محل ساعات", "محكمة", "قسم شرطة", "سجن", "مبنى المخابرات", "البرلمان", "وزارة التربية", "السفارة", "مكتب محامي", "غرفة عمليات", "ثكنة عسكرية", "برج مراقبة", "قاعدة صواريخ", "بيت جدي", "صالة الجيم", "محطة الفضاء الدولية", "نادي الفروسية", "حلبة سباق", "ملعب تنس", "صالة بولينج", "مدينة ملاهي", "زحليقة", "قطار موت", "بيت الرعب", "البحر الميت", "حمامات ماعين", "وادي رم", "العقبة", "جسر عبدون", "المدينة الرياضية", "مجمع بنك الإسكان", "مستشفى البشير", "الجامعة الأردنية", "التكنو", "الهاشمية", "علبة مكياج", "خزانة ملابس", "درج المكتب", "سلة مهملات", "فرن غاز", "غسالة", "نشافة", "مكواة", "مكنسة كهربائية", "اباجورة", "برواز صورة", "ساعة حائط", "سجادة صلاة", "مكتبة عامة", "محل ورد", "دار أيتام", "دار مسنين", "مخيم لاجئين", "خيمة بدو", "مزرعة خيول", "مزرعة دجاج", "منحل عسل", "مشاتل ورد", "داخل كيس شيبس", "تحت الكنباية", "ورا الباب", "جوا الخزانة", "فوق السطح", "جوا الغسالة", "تحت الطاولة", "داخل الشنطة", "جوا الجيبة", "فوق الشجرة", "البرازيل", "ألمانيا", "إسبانيا", "إيطاليا", "الأرجنتين", "تركيا", "المغرب", "تونس", "الجزائر", "مصر", "السودان", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "برج خليفة", "برج العرب", "مول دبي", "جزيرة النخلة", "سوق نايف", "القرية العالمية" ];
 
 function showGame(t) {
     $('#main-menu').hide();
@@ -191,17 +190,18 @@ let timerInterval = null;
 let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
-let arrowsEnabled = false; // وضع التغشيش
-let currentArrow = null;   // عنصر السهم الحالي
+let arrowsEnabled = false;
+let currentArrow = null;
 
-// تقييم الحركة (بسيط لكن فعال)
 function evaluateMove(move, game) {
     let value = 0;
     let targetPiece = game.get(move.to);
-    if(targetPiece && targetPiece.type === 'q') value += 9;
-    else if(targetPiece && targetPiece.type === 'r') value += 5;
-    else if(targetPiece && targetPiece.type === 'b' || targetPiece.type === 'n') value += 3;
-    else if(targetPiece && targetPiece.type === 'p') value += 1;
+    if(targetPiece) {
+        if(targetPiece.type === 'q') value += 9;
+        else if(targetPiece.type === 'r') value += 5;
+        else if(targetPiece.type === 'b' || targetPiece.type === 'n') value += 3;
+        else if(targetPiece.type === 'p') value += 1;
+    }
     let gameCopy = new Chess(game.fen());
     let moveCopy = gameCopy.move({from: move.from, to: move.to, promotion: 'q'});
     if(moveCopy && gameCopy.in_check()) value += 2;
@@ -225,33 +225,41 @@ function getBestMove() {
 }
 
 function showArrow() {
+    clearArrow();
     if(!arrowsEnabled) return;
     if(chessGame.game_over()) return;
     if(chessGame.turn() !== myChessColor) return;
+    
     let best = getBestMove();
     if(!best) return;
-    let fromSq = best.from;
-    let toSq = best.to;
-    let boardEl = $('#board');
-    let boardOffset = boardEl.offset();
-    let squareWidth = boardEl.width() / 8;
+    
     let files = ['a','b','c','d','e','f','g','h'];
-    let fromCol = files.indexOf(fromSq[0]);
-    let fromRow = 8 - parseInt(fromSq[1]);
-    let toCol = files.indexOf(toSq[0]);
-    let toRow = 8 - parseInt(toSq[1]);
+    let fromCol = files.indexOf(best.from[0]);
+    let fromRow = 8 - parseInt(best.from[1]);
+    let toCol = files.indexOf(best.to[0]);
+    let toRow = 8 - parseInt(best.to[1]);
+    
     if(myChessColor === 'b') {
-        fromCol = 7 - fromCol; fromRow = 7 - fromRow;
-        toCol = 7 - toCol; toRow = 7 - toRow;
+        fromCol = 7 - fromCol;
+        fromRow = 7 - fromRow;
+        toCol = 7 - toCol;
+        toRow = 7 - toRow;
     }
-    let startX = fromCol * squareWidth + squareWidth/2;
-    let startY = fromRow * squareWidth + squareWidth/2;
-    let endX = toCol * squareWidth + squareWidth/2;
-    let endY = toRow * squareWidth + squareWidth/2;
+    
+    let boardEl = $('#board');
+    let squareSize = boardEl.width() / 8;
+    let startX = fromCol * squareSize + squareSize/2;
+    let startY = fromRow * squareSize + squareSize/2;
+    let endX = toCol * squareSize + squareSize/2;
+    let endY = toRow * squareSize + squareSize/2;
+    
     let angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
     let length = Math.hypot(endX - startX, endY - startY);
-    if(currentArrow) currentArrow.remove();
-    let arrowSvg = $(`<svg class="arrow-svg" style="position: absolute; left: ${startX-20}px; top: ${startY-20}px; width: ${length+20}px; height: 40px; overflow: visible;"><line x1="20" y1="20" x2="${length}" y2="20" stroke="#00ff00" stroke-width="4" stroke-dasharray="8,4"/><polygon points="${length-10},15 ${length+5},20 ${length-10},25" fill="#00ff00"/></svg>`);
+    
+    let arrowSvg = $(`<svg class="arrow-svg" style="position: absolute; left: ${startX-20}px; top: ${startY-20}px; width: ${length+30}px; height: 50px; overflow: visible;">
+        <line x1="20" y1="25" x2="${length+10}" y2="25" stroke="#00ff00" stroke-width="4" stroke-dasharray="8,4" />
+        <polygon points="${length},20 ${length+15},25 ${length},30" fill="#00ff00" />
+    </svg>`);
     arrowSvg.css('transform', `rotate(${angle}deg)`);
     boardEl.append(arrowSvg);
     currentArrow = arrowSvg;
@@ -442,7 +450,7 @@ function initChess() {
                     if(chessGame.turn() === myChessColor) startTimer();
                     else $('#timer-display').text('⏱️ انتظر دور الخصم');
                     clearArrow();
-                    if(arrowsEnabled && chessGame.turn() === myChessColor) showArrow();
+                    if(arrowsEnabled && chessGame.turn() === myChessColor) setTimeout(() => showArrow(), 50);
                 } else {
                     endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
                 }
@@ -509,7 +517,7 @@ function setupChessReceiver() {
                 if(chessGame.turn() === myChessColor) startTimer();
                 else $('#timer-display').text('⏱️ انتظر دور الخصم');
                 clearArrow();
-                if(arrowsEnabled && chessGame.turn() === myChessColor) showArrow();
+                if(arrowsEnabled && chessGame.turn() === myChessColor) setTimeout(() => showArrow(), 50);
             } else {
                 endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
             }
