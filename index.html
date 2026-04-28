@@ -44,7 +44,7 @@
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
         .hack-effect { animation: shake 0.3s ease-in-out 0s 2; background: #0f0; color: #000; }
         @keyframes shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-3px, 0); } 100% { transform: translate(0, 0); } }
-        .arrow-svg { position: absolute; pointer-events: none; z-index: 100; filter: drop-shadow(0 0 3px #00ff00); }
+        .arrow-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 200; }
     </style>
 </head>
 <body>
@@ -191,9 +191,8 @@ let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
 let arrowsEnabled = false;
-let currentArrow = null;
+let currentArrowCanvas = null;
 
-// تقييم الحركة - ذكي
 function evaluateMove(move, game) {
     let value = 0;
     let targetPiece = game.get(move.to);
@@ -258,25 +257,44 @@ function showArrow() {
     
     let boardEl = $('#board');
     let squareSize = boardEl.width() / 8;
-    let startX = fromCol * squareSize + squareSize/2;
-    let startY = fromRow * squareSize + squareSize/2;
-    let endX = toCol * squareSize + squareSize/2;
-    let endY = toRow * squareSize + squareSize/2;
+    let startX = fromCol * squareSize;
+    let startY = fromRow * squareSize;
+    let endX = toCol * squareSize;
+    let endY = toRow * squareSize;
     
-    let angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-    let length = Math.hypot(endX - startX, endY - startY);
+    let canvas = $(`<canvas class="arrow-canvas" width="${boardEl.width()}" height="${boardEl.height()}"></canvas>`);
+    boardEl.append(canvas);
+    let ctx = canvas[0].getContext('2d');
     
-    let arrowSvg = $(`<svg class="arrow-svg" style="position: absolute; left: ${startX-20}px; top: ${startY-20}px; width: ${length+30}px; height: 50px; overflow: visible;">
-        <line x1="20" y1="25" x2="${length+10}" y2="25" stroke="#00ff00" stroke-width="4" stroke-dasharray="8,4" />
-        <polygon points="${length},20 ${length+15},25 ${length},30" fill="#00ff00" />
-    </svg>`);
-    arrowSvg.css('transform', `rotate(${angle}deg)`);
-    boardEl.append(arrowSvg);
-    currentArrow = arrowSvg;
+    let startCenterX = startX + squareSize/2;
+    let startCenterY = startY + squareSize/2;
+    let endCenterX = endX + squareSize/2;
+    let endCenterY = endY + squareSize/2;
+    
+    ctx.beginPath();
+    ctx.moveTo(startCenterX, startCenterY);
+    ctx.lineTo(endCenterX, endCenterY);
+    ctx.strokeStyle = '#0f0';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([8,6]);
+    ctx.stroke();
+    
+    let angle = Math.atan2(endCenterY - startCenterY, endCenterX - startCenterX);
+    let headSize = 15;
+    let headX = endCenterX;
+    let headY = endCenterY;
+    ctx.beginPath();
+    ctx.moveTo(headX, headY);
+    ctx.lineTo(headX - headSize * Math.cos(angle - Math.PI/6), headY - headSize * Math.sin(angle - Math.PI/6));
+    ctx.lineTo(headX - headSize * Math.cos(angle + Math.PI/6), headY - headSize * Math.sin(angle + Math.PI/6));
+    ctx.fillStyle = '#0f0';
+    ctx.fill();
+    
+    currentArrowCanvas = canvas;
 }
 
 function clearArrow() {
-    if(currentArrow) { currentArrow.remove(); currentArrow = null; }
+    if(currentArrowCanvas) { currentArrowCanvas.remove(); currentArrowCanvas = null; }
 }
 
 function toggleArrows() {
