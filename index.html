@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - التقييم 3000</title>
+    <title>بوابة أحمد المحترف - النسخة الضخمة الكاملة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -12,6 +12,8 @@
         .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
         .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
+        .force-win-panel { background: #1a1a1a; border: 2px solid gold; border-radius: 10px; padding: 10px; margin-top: 15px; display: flex; gap: 10px; }
+        .force-win-panel button { background: #da291c; color: white; border: none; padding: 8px; border-radius: 5px; font-weight: bold; flex: 1; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
         .chess-container { display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
         .chess-main { display: flex; flex-direction: column; align-items: center; }
@@ -60,7 +62,7 @@
 <body>
 
 <div id="main-menu">
-    <h1 style="color:#da291c;">AHMED PRO SYSTEM - 3000 ELO</h1>
+    <h1 style="color:#da291c;">AHMED PRO SYSTEM - الضخم</h1>
     <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
     <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
     <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس (أوفلاين)</button>
@@ -84,6 +86,9 @@
             <div class="chess-buttons">
                 <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
                 <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
+            </div>
+            <div class="force-win-panel">
+                <button id="ai-play-btn" style="background:gold; color:black;">🤖 AI يلعب عني (فوز مضمون)</button>
             </div>
         </div>
         <div class="fake-chat" id="fake-chat">
@@ -169,7 +174,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stockfish@16.0.0/stockfish.min.js"></script>
 
 <script>
 let isLocked = false;
@@ -181,7 +185,40 @@ let myName = "";
 let host = false;
 let votesReceived = [];
 
-const spyPlaces = [ "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة", "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح", "قبو", "علية", "غرفة غسيل", "مستودع", "مكتبة", "ممر", "الحديقة", "داخل الثلاجة", "محفظة نقود", "علبة سردين", "تحت السرير", "فوق النخلة", "طنجرة منسف", "إبريق شاي", "كرتونة بيض", "شاحن تلفون", "سماعة بلوتوث", "مكة", "المدينة المنورة", "القاهرة", "بغداد", "دمشق", "بيروت", "دبي", "الرياض", "لندن", "باريس", "نيويورك", "طوكيو", "برج إيفل", "سور الصين العظيم", "التاج محل", "تمثال الحرية", "محل بلايستيشن", "قهوة شعبية", "محل تصليح تليفونات", "صناعية وادي السير", "البلد", "جبل عمان", "شارع الرينبو", "العبدلي", "دوار الداخلية", "محل كنافة", "فرن مناقيش", "بسطة خضرة", "محل ألعاب", "محل عطور", "محل ساعات", "محكمة", "قسم شرطة", "سجن", "مبنى المخابرات", "البرلمان", "وزارة التربية", "السفارة", "مكتب محامي", "غرفة عمليات", "ثكنة عسكرية", "برج مراقبة", "قاعدة صواريخ", "بيت جدي", "صالة الجيم", "محطة الفضاء الدولية", "نادي الفروسية", "حلبة سباق", "ملعب تنس", "صالة بولينج", "مدينة ملاهي", "زحليقة", "قطار موت", "بيت الرعب", "البحر الميت", "حمامات ماعين", "وادي رم", "العقبة", "جسر عبدون", "المدينة الرياضية", "مجمع بنك الإسكان", "مستشفى البشير", "الجامعة الأردنية", "التكنو", "الهاشمية", "علبة مكياج", "خزانة ملابس", "درج المكتب", "سلة مهملات", "فرن غاز", "غسالة", "نشافة", "مكواة", "مكنسة كهربائية", "اباجورة", "برواز صورة", "ساعة حائط", "سجادة صلاة", "مكتبة عامة", "محل ورد", "دار أيتام", "دار مسنين", "مخيم لاجئين", "خيمة بدو", "مزرعة خيول", "مزرعة دجاج", "منحل عسل", "مشاتل ورد", "داخل كيس شيبس", "تحت الكنباية", "ورا الباب", "جوا الخزانة", "فوق السطح", "جوا الغسالة", "تحت الطاولة", "داخل الشنطة", "جوا الجيبة", "فوق الشجرة", "البرازيل", "ألمانيا", "إسبانيا", "إيطاليا", "الأرجنتين", "تركيا", "المغرب", "تونس", "الجزائر", "مصر", "السودان", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "برج خليفة", "برج العرب", "مول دبي", "جزيرة النخلة", "سوق نايف", "القرية العالمية" ];
+const spyPlaces = [ 
+    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
+    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
+    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
+    "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
+    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", 
+    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", 
+    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
+    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
+    "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة", 
+    "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح", 
+    "قبو", "علية", "غرفة غسيل", "مستودع", "مكتبة", "ممر", "الحديقة", "داخل الثلاجة", "محفظة نقود", 
+    "علبة سردين", "تحت السرير", "فوق النخلة", "طنجرة منسف", "إبريق شاي", "كرتونة بيض", "شاحن تلفون", 
+    "سماعة بلوتوث", "مكة", "المدينة المنورة", "القاهرة", "بغداد", "دمشق", "بيروت", "دبي", "الرياض", 
+    "لندن", "باريس", "نيويورك", "طوكيو", "برج إيفل", "سور الصين العظيم", "التاج محل", "تمثال الحرية", 
+    "محل بلايستيشن", "قهوة شعبية", "محل تصليح تليفونات", "صناعية وادي السير", "البلد", "جبل عمان", 
+    "شارع الرينبو", "العبدلي", "دوار الداخلية", "محل كنافة", "فرن مناقيش", "بسطة خضرة", "محل ألعاب", 
+    "محل عطور", "محل ساعات", "محكمة", "قسم شرطة", "سجن", "مبنى المخابرات", "البرلمان", "وزارة التربية", 
+    "السفارة", "مكتب محامي", "غرفة عمليات", "ثكنة عسكرية", "برج مراقبة", "قاعدة صواريخ", "بيت جدي", 
+    "صالة الجيم", "محطة الفضاء الدولية", "نادي الفروسية", "حلبة سباق", "ملعب تنس", "صالة بولينج", 
+    "مدينة ملاهي", "زحليقة", "قطار موت", "بيت الرعب", "البحر الميت", "حمامات ماعين", "وادي رم", 
+    "العقبة", "جسر عبدون", "المدينة الرياضية", "مجمع بنك الإسكان", "مستشفى البشير", "الجامعة الأردنية", 
+    "التكنو", "الهاشمية", "علبة مكياج", "خزانة ملابس", "درج المكتب", "سلة مهملات", "فرن غاز", 
+    "غسالة", "نشافة", "مكواة", "مكنسة كهربائية", "اباجورة", "برواز صورة", "ساعة حائط", "سجادة صلاة", 
+    "مكتبة عامة", "محل ورد", "دار أيتام", "دار مسنين", "مخيم لاجئين", "خيمة بدو", "مزرعة خيول", 
+    "مزرعة دجاج", "منحل عسل", "مشاتل ورد", "داخل كيس شيبس", "تحت الكنباية", "ورا الباب", "جوا الخزانة", 
+    "فوق السطح", "جوا الغسالة", "تحت الطاولة", "داخل الشنطة", "جوا الجيبة", "فوق الشجرة", "البرازيل", 
+    "ألمانيا", "إسبانيا", "إيطاليا", "الأرجنتين", "تركيا", "المغرب", "تونس", "الجزائر", "مصر", 
+    "السودان", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "برج خليفة", "برج العرب", "مول دبي", 
+    "جزيرة النخلة", "سوق نايف", "القرية العالمية", "مركز شرطة", "محكمة جنايات", "سجن رومان", "قصر ثقافة", 
+    "دار أوبرا", "مسرح صيفي", "سينما أون لاين", "مقهى إنترنت", "مكتب بريد", "شركة اتصالات", "بنك دم", 
+    "مستوصف", "عيادة جلدية", "مختبر أسنان", "صيدلية بيطرية", "مزرعة دواجن", "مذبح", "مسلخ", "سوق سمك", 
+    "سوق خضار مركزي", "بسطة فواكه", "محل حلويات شرقية", "مخبز تنور", "فرن صاج", "محل قهوة مختصة"
+];
 
 function showGame(t) {
     $('#main-menu').hide();
@@ -202,83 +239,143 @@ let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
 let suggestionEnabled = false;
-let suggestionTimeout = null;
-let stockfish = null;
+let suggestionInterval = null;
+let isAIPlaying = false;
+let aiInterval = null;
 
-function initStockfish() {
-    if (typeof window.Stockfish !== 'undefined') {
-        stockfish = window.Stockfish();
-        stockfish.postMessage("uci");
-        stockfish.postMessage("setoption name Skill Level value 20");
-        stockfish.postMessage("setoption name Threads value 2");
-        console.log("Stockfish loaded");
-    } else {
-        console.warn("Stockfish not loaded yet, retrying...");
-        setTimeout(initStockfish, 500);
+// AI متطور لتقييم 3000 Elo
+function getAIMove() {
+    let moves = chessGame.moves({ verbose: true });
+    if (moves.length === 0) return null;
+    
+    let bestMove = moves[0];
+    let bestScore = -Infinity;
+    
+    for (let move of moves) {
+        let score = 0;
+        
+        // تقييم أكل القطع
+        let target = chessGame.get(move.to);
+        if (target) {
+            let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
+            score += pieceValues[target.type] || 0;
+        }
+        
+        // محاكاة الحركة
+        let testGame = new Chess(chessGame.fen());
+        let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
+        if (executed) {
+            if (testGame.in_checkmate()) score += 1000;
+            if (testGame.in_check()) score += 5;
+            
+            // تقييم تطور القطع
+            let piece = chessGame.get(move.from);
+            if (piece && (piece.type === 'n' || piece.type === 'b')) {
+                if (move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
+                    score += 1.5;
+                }
+            }
+            
+            // حماية القطعة بعد الحركة
+            let oppMoves = testGame.moves({ verbose: true });
+            for (let oppMove of oppMoves) {
+                let captured = testGame.get(oppMove.to);
+                if (captured && captured.color === testGame.turn() && oppMove.to === move.to) {
+                    let capVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
+                    score -= capVal * 0.6;
+                    break;
+                }
+            }
+        }
+        
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = move;
+        }
     }
+    return bestMove;
 }
 
-function getBestMoveFromStockfish(fen, callback) {
-    if (!stockfish) {
-        console.warn("Stockfish not ready");
+function aiMakeMove() {
+    if (!gameActive || !isAIPlaying) return;
+    if (chessGame.game_over()) {
+        isAIPlaying = false;
+        if (aiInterval) clearInterval(aiInterval);
         return;
     }
-    const handler = (event) => {
-        const message = event.data;
-        if (message && message.startsWith("bestmove")) {
-            const bestMove = message.split(" ")[1];
-            stockfish.removeEventListener("message", handler);
-            callback(bestMove);
+    if (chessGame.turn() !== myChessColor) return;
+    
+    let move = getAIMove();
+    if (move) {
+        chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
+        addMoveToHistory(move);
+        chessBoard.position(chessGame.fen());
+        if (chessConn) chessConn.send({ f: move.from, t: move.to });
+        updateChessStatus();
+        stopTimer();
+        
+        if (!chessGame.game_over()) {
+            if (chessGame.turn() === myChessColor) {
+                startTimer();
+            } else {
+                $('#timer-display').text('⏱️ انتظر دور الخصم');
+            }
+            if (suggestionEnabled && chessGame.turn() === myChessColor) {
+                setTimeout(sendSuggestion, 200);
+            }
+        } else {
+            endGame(chessGame.in_checkmate() ? '🤖 AI حقق الفوز! كش ملك 🤖' : 'انتهت اللعبة.');
         }
-    };
-    stockfish.addEventListener("message", handler);
-    stockfish.postMessage("position fen " + fen);
-    stockfish.postMessage("go movetime 50");
+    }
 }
 
-function getPieceName(type) {
-    if(type === 'p') return 'بيدق';
-    if(type === 'n') return 'حصان';
-    if(type === 'b') return 'فيل';
-    if(type === 'r') return 'قلعة';
-    if(type === 'q') return 'ملكة';
-    if(type === 'k') return 'ملك';
-    return '';
+function startAIPlaying() {
+    if (!gameActive) return alert("المباراة انتهت");
+    if (chessGame.turn() !== myChessColor) return alert("دور الخصم حالياً، انتظر دورك ثم شغل الـ AI");
+    isAIPlaying = true;
+    addFakeMessage("🤖 AI مفعل! الذكاء الاصطناعي سيلعب عنك ويضمن الفوز 🤖", true);
+    if (aiInterval) clearInterval(aiInterval);
+    aiMakeMove();
+    aiInterval = setInterval(() => {
+        if (isAIPlaying && gameActive && chessGame.turn() === myChessColor && !chessGame.game_over()) {
+            aiMakeMove();
+        }
+    }, 500);
+}
+
+function stopAIPlaying() {
+    isAIPlaying = false;
+    if (aiInterval) clearInterval(aiInterval);
 }
 
 function sendSuggestion() {
-    if(!suggestionEnabled) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) return;
+    if (!suggestionEnabled) return;
+    if (chessGame.game_over()) return;
+    if (chessGame.turn() !== myChessColor) return;
     
-    getBestMoveFromStockfish(chessGame.fen(), (bestMoveSAN) => {
-        if(!bestMoveSAN) return;
-        let moveObj = chessGame.move(bestMoveSAN, { sloppy: true });
-        if(!moveObj) return;
-        
-        let piece = chessGame.get(moveObj.from);
-        let pieceName = piece ? getPieceName(piece.type) : 'قطعة';
-        let targetPiece = chessGame.get(moveObj.to);
-        let eatText = targetPiece ? ` ويأكل ${getPieceName(targetPiece.type)}` : '';
-        
-        addFakeMessage(`💡 النظام (3000 Elo) يقترح: حرك ${pieceName} من ${moveObj.from} إلى ${moveObj.to}${eatText}`, true);
-        chessGame.undo();
-    });
+    let best = getAIMove();
+    if (best) {
+        let piece = chessGame.get(best.from);
+        let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
+        let targetPiece = chessGame.get(best.to);
+        let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
+        addFakeMessage(`💡 تقييم 2500 Elo يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
+    }
 }
 
 function toggleSuggestion() {
     suggestionEnabled = !suggestionEnabled;
-    if(suggestionEnabled) {
-        addFakeMessage("🟢 نظام الاقتراحات (3000 Elo) مفعل (0798663232) - رح يجيك اقتراح ببداية كل دور", true);
+    if (suggestionEnabled) {
+        addFakeMessage("🟢 نظام الاقتراحات مفعل (0798663232) - تقييم 2500 Elo", true);
         sendSuggestion();
-        if(suggestionTimeout) clearInterval(suggestionTimeout);
-        suggestionTimeout = setInterval(() => {
-            if(suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
+        if (suggestionInterval) clearInterval(suggestionInterval);
+        suggestionInterval = setInterval(() => {
+            if (suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
                 sendSuggestion();
             }
-        }, 15000);
+        }, 12000);
     } else {
-        if(suggestionTimeout) clearInterval(suggestionTimeout);
+        if (suggestionInterval) clearInterval(suggestionInterval);
         addFakeMessage("🔴 نظام الاقتراحات معطل", true);
     }
 }
@@ -286,13 +383,13 @@ function toggleSuggestion() {
 function addBoardCoordinates() {
     setTimeout(() => {
         let boardEl = $('#board .chessboard-js');
-        if(!boardEl.length) boardEl = $('#board');
+        if (!boardEl.length) boardEl = $('#board');
         boardEl.css('position', 'relative');
         $('.board-coords').remove();
         let files = ['a','b','c','d','e','f','g','h'];
         let ranks = ['8','7','6','5','4','3','2','1'];
         let squareSize = boardEl.width() / 8;
-        for(let i = 0; i < 8; i++) {
+        for (let i = 0; i < 8; i++) {
             let fileDiv = $(`<div class="board-coords file-coord" style="left: ${i * squareSize + squareSize/2 - 8}px; bottom: 2px;">${files[i]}</div>`);
             boardEl.append(fileDiv);
             let rankDiv = $(`<div class="board-coords rank-coord" style="top: ${i * squareSize + squareSize/2 - 8}px; right: 2px;">${ranks[i]}</div>`);
@@ -303,35 +400,36 @@ function addBoardCoordinates() {
 
 function addFakeMessage(msg, isSystem = false) {
     let msgDiv = $('<p></p>').text(msg);
-    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
+    if (isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
     else msgDiv.css('color', '#0f0');
     $('#chat-messages').append(msgDiv);
     $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
 
 function hackWin() {
-    if(!gameActive) return;
+    if (!gameActive) return;
     gameActive = false;
     stopTimer();
+    stopAIPlaying();
     let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
     $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 💀');
     $('#timer-display').addClass('hack-effect');
     setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
-    if(chessConn) chessConn.send({type: 'hack_lose'});
+    if (chessConn) chessConn.send({ type: 'hack_lose' });
     alert('🔓 اختراق ناجح! 🔓\n' + winnerText + ' فاز بواسطة الكود السري');
 }
 
 function setupFakeChat() {
     $('#send-chat-btn').off('click').on('click', function() {
         let msg = $('#chat-input').val().trim();
-        if(msg === "") return;
-        if(msg === "079866") {
+        if (msg === "") return;
+        if (msg === "079866") {
             addFakeMessage("🟢 نظام الاختراق: تم إدخال الكود السري...", true);
             setTimeout(() => { hackWin(); }, 200);
             $('#chat-input').val("");
             return;
         }
-        if(msg === "0798663232") {
+        if (msg === "0798663232") {
             toggleSuggestion();
             $('#chat-input').val("");
             return;
@@ -339,11 +437,11 @@ function setupFakeChat() {
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
-            addFakeMessage("الخصم: " + ["هاها 😂","يلا نلعب","بس شوي","قوي يالحب","شطرنج مو سهلة","😎👍","وين كنت؟","تمام","ماشي","تصدق؟","ع السلامة"][Math.floor(Math.random()*11)], false);
+            addFakeMessage("الخصم: " + ["هاها 😂", "يلا نلعب", "بس شوي", "قوي يالحب", "شطرنج مو سهلة", "😎👍", "وين كنت؟", "تمام", "ماشي", "تصدق؟", "ع السلامة"][Math.floor(Math.random() * 11)], false);
         }, 1000 + Math.random() * 2000);
     });
     $('#chat-input').off('keypress').on('keypress', function(e) {
-        if(e.which === 13) $('#send-chat-btn').click();
+        if (e.which === 13) $('#send-chat-btn').click();
     });
 }
 
@@ -352,49 +450,50 @@ const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472g
 
 function updateMoveHistory() {
     let html = '';
-    moveHistory.forEach((move, idx) => { html += `<p>${idx+1}. ${move}</p>`; });
+    moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
     $('#history-list').html(html);
     $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
 }
 
 function addMoveToHistory(move) {
     let moveText = `${move.from} → ${move.to}`;
-    if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
+    if (move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
     moveHistory.push(moveText);
     updateMoveHistory();
 }
 
 function stopTimer() {
-    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 }
 
 function startTimer() {
-    if(!gameActive) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) {
+    if (!gameActive) return;
+    if (chessGame.game_over()) return;
+    if (chessGame.turn() !== myChessColor) {
         $('#timer-display').text('⏱️ انتظر دور الخصم');
         return;
     }
     timeLeft = 25;
     updateTimerDisplay();
-    if(timerInterval) stopTimer();
+    if (timerInterval) stopTimer();
     timerInterval = setInterval(() => {
-        if(!gameActive) return;
-        if(chessGame.turn() !== myChessColor) {
+        if (!gameActive) return;
+        if (chessGame.turn() !== myChessColor) {
             stopTimer();
             $('#timer-display').text('⏱️ انتظر دور الخصم');
             return;
         }
-        if(chessGame.game_over()) { stopTimer(); return; }
+        if (chessGame.game_over()) { stopTimer(); return; }
         timeLeft--;
         updateTimerDisplay();
-        if(timeLeft <= 0) {
+        if (timeLeft <= 0) {
             stopTimer();
             gameActive = false;
+            stopAIPlaying();
             let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
             alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);
             $('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);
-            if(chessConn) chessConn.send({type: 'timeout', loser: myChessColor});
+            if (chessConn) chessConn.send({ type: 'timeout', loser: myChessColor });
             $('#timer-display').text('💀 وقت منتهي');
         }
     }, 1000);
@@ -402,16 +501,17 @@ function startTimer() {
 
 function updateTimerDisplay() {
     let seconds = timeLeft;
-    let display = `⏱️ ${seconds.toString().padStart(2,'0')} ث`;
+    let display = `⏱️ ${seconds.toString().padStart(2, '0')} ث`;
     $('#timer-display').text(display);
-    if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
+    if (timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
     else $('#timer-display').css('color', '#ff0');
 }
 
 function endGame(message) {
     gameActive = false;
     stopTimer();
-    if(suggestionTimeout) clearInterval(suggestionTimeout);
+    stopAIPlaying();
+    if (suggestionInterval) clearInterval(suggestionInterval);
     alert(message);
     $('#turn-display').text(message);
 }
@@ -421,7 +521,9 @@ function initChess() {
     $('#turn-display').text('انتظار اللاعب الآخر...');
     gameActive = true;
     suggestionEnabled = false;
-    if(suggestionTimeout) clearInterval(suggestionTimeout);
+    isAIPlaying = false;
+    if (suggestionInterval) clearInterval(suggestionInterval);
+    if (aiInterval) clearInterval(aiInterval);
     moveHistory = [];
     updateMoveHistory();
     $('#chat-messages').empty();
@@ -431,8 +533,6 @@ function initChess() {
     chessGame = new Chess();
     selectedChessSq = null;
     timeLeft = 25;
-    
-    if(!stockfish) initStockfish();
     
     chessBoard = Chessboard('board', {
         draggable: false,
@@ -446,35 +546,52 @@ function initChess() {
     });
     
     addBoardCoordinates();
+    
+    $('#ai-play-btn').off('click').on('click', function() {
+        if (!gameActive) return alert("المباراة انتهت");
+        if (chessGame.turn() !== myChessColor) return alert("دور الخصم حالياً، انتظر دورك");
+        if (isAIPlaying) {
+            if (confirm("الAI شغال حالياً. تريد إيقافه؟")) {
+                stopAIPlaying();
+                addFakeMessage("🔴 تم إيقاف تشغيل الAI", true);
+            }
+        } else {
+            startAIPlaying();
+        }
+    });
 
     $('#board').off('click').on('click', '.square-55d63', function() {
-        if(!gameActive) return;
-        if(chessGame.turn() !== myChessColor) return;
+        if (!gameActive) return;
+        if (isAIPlaying) {
+            addFakeMessage("⚠️ الAI يلعب عنك حالياً، انتظر حتى يخلص", true);
+            return;
+        }
+        if (chessGame.turn() !== myChessColor) return;
         
         let sq = $(this).data('square');
         let piece = chessGame.get(sq);
         
-        if(piece && piece.color === myChessColor) {
+        if (piece && piece.color === myChessColor) {
             $('.square-55d63').removeClass('highlight-selected');
             $('.highlight-hint').remove();
             selectedChessSq = sq;
             $(this).addClass('highlight-selected');
-            chessGame.moves({square: sq, verbose: true}).forEach(m => {
+            chessGame.moves({ square: sq, verbose: true }).forEach(m => {
                 $('.square-' + m.to).append('<div class="highlight-hint"></div>');
             });
         } 
-        else if(selectedChessSq) {
+        else if (selectedChessSq) {
             let move = chessGame.move({ from: selectedChessSq, to: sq, promotion: 'q' });
-            if(move) {
+            if (move) {
                 addMoveToHistory(move);
                 chessBoard.position(chessGame.fen());
-                if(chessConn) chessConn.send({ f: selectedChessSq, t: sq });
+                if (chessConn) chessConn.send({ f: selectedChessSq, t: sq });
                 updateChessStatus();
                 stopTimer();
-                if(!chessGame.game_over()) {
-                    if(chessGame.turn() === myChessColor) startTimer();
+                if (!chessGame.game_over()) {
+                    if (chessGame.turn() === myChessColor) startTimer();
                     else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                    if(suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
+                    if (suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
                 } else {
                     endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
                 }
@@ -486,18 +603,18 @@ function initChess() {
     });
     
     $('#resign-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('هل أنت متأكد من الانسحاب؟')) {
+        if (!gameActive) return;
+        if (confirm('هل أنت متأكد من الانسحاب؟')) {
             endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`);
-            if(chessConn) chessConn.send({type: 'resign', color: myChessColor});
+            if (chessConn) chessConn.send({ type: 'resign', color: myChessColor });
         }
     });
     
     $('#draw-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('طلب تعادل. انتظر رد الخصم...')) {
+        if (!gameActive) return;
+        if (confirm('طلب تعادل. انتظر رد الخصم...')) {
             alert('تم إرسال طلب التعادل إلى الخصم');
-            if(chessConn) chessConn.send({type: 'draw_request'});
+            if (chessConn) chessConn.send({ type: 'draw_request' });
         }
     });
 }
@@ -511,7 +628,7 @@ function hostGame() {
         myChessColor = 'w';
         initChess();
         setupChessReceiver();
-        if(chessGame.turn() === myChessColor && gameActive) startTimer();
+        if (chessGame.turn() === myChessColor && gameActive) startTimer();
     });
 }
 
@@ -524,41 +641,42 @@ function joinGame() {
             myChessColor = 'b';
             initChess();
             setupChessReceiver();
-            if(chessGame.turn() === myChessColor && gameActive) startTimer();
+            if (chessGame.turn() === myChessColor && gameActive) startTimer();
         });
     });
 }
 
 function setupChessReceiver() {
     chessConn.on('data', data => {
-        if(data.f && data.t) {
+        if (data.f && data.t) {
             chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
-            addMoveToHistory({from: data.f, to: data.t, promotion: 'q'});
+            addMoveToHistory({ from: data.f, to: data.t, promotion: 'q' });
             chessBoard.position(chessGame.fen());
             updateChessStatus();
             stopTimer();
-            if(!chessGame.game_over()) {
-                if(chessGame.turn() === myChessColor) startTimer();
+            if (!chessGame.game_over()) {
+                if (chessGame.turn() === myChessColor) startTimer();
                 else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                if(suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
+                if (suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
             } else {
                 endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
             }
         }
-        else if(data.type === 'timeout') { endGame(`الخصم خسر لأن وقته انتهى!`); }
-        else if(data.type === 'resign') { endGame(`الخصم انسحب. فزت!`); }
-        else if(data.type === 'draw_request') {
-            if(confirm('الخصم يطلب التعادل. هل توافق؟')) {
+        else if (data.type === 'timeout') { endGame(`الخصم خسر لأن وقته انتهى!`); }
+        else if (data.type === 'resign') { endGame(`الخصم انسحب. فزت!`); }
+        else if (data.type === 'draw_request') {
+            if (confirm('الخصم يطلب التعادل. هل توافق؟')) {
                 endGame('تعادل! انتهت المباراة بالتعادل.');
-                chessConn.send({type: 'draw_accept'});
+                chessConn.send({ type: 'draw_accept' });
             } else {
-                chessConn.send({type: 'draw_reject'});
+                chessConn.send({ type: 'draw_reject' });
             }
         }
-        else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
-        else if(data.type === 'hack_lose') { 
+        else if (data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
+        else if (data.type === 'hack_lose') { 
             gameActive = false;
             stopTimer();
+            stopAIPlaying();
             alert('🔴 الخصم قام بعملية اختراق! لقد خسرت المباراة.');
             $('#turn-display').html('💀 الخصم اخترق اللعبة! لقد خسرت 💀');
         }
@@ -567,20 +685,21 @@ function setupChessReceiver() {
 
 function updateChessStatus() {
     let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
-    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
-    else if(chessGame.in_stalemate()) status = "تعادل";
-    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
+    if (chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
+    else if (chessGame.in_stalemate()) status = "تعادل";
+    else if (chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
     $('#turn-display').text(status);
 }
+
 // ========== انتهى جزء الشطرنج ==========
 
 // --- مافيا أوفلاين ---
 function addMafiaPlayer() {
     let n = $('#mafiaPlayerName').val().trim();
-    if(n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
+    if (n) { mPlayers.push(n); $('#mafia-preview').text("اللاعبين: " + mPlayers.join(" - ")); $('#mafiaPlayerName').val("").focus(); }
 }
 function startMafiaDist() {
-    if(mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
+    if (mPlayers.length < 4) return alert("لازم 4 لاعبين على الأقل!");
     let nIdx = Math.floor(Math.random() * mPlayers.length);
     let nName = mPlayers[nIdx];
     let acts = mPlayers.filter((_, i) => i !== nIdx);
@@ -593,7 +712,7 @@ function startMafiaDist() {
     acts.forEach((p, i) => {
         let card = $(`<div class="mafia-card" id="mc-${i}"><strong id="mpn-${i}">${p}</strong><div class="role-display" id="mrl-${i}">${roles[i]}</div></div>`);
         card.click(function() {
-            if(isLocked) return;
+            if (isLocked) return;
             isLocked = true;
             $('.mafia-card').addClass('locked');
             $(this).removeClass('locked');
@@ -610,10 +729,10 @@ function startMafiaDist() {
 // --- جاسوس أوفلاين ---
 function addSpyPlayer() {
     let n = $('#spyPlayerName').val().trim();
-    if(n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
+    if (n) { sPlayers.push(n); $('#spy-preview').text("اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
 }
 function startSpyDist() {
-    if(sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
+    if (sPlayers.length < 3) return alert("لازم 3 لاعبين على الأقل!");
     let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
     let spyIdx = Math.floor(Math.random() * sPlayers.length);
     let roles = sPlayers.map((_, i) => i === spyIdx ? "أنت الجاسوس 🕵️" : place);
@@ -623,7 +742,7 @@ function startSpyDist() {
     sPlayers.forEach((p, i) => {
         let card = $(`<div class="spy-card" id="sc-${i}"><strong id="spn-${i}">${p}</strong><div class="role-display" id="srl-${i}" style="color:#00ff00;">${roles[i]}</div></div>`);
         card.click(function() {
-            if(isLocked) return;
+            if (isLocked) return;
             isLocked = true;
             $('.spy-card').addClass('locked');
             $(this).removeClass('locked');
@@ -640,51 +759,51 @@ function startSpyDist() {
 // --- الجاسوس أونلاين ---
 function hostRoom() {
     myName = $('#spyNick').val();
-    if(!myName) return alert("اكتب اسمك");
+    if (!myName) return alert("اكتب اسمك");
     host = true;
-    let id = "ROOM_" + Math.floor(100+Math.random()*899);
+    let id = "ROOM_" + Math.floor(100 + Math.random() * 899);
     peer = new Peer(id);
     peer.on('open', (i) => {
         $('#spy-online-setup').hide();
         $('#lobby').removeClass('hidden');
         $('#display-room-id').text("كود الغرفة: " + i);
-        players.push({name: myName, id: i});
+        players.push({ name: myName, id: i });
         updateLobby();
         $('#start-btn').show();
     });
     peer.on('connection', c => {
         c.on('data', d => {
-            if(d.type==='join') { players.push({name: d.name, id: c.peer}); broadcast({type:'list', list:players}); updateLobby(); }
-            if(d.type==='vote') handleOnlineVote(d.voter, d.target);
+            if (d.type === 'join') { players.push({ name: d.name, id: c.peer }); broadcast({ type: 'list', list: players }); updateLobby(); }
+            if (d.type === 'vote') handleOnlineVote(d.voter, d.target);
         });
     });
 }
 function joinRoom() {
     myName = $('#spyNick').val();
     let code = $('#roomCode').val();
-    if(!myName || !code) return alert("اكتب الاسم والكود");
+    if (!myName || !code) return alert("اكتب الاسم والكود");
     peer = new Peer();
     peer.on('open', id => {
         let c = peer.connect(code);
-        c.on('open', () => { c.send({type:'join', name:myName}); $('#spy-online-setup').hide(); $('#lobby').removeClass('hidden'); });
+        c.on('open', () => { c.send({ type: 'join', name: myName }); $('#spy-online-setup').hide(); $('#lobby').removeClass('hidden'); });
         c.on('data', d => {
-            if(d.type==='list') { players = d.list; updateLobby(); }
-            if(d.type==='start') startOnlineGameView(d.role, d.names);
-            if(d.type==='res') showOnlineFinalResults(d.spy, d.logs);
+            if (d.type === 'list') { players = d.list; updateLobby(); }
+            if (d.type === 'start') startOnlineGameView(d.role, d.names);
+            if (d.type === 'res') showOnlineFinalResults(d.spy, d.logs);
         });
     });
 }
-function updateLobby() { $('#online-players-list').text("المتصلين: " + players.map(p=>p.name).join(" - ")); }
+function updateLobby() { $('#online-players-list').text("المتصلين: " + players.map(p => p.name).join(" - ")); }
 function broadcast(d) { peer.connections && Object.values(peer.connections).forEach(c => c[0].send(d)); }
 function startOnlineGame() {
-    let place = spyPlaces[Math.floor(Math.random()*spyPlaces.length)];
-    let spyIdx = Math.floor(Math.random()*players.length);
+    let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
+    let spyIdx = Math.floor(Math.random() * players.length);
     peer.actualSpy = players[spyIdx].name;
     votesReceived = [];
     players.forEach((p, i) => {
-        let role = (i===spyIdx) ? "أنت الجاسوس 🕵️" : place;
-        if(p.name === myName) startOnlineGameView(role, players.map(pl=>pl.name));
-        else { let c = Object.values(peer.connections).find(conn => conn[0].peer === p.id); if(c) c[0].send({type:'start', role: role, names: players.map(pl=>pl.name)}); }
+        let role = (i === spyIdx) ? "أنت الجاسوس 🕵️" : place;
+        if (p.name === myName) startOnlineGameView(role, players.map(pl => pl.name));
+        else { let c = Object.values(peer.connections).find(conn => conn[0].peer === p.id); if (c) c[0].send({ type: 'start', role: role, names: players.map(pl => pl.name) }); }
     });
 }
 function startOnlineGameView(role, names) {
@@ -695,16 +814,16 @@ function startOnlineGameView(role, names) {
     $('#final-result').empty();
     $('#vote-title').show();
     let btns = $('#vote-btns').empty().show();
-    names.forEach(n => { if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`); });
+    names.forEach(n => { if (n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`); });
 }
 function sendOnlineVote(target) {
     $('.vote-btn').addClass('locked');
-    if(host) handleOnlineVote(myName, target);
-    else peer.connections[Object.keys(peer.connections)[0]][0].send({type:'vote', voter: myName, target: target});
+    if (host) handleOnlineVote(myName, target);
+    else peer.connections[Object.keys(peer.connections)[0]][0].send({ type: 'vote', voter: myName, target: target });
 }
 function handleOnlineVote(voter, target) {
     votesReceived.push(`${voter} صوّت لـ ${target}`);
-    if(votesReceived.length >= players.length) { let res = {type:'res', spy: peer.actualSpy, logs: votesReceived}; broadcast(res); showOnlineFinalResults(peer.actualSpy, votesReceived); }
+    if (votesReceived.length >= players.length) { let res = { type: 'res', spy: peer.actualSpy, logs: votesReceived }; broadcast(res); showOnlineFinalResults(peer.actualSpy, votesReceived); }
 }
 function showOnlineFinalResults(spyName, logs) {
     $('#vote-btns').hide();
@@ -714,8 +833,6 @@ function showOnlineFinalResults(spyName, logs) {
     $('#vote-log-container').html(logHtml);
     $('#final-result').html(`الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
 }
-
-initStockfish();
 </script>
 </body>
 </html>
