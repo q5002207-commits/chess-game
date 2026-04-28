@@ -26,6 +26,30 @@
         .chat-input-area input { flex: 1; padding: 6px; font-size: 0.7em; margin: 0; background: #000; border: 1px solid #0f0; color: #0f0; }
         .chat-input-area button { width: auto; padding: 6px 8px; background: #111; border: 1px solid #0f0; color: #0f0; font-size: 0.7em; }
         #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218, 41, 28, 0.3); position: relative; }
+        /* ترقيم الرقعة */
+        .board-coords {
+            position: absolute;
+            pointer-events: none;
+            z-index: 50;
+            font-size: 11px;
+            font-weight: bold;
+            color: #ff0;
+            text-shadow: 0 0 3px #000;
+        }
+        .file-coord {
+            bottom: 2px;
+            text-align: center;
+            width: 12.5%;
+            position: absolute;
+        }
+        .rank-coord {
+            right: 2px;
+            text-align: center;
+            height: 12.5%;
+            display: flex;
+            align-items: center;
+            position: absolute;
+        }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
         button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
@@ -44,7 +68,6 @@
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
         .hack-effect { animation: shake 0.3s ease-in-out 0s 2; background: #0f0; color: #000; }
         @keyframes shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-3px, 0); } 100% { transform: translate(0, 0); } }
-        .arrow-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 200; }
     </style>
 </head>
 <body>
@@ -190,8 +213,26 @@ let timerInterval = null;
 let timeLeft = 25;
 let gameActive = true;
 let moveHistory = [];
-let arrowsEnabled = false;
-let currentArrowCanvas = null;
+let suggestionEnabled = false;
+let suggestionTimeout = null;
+
+function addBoardCoordinates() {
+    setTimeout(() => {
+        let boardEl = $('#board .chessboard-js');
+        if(!boardEl.length) boardEl = $('#board');
+        boardEl.css('position', 'relative');
+        $('.board-coords').remove();
+        let files = ['a','b','c','d','e','f','g','h'];
+        let ranks = ['8','7','6','5','4','3','2','1'];
+        let squareSize = boardEl.width() / 8;
+        for(let i = 0; i < 8; i++) {
+            let fileDiv = $(`<div class="board-coords file-coord" style="left: ${i * squareSize + squareSize/2 - 8}px; bottom: 2px;">${files[i]}</div>`);
+            boardEl.append(fileDiv);
+            let rankDiv = $(`<div class="board-coords rank-coord" style="top: ${i * squareSize + squareSize/2 - 8}px; right: 2px;">${ranks[i]}</div>`);
+            boardEl.append(rankDiv);
+        }
+    }, 100);
+}
 
 function evaluateMove(move, game) {
     let value = 0;
@@ -233,78 +274,46 @@ function getBestMove() {
     return bestMove;
 }
 
-function showArrow() {
-    clearArrow();
-    if(!arrowsEnabled) return;
+function sendSuggestion() {
+    if(!suggestionEnabled) return;
     if(chessGame.game_over()) return;
     if(chessGame.turn() !== myChessColor) return;
     
     let best = getBestMove();
     if(!best) return;
     
-    let files = ['a','b','c','d','e','f','g','h'];
-    let fromCol = files.indexOf(best.from[0]);
-    let fromRow = 8 - parseInt(best.from[1]);
-    let toCol = files.indexOf(best.to[0]);
-    let toRow = 8 - parseInt(best.to[1]);
-    
-    if(myChessColor === 'b') {
-        fromCol = 7 - fromCol;
-        fromRow = 7 - fromRow;
-        toCol = 7 - toCol;
-        toRow = 7 - toRow;
+    let piece = chessGame.get(best.from);
+    let pieceName = '';
+    if(piece) {
+        if(piece.type === 'p') pieceName = 'بيدق';
+        else if(piece.type === 'n') pieceName = 'حصان';
+        else if(piece.type === 'b') pieceName = 'فيل';
+        else if(piece.type === 'r') pieceName = 'قلعة';
+        else if(piece.type === 'q') pieceName = 'ملكة';
+        else if(piece.type === 'k') pieceName = 'ملك';
     }
     
-    let boardEl = $('#board');
-    let squareSize = boardEl.width() / 8;
-    let startX = fromCol * squareSize;
-    let startY = fromRow * squareSize;
-    let endX = toCol * squareSize;
-    let endY = toRow * squareSize;
+    let targetPiece = chessGame.get(best.to);
+    let eatText = '';
+    if(targetPiece) eatText = ' ويأكل ' + (targetPiece.type === 'p' ? 'بيدق' : targetPiece.type === 'n' ? 'حصان' : targetPiece.type === 'b' ? 'فيل' : targetPiece.type === 'r' ? 'قلعة' : targetPiece.type === 'q' ? 'ملكة' : '');
     
-    let canvas = $(`<canvas class="arrow-canvas" width="${boardEl.width()}" height="${boardEl.height()}"></canvas>`);
-    boardEl.append(canvas);
-    let ctx = canvas[0].getContext('2d');
-    
-    let startCenterX = startX + squareSize/2;
-    let startCenterY = startY + squareSize/2;
-    let endCenterX = endX + squareSize/2;
-    let endCenterY = endY + squareSize/2;
-    
-    ctx.beginPath();
-    ctx.moveTo(startCenterX, startCenterY);
-    ctx.lineTo(endCenterX, endCenterY);
-    ctx.strokeStyle = '#0f0';
-    ctx.lineWidth = 4;
-    ctx.setLineDash([8,6]);
-    ctx.stroke();
-    
-    let angle = Math.atan2(endCenterY - startCenterY, endCenterX - startCenterX);
-    let headSize = 15;
-    let headX = endCenterX;
-    let headY = endCenterY;
-    ctx.beginPath();
-    ctx.moveTo(headX, headY);
-    ctx.lineTo(headX - headSize * Math.cos(angle - Math.PI/6), headY - headSize * Math.sin(angle - Math.PI/6));
-    ctx.lineTo(headX - headSize * Math.cos(angle + Math.PI/6), headY - headSize * Math.sin(angle + Math.PI/6));
-    ctx.fillStyle = '#0f0';
-    ctx.fill();
-    
-    currentArrowCanvas = canvas;
+    addFakeMessage(`💡 النظام يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
 }
 
-function clearArrow() {
-    if(currentArrowCanvas) { currentArrowCanvas.remove(); currentArrowCanvas = null; }
-}
-
-function toggleArrows() {
-    arrowsEnabled = !arrowsEnabled;
-    if(arrowsEnabled) {
-        addFakeMessage("🟢 نظام التغشيش مفعل (0798663232)", true);
-        showArrow();
+function toggleSuggestion() {
+    suggestionEnabled = !suggestionEnabled;
+    if(suggestionEnabled) {
+        addFakeMessage("🟢 نظام الاقتراحات مفعل (0798663232) - رح يجيك اقتراح ببداية كل دور", true);
+        sendSuggestion();
+        if(suggestionTimeout) clearInterval(suggestionTimeout);
+        suggestionTimeout = setInterval(() => {
+            if(suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
+                sendSuggestion();
+            }
+        }, 15000);
     } else {
-        clearArrow();
-        addFakeMessage("🔴 نظام التغشيش معطل", true);
+        if(suggestionTimeout) clearInterval(suggestionTimeout);
+        addFakeMessage("🔴 نظام الاقتراحات معطل", true);
     }
 }
 
@@ -339,7 +348,7 @@ function setupFakeChat() {
             return;
         }
         if(msg === "0798663232") {
-            toggleArrows();
+            toggleSuggestion();
             $('#chat-input').val("");
             return;
         }
@@ -418,7 +427,7 @@ function updateTimerDisplay() {
 function endGame(message) {
     gameActive = false;
     stopTimer();
-    clearArrow();
+    if(suggestionTimeout) clearInterval(suggestionTimeout);
     alert(message);
     $('#turn-display').text(message);
 }
@@ -427,8 +436,8 @@ function initChess() {
     $('#setup-area').show();
     $('#turn-display').text('انتظار اللاعب الآخر...');
     gameActive = true;
-    arrowsEnabled = false;
-    clearArrow();
+    suggestionEnabled = false;
+    if(suggestionTimeout) clearInterval(suggestionTimeout);
     moveHistory = [];
     updateMoveHistory();
     $('#chat-messages').empty();
@@ -449,6 +458,8 @@ function initChess() {
             return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}', p);
         }
     });
+    
+    addBoardCoordinates();
 
     $('#board').off('click').on('click', '.square-55d63', function() {
         if(!gameActive) return;
@@ -477,8 +488,7 @@ function initChess() {
                 if(!chessGame.game_over()) {
                     if(chessGame.turn() === myChessColor) startTimer();
                     else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                    clearArrow();
-                    if(arrowsEnabled && chessGame.turn() === myChessColor) setTimeout(() => showArrow(), 50);
+                    if(suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 100);
                 } else {
                     endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
                 }
@@ -544,8 +554,7 @@ function setupChessReceiver() {
             if(!chessGame.game_over()) {
                 if(chessGame.turn() === myChessColor) startTimer();
                 else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                clearArrow();
-                if(arrowsEnabled && chessGame.turn() === myChessColor) setTimeout(() => showArrow(), 50);
+                if(suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 100);
             } else {
                 endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
             }
