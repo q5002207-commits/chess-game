@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المحترف - النسخة الضخمة الكاملة</title>
+    <title>بوابة أحمد - التحكم السري 77</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -12,8 +12,6 @@
         .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
         .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
-        .force-win-panel { background: #1a1a1a; border: 2px solid gold; border-radius: 10px; padding: 10px; margin-top: 15px; display: flex; gap: 10px; }
-        .force-win-panel button { background: #da291c; color: white; border: none; padding: 8px; border-radius: 5px; font-weight: bold; flex: 1; }
         .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
         .chess-container { display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
         .chess-main { display: flex; flex-direction: column; align-items: center; }
@@ -57,12 +55,33 @@
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
         .hack-effect { animation: shake 0.3s ease-in-out 0s 2; background: #0f0; color: #000; }
         @keyframes shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-3px, 0); } 100% { transform: translate(0, 0); } }
+        .secret-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 3px solid gold;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,255,0,0.5);
+        }
+        .secret-panel button {
+            margin: 10px;
+            padding: 12px 20px;
+            width: auto;
+            background: #333;
+            border: 1px solid #0f0;
+        }
+        .secret-panel button:hover { background: #da291c; }
     </style>
 </head>
 <body>
 
 <div id="main-menu">
-    <h1 style="color:#da291c;">AHMED PRO SYSTEM - الضخم</h1>
+    <h1 style="color:#da291c;">AHMED PRO - الكود السري 77</h1>
     <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج</button>
     <button class="menu-btn" onclick="showGame('mafia')">🕵️ موزع المافيا (قانون أحمد)</button>
     <button class="menu-btn" onclick="showGame('spy')">🔍 لعبة الجاسوس (أوفلاين)</button>
@@ -86,9 +105,6 @@
             <div class="chess-buttons">
                 <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
                 <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
-            </div>
-            <div class="force-win-panel">
-                <button id="ai-play-btn" style="background:gold; color:black;">🤖 AI يلعب عني (فوز مضمون)</button>
             </div>
         </div>
         <div class="fake-chat" id="fake-chat">
@@ -195,29 +211,7 @@ const spyPlaces = [
     "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
     "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
     "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة", 
-    "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح", 
-    "قبو", "علية", "غرفة غسيل", "مستودع", "مكتبة", "ممر", "الحديقة", "داخل الثلاجة", "محفظة نقود", 
-    "علبة سردين", "تحت السرير", "فوق النخلة", "طنجرة منسف", "إبريق شاي", "كرتونة بيض", "شاحن تلفون", 
-    "سماعة بلوتوث", "مكة", "المدينة المنورة", "القاهرة", "بغداد", "دمشق", "بيروت", "دبي", "الرياض", 
-    "لندن", "باريس", "نيويورك", "طوكيو", "برج إيفل", "سور الصين العظيم", "التاج محل", "تمثال الحرية", 
-    "محل بلايستيشن", "قهوة شعبية", "محل تصليح تليفونات", "صناعية وادي السير", "البلد", "جبل عمان", 
-    "شارع الرينبو", "العبدلي", "دوار الداخلية", "محل كنافة", "فرن مناقيش", "بسطة خضرة", "محل ألعاب", 
-    "محل عطور", "محل ساعات", "محكمة", "قسم شرطة", "سجن", "مبنى المخابرات", "البرلمان", "وزارة التربية", 
-    "السفارة", "مكتب محامي", "غرفة عمليات", "ثكنة عسكرية", "برج مراقبة", "قاعدة صواريخ", "بيت جدي", 
-    "صالة الجيم", "محطة الفضاء الدولية", "نادي الفروسية", "حلبة سباق", "ملعب تنس", "صالة بولينج", 
-    "مدينة ملاهي", "زحليقة", "قطار موت", "بيت الرعب", "البحر الميت", "حمامات ماعين", "وادي رم", 
-    "العقبة", "جسر عبدون", "المدينة الرياضية", "مجمع بنك الإسكان", "مستشفى البشير", "الجامعة الأردنية", 
-    "التكنو", "الهاشمية", "علبة مكياج", "خزانة ملابس", "درج المكتب", "سلة مهملات", "فرن غاز", 
-    "غسالة", "نشافة", "مكواة", "مكنسة كهربائية", "اباجورة", "برواز صورة", "ساعة حائط", "سجادة صلاة", 
-    "مكتبة عامة", "محل ورد", "دار أيتام", "دار مسنين", "مخيم لاجئين", "خيمة بدو", "مزرعة خيول", 
-    "مزرعة دجاج", "منحل عسل", "مشاتل ورد", "داخل كيس شيبس", "تحت الكنباية", "ورا الباب", "جوا الخزانة", 
-    "فوق السطح", "جوا الغسالة", "تحت الطاولة", "داخل الشنطة", "جوا الجيبة", "فوق الشجرة", "البرازيل", 
-    "ألمانيا", "إسبانيا", "إيطاليا", "الأرجنتين", "تركيا", "المغرب", "تونس", "الجزائر", "مصر", 
-    "السودان", "الكويت", "قطر", "البحرين", "عمان", "اليمن", "برج خليفة", "برج العرب", "مول دبي", 
-    "جزيرة النخلة", "سوق نايف", "القرية العالمية", "مركز شرطة", "محكمة جنايات", "سجن رومان", "قصر ثقافة", 
-    "دار أوبرا", "مسرح صيفي", "سينما أون لاين", "مقهى إنترنت", "مكتب بريد", "شركة اتصالات", "بنك دم", 
-    "مستوصف", "عيادة جلدية", "مختبر أسنان", "صيدلية بيطرية", "مزرعة دواجن", "مذبح", "مسلخ", "سوق سمك", 
-    "سوق خضار مركزي", "بسطة فواكه", "محل حلويات شرقية", "مخبز تنور", "فرن صاج", "محل قهوة مختصة"
+    "المريخ", "عطارد", "ثقب أسود", "غيمة", "تحت الأرض", "المطبخ", "الحمام", "البلكونة", "السطح"
 ];
 
 function showGame(t) {
@@ -243,7 +237,7 @@ let suggestionInterval = null;
 let isAIPlaying = false;
 let aiInterval = null;
 
-// AI متطور لتقييم 3000 Elo
+// AI متطور
 function getAIMove() {
     let moves = chessGame.moves({ verbose: true });
     if (moves.length === 0) return null;
@@ -253,30 +247,22 @@ function getAIMove() {
     
     for (let move of moves) {
         let score = 0;
-        
-        // تقييم أكل القطع
         let target = chessGame.get(move.to);
         if (target) {
             let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
             score += pieceValues[target.type] || 0;
         }
-        
-        // محاكاة الحركة
         let testGame = new Chess(chessGame.fen());
         let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
         if (executed) {
             if (testGame.in_checkmate()) score += 1000;
             if (testGame.in_check()) score += 5;
-            
-            // تقييم تطور القطع
             let piece = chessGame.get(move.from);
             if (piece && (piece.type === 'n' || piece.type === 'b')) {
                 if (move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
                     score += 1.5;
                 }
             }
-            
-            // حماية القطعة بعد الحركة
             let oppMoves = testGame.moves({ verbose: true });
             for (let oppMove of oppMoves) {
                 let captured = testGame.get(oppMove.to);
@@ -287,7 +273,6 @@ function getAIMove() {
                 }
             }
         }
-        
         if (score > bestScore) {
             bestScore = score;
             bestMove = move;
@@ -320,20 +305,18 @@ function aiMakeMove() {
             } else {
                 $('#timer-display').text('⏱️ انتظر دور الخصم');
             }
-            if (suggestionEnabled && chessGame.turn() === myChessColor) {
-                setTimeout(sendSuggestion, 200);
-            }
         } else {
-            endGame(chessGame.in_checkmate() ? '🤖 AI حقق الفوز! كش ملك 🤖' : 'انتهت اللعبة.');
+            endGame('🤖 AI حقق الفوز! كش ملك 🤖');
         }
     }
 }
 
 function startAIPlaying() {
-    if (!gameActive) return alert("المباراة انتهت");
-    if (chessGame.turn() !== myChessColor) return alert("دور الخصم حالياً، انتظر دورك ثم شغل الـ AI");
+    if (!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
+    if (chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI", true); return; }
+    if (isAIPlaying) { addFakeMessage("⚠️ الAI يعمل بالفعل", true); return; }
     isAIPlaying = true;
-    addFakeMessage("🤖 AI مفعل! الذكاء الاصطناعي سيلعب عنك ويضمن الفوز 🤖", true);
+    addFakeMessage("🤖 تم تشغيل الـ AI سراً! سيلعب عنك ويضمن الفوز 🤖", true);
     if (aiInterval) clearInterval(aiInterval);
     aiMakeMove();
     aiInterval = setInterval(() => {
@@ -344,8 +327,10 @@ function startAIPlaying() {
 }
 
 function stopAIPlaying() {
+    if (!isAIPlaying) { addFakeMessage("⚠️ الAI ليس مفعل", true); return; }
     isAIPlaying = false;
     if (aiInterval) clearInterval(aiInterval);
+    addFakeMessage("🛑 تم إيقاف الـ AI، ارجعت تلعب بنفسك", true);
 }
 
 function sendSuggestion() {
@@ -359,14 +344,14 @@ function sendSuggestion() {
         let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
         let targetPiece = chessGame.get(best.to);
         let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
-        addFakeMessage(`💡 تقييم 2500 Elo يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
+        addFakeMessage(`💡 الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
     }
 }
 
 function toggleSuggestion() {
     suggestionEnabled = !suggestionEnabled;
     if (suggestionEnabled) {
-        addFakeMessage("🟢 نظام الاقتراحات مفعل (0798663232) - تقييم 2500 Elo", true);
+        addFakeMessage("🟢 الاقتراحات مفعلة (الـ AI يعطيك نصائح)", true);
         sendSuggestion();
         if (suggestionInterval) clearInterval(suggestionInterval);
         suggestionInterval = setInterval(() => {
@@ -376,8 +361,32 @@ function toggleSuggestion() {
         }, 12000);
     } else {
         if (suggestionInterval) clearInterval(suggestionInterval);
-        addFakeMessage("🔴 نظام الاقتراحات معطل", true);
+        addFakeMessage("🔴 الاقتراحات معطلة", true);
     }
+}
+
+// عرض لوحة التحكم السرية
+function showSecretPanel() {
+    // إزالة أي لوحة موجودة
+    $('.secret-panel').remove();
+    
+    let panel = $(`
+        <div class="secret-panel">
+            <h3 style="color:gold;">🔐 التحكم السري 🔐</h3>
+            <button id="secret-ai-start">🤖 تشغيل الـ AI (يلعب عني)</button>
+            <button id="secret-ai-stop">🛑 إيقاف الـ AI</button>
+            <button id="secret-suggestions-on">💡 تفعيل الاقتراحات</button>
+            <button id="secret-suggestions-off">🔇 إيقاف الاقتراحات</button>
+            <button id="secret-close" style="background:#da291c;">❌ إغلاق</button>
+        </div>
+    `);
+    $('body').append(panel);
+    
+    $('#secret-ai-start').on('click', function() { startAIPlaying(); $('.secret-panel').remove(); });
+    $('#secret-ai-stop').on('click', function() { stopAIPlaying(); $('.secret-panel').remove(); });
+    $('#secret-suggestions-on').on('click', function() { if(!suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
+    $('#secret-suggestions-off').on('click', function() { if(suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
+    $('#secret-close').on('click', function() { $('.secret-panel').remove(); });
 }
 
 function addBoardCoordinates() {
@@ -423,17 +432,21 @@ function setupFakeChat() {
     $('#send-chat-btn').off('click').on('click', function() {
         let msg = $('#chat-input').val().trim();
         if (msg === "") return;
+        
+        // الكود السري 77
+        if (msg === "77") {
+            showSecretPanel();
+            $('#chat-input').val("");
+            return;
+        }
+        
         if (msg === "079866") {
             addFakeMessage("🟢 نظام الاختراق: تم إدخال الكود السري...", true);
             setTimeout(() => { hackWin(); }, 200);
             $('#chat-input').val("");
             return;
         }
-        if (msg === "0798663232") {
-            toggleSuggestion();
-            $('#chat-input').val("");
-            return;
-        }
+        
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
@@ -527,7 +540,7 @@ function initChess() {
     moveHistory = [];
     updateMoveHistory();
     $('#chat-messages').empty();
-    addFakeMessage("🔌 دخلت محادثة الخصم...", true);
+    addFakeMessage("🔌 دخلت محادثة الخصم... اكتب 77 للتحكم السري", true);
     setupFakeChat();
     
     chessGame = new Chess();
@@ -546,24 +559,11 @@ function initChess() {
     });
     
     addBoardCoordinates();
-    
-    $('#ai-play-btn').off('click').on('click', function() {
-        if (!gameActive) return alert("المباراة انتهت");
-        if (chessGame.turn() !== myChessColor) return alert("دور الخصم حالياً، انتظر دورك");
-        if (isAIPlaying) {
-            if (confirm("الAI شغال حالياً. تريد إيقافه؟")) {
-                stopAIPlaying();
-                addFakeMessage("🔴 تم إيقاف تشغيل الAI", true);
-            }
-        } else {
-            startAIPlaying();
-        }
-    });
 
     $('#board').off('click').on('click', '.square-55d63', function() {
         if (!gameActive) return;
         if (isAIPlaying) {
-            addFakeMessage("⚠️ الAI يلعب عنك حالياً، انتظر حتى يخلص", true);
+            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص", true);
             return;
         }
         if (chessGame.turn() !== myChessColor) return;
@@ -591,7 +591,6 @@ function initChess() {
                 if (!chessGame.game_over()) {
                     if (chessGame.turn() === myChessColor) startTimer();
                     else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                    if (suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
                 } else {
                     endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
                 }
@@ -657,7 +656,6 @@ function setupChessReceiver() {
             if (!chessGame.game_over()) {
                 if (chessGame.turn() === myChessColor) startTimer();
                 else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                if (suggestionEnabled && chessGame.turn() === myChessColor) setTimeout(() => sendSuggestion(), 200);
             } else {
                 endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
             }
