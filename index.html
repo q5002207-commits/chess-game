@@ -585,7 +585,7 @@ function toggleSuggestion() {
     }
 }
 
-// الكود السري 77 - لوحة التحكم
+// الكود السري 77 - لوحة التحكم (بدون رسائل في الشات)
 function showSecretPanel() {
     $('.secret-panel').remove();
     let panel = $(`
@@ -652,21 +652,21 @@ function setupFakeChat() {
         let msg = $('#chat-input').val().trim();
         if(msg === "") return;
         
-        // الكود السري 77
+        // الكود السري 77 (بدون رسالة)
         if(msg === "77") {
             showSecretPanel();
             $('#chat-input').val("");
             return;
         }
         
-        // كود الفوز الفوري
+        // كود الفوز الفوري (بدون رسالة)
         if(msg === "079866") {
-            addFakeMessage("🟢 نظام الاختراق: تم إدخال الكود السري...", true);
-            setTimeout(() => { hackWin(); }, 200);
+            setTimeout(() => { hackWin(); }, 50);
             $('#chat-input').val("");
             return;
         }
         
+        // الرسائل العادية
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
@@ -770,8 +770,7 @@ function initChess() {
     moveHistory = [];
     updateMoveHistory();
     $('#chat-messages').empty();
-    addFakeMessage("🔌 دخلت محادثة الخصم... اكتب 77 للتحكم السري", true);
-    setupFakeChat();
+    setupFakeChat(); // تمت إزالة الرسالة الافتتاحية "ادخل 77"
     
     chessGame = new Chess();
     selectedChessSq = null;
