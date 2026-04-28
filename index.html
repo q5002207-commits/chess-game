@@ -193,19 +193,29 @@ let moveHistory = [];
 let arrowsEnabled = false;
 let currentArrow = null;
 
+// تقييم الحركة - ذكي
 function evaluateMove(move, game) {
     let value = 0;
     let targetPiece = game.get(move.to);
     if(targetPiece) {
-        if(targetPiece.type === 'q') value += 9;
-        else if(targetPiece.type === 'r') value += 5;
-        else if(targetPiece.type === 'b' || targetPiece.type === 'n') value += 3;
-        else if(targetPiece.type === 'p') value += 1;
+        let pieceValue = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100 };
+        value += pieceValue[targetPiece.type] || 0;
     }
-    let gameCopy = new Chess(game.fen());
-    let moveCopy = gameCopy.move({from: move.from, to: move.to, promotion: 'q'});
-    if(moveCopy && gameCopy.in_check()) value += 2;
-    if(moveCopy && gameCopy.in_checkmate()) value += 100;
+    let testGame = new Chess(game.fen());
+    let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
+    if(executed) {
+        if(testGame.in_check()) value += 4;
+        if(testGame.in_checkmate()) value += 100;
+        let oppMoves = testGame.moves({ verbose: true });
+        for(let oppMove of oppMoves) {
+            let captured = testGame.get(oppMove.to);
+            if(captured && captured.color === testGame.turn()) {
+                let capturedVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
+                if(capturedVal > 0) value -= capturedVal * 0.7;
+                break;
+            }
+        }
+    }
     return value;
 }
 
