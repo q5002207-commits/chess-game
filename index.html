@@ -52,8 +52,7 @@
         .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
         .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
         .secret-panel button:hover { background: #da291c; }
-        .force-win-panel { background: #1a1a1a; border: 2px solid gold; border-radius: 10px; padding: 10px; margin-top: 15px; display: flex; gap: 10px; }
-        .force-win-panel button { background: #da291c; color: white; border: none; padding: 8px; border-radius: 5px; font-weight: bold; flex: 1; }
+        .force-win-panel { display: none; } /* تم إخفاء زر AI */
     </style>
 </head>
 <body>
@@ -99,9 +98,7 @@
                 <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
                 <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
             </div>
-            <div class="force-win-panel">
-                <button id="ai-play-btn" style="background:gold; color:black;">🤖 AI يلعب عني (فوز مضمون)</button>
-            </div>
+            <!-- تم إخفاء زر AI نهائياً -->
         </div>
         <div class="fake-chat" id="fake-chat">
             <h4>💬 شات مع الخصم</h4>
@@ -532,10 +529,10 @@ function aiMakeMove() {
 
 function startAIPlaying() {
     if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI", true); return; }
+    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI (77)", true); return; }
     if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
     isAIPlaying = true;
-    addFakeMessage("🤖 تم تشغيل الـ AI! سيلعب عنك ويضمن الفوز 🤖", true);
+    addFakeMessage("🤖 تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز 🤖", true);
     if(aiInterval) clearInterval(aiInterval);
     aiMakeMove();
     aiInterval = setInterval(() => {
@@ -549,7 +546,7 @@ function stopAIPlaying() {
     if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
     isAIPlaying = false;
     if(aiInterval) clearInterval(aiInterval);
-    addFakeMessage("🛑 تم إيقاف الـ AI، ارجعت تلعب بنفسك", true);
+    addFakeMessage("🛑 تم إيقاف الـ AI من اللوحة السرية، ارجعت تلعب بنفسك", true);
 }
 
 // الاقتراحات
@@ -846,15 +843,7 @@ function initChess() {
         }
     });
     
-    $('#ai-play-btn').off('click').on('click', function() {
-        if(!gameActive) { alert("المباراة انتهت"); return; }
-        if(chessGame.turn() !== myChessColor) { alert("دور الخصم حالياً، انتظر دورك"); return; }
-        if(isAIPlaying) {
-            if(confirm("الـ AI شغال حالياً. تريد إيقافه؟")) stopAIPlaying();
-        } else {
-            startAIPlaying();
-        }
-    });
+    // تم إخفاء زر AI نهائياً، فلا حاجة لربطه
 }
 
 // الاتصال عبر PeerJS
