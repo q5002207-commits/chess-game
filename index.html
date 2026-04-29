@@ -3,100 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة أحمد - ساحة التحدي 🧠</title>
+    <title>سين جيم - نظام أحمد</title>
     <style>
-        * { box-sizing: border-box; touch-action: manipulation; }
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding: 15px; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0b0b; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .header { background: #da291c; width: 100%; max-width: 800px; padding: 15px; text-align: center; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.5); }
         
-        .header { background: #da291c; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 0 15px #da291c; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
-        .btn:hover { background: #da291c; }
-        
-        /* قسم المسابقة */
-        #quiz-section { max-width: 500px; margin: 0 auto; }
-        .score-board { font-size: 1.5em; color: #0f0; margin-bottom: 20px; text-shadow: 0 0 10px #0f0; }
-        .question-card { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #444; margin-bottom: 20px; }
-        .option-btn { background: #222; border: 1px solid #0f0; color: #0f0; width: 100%; padding: 12px; margin: 5px 0; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .option-btn:hover { background: #0f0; color: #000; }
-        
-        .hidden { display: none; }
-        .correct { background: #0f0 !important; color: #000 !important; }
-        .wrong { background: #f00 !important; color: #fff !important; }
+        /* لوحة اللعبة */
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 800px; }
+        .category-name { background: #222; padding: 15px; text-align: center; font-weight: bold; border: 1px solid #da291c; border-radius: 5px; color: #da291c; }
+        .q-cell { background: #1a1a1a; padding: 25px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 1.5em; font-weight: bold; transition: 0.3s; border: 1px solid #333; }
+        .q-cell:hover { background: #da291c; color: white; transform: scale(1.05); }
+        .q-cell.used { visibility: hidden; pointer-events: none; }
+
+        /* نافذة السؤال */
+        #q-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 2px solid #da291c; max-width: 600px; width: 90%; text-align: center; }
+        .modal-q { font-size: 1.8em; margin-bottom: 30px; }
+        .answer-btn { background: #0f0; color: #000; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; display: inline-block; margin-top: 20px; }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2em; cursor: pointer; color: #f00; }
+
+        /* النقاط */
+        .teams-container { display: flex; justify-content: space-around; width: 100%; max-width: 800px; margin-top: 30px; }
+        .team-box { background: #222; padding: 15px; border-radius: 10px; text-align: center; width: 45%; border-bottom: 4px solid #da291c; }
+        .score-val { font-size: 2em; color: #0f0; display: block; margin: 10px 0; }
+        .score-controls button { background: #333; color: white; border: none; padding: 5px 15px; margin: 0 5px; border-radius: 5px; cursor: pointer; font-size: 1.2em; }
     </style>
 </head>
 <body>
 
-<div id="main-menu">
-    <div class="header"><h1>⚔️ نظام أحمد المحترف ⚔️</h1></div>
-    <button class="btn" onclick="startQuiz()">🚩 ابدأ مسابقة (س وج)</button>
-    <button class="btn" style="border-color: #555; color: #888;">🕵️ المافيا (قريباً)</button>
+<div class="header">
+    <h1>♟️ سين جيم - نسخة المحترفين ♟️</h1>
 </div>
 
-<div id="quiz-section" class="hidden">
-    <div class="score-board">النقاط: <span id="score">0</span></div>
-    <div class="question-card">
-        <h3 id="q-text">جاري تحميل السؤال...</h3>
-        <div id="options-container"></div>
+<div class="game-grid">
+    <div class="category-name">تكنولوجيا</div>
+    <div class="category-name">أمن سيبراني</div>
+    <div class="category-name">عامة</div>
+
+    <div class="q-cell" onclick="openQ('تكنولوجيا', 100, 'ما هو اختصار كلمة HTML؟')">100</div>
+    <div class="q-cell" onclick="openQ('أمن', 100, 'ما هو الـ Phishing؟')">100</div>
+    <div class="q-cell" onclick="openQ('عامة', 100, 'عاصمة الأردن؟')">100</div>
+
+    <div class="q-cell" onclick="openQ('تكنولوجيا', 200, 'من هو مؤسس شركة مايكروسوفت؟')">200</div>
+    <div class="q-cell" onclick="openQ('أمن', 200, 'ما هو الـ Firewall؟')">200</div>
+    <div class="q-cell" onclick="openQ('عامة', 200, 'أكبر محيط في العالم؟')">200</div>
+
+    <div class="q-cell" onclick="openQ('تكنولوجيا', 300, 'ما هي لغة البرمجة الأكثر استخداماً للذكاء الاصطناعي؟')">300</div>
+    <div class="q-cell" onclick="openQ('أمن', 300, 'ما هو الهجوم بـ Brute Force؟')">300</div>
+    <div class="q-cell" onclick="openQ('عامة', 300, 'أطول نهر في العالم؟')">300</div>
+</div>
+
+<div class="teams-container">
+    <div class="team-box">
+        <h3>الفريق الأول</h3>
+        <span class="score-val" id="score1">0</span>
+        <div class="score-controls">
+            <button onclick="changeScore(1, -50)">-</button>
+            <button onclick="changeScore(1, 50)">+</button>
+        </div>
     </div>
-    <button class="btn" onclick="location.reload()" style="background: #333; border: none;">🏠 القائمة الرئيسية</button>
+    <div class="team-box">
+        <h3>الفريق الثاني</h3>
+        <span class="score-val" id="score2">0</span>
+        <div class="score-controls">
+            <button onclick="changeScore(2, -50)">-</button>
+            <button onclick="changeScore(2, 50)">+</button>
+        </div>
+    </div>
+</div>
+
+<div id="q-modal">
+    <span class="close-btn" onclick="closeQ()">&times;</span>
+    <div class="modal-content">
+        <h2 id="modal-cat" style="color:#da291c;"></h2>
+        <div class="modal-q" id="modal-text">السؤال يظهر هنا...</div>
+        <div id="ans-text" style="display:none; color:#0f0; font-size:1.5em; margin-bottom:20px;"></div>
+        <div class="answer-btn" onclick="$('#ans-text').show()">إظهار الإجابة</div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    let score = 0;
-    let currentQ = 0;
+    let currentCell;
+    let scores = { 1: 0, 2: 0 };
 
-    const questions = [
-        { q: "ما هو نظام التشغيل المفضل للهكرز؟", a: ["ويندوز", "كالي لينكس", "اندرويد"], c: 1 },
-        { q: "ما معنى كلمة (Firewall) بالعربي؟", a: ["جدار الحماية", "حرق الملفات", "سيرفر سريع"], c: 0 },
-        { q: "كم بت (Bit) يوجد في البايت الواحد؟", a: ["4", "10", "8"], c: 2 },
-        { q: "ما هو أسرع كائن حي في العالم؟", a: ["الفهد", "صقر الشاهين", "السمك الطائر"], c: 1 },
-        { q: "في أي لغة برمجية نستخدم وسم <html>؟", a: ["C++", "Python", "HTML"], c: 2 }
-    ];
-
-    function startQuiz() {
-        $('#main-menu').hide();
-        $('#quiz-section').removeClass('hidden');
-        showQuestion();
+    function openQ(cat, val, text) {
+        currentCell = event.target;
+        $('#modal-cat').text(cat + " - " + val);
+        $('#modal-text').text(text);
+        $('#ans-text').hide();
+        $('#q-modal').css('display', 'flex');
     }
 
-    function showQuestion() {
-        if (currentQ >= questions.length) {
-            $('#q-text').html("🏆 انتهى التحدي! <br> نقاطك النهائية: " + score);
-            $('#options-container').empty();
-            return;
-        }
-
-        let qData = questions[currentQ];
-        $('#q-text').text(qData.q);
-        $('#options-container').empty();
-
-        qData.a.forEach((opt, index) => {
-            let btn = $(`<button class="option-btn">${opt}</button>`);
-            btn.click(() => checkAnswer(index));
-            $('#options-container').append(btn);
-        });
+    function closeQ() {
+        $('#q-modal').hide();
+        if (currentCell) $(currentCell).addClass('used');
     }
 
-    function checkAnswer(index) {
-        let correctIdx = questions[currentQ].c;
-        let btns = $('.option-btn');
-
-        if (index === correctIdx) {
-            $(btns[index]).addClass('correct');
-            score += 10;
-            $('#score').text(score);
-        } else {
-            $(btns[index]).addClass('wrong');
-            $(btns[correctIdx]).addClass('correct');
-        }
-
-        $('.option-btn').prop('disabled', true);
-        
-        setTimeout(() => {
-            currentQ++;
-            showQuestion();
-        }, 1500);
+    function changeScore(team, val) {
+        scores[team] += val;
+        $(`#score${team}`).text(scores[team]);
     }
 </script>
 
