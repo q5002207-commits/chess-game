@@ -6,21 +6,93 @@
     <title>شطرنج 2 ضد 2 - متزامن</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        body { background: #000; color: #0f0; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
-        .game-area { text-align: center; background: #111; padding: 15px; border-radius: 10px; border: 1px solid #0f0; }
-        .info-panel { background: #111; padding: 15px; border-radius: 10px; border: 1px solid #0f0; width: 280px; }
-        #board { width: 480px; max-width: 85vw; margin: 0 auto; }
-        button { background: #da291c; color: white; border: none; padding: 10px 18px; margin: 5px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 8px; border-radius: 5px; margin: 5px; width: calc(100% - 22px); }
-        .chat-box { height: 300px; overflow-y: auto; border: 1px solid #0f0; padding: 8px; margin-bottom: 10px; font-size: 13px; text-align: right; background: #0a0a0a; }
-        .team-status { background: #1a1a1a; padding: 12px; border-radius: 8px; margin-top: 10px; border-right: 3px solid #da291c; }
-        .turn-status { background: #1a1a1a; padding: 12px; border-radius: 8px; margin-top: 10px; font-weight: bold; border-right: 3px solid #ff0; }
+        body { 
+            background: #000; 
+            color: #0f0; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+            margin: 0; 
+        }
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            justify-content: center; 
+            align-items: flex-start; 
+        }
+        .game-area { 
+            text-align: center; 
+            background: #111; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #0f0; 
+        }
+        .info-panel { 
+            background: #111; 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid #0f0; 
+            width: 280px; 
+        }
+        #board { 
+            width: 480px; 
+            max-width: 85vw; 
+            margin: 0 auto; 
+        }
+        button { 
+            background: #da291c; 
+            color: white; 
+            border: none; 
+            padding: 10px 18px; 
+            margin: 5px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        input { 
+            background: #000; 
+            color: #0f0; 
+            border: 1px solid #0f0; 
+            padding: 8px; 
+            border-radius: 5px; 
+            margin: 5px; 
+            width: calc(100% - 22px); 
+        }
+        .chat-box { 
+            height: 300px; 
+            overflow-y: auto; 
+            border: 1px solid #0f0; 
+            padding: 8px; 
+            margin-bottom: 10px; 
+            font-size: 13px; 
+            text-align: right; 
+            background: #0a0a0a; 
+        }
+        .team-status, .turn-status { 
+            background: #1a1a1a; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            border-right: 3px solid #da291c; 
+        }
+        .turn-status { border-right-color: #ff0; }
         .hidden { display: none; }
         .error { color: #ff5555; }
         .success { color: #55ff55; }
         .highlight-selected { background-color: rgba(255, 255, 0, 0.5) !important; }
-        .highlight-hint { width: 16px; height: 16px; background: rgba(0, 255, 0, 0.7); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .highlight-hint { 
+            width: 16px; 
+            height: 16px; 
+            background: rgba(0, 255, 0, 0.7); 
+            border-radius: 50%; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            pointer-events: none; 
+        }
     </style>
 </head>
 <body>
@@ -42,6 +114,7 @@
             </div>
         </div>
     </div>
+    
     <div class="info-panel">
         <h4>💬 شات الفريق</h4>
         <div id="chatMessages" class="chat-box"></div>
@@ -57,7 +130,8 @@
 
 <script>
 // ===================== متغيرات عامة =====================
-let conn = null;
+let peer = null;
+let connections = {};        // peerId => DataConnection
 let isHost = false;
 let myId = null;
 let myName = "";
@@ -71,7 +145,10 @@ let teamBlack = [];
 let currentTurn = 'white';
 let expectedPlayerId = null;
 let selectedSquare = null;
-let boardOrientation = 'white'; // اتجاه الرقعة عندي
+let boardOrientation = 'white';
+
+let whiteTurnIndex = 0;
+let blackTurnIndex = 0;
 
 // ===================== دوال مساعدة =====================
 function addSystemMessage(msg, isError = false) {
@@ -86,19 +163,33 @@ function addChatMessage(sender, msg) {
 }
 
 function broadcast(data) {
-    if (conn && conn.connections) {
-        Object.values(conn.connections).forEach(c => {
-            if (c[0]) c[0].send(data);
-        });
+    Object.values(connections).forEach(conn => {
+        if (conn && conn.open) {
+            conn.send(data);
+        }
+    });
+}
+
+function getNextPlayerId(team) {
+    if (team === 'white') {
+        const player = teamWhite[whiteTurnIndex % teamWhite.length];
+        whiteTurnIndex++;
+        return player ? player.id : null;
+    } else {
+        const player = teamBlack[blackTurnIndex % teamBlack.length];
+        blackTurnIndex++;
+        return player ? player.id : null;
     }
+}
+
+function canPlay() {
+    if (!gameActive || game.game_over()) return false;
+    return expectedPlayerId === myId;
 }
 
 function updateBoardOrientation() {
     if (!board) return;
-    let orientation = 'white';
-    if (myTeam === 'white') orientation = 'white';
-    else if (myTeam === 'black') orientation = 'black';
-    else orientation = 'white';
+    const orientation = (myTeam === 'black') ? 'black' : 'white';
     
     if (boardOrientation !== orientation) {
         boardOrientation = orientation;
@@ -121,268 +212,261 @@ function reattachBoardEvents() {
             addSystemMessage("⚠️ ليس دورك الآن!", true);
             return;
         }
-        let sq = $(this).data('square');
-        let piece = game.get(sq);
-        if (piece && piece.color === currentTurn.charAt(0)) {
-            $('.square-55d63').removeClass('highlight-selected');
-            $('.highlight-hint').remove();
-            selectedSquare = sq;
-            $(this).addClass('highlight-selected');
-            game.moves({ square: sq, verbose: true }).forEach(m => {
-                $('.square-' + m.to).append('<div class="highlight-hint"></div>');
-            });
-        } else if (selectedSquare) {
+
+        const sq = $(this).data('square');
+        const piece = game.get(sq);
+
+        if (selectedSquare) {
             makeMove({ from: selectedSquare, to: sq, promotion: 'q' });
             $('.square-55d63').removeClass('highlight-selected');
             $('.highlight-hint').remove();
             selectedSquare = null;
+        } 
+        else if (piece && piece.color === currentTurn.charAt(0)) {
+            $('.square-55d63').removeClass('highlight-selected');
+            $('.highlight-hint').remove();
+            selectedSquare = sq;
+            $(this).addClass('highlight-selected');
+
+            game.moves({ square: sq, verbose: true }).forEach(m => {
+                $('.square-' + m.to).append('<div class="highlight-hint"></div>');
+            });
         }
     });
 }
 
 function updateUI() {
-    // تحديث حالة الفريق
     if (!myTeam) {
         $('#teamInfo').html('⏳ انتظار بدء المباراة...');
     } else {
-        let whiteNames = teamWhite.map(p => p.name).join(' & ');
-        let blackNames = teamBlack.map(p => p.name).join(' & ');
+        const whiteNames = teamWhite.map(p => p.name).join(' & ');
+        const blackNames = teamBlack.map(p => p.name).join(' & ');
         $('#teamInfo').html(`
             🎯 <strong>فريقي: ${myTeam === 'white' ? 'الأبيض 🤍' : 'الأسود 🖤'}</strong><br>
             🤍 الأبيض: ${whiteNames || '؟'}<br>
             🖤 الأسود: ${blackNames || '؟'}
         `);
     }
-    
-    // تحديث حالة الدور
+
     if (!gameActive) {
-        $('#turnInfo').html('⏳ المباراة لم تبدأ');
+        $('#turnInfo').html('⏳ المباراة لم تبدأ بعد');
     } else {
-        let turnText = currentTurn === 'white' ? '🤍 الفريق الأبيض' : '🖤 الفريق الأسود';
-        let currentPlayers = currentTurn === 'white' ? teamWhite : teamBlack;
-        let currentPlayer = currentPlayers.find(p => p.id === expectedPlayerId);
-        let playerName = currentPlayer ? currentPlayer.name : '?';
+        const turnText = currentTurn === 'white' ? '🤍 الفريق الأبيض' : '🖤 الفريق الأسود';
+        const currentPlayers = currentTurn === 'white' ? teamWhite : teamBlack;
+        const currentPlayer = currentPlayers.find(p => p.id === expectedPlayerId);
+        const playerName = currentPlayer ? currentPlayer.name : '?';
         $('#turnInfo').html(`🎲 ${turnText}<br>⏳ يلعب الآن: ${playerName}`);
     }
-    
-    // تحديث الرقعة واتجاهها
+
     updateBoardOrientation();
 }
 
-function updateBoard() {
-    if (board) board.position(game.fen());
-}
+function makeMove(moveData) {
+    const result = game.move(moveData);
+    if (!result) return;
 
-function canPlay() {
-    if (!gameActive || game.game_over()) return false;
-    if (game.turn() !== currentTurn.charAt(0)) return false;
-    if (expectedPlayerId !== myId) return false;
-    return true;
-}
+    const playerName = players.find(p => p.id === myId)?.name || '?';
+    addChatMessage("🎮 حركة", `${playerName} نقل: ${result.from} → ${result.to}`);
 
-function makeMove(move) {
-    let result = game.move(move);
-    if (result) {
-        let playerName = players.find(p => p.id === myId)?.name || '?';
-        addChatMessage("🎮 حركة", `${playerName} نقل: ${result.from} → ${result.to}`);
-        updateBoard();
-        broadcast({ type: 'move', from: result.from, to: result.to, playerId: myId, fen: game.fen() });
-        
-        if (game.game_over()) {
-            let winner = game.turn() === 'w' ? 'الأسود' : 'الأبيض';
-            addSystemMessage(`🏆 ${winner} فاز بالمباراة! 🏆`);
-            gameActive = false;
-            broadcast({ type: 'end', winner: winner });
-            $('#turnInfo').html(`🏆 الفائز: ${winner}`);
-            return;
-        }
-        
-        // تبديل الدور
-        currentTurn = currentTurn === 'white' ? 'black' : 'white';
-        let nextPlayers = currentTurn === 'white' ? teamWhite : teamBlack;
-        expectedPlayerId = nextPlayers[0]?.id;
-        updateUI();
-        broadcast({ type: 'turn', team: currentTurn, expectedPlayerId: expectedPlayerId, fen: game.fen() });
+    updateBoardOrientation();
+
+    broadcast({
+        type: 'move',
+        from: result.from,
+        to: result.to,
+        playerId: myId,
+        fen: game.fen()
+    });
+
+    if (game.game_over()) {
+        const winner = game.turn() === 'w' ? 'الأسود' : 'الأبيض';
+        addSystemMessage(`🏆 ${winner} فاز بالمباراة! 🏆`);
+        gameActive = false;
+        broadcast({ type: 'end', winner: winner });
+        $('#turnInfo').html(`🏆 الفائز: ${winner}`);
+        return;
     }
+
+    // تبديل الدور داخل الفريق
+    currentTurn = currentTurn === 'white' ? 'black' : 'white';
+    expectedPlayerId = getNextPlayerId(currentTurn);
+
+    updateUI();
+
+    broadcast({
+        type: 'turn',
+        team: currentTurn,
+        expectedPlayerId: expectedPlayerId,
+        fen: game.fen()
+    });
 }
 
+// ===================== بدء المباراة =====================
 function startGame() {
-    if (!isHost) {
-        addSystemMessage("❌ فقط الـ Host يمكنه بدء المباراة", true);
-        return;
-    }
-    if (players.length !== 4) {
-        addSystemMessage(`❌ تحتاج 4 لاعبين! (العدد الحالي: ${players.length})`, true);
-        return;
-    }
-    
-    // توزيع عشوائي للفرق
-    let shuffled = [...players];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
+    if (!isHost) return addSystemMessage("❌ فقط الـ Host يقدر يبدأ", true);
+    if (players.length !== 4) return addSystemMessage(`❌ تحتاج 4 لاعبين (الحالي: ${players.length})`, true);
+
+    let shuffled = [...players].sort(() => Math.random() - 0.5);
     teamWhite = [shuffled[0], shuffled[1]];
     teamBlack = [shuffled[2], shuffled[3]];
-    
+
+    whiteTurnIndex = 0;
+    blackTurnIndex = 0;
+
     broadcast({
         type: 'teams',
-        white: teamWhite.map(p => p.id),
-        black: teamBlack.map(p => p.id),
-        whiteNames: teamWhite.map(p => p.name),
-        blackNames: teamBlack.map(p => p.name)
+        white: teamWhite,
+        black: teamBlack
     });
-    
-    // تطبيق الفرق محلياً
-    if (teamWhite.some(p => p.id === myId)) myTeam = 'white';
-    else if (teamBlack.some(p => p.id === myId)) myTeam = 'black';
-    
-    broadcast({ type: 'start' });
+
+    myTeam = teamWhite.some(p => p.id === myId) ? 'white' : 'black';
+
     game = new Chess();
     gameActive = true;
     currentTurn = 'white';
-    expectedPlayerId = teamWhite[0]?.id;
+    expectedPlayerId = teamWhite[0].id;
+
     updateUI();
-    addSystemMessage("🎉 بدأت المباراة! النقلة الأولى للفريق الأبيض.");
-    broadcast({ type: 'sync', fen: game.fen(), turn: currentTurn, expectedPlayerId: expectedPlayerId });
+    addSystemMessage("🎉 بدأت المباراة! الفريق الأبيض يبدأ.");
+
+    broadcast({
+        type: 'start',
+        fen: game.fen(),
+        currentTurn: currentTurn,
+        expectedPlayerId: expectedPlayerId,
+        white: teamWhite,
+        black: teamBlack
+    });
 }
 
-// ===================== دوال الاتصال =====================
-function setupDataReceiver() {
-    if (!conn) return;
-    conn.on('data', (data) => {
-        console.log("Received:", data);
-        if (data.type === 'teams') {
-            teamWhite = data.white.map((id, i) => ({ id, name: data.whiteNames[i] }));
-            teamBlack = data.black.map((id, i) => ({ id, name: data.blackNames[i] }));
-            if (teamWhite.some(p => p.id === myId)) myTeam = 'white';
-            else if (teamBlack.some(p => p.id === myId)) myTeam = 'black';
+// ===================== استقبال البيانات =====================
+function handleIncomingData(data) {
+    console.log("Received:", data);
+
+    switch(data.type) {
+        case 'give_name':
+            // يتم التعامل معها في peer.on('connection')
+            break;
+
+        case 'teams':
+            teamWhite = data.white;
+            teamBlack = data.black;
+            myTeam = teamWhite.some(p => p.id === myId) ? 'white' : 'black';
             updateUI();
             addSystemMessage("✅ تم توزيع الفرق!");
-        }
-        else if (data.type === 'start') {
-            game = new Chess();
+            break;
+
+        case 'start':
+            teamWhite = data.white;
+            teamBlack = data.black;
+            myTeam = teamWhite.some(p => p.id === myId) ? 'white' : 'black';
+            game = new Chess(data.fen);
             gameActive = true;
-            currentTurn = 'white';
-            expectedPlayerId = teamWhite[0]?.id;
+            currentTurn = data.currentTurn;
+            expectedPlayerId = data.expectedPlayerId;
             updateUI();
             addSystemMessage("🎉 بدأت المباراة!");
-        }
-        else if (data.type === 'move') {
+            break;
+
+        case 'move':
             game.move({ from: data.from, to: data.to, promotion: 'q' });
-            let player = players.find(p => p.id === data.playerId);
+            const player = players.find(p => p.id === data.playerId);
             addChatMessage("🎮 حركة", `${player?.name || '?'} نقل: ${data.from} → ${data.to}`);
             updateUI();
+
             if (game.game_over()) {
-                let winner = game.turn() === 'w' ? 'الأسود' : 'الأبيض';
-                addSystemMessage(`🏆 ${winner} فاز بالمباراة! 🏆`);
+                const winner = game.turn() === 'w' ? 'الأسود' : 'الأبيض';
+                addSystemMessage(`🏆 ${winner} فاز بالمباراة!`);
                 gameActive = false;
-                $('#turnInfo').html(`🏆 الفائز: ${winner}`);
             }
-        }
-        else if (data.type === 'turn') {
+            break;
+
+        case 'turn':
             currentTurn = data.team;
             expectedPlayerId = data.expectedPlayerId;
             if (data.fen) game.load(data.fen);
             updateUI();
-        }
-        else if (data.type === 'sync') {
-            if (data.fen) game.load(data.fen);
-            currentTurn = data.turn;
-            expectedPlayerId = data.expectedPlayerId;
-            updateUI();
-        }
-        else if (data.type === 'end') {
+            break;
+
+        case 'end':
             gameActive = false;
+            addSystemMessage(`🏆 ${data.winner} فاز بالمباراة!`);
             $('#turnInfo').html(`🏆 الفائز: ${data.winner}`);
-            addSystemMessage(`🏆 ${data.winner} فاز بالمباراة! 🏆`);
-        }
-        else if (data.type === 'chat') {
+            break;
+
+        case 'chat':
             addChatMessage(data.name, data.msg);
-        }
-        else if (data.type === 'new_player') {
-            if (!players.some(p => p.id === data.id)) {
-                players.push({ id: data.id, name: data.name });
-                addSystemMessage(`👤 ${data.name} انضم (${players.length}/4)`);
-                if (players.length === 4 && isHost) {
-                    $('#startGameBtn').removeClass('hidden');
-                    addSystemMessage("✅ اكتمل العدد! اضغط 'بدء المباراة'");
-                }
-            }
-        }
-        else if (data.type === 'sync_players') {
+            break;
+
+        case 'sync_players':
             players = data.players;
-            addSystemMessage(`👥 تحديث القائمة (${players.length}/4)`);
-            if (players.length === 4 && isHost) $('#startGameBtn').removeClass('hidden');
-            updateUI();
-        }
-        else if (data.type === 'ask_name') {
-            conn.send({ type: 'give_name', name: myName });
-        }
-    });
+            if (players.length === 4 && isHost) {
+                $('#startGameBtn').removeClass('hidden');
+            }
+            break;
+    }
 }
 
+// ===================== Host & Join =====================
 function hostGame() {
-    let roomId = Math.floor(1000 + Math.random() * 9000).toString();
+    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
     myId = "host_" + roomId;
     myName = prompt("ادخل اسمك:", "المنشئ") || "Host";
     isHost = true;
-    
-    conn = new Peer("CHESS2V2_" + roomId);
-    conn.on('open', () => {
-        alert("🎮 تم إنشاء الغرفة!\nكود الغرفة: " + roomId);
-        players.push({ id: myId, name: myName });
+
+    peer = new Peer("CHESS2V2_" + roomId);
+
+    peer.on('open', () => {
+        alert(`✅ تم إنشاء الغرفة!\nكود الغرفة: ${roomId}`);
+        players = [{ id: myId, name: myName }];
         $('#lobby').hide();
         $('#gameControls').removeClass('hidden');
-        addSystemMessage(`✅ مرحباً ${myName}! أنت Host الغرفة.`);
-        addSystemMessage(`📌 كود الغرفة: ${roomId}`);
-        addSystemMessage(`👥 عدد اللاعبين: ${players.length}/4`);
-    });
-    
-    conn.on('connection', (c) => {
-        // طلب الاسم من اللاعب الجديد
-        c.send({ type: 'ask_name' });
-        c.on('data', (d) => {
-            if (d.type === 'give_name') {
-                let newPlayer = { id: c.peer, name: d.name };
-                if (!players.some(p => p.id === c.peer)) {
-                    players.push(newPlayer);
-                    addSystemMessage(`👤 ${d.name} انضم (${players.length}/4)`);
-                    broadcast({ type: 'sync_players', players: players });
-                    if (players.length === 4 && isHost) {
-                        $('#startGameBtn').removeClass('hidden');
-                        addSystemMessage("✅ اكتمل العدد! اضغط 'بدء المباراة'");
+        addSystemMessage(`أنت Host - كود الغرفة: ${roomId}`);
+        
+        // استقبال الاتصالات
+        peer.on('connection', (c) => {
+            connections[c.peer] = c;
+            c.on('data', (data) => {
+                if (data.type === 'give_name') {
+                    if (!players.some(p => p.id === c.peer)) {
+                        players.push({ id: c.peer, name: data.name });
+                        addSystemMessage(`👤 ${data.name} انضم (${players.length}/4)`);
+                        broadcast({ type: 'sync_players', players: players });
+                        
+                        if (players.length === 4) {
+                            $('#startGameBtn').removeClass('hidden');
+                        }
                     }
+                } else {
+                    handleIncomingData(data);
                 }
-            }
+            });
         });
     });
-    
-    setupDataReceiver();
 }
 
 function joinGame() {
     let roomId = $('#codeInput').val().trim();
-    if (!roomId) {
-        alert("الرجاء إدخال كود الغرفة");
-        return;
-    }
-    
-    myId = "player_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    if (!roomId) return alert("الرجاء إدخال كود الغرفة");
+
     myName = prompt("ادخل اسمك:", "لاعب") || "Player";
-    
-    conn = new Peer();
-    conn.on('open', () => {
-        let c = conn.connect("CHESS2V2_" + roomId);
-        c.on('open', () => {
-            c.send({ type: 'give_name', name: myName });
+    myId = "player_" + Date.now();
+
+    peer = new Peer();
+
+    peer.on('open', () => {
+        const conn = peer.connect("CHESS2V2_" + roomId);
+        connections["CHESS2V2_" + roomId] = conn;
+
+        conn.on('open', () => {
+            conn.send({ type: 'give_name', name: myName });
             $('#lobby').hide();
             $('#gameControls').removeClass('hidden');
-            addSystemMessage(`✅ مرحباً ${myName}! جاري الاتصال...`);
+            addSystemMessage("✅ تم الاتصال بالغرفة");
         });
+
+        conn.on('data', handleIncomingData);
     });
-    
-    setupDataReceiver();
 }
 
 // ===================== إعداد الرقعة والشات =====================
@@ -397,15 +481,16 @@ function setupBoard() {
 }
 
 function setupChat() {
-    $('#sendChatBtn').off('click').on('click', () => {
+    $('#sendChatBtn').on('click', () => {
         let msg = $('#chatInput').val().trim();
-        if (msg && conn) {
+        if (msg) {
             broadcast({ type: 'chat', name: myName, msg: msg });
             addChatMessage(myName, msg);
             $('#chatInput').val('');
         }
     });
-    $('#chatInput').off('keypress').on('keypress', (e) => {
+
+    $('#chatInput').on('keypress', (e) => {
         if (e.which === 13) $('#sendChatBtn').click();
     });
 }
@@ -414,7 +499,7 @@ function setupChat() {
 $(document).ready(() => {
     setupBoard();
     setupChat();
-    
+
     $('#hostBtn').on('click', hostGame);
     $('#joinBtn').on('click', joinGame);
     $('#startGameBtn').on('click', startGame);
