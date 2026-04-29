@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شطرنج 2 ضد 2 - نسخة مبسطة</title>
+    <title>شطرنج 2 ضد 2 - بث مباشر للجميع</title>
     <style>
         * {
             user-select: none;
@@ -12,7 +12,7 @@
         body {
             background: #0a0f0a;
             color: #b3ffb3;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 15px;
             direction: rtl;
@@ -22,6 +22,7 @@
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
+            align-items: flex-start;
         }
         .game-card {
             background: #111a11;
@@ -56,6 +57,7 @@
             font-size: 44px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.1s;
         }
         .square.light {
             background-color: #f0d9b5;
@@ -85,6 +87,11 @@
             border-radius: 30px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #2ecc2e;
+            color: #000;
         }
         input {
             padding: 10px;
@@ -123,12 +130,12 @@
             display: inline-block;
         }
         .white-team {
+            background: #2a4a2a;
             color: #ffffff;
-            background: #2a3a2a;
         }
         .black-team {
-            color: #aaaaaa;
-            background: #1a1a1a;
+            background: #3a3a3a;
+            color: #cccccc;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -138,26 +145,26 @@
 <body>
 <div class="container">
     <div class="game-card">
-        <h2>♟️ شطرنج 2 ضد 2</h2>
+        <h2>♟️ شطرنج 2 ضد 2 | بث مباشر</h2>
         <div id="board"></div>
 
         <div id="lobby" style="margin-top: 15px;">
-            <button id="hostBtn">🏠 إنشاء غرفة</button><br><br>
-            <input id="roomCode" placeholder="كود الغرفة">
-            <button id="joinBtn">🚪 دخول</button>
+            <button id="hostBtn">🏠 إنشاء غرفة جديدة</button><br><br>
+            <input id="roomCodeInput" placeholder="كود الغرفة (4 أرقام)">
+            <button id="joinBtn">🚪 دخول الغرفة</button>
         </div>
 
         <div id="gameArea" class="hidden">
-            <div id="statusMsg" class="info-box">⏳ جاري الاتصال...</div>
+            <div id="statusMsg" class="info-box">⏳ جاري تجهيز الغرفة...</div>
             <div id="turnMsg" class="info-box"></div>
             <div id="teamMsg" class="info-box"></div>
-            <button id="startGameBtn" class="hidden" style="background:#2a722a;">▶️ بدء المباراة</button>
-            <button id="restartBtn" class="hidden" style="background:#5a2a2a;">🔄 إعادة ضبط</button>
+            <button id="startGameBtn" class="hidden" style="background:#2a722a;">▶️ بدء المباراة (المضيف)</button>
+            <button id="restartBtn" class="hidden" style="background:#5a2a2a;">🔄 إعادة توزيع الفرق</button>
         </div>
     </div>
 
     <div class="chat-card">
-        <h4>💬 الدردشة</h4>
+        <h4>💬 الدردشة العامة</h4>
         <div id="chat"></div>
         <input id="chatInput" placeholder="اكتب رسالة...">
         <button id="sendChatBtn">إرسال</button>
@@ -168,34 +175,34 @@
 </div>
 
 <script>
-// ====================== إعدادات اللعبة ======================
+// ====================== المتغيرات ======================
 let peer = null;
 let myId = null;
 let myName = "";
-let isCreator = false;
-let roomId = "";
-let connections = {};
+let isHost = false;
+let roomCode = "";
+let connections = {};        // تخزين كل الاتصالات
 let allPlayers = [];
-let gameEngine = new Chess();
-let isGameActive = false;
-let myColor = null;      // "white" أو "black"
+let game = new Chess();
+let gameActive = false;
+let myTeam = null;           // "white" أو "black"
 let whiteTeam = [];
 let blackTeam = [];
-let turn = "white";
+let currentTurn = "white";
 let currentPlayerId = null;
-let selectedCell = null;
+let selectedSquare = null;
 
-// خريطة القطع
-const piecesSymbols = {
+// رموز القطع (Unicode)
+const pieceSymbols = {
     'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟',
     'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙'
 };
 
 // ====================== رسم الرقعة ======================
-function drawBoard() {
+function renderBoard() {
     const boardDiv = $('#board');
     boardDiv.empty();
-    const fen = gameEngine.fen();
+    const fen = game.fen();
     const rows = fen.split(' ')[0].split('/');
     
     for (let i = 0; i < 8; i++) {
@@ -204,18 +211,18 @@ function drawBoard() {
         for (let j = 0; j < row.length; j++) {
             const ch = row[j];
             if (isNaN(parseInt(ch))) {
-                const pieceSymbol = piecesSymbols[ch] || ch;
-                const squareName = String.fromCharCode(97 + col) + (8 - i);
+                const symbol = pieceSymbols[ch] || ch;
+                const square = String.fromCharCode(97 + col) + (8 - i);
                 const isLight = (i + col) % 2 === 0;
-                const squareDiv = $(`<div class="square ${isLight ? 'light' : 'dark'}" data-cell="${squareName}">${pieceSymbol}</div>`);
+                const squareDiv = $(`<div class="square ${isLight ? 'light' : 'dark'}" data-square="${square}">${symbol}</div>`);
                 boardDiv.append(squareDiv);
                 col++;
             } else {
                 const empty = parseInt(ch);
                 for (let k = 0; k < empty; k++) {
-                    const squareName = String.fromCharCode(97 + col) + (8 - i);
+                    const square = String.fromCharCode(97 + col) + (8 - i);
                     const isLight = (i + col) % 2 === 0;
-                    const squareDiv = $(`<div class="square ${isLight ? 'light' : 'dark'}" data-cell="${squareName}"></div>`);
+                    const squareDiv = $(`<div class="square ${isLight ? 'light' : 'dark'}" data-square="${square}"></div>`);
                     boardDiv.append(squareDiv);
                     col++;
                 }
@@ -227,94 +234,195 @@ function drawBoard() {
 
 function attachClickEvents() {
     $('.square').off('click').on('click', function() {
-        if (!isGameActive) {
-            showStatus("⚠️ المباراة لم تبدأ بعد!", true);
+        if (!gameActive) {
+            showMessage("⏳ المباراة لم تبدأ بعد!", true);
             return;
         }
         
         if (myId !== currentPlayerId) {
-            showStatus("❌ ليس دورك الآن!", true);
+            showMessage("❌ ليس دورك الآن!", true);
             return;
         }
         
-        const cell = $(this).attr('data-cell');
+        const square = $(this).attr('data-square');
         
-        // إذا لم يتم تحديد أي قطعة
-        if (selectedCell === null) {
-            const piece = gameEngine.get(cell);
-            if (piece && ((piece.color === 'w' && myColor === 'white') || (piece.color === 'b' && myColor === 'black'))) {
-                selectedCell = cell;
+        if (selectedSquare === null) {
+            const piece = game.get(square);
+            if (piece && ((piece.color === 'w' && myTeam === 'white') || (piece.color === 'b' && myTeam === 'black'))) {
+                selectedSquare = square;
                 $('.square').removeClass('selected possible');
                 $(this).addClass('selected');
                 
                 // عرض الحركات الممكنة
-                const moves = gameEngine.moves({ verbose: true });
-                const validMoves = moves.filter(m => m.from === cell).map(m => m.to);
-                validMoves.forEach(moveTo => {
-                    $(`[data-cell="${moveTo}"]`).addClass('possible');
+                const moves = game.moves({ verbose: true });
+                const possibleMoves = moves.filter(m => m.from === square).map(m => m.to);
+                possibleMoves.forEach(moveTo => {
+                    $(`[data-square="${moveTo}"]`).addClass('possible');
                 });
-                showStatus(`🔍 تم تحديد القطعة في ${cell}`);
+                showMessage(`🔍 تم تحديد القطعة في ${square}`);
             } else {
-                showStatus("⚠️ هذه ليست قطعتك!", true);
+                showMessage("⚠️ هذه القطعة ليست من فريقك!", true);
             }
         } else {
-            // محاولة التحرك
-            attemptMove(selectedCell, cell);
-            selectedCell = null;
+            executeMove(selectedSquare, square);
+            selectedSquare = null;
             $('.square').removeClass('selected possible');
         }
     });
 }
 
-function attemptMove(from, to) {
-    const move = gameEngine.move({ from: from, to: to, promotion: 'q' });
+function executeMove(from, to) {
+    const move = game.move({ from: from, to: to, promotion: 'q' });
     if (move) {
-        drawBoard();
-        showStatus(`✅ نقلة: ${from} → ${to}`);
+        renderBoard();
+        showMessage(`✅ ${from} → ${to}`);
         
-        // إرسال الحركة للجميع
-        sendToAll({ type: 'move_update', fen: gameEngine.fen() });
+        // ====== أهم جزء: بث الحركة لجميع اللاعبين ======
+        broadcastToAll({
+            type: 'sync_move',
+            fen: game.fen()
+        });
         
         // تبديل الدور
-        if (turn === 'white') {
-            turn = 'black';
+        if (currentTurn === 'white') {
+            currentTurn = 'black';
             currentPlayerId = blackTeam[0]?.id;
         } else {
-            turn = 'white';
+            currentTurn = 'white';
             currentPlayerId = whiteTeam[0]?.id;
         }
         
-        updateTurnDisplay();
-        sendToAll({ type: 'turn_update', turn: turn, currentPlayerId: currentPlayerId });
+        updateDisplay();
+        
+        // بث تغيير الدور للجميع
+        broadcastToAll({
+            type: 'sync_turn',
+            turn: currentTurn,
+            playerId: currentPlayerId
+        });
         
         // التحقق من النهاية
-        if (gameEngine.game_over()) {
-            let winner = gameEngine.in_checkmate() ? (gameEngine.turn() === 'w' ? 'الأسود' : 'الأبيض') : 'تعادل';
-            showStatus(`🏆 انتهت المباراة! الفائز: ${winner}`);
-            sendToAll({ type: 'game_end', winner: winner });
-            isGameActive = false;
+        if (game.game_over()) {
+            let winner = game.in_checkmate() ? (game.turn() === 'w' ? 'الأسود' : 'الأبيض') : 'تعادل';
+            showMessage(`🏆 انتهت المباراة! الفائز: ${winner}`);
+            broadcastToAll({ type: 'game_finished', winner: winner });
+            gameActive = false;
         }
     } else {
-        showStatus("🚫 حركة غير قانونية!", true);
+        showMessage("🚫 حركة غير قانونية!", true);
     }
 }
 
-function showStatus(msg, isError = false) {
+// ====================== دالة البث لجميع اللاعبين ======================
+function broadcastToAll(data, excludeId = null) {
+    console.log("📡 بث للجميع:", data.type);
+    for (let connId in connections) {
+        if (connections[connId] && connections[connId].open && connId !== excludeId) {
+            connections[connId].send(data);
+        }
+    }
+}
+
+// ====================== معالجة البيانات الواردة ======================
+function handleIncoming(data, senderId) {
+    console.log("📩 استقبل بيانات:", data.type, "من", senderId);
+    
+    // لاعب جديد ينضم (فقط المضيف يعالج هذا)
+    if (data.type === 'join_request' && isHost) {
+        if (!allPlayers.find(p => p.id === data.playerId)) {
+            allPlayers.push({ id: data.playerId, name: data.playerName });
+            showMessage(`${data.playerName} انضم إلى الغرفة (${allPlayers.length}/4)`);
+            
+            // تحديث قائمة اللاعبين عند الجميع
+            broadcastToAll({ type: 'players_update', players: allPlayers });
+            updatePlayersUI();
+            
+            if (allPlayers.length === 4) {
+                $('#startGameBtn').removeClass('hidden');
+            }
+        }
+    }
+    
+    // تحديث قائمة اللاعبين
+    if (data.type === 'players_update') {
+        allPlayers = data.players;
+        updatePlayersUI();
+    }
+    
+    // بدء المباراة
+    if (data.type === 'start_game') {
+        whiteTeam = data.whiteTeam;
+        blackTeam = data.blackTeam;
+        myTeam = whiteTeam.some(p => p.id === myId) ? 'white' : (blackTeam.some(p => p.id === myId) ? 'black' : null);
+        gameActive = true;
+        currentTurn = 'white';
+        currentPlayerId = whiteTeam[0].id;
+        game = new Chess();
+        renderBoard();
+        updateDisplay();
+        showMessage(`🎉 بدأت المباراة! أنت في فريق ${myTeam === 'white' ? 'الأبيض 🤍' : 'الأسود 🖤'}`);
+        $('#startGameBtn').addClass('hidden');
+        $('#restartBtn').removeClass('hidden');
+    }
+    
+    // مزامنة الحركة (هذا هو الحل للمشكلة!)
+    if (data.type === 'sync_move') {
+        game.load(data.fen);
+        renderBoard();
+        showMessage(`🔄 تم تحديث الرقعة من لاعب آخر`);
+    }
+    
+    // مزامنة الدور
+    if (data.type === 'sync_turn') {
+        currentTurn = data.turn;
+        currentPlayerId = data.playerId;
+        updateDisplay();
+    }
+    
+    // انتهاء المباراة
+    if (data.type === 'game_finished') {
+        showMessage(`🏆 النتيجة: ${data.winner}`);
+        gameActive = false;
+    }
+    
+    // إعادة الضبط
+    if (data.type === 'reset_game') {
+        whiteTeam = data.whiteTeam;
+        blackTeam = data.blackTeam;
+        myTeam = whiteTeam.some(p => p.id === myId) ? 'white' : 'black';
+        gameActive = true;
+        currentTurn = 'white';
+        currentPlayerId = whiteTeam[0].id;
+        game = new Chess();
+        renderBoard();
+        updateDisplay();
+        showMessage(`🔄 تم إعادة ضبط المباراة!`);
+    }
+    
+    // رسالة شات
+    if (data.type === 'chat_message') {
+        $('#chat').append(`<div><strong>${data.sender}:</strong> ${data.message}</div>`);
+        $('#chat').scrollTop($('#chat')[0].scrollHeight);
+    }
+}
+
+// ====================== وظائف العرض ======================
+function showMessage(msg, isError = false) {
     $('#statusMsg').html(`<span style="color:${isError ? '#ff8888' : '#88ff88'}">${msg}</span>`);
 }
 
-function updateTurnDisplay() {
-    if (!isGameActive) {
-        $('#turnMsg').html("⏳ انتظر بدء المباراة");
+function updateDisplay() {
+    if (!gameActive) {
+        $('#turnMsg').html("⏳ انتظار بدء المباراة");
         return;
     }
-    const turnTeam = turn === 'white' ? '🤍 الفريق الأبيض' : '🖤 الفريق الأسود';
-    const playerObj = (turn === 'white' ? whiteTeam : blackTeam).find(p => p.id === currentPlayerId);
-    $('#turnMsg').html(`🎲 الدور: ${turnTeam}<br>👤 يتحرك: ${playerObj?.name || '???'}`);
-    $('#teamMsg').html(`🎨 أنت في فريق ${myColor === 'white' ? '🤍 الأبيض' : '🖤 الأسود'}<br>🤍 الأبيض: ${whiteTeam.map(p=>p.name).join(', ')}<br>🖤 الأسود: ${blackTeam.map(p=>p.name).join(', ')}`);
+    const turnTeam = currentTurn === 'white' ? '🤍 الأبيض' : '🖤 الأسود';
+    const playerObj = (currentTurn === 'white' ? whiteTeam : blackTeam).find(p => p.id === currentPlayerId);
+    $('#turnMsg').html(`🎲 الدور: ${turnTeam}<br>⚡ يتحرك: ${playerObj?.name || '???'}`);
+    $('#teamMsg').html(`🎨 فريقك: ${myTeam === 'white' ? '🤍 أبيض' : '🖤 أسود'}<br>🤍 الأبيض: ${whiteTeam.map(p=>p.name).join(', ')}<br>🖤 الأسود: ${blackTeam.map(p=>p.name).join(', ')}`);
 }
 
-function updatePlayersList() {
+function updatePlayersUI() {
     let html = '<div style="display:flex; flex-wrap:wrap; gap:5px;">';
     allPlayers.forEach(p => {
         let teamClass = "";
@@ -327,89 +435,14 @@ function updatePlayersList() {
     $('#playersContainer').html(html);
 }
 
-// ====================== وظائف الشبكة ======================
-function sendToAll(data, exclude = null) {
-    for (let id in connections) {
-        if (connections[id] && connections[id].open && id !== exclude) {
-            connections[id].send(data);
-        }
-    }
-}
-
-function handleNetworkData(data, senderId) {
-    if (data.type === 'new_player' && isCreator) {
-        if (!allPlayers.find(p => p.id === data.playerId)) {
-            allPlayers.push({ id: data.playerId, name: data.playerName });
-            showStatus(`${data.playerName} انضم (${allPlayers.length}/4)`);
-            sendToAll({ type: 'players_update', players: allPlayers });
-            updatePlayersList();
-            if (allPlayers.length === 4) $('#startGameBtn').removeClass('hidden');
-        }
-    }
-    
-    if (data.type === 'players_update') {
-        allPlayers = data.players;
-        updatePlayersList();
-    }
-    
-    if (data.type === 'game_start') {
-        whiteTeam = data.white;
-        blackTeam = data.black;
-        myColor = whiteTeam.some(p => p.id === myId) ? 'white' : (blackTeam.some(p => p.id === myId) ? 'black' : null);
-        isGameActive = true;
-        turn = 'white';
-        currentPlayerId = whiteTeam[0].id;
-        gameEngine = new Chess();
-        drawBoard();
-        updateTurnDisplay();
-        showStatus("🎉 بدأت المباراة! فريقك: " + (myColor === 'white' ? 'أبيض' : 'أسود'));
-        $('#startGameBtn').addClass('hidden');
-        $('#restartBtn').removeClass('hidden');
-    }
-    
-    if (data.type === 'move_update') {
-        gameEngine.load(data.fen);
-        drawBoard();
-    }
-    
-    if (data.type === 'turn_update') {
-        turn = data.turn;
-        currentPlayerId = data.currentPlayerId;
-        updateTurnDisplay();
-    }
-    
-    if (data.type === 'game_end') {
-        showStatus(`🏆 النتيجة: ${data.winner}`);
-        isGameActive = false;
-    }
-    
-    if (data.type === 'restart_game') {
-        whiteTeam = data.white;
-        blackTeam = data.black;
-        myColor = whiteTeam.some(p => p.id === myId) ? 'white' : 'black';
-        isGameActive = true;
-        turn = 'white';
-        currentPlayerId = whiteTeam[0].id;
-        gameEngine = new Chess();
-        drawBoard();
-        updateTurnDisplay();
-        showStatus("🔄 تم إعادة ضبط المباراة!");
-    }
-    
-    if (data.type === 'chat_msg') {
-        $('#chat').append(`<div><strong>${data.sender}:</strong> ${data.message}</div>`);
-        $('#chat').scrollTop($('#chat')[0].scrollHeight);
-    }
-}
-
-// ====================== بدء المباراة (للمضيف) ======================
+// ====================== بدء المباراة (للمضيف فقط) ======================
 function startMatch() {
-    if (!isCreator || allPlayers.length !== 4) {
-        showStatus("يجب وجود 4 لاعبين لبدء المباراة!", true);
+    if (!isHost || allPlayers.length !== 4) {
+        showMessage("⚠️ يجب أن يكون هناك 4 لاعبين لبدء المباراة!", true);
         return;
     }
     
-    // توزيع عشوائي
+    // توزيع عشوائي للفرق
     const shuffled = [...allPlayers];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -419,25 +452,26 @@ function startMatch() {
     whiteTeam = [shuffled[0], shuffled[1]];
     blackTeam = [shuffled[2], shuffled[3]];
     
-    sendToAll({
-        type: 'game_start',
-        white: whiteTeam,
-        black: blackTeam
+    broadcastToAll({
+        type: 'start_game',
+        whiteTeam: whiteTeam,
+        blackTeam: blackTeam
     });
     
-    isGameActive = true;
-    turn = 'white';
+    gameActive = true;
+    currentTurn = 'white';
     currentPlayerId = whiteTeam[0].id;
-    gameEngine = new Chess();
-    drawBoard();
-    updateTurnDisplay();
-    showStatus("🎯 بدأت المباراة!");
+    game = new Chess();
+    renderBoard();
+    updateDisplay();
+    showMessage("🎯 انطلقت المباراة! فريق الأبيض يبدأ");
     $('#startGameBtn').addClass('hidden');
     $('#restartBtn').removeClass('hidden');
 }
 
-function restartMatch() {
-    if (!isCreator) return;
+function resetMatch() {
+    if (!isHost) return;
+    
     const shuffled = [...allPlayers];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -445,85 +479,97 @@ function restartMatch() {
     }
     whiteTeam = [shuffled[0], shuffled[1]];
     blackTeam = [shuffled[2], shuffled[3]];
-    sendToAll({ type: 'restart_game', white: whiteTeam, black: blackTeam });
-    isGameActive = true;
-    turn = 'white';
+    
+    broadcastToAll({
+        type: 'reset_game',
+        whiteTeam: whiteTeam,
+        blackTeam: blackTeam
+    });
+    
+    gameActive = true;
+    currentTurn = 'white';
     currentPlayerId = whiteTeam[0].id;
-    gameEngine = new Chess();
-    drawBoard();
-    updateTurnDisplay();
-    showStatus("🔄 تم إعادة الضبط!");
+    game = new Chess();
+    renderBoard();
+    updateDisplay();
+    showMessage("🔄 تم إعادة ضبط المباراة!");
 }
 
-// ====================== إنشاء غرفة ======================
+// ====================== إنشاء غرفة (Host) ======================
 $('#hostBtn').click(() => {
     const newRoom = Math.floor(1000 + Math.random() * 9000).toString();
-    roomId = newRoom;
-    myName = prompt("أدخل اسمك:", "قائد الفريق") || "قائد";
-    isCreator = true;
-    myId = 'creator_' + Date.now();
+    roomCode = newRoom;
+    myName = prompt("أدخل اسمك:", "المضيف") || "المضيف";
+    isHost = true;
+    myId = 'host_' + Date.now() + '_' + roomCode;
     allPlayers = [{ id: myId, name: myName }];
     
-    peer = new Peer('chess2v2_' + roomId);
+    peer = new Peer('chess2v2_' + roomCode);
     peer.on('open', () => {
-        showStatus(`✅ الغرفة جاهزة! الكود: ${roomId}`);
+        showMessage(`✅ الغرفة جاهزة! كود: ${roomCode}`);
         $('#lobby').hide();
         $('#gameArea').removeClass('hidden');
         $('#restartBtn').addClass('hidden');
         $('#startGameBtn').addClass('hidden');
-        updatePlayersList();
-        drawBoard();
+        updatePlayersUI();
+        renderBoard();
         
         peer.on('connection', (conn) => {
             connections[conn.peer] = conn;
-            conn.on('data', (d) => handleNetworkData(d, conn.peer));
-            conn.on('close', () => { delete connections[conn.peer]; });
+            conn.on('data', (data) => handleIncoming(data, conn.peer));
+            conn.on('close', () => {
+                delete connections[conn.peer];
+                showMessage("⚠️ أحد اللاعبين انقطع", true);
+            });
         });
     });
 });
 
-// ====================== دخول غرفة ======================
+// ====================== دخول غرفة (Client) ======================
 $('#joinBtn').click(() => {
-    const code = $('#roomCode').val().trim();
+    const code = $('#roomCodeInput').val().trim();
     if (!code) return alert("أدخل كود الغرفة!");
-    roomId = code;
+    roomCode = code;
     myName = prompt("أدخل اسمك:", "لاعب") || "لاعب";
-    isCreator = false;
-    myId = 'player_' + Date.now();
+    isHost = false;
+    myId = 'player_' + Date.now() + '_' + Math.random();
     
     peer = new Peer();
     peer.on('open', () => {
         const conn = peer.connect('chess2v2_' + code);
         conn.on('open', () => {
             connections[code] = conn;
-            conn.send({ type: 'new_player', playerId: myId, playerName: myName });
-            showStatus("جاري الانضمام...");
+            conn.send({ type: 'join_request', playerId: myId, playerName: myName });
+            showMessage("🔗 جاري الاتصال بالغرفة...");
             $('#lobby').hide();
             $('#gameArea').removeClass('hidden');
             $('#startGameBtn').addClass('hidden');
             $('#restartBtn').addClass('hidden');
-            drawBoard();
+            renderBoard();
         });
-        conn.on('data', (d) => handleNetworkData(d, code));
+        conn.on('data', (data) => handleIncoming(data, code));
+        conn.on('close', () => {
+            showMessage("🔌 تم قطع الاتصال بالمضيف", true);
+        });
     });
 });
 
 // ====================== أزرار التحكم ======================
-$('#startGameBtn').click(() => { if (isCreator) startMatch(); });
-$('#restartBtn').click(() => { if (isCreator) restartMatch(); });
+$('#startGameBtn').click(() => { if (isHost) startMatch(); });
+$('#restartBtn').click(() => { if (isHost) resetMatch(); });
 
 $('#sendChatBtn').click(() => {
     const msg = $('#chatInput').val().trim();
     if (!msg) return;
     $('#chat').append(`<div><strong>${myName}:</strong> ${msg}</div>`);
     $('#chat').scrollTop($('#chat')[0].scrollHeight);
-    sendToAll({ type: 'chat_msg', sender: myName, message: msg });
+    broadcastToAll({ type: 'chat_message', sender: myName, message: msg });
     $('#chatInput').val('');
 });
 
-// بداية
+// تشغيل الرقعة في البداية
 $(document).ready(() => {
-    drawBoard();
+    renderBoard();
 });
 </script>
 </body>
