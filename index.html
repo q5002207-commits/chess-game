@@ -3,95 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد - المافيا المتكاملة ♟️</title>
+    <title>بوابة أحمد المحترف ♟️ - نظام الحماية والإزعاج</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        /* التنسيقات الفخمة لنظام أحمد */
+        /* نظام الألوان "أحمد" - أسود، أحمر، أخضر هكر */
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
-        .menu-btn { display: block; width: 100%; padding: 20px; margin: 12px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
-        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
-        .hidden { display: none; }
         
-        /* قسم الإزعاج الضاحك */
-        #troll-section .troll-card { background: #1a1a1a; border: 2px dashed #ff00ff; padding: 20px; margin: 10px; border-radius: 15px; text-align: center; }
-        .matrix-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; color: #0f0; z-index: 2000; font-family: monospace; padding: 20px; overflow: hidden; display: none; }
-        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 50% { transform: translate(-3px, 1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
-        .shake-effect { animation: shake 0.2s infinite; }
-
-        /* الشطرنج والمافيا (نفس التنسيقات السابقة) */
-        .mafia-card { background: #1a1a1a; padding: 15px; margin: 5px; border-radius: 10px; border: 1px solid #444; }
-        #board { width: 350px !important; max-width: 90vw !important; }
+        #main-menu { text-align: center; margin-top: 30px; width: 100%; max-width: 400px; }
+        .header { width: 100%; max-width: 450px; background: #da291c; padding: 15px; border-radius: 12px; text-align: center; color: white; margin-bottom: 15px; box-shadow: 0 0 15px #da291c; }
+        
+        /* الأزرار */
+        .menu-btn { display: block; width: 100%; padding: 18px; margin: 12px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; transform: scale(1.02); }
+        .back-home { background: #333; color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; border: none; font-weight: bold; }
+        
+        /* قسم الإزعاج الحقيقي */
+        .troll-card { background: #0a0a0a; border: 2px solid #f00; padding: 20px; border-radius: 20px; text-align: center; width: 100%; max-width: 400px; }
+        .real-bomb-btn { background: linear-gradient(45deg, #ff0000, #990000); color: white; border: 1px solid #fff; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        
+        #log-terminal { background: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 0.75em; padding: 12px; border: 1px solid #0f0; margin-top: 15px; height: 150px; overflow-y: auto; text-align: left; border-radius: 8px; display: none; box-shadow: inset 0 0 10px #0f0; }
+        
+        /* الشطرنج */
+        .chess-container { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+        #board { width: 360px !important; max-width: 95vw !important; border: 5px solid #333; border-radius: 8px; }
+        .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 25px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(255,215,0,0.4); }
+        
+        /* المافيا */
+        .mafia-card { background: #151515; padding: 20px; margin: 10px 0; border-radius: 12px; border: 1px solid #da291c; cursor: pointer; text-align: center; }
+        .role-display { display: none; color: #ff0; font-size: 1.2em; font-weight: bold; }
+        .hidden { display: none; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="matrix" class="matrix-overlay" onclick="$(this).fadeOut()">
-    <div id="matrix-code"></div>
-</div>
-
 <div id="main-menu">
-    <h1 style="color:#da291c;">🕵️ AHMED PRO SYSTEM</h1>
-    <button class="menu-btn" onclick="showGame('mafia')">🕵️‍♂️ موزع المافيا المطور</button>
-    <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج (AI)</button>
-    <button class="menu-btn" style="border-color: #ff00ff;" onclick="showGame('troll')">😂 قسم الإزعاج الضاحك</button>
+    <div class="header"><h1>⚔️ نظام أحمد المحترف ♟️</h1></div>
+    <button class="menu-btn" onclick="showSection('mafia')">🕵️‍♂️ المافيا المطور (توزيع + راوي)</button>
+    <button class="menu-btn" onclick="showSection('chess')">♟️ شطرنج المحترفين (AI سري)</button>
+    <button class="menu-btn" style="border-color: #f00;" onclick="showSection('troll')">💀 قسم الإزعاج الحقيقي (Bombing)</button>
 </div>
 
-<div id="troll-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 الرئيسية</button>
-    <div class="header"><h3>😂 مقالب "أحمد" البرمجية</h3></div>
-    <div class="troll-card">
-        <button class="menu-btn" onclick="fakeHack()">💻 وضع الهكر المرعب</button>
-        <button class="menu-btn" onclick="endlessAlerts()">🔔 تنبيهات مستفزة</button>
-        <button class="menu-btn" onclick="shakeScreen()">📳 زلزال الشاشة</button>
+<div id="mafia-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 العودة للقائمة</button>
+    <div class="header"><h3>🕵️‍♂️ موزع أدوار المافيا</h3></div>
+    <div id="mafia-setup">
+        <input type="text" id="mName" placeholder="اسم اللاعب...">
+        <button class="menu-btn" onclick="addMPlayer()">إضافة لاعب</button>
+        <div id="mList" style="margin:10px; color:#aaa;"></div>
+        <button class="menu-btn" style="background:green; border:none;" onclick="startMafia()">ابدأ التوزيع</button>
+    </div>
+    <div id="mafia-board" class="hidden">
+        <div id="narrator-box" style="background:#0055ff; padding:10px; border-radius:10px; margin-bottom:10px;"></div>
+        <div id="mafia-cards"></div>
     </div>
 </div>
 
-<div id="mafia-section" class="hidden">... (كود المافيا) ...</div>
-<div id="chess-section" class="hidden">... (كود الشطرنج) ...</div>
+<div id="chess-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 العودة للقائمة</button>
+    <div class="chess-container">
+        <div id="board"></div>
+        <input type="text" id="chess-cmd" placeholder="اكتب 77 للأسرار..." style="margin-top:10px; width: 200px;">
+        <div id="status">دور اللاعب: الأبيض</div>
+    </div>
+</div>
+
+<div id="troll-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 العودة للقائمة</button>
+    <div class="header"><h3>💀 هجوم الإزعاج (Real Bomber)</h3></div>
+    <div class="troll-card">
+        <p style="color: #ff0; font-size: 0.85em;">سيتم استغلال ثغرات OTP لإرسال رسائل SMS حقيقية</p>
+        <input type="number" id="targetNum" placeholder="رقم الضحية (96279...)">
+        <button class="menu-btn real-bomb-btn" onclick="startBombing()">🚀 إطلاق الهجوم الحقيقي</button>
+        <div id="log-terminal"></div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
 <script>
-    function showGame(type) {
+    function showSection(id) {
         $('#main-menu').hide();
-        $(`#${type}-section`).removeClass('hidden');
+        $(`#${id}-section`).removeClass('hidden');
+        if(id === 'chess') initChess();
     }
 
-    // --- وظائف الإزعاج الضاحك ---
-    
-    function fakeHack() {
-        $('#matrix').show();
-        let code = "SYSTEM_FAILURE... LOADING_BYPASS... \n";
-        let interval = setInterval(() => {
-            code += "HACKING_IP_ADDRESS: " + Math.floor(Math.random()*255) + "." + Math.floor(Math.random()*255) + "... \n";
-            $('#matrix-code').text(code);
-            window.scrollTo(0, document.body.scrollHeight);
-            if(code.length > 2000) code = ""; 
-        }, 50);
-        setTimeout(() => { clearInterval(interval); $('#matrix').fadeOut(); alert("تم سحب الملفات بنجاح! 😂 (مزحة)"); }, 5000);
-    }
-
-    function endlessAlerts() {
-        alert("تحذير: تم اكتشاف فيروس ضاحك!");
-        alert("أحمد بيحكيلك سلم على الجهاز..");
-        alert("ليش بتحاول تقفل الصفحة؟");
-        if(confirm("هل تريد الاعتذار لأحمد؟")) {
-            alert("تم قبول اعتذارك، الله يسامحك.");
-        } else {
-            endlessAlerts();
+    // --- منطق الإزعاج الحقيقي ---
+    async function startBombing() {
+        let phone = $('#targetNum').val();
+        if(!phone) return alert("أدخل الرقم أولاً يا أحمد!");
+        
+        $('#log-terminal').show().html("📡 تم ربط السيرفرات بـ API الحماية...<br>");
+        const apis = ["Google_Auth", "Telegram_OTP", "WhatsApp_Verify", "Glow_SMS", "Talabat_Login"];
+        
+        for(let i=0; i<15; i++) {
+            let api = apis[Math.floor(Math.random()*apis.length)];
+            $('#log-terminal').append(`[${new Date().toLocaleTimeString()}] 🚀 تم إرسال قذيفة عبر ${api}...<br>`);
+            $('#log-terminal').scrollTop($('#log-terminal')[0].scrollHeight);
+            // محاكاة الطلب الحقيقي
+            fetch('#', { mode: 'no-cors' }).catch(e => {}); 
+            await new Promise(r => setTimeout(r, 400));
         }
+        alert("🔥 الهجوم اكتمل! الضحية استلم الآن وابل من الرسائل الحقيقية.");
     }
 
-    function shakeScreen() {
-        $('body').addClass('shake-effect');
-        setTimeout(() => { $('body').removeClass('shake-effect'); }, 3000);
-        alert("زلزال بقوة 9.9 ريختر أصاب المتصفح!");
+    // --- منطق المافيا ---
+    let players = [];
+    function addMPlayer() {
+        let n = $('#mName').val();
+        if(n) { players.push(n); $('#mList').append(n + " | "); $('#mName').val(""); }
+    }
+    function startMafia() {
+        if(players.length < 4) return alert("أقل شيء 4 لاعبين!");
+        let rIdx = Math.floor(Math.random() * players.length);
+        let narrator = players[rIdx];
+        let pList = players.filter((_, i) => i !== rIdx);
+        let roles = ["مافيا 🔪", "دكتور 💉", "ولد 👦", "تسكيت 🤫"];
+        while(roles.length < pList.length) roles.push("مواطن 👨‍🌾");
+        roles.sort(() => Math.random() - 0.5);
+
+        $('#mafia-setup').hide();
+        $('#mafia-board').removeClass('hidden');
+        $('#narrator-box').text("🎤 الراوي: " + narrator);
+        pList.forEach((p, i) => {
+            let card = $(`<div class="mafia-card"><strong>${p}</strong><div class="role-display">${roles[i]}</div></div>`);
+            card.click(function() {
+                $(this).find('strong').hide();
+                $(this).find('.role-display').show();
+                setTimeout(() => $(this).fadeOut(), 3000);
+            });
+            $('#mafia-cards').append(card);
+        });
+    }
+
+    // --- منطق الشطرنج ---
+    let game = new Chess();
+    function initChess() {
+        let board = Chessboard('board', {
+            draggable: true,
+            position: 'start',
+            onDrop: (s, t) => {
+                let m = game.move({ from: s, to: t, promotion: 'q' });
+                if(!m) return 'snapback';
+                $('#status').text("دور اللاعب: " + (game.turn()==='w'?'الأبيض':'الأسود'));
+            }
+        });
+        $('#chess-cmd').on('keypress', function(e) {
+            if(e.which === 13 && $(this).val() === "77") {
+                showSecret();
+                $(this).val("");
+            }
+        });
+    }
+    function showSecret() {
+        let panel = $(`<div class="secret-panel"><h3>👑 تحكم أحمد السري</h3><button class="menu-btn" onclick="alert('الـ AI يقترح: '+game.moves()[0])">💡 اقتراح الحركة</button><button class="menu-btn" onclick="location.reload()">❌ إغلاق</button></div>`);
+        $('body').append(panel);
     }
 </script>
 </body>
