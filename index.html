@@ -11,9 +11,10 @@
         .game { background:#111; padding:15px; border:2px solid #0f0; border-radius:10px; text-align:center; }
         .panel { background:#111; padding:15px; border:2px solid #0f0; border-radius:10px; width:300px; }
         #board { width:460px; max-width:95vw; }
-        button { padding:12px 20px; margin:8px; background:#da291c; color:white; border:none; border-radius:8px; cursor:pointer; }
+        button { padding:12px 20px; margin:8px; background:#da291c; color:white; border:none; border-radius:8px; cursor:pointer; font-size:16px; }
+        input { padding:10px; margin:5px; width:220px; background:#000; color:#0f0; border:1px solid #0f0; }
         .hidden { display:none; }
-        .status { background:#1a1a1a; padding:12px; margin:10px 0; border-radius:8px; }
+        .status { background:#1a1a1a; padding:15px; margin:10px 0; border-radius:8px; font-size:15px; }
     </style>
 </head>
 <body>
@@ -24,22 +25,22 @@
         <div id="board"></div>
 
         <div id="lobby">
-            <button id="hostBtn">إنشاء غرفة</button><br>
-            <input id="codeInput" placeholder="كود الغرفة" style="width:200px;padding:10px;">
+            <button id="hostBtn">إنشاء غرفة جديدة</button><br><br>
+            <input id="codeInput" placeholder="أدخل كود الغرفة"><br>
             <button id="joinBtn">دخول الغرفة</button>
         </div>
 
         <div id="gameUI" class="hidden">
             <div id="status" class="status">⏳ جاري الانتظار...</div>
             <div id="turnStatus" class="status">الدور: ...</div>
-            <button id="startBtn" class="hidden" style="background:green;width:100%;">بدء المباراة</button>
+            <button id="startBtn" class="hidden" style="background:#00aa00; width:100%;">بدء المباراة</button>
         </div>
     </div>
 
     <div class="panel">
         <h4>الشات</h4>
-        <div id="chat" style="height:300px;overflow-y:auto;background:#0a0a0a;padding:10px;margin-bottom:10px;"></div>
-        <input id="chatInput" placeholder="رسالة..." style="width:100%;padding:8px;">
+        <div id="chat" style="height:320px; overflow-y:auto; background:#0a0a0a; padding:10px; margin-bottom:10px;"></div>
+        <input id="chatInput" placeholder="اكتب رسالة..." style="width:100%;">
         <button id="sendBtn">إرسال</button>
     </div>
 </div>
@@ -50,173 +51,171 @@
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
 <script>
-let peer, myId, myName, isHost = false;
+let peer = null;
+let myId = null;
+let myName = "";
+let isHost = false;
 let connections = {};
 let players = [];
 let game = new Chess();
-let board;
+let board = null;
 let gameActive = false;
 let myTeam = null;
-let teamWhite = [], teamBlack = [];
+let teamWhite = [];
+let teamBlack = [];
 let currentTurn = "white";
-let expectedId = null;
+let expectedPlayerId = null;
 
-// ==================== دوال أساسية ====================
-function log(msg, error=false) {
-    const color = error ? "red" : "#0f0";
+// ==================== مساعدات ====================
+function log(msg, isError = false) {
+    const color = isError ? "#ff5555" : "#55ff55";
     $("#status").html(`<span style="color:${color}">${msg}</span>`);
 }
 
-function addChat(name, msg) {
-    $("#chat").append(`<div><b>${name}:</b> ${msg}</div>`);
+function addChat(sender, msg) {
+    $("#chat").append(`<div><strong>${sender}:</strong> ${msg}</div>`);
     $("#chat").scrollTop($("#chat")[0].scrollHeight);
 }
 
 function broadcast(data) {
-    Object.values(connections).forEach(c => c.open && c.send(data));
+    Object.values(connections).forEach(c => {
+        if (c && c.open) c.send(data);
+    });
 }
 
-function canIPlay() {
-    return gameActive && myId === expectedId;
+function canPlay() {
+    return gameActive && (myId === expectedPlayerId);
 }
 
-function updateTurnUI() {
+function updateUI() {
     if (!gameActive) {
-        $("#turnStatus").html("المباراة لم تبدأ");
+        $("#turnStatus").html("المباراة لم تبدأ بعد");
         return;
     }
-    const team = currentTurn === "white" ? "🤍 الأبيض" : "🖤 الأسود";
-    const player = (currentTurn==="white" ? teamWhite : teamBlack).find(p => p.id === expectedId);
-    $("#turnStatus").html(`الدور: ${team}<br>يلعب الآن: ${player ? player.name : "؟"}`);
+    const teamText = currentTurn === "white" ? "🤍 الفريق الأبيض" : "🖤 الفريق الأسود";
+    const currentPlayer = (currentTurn === "white" ? teamWhite : teamBlack).find(p => p.id === expectedPlayerId);
+    $("#turnStatus").html(`${teamText}<br>يلعب الآن: ${currentPlayer ? currentPlayer.name : "؟"}`);
 }
 
-// ==================== Host ====================
+// ==================== إنشاء غرفة (Host) ====================
 $("#hostBtn").click(() => {
-    const room = Math.floor(1000 + Math.random()*9000) + "";
-    myId = "H" + room;
-    myName = prompt("اسمك؟", "Host") || "Host";
+    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
+    myId = "HOST_" + roomId;
+    myName = prompt("أدخل اسمك:", "المنشئ") || "Host";
     isHost = true;
 
-    peer = new Peer("CH2V2_" + room);
+    peer = new Peer("CH2V2_" + roomId);
+
     peer.on("open", () => {
         players = [{id: myId, name: myName}];
         $("#lobby").hide();
         $("#gameUI").removeClass("hidden");
-        log(`✅ غرفة جاهزة! الكود: <b>${room}</b>`);
+        log(`✅ تم إنشاء الغرفة!<br>كود الغرفة: <b>${roomId}</b>`);
 
-        peer.on("connection", conn => {
+        peer.on("connection", (conn) => {
             connections[conn.peer] = conn;
-            conn.on("data", data => handleData(data, conn));
+            conn.on("data", (data) => handleIncoming(data, conn));
         });
     });
 });
 
-// ==================== Join ====================
+// ==================== دخول غرفة ====================
 $("#joinBtn").click(() => {
     const code = $("#codeInput").val().trim();
-    if (!code) return alert("أدخل الكود");
+    if (!code) return alert("أدخل كود الغرفة");
 
-    myName = prompt("اسمك؟", "لاعب") || "Player";
-    myId = "P" + Date.now();
+    myName = prompt("أدخل اسمك:", "لاعب") || "Player";
+    myId = "PLAYER_" + Date.now();
 
     peer = new Peer();
+
     peer.on("open", () => {
         const conn = peer.connect("CH2V2_" + code);
         connections[code] = conn;
 
         conn.on("open", () => {
-            conn.send({type:"name", name:myName});
+            conn.send({type: "join", name: myName, id: myId});
             $("#lobby").hide();
             $("#gameUI").removeClass("hidden");
-            log("جاري الاتصال...");
+            log("جاري الاتصال بالغرفة...");
         });
 
-        conn.on("data", handleData);
+        conn.on("data", handleIncoming);
     });
 });
 
-function handleData(data, conn=null) {
-    if (data.type === "name") {
-        if (isHost) {
-            players.push({id: conn.peer, name: data.name});
-            log(`${data.name} انضم (${players.length}/4)`);
-            broadcast({type:"playerlist", players});
-            if (players.length === 4) $("#startBtn").removeClass("hidden");
-        }
+function handleIncoming(data, conn = null) {
+    console.log("Received:", data);
+
+    if (data.type === "join" && isHost) {
+        players.push({id: data.id, name: data.name});
+        log(`${data.name} انضم (${players.length}/4)`);
+        broadcast({type: "players", players: players});
+        if (players.length === 4) $("#startBtn").removeClass("hidden");
     }
-    else if (data.type === "playerlist") {
+
+    if (data.type === "players") {
         players = data.players;
     }
-    else if (data.type === "start") {
+
+    if (data.type === "start") {
         teamWhite = data.white;
         teamBlack = data.black;
-        myTeam = teamWhite.some(p=>p.id===myId) ? "white" : "black";
+        myTeam = teamWhite.some(p => p.id === myId) ? "white" : "black";
         gameActive = true;
         currentTurn = "white";
-        expectedId = data.expectedId;
-        updateTurnUI();
-        log("🎉 المباراة بدأت!");
+        expectedPlayerId = data.expectedPlayerId;
+        updateUI();
+        log("🎉 بدأت المباراة!");
     }
-    else if (data.type === "move") {
-        game.move({from:data.from, to:data.to, promotion:'q'});
-        board.position(game.fen());
-    }
-    else if (data.type === "turn") {
+
+    if (data.type === "turn") {
         currentTurn = data.currentTurn;
-        expectedId = data.expectedId;
-        updateTurnUI();
+        expectedPlayerId = data.expectedPlayerId;
+        updateUI();
     }
 }
 
 // ==================== بدء المباراة ====================
 $("#startBtn").click(() => {
-    if (!isHost || players.length !== 4) return;
+    if (!isHost || players.length !== 4) return log("يجب أن يكون هناك 4 لاعبين", true);
 
-    const shuffled = [...players].sort(() => Math.random()-0.5);
+    const shuffled = [...players].sort(() => Math.random() - 0.5);
     teamWhite = [shuffled[0], shuffled[1]];
     teamBlack = [shuffled[2], shuffled[3]];
 
-    myTeam = teamWhite.some(p => p.id === myId) ? "white" : "black";
-
-    game = new Chess();
-    gameActive = true;
-    currentTurn = "white";
-    expectedId = teamWhite[0].id;
+    expectedPlayerId = teamWhite[0].id;
 
     broadcast({
         type: "start",
         white: teamWhite,
         black: teamBlack,
-        expectedId: expectedId
+        expectedPlayerId: expectedPlayerId
     });
 
-    updateTurnUI();
-    log("المباراة بدأت - الأبيض يلعب أولاً");
+    gameActive = true;
+    currentTurn = "white";
+    updateUI();
+    log("🎉 المباراة بدأت! الأبيض يلعب أولاً");
 });
 
-// ==================== الرقعة ====================
-board = Chessboard('board', {
-    draggable: false,
-    position: 'start',
-    pieceTheme: 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'
-});
+// ==================== الرقعة + النقل (مبسط) ====================
+board = Chessboard('board', { draggable: false, position: 'start' });
 
 $("#board").on("click", ".square-55d63", function() {
-    if (!canIPlay()) {
+    if (!canPlay()) {
         log("⚠️ ليس دورك الآن!", true);
         return;
     }
-
-    // هنا يمكنك إضافة منطق اختيار القطعة والنقل (مبسط حالياً)
-    alert("دورك! (سيتم تطوير منطق النقل في النسخة القادمة)");
+    log("دورك! (سيتم إضافة منطق النقل الكامل قريبًا)", false);
 });
 
 // شات
 $("#sendBtn").click(() => {
-    const text = $("#chatInput").val().trim();
-    if (text) {
-        broadcast({type:"chat", name:myName, msg:text});
-        addChat(myName, text);
+    const msg = $("#chatInput").val().trim();
+    if (msg) {
+        broadcast({type: "chat", name: myName, msg: msg});
+        addChat(myName, msg);
         $("#chatInput").val("");
     }
 });
