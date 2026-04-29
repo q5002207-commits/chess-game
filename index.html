@@ -2,223 +2,604 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شطرنج 2 ضد 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>شطرنج 2 ضد 2 - لعبة الفريقين المباشرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        body { background:#000; color:#0f0; font-family:Segoe UI; margin:0; padding:15px; }
-        .container { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
-        .game { background:#111; padding:15px; border:2px solid #0f0; border-radius:10px; text-align:center; }
-        .panel { background:#111; padding:15px; border:2px solid #0f0; border-radius:10px; width:300px; }
-        #board { width:460px; max-width:95vw; }
-        button { padding:12px 20px; margin:8px; background:#da291c; color:white; border:none; border-radius:8px; cursor:pointer; font-size:16px; }
-        input { padding:10px; margin:5px; width:220px; background:#000; color:#0f0; border:1px solid #0f0; }
-        .hidden { display:none; }
-        .status { background:#1a1a1a; padding:15px; margin:10px 0; border-radius:8px; font-size:15px; }
+        * {
+            user-select: none;
+        }
+        body {
+            background: #0a0f0a;
+            color: #b3ffb3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            direction: rtl;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .game {
+            background: #111a11;
+            padding: 20px;
+            border: 2px solid #2ecc2e;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,255,0,0.1);
+        }
+        .panel {
+            background: #0f120f;
+            padding: 18px;
+            border: 2px solid #2ecc2e;
+            border-radius: 24px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        #board {
+            width: 500px;
+            max-width: 92vw;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 18px;
+            margin: 6px;
+            background: #1e3a1e;
+            color: #c2f0c2;
+            border: 1px solid #55ff55;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #2ecc2e;
+            color: #000;
+            transform: scale(1.02);
+        }
+        input {
+            padding: 10px;
+            margin: 5px 0;
+            width: 90%;
+            background: #0a0f0a;
+            color: #b3ffb3;
+            border: 1px solid #2ecc2e;
+            border-radius: 30px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .status {
+            background: #0c170c;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 20px;
+            font-size: 14px;
+            border-right: 4px solid #2ecc2e;
+            text-align: right;
+        }
+        #chat {
+            background: #050a05;
+            height: 280px;
+            overflow-y: auto;
+            padding: 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .chat-meta {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        .team-badge {
+            display: inline-block;
+            background: #1e3a1e;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 12px;
+            margin: 4px;
+        }
+        .turn-highlight {
+            background: #2a3a2a;
+            padding: 8px;
+            border-radius: 18px;
+            font-weight: bold;
+        }
+        hr {
+            border-color: #2ecc2e;
+            margin: 8px 0;
+        }
+        .players-list {
+            background: #0c110c;
+            border-radius: 18px;
+            padding: 8px;
+            font-size: 13px;
+        }
+        .badge {
+            background: #162016;
+            border-radius: 20px;
+            padding: 4px 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #5a8a5a;
+        }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="game">
-        <h2>♟️ شطرنج 2 ضد 2</h2>
+        <h2>⚔️ شطرنج 2 ضد 2 | فريق أبيض 🆚 فريق أسود</h2>
         <div id="board"></div>
 
-        <div id="lobby">
-            <button id="hostBtn">إنشاء غرفة جديدة</button><br><br>
-            <input id="codeInput" placeholder="أدخل كود الغرفة"><br>
-            <button id="joinBtn">دخول الغرفة</button>
+        <div id="lobby" style="margin-top: 20px;">
+            <button id="hostBtn">🚀 إنشاء غرفة جديدة</button><br><br>
+            <input id="codeInput" placeholder="📌 كود الغرفة (4 أرقام)" maxlength="6">
+            <button id="joinBtn">🔗 دخول الغرفة</button>
         </div>
 
         <div id="gameUI" class="hidden">
-            <div id="status" class="status">⏳ جاري الانتظار...</div>
-            <div id="turnStatus" class="status">الدور: ...</div>
-            <button id="startBtn" class="hidden" style="background:#00aa00; width:100%;">بدء المباراة</button>
+            <div id="status" class="status">🟢 جاري تجهيز الغرفة...</div>
+            <div id="turnStatus" class="status turn-highlight">⏳ انتظار بدء المباراة</div>
+            <div id="teamInfo" class="status"></div>
+            <button id="startBtn" class="hidden" style="background:#2a722a;">▶️ بدء المباراة (المضيف)</button>
+            <button id="resetGameBtn" class="hidden" style="background:#5a2a2a; margin-top:5px;">🔄 إعادة ضبط (المضيف)</button>
         </div>
     </div>
 
     <div class="panel">
-        <h4>الشات</h4>
-        <div id="chat" style="height:320px; overflow-y:auto; background:#0a0a0a; padding:10px; margin-bottom:10px;"></div>
-        <input id="chatInput" placeholder="اكتب رسالة..." style="width:100%;">
-        <button id="sendBtn">إرسال</button>
+        <h4>💬 دردشة الفريقين</h4>
+        <div id="chat"></div>
+        <div style="display: flex; gap: 8px;">
+            <input id="chatInput" placeholder="رسالة ..." style="flex:1;">
+            <button id="sendBtn" style="background:#1a4a1a;">إرسال</button>
+        </div>
+        <div class="players-list" id="onlinePlayersDisplay">
+            <span>👥 انتظار اتصال اللاعبين...</span>
+        </div>
     </div>
 </div>
+<footer>🎲 تحرك بنقرة على قطعة ثم على المربع الهدف | يلعب كل فريق بالتناوب داخلياً</footer>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <script>
+// --------------------------------------------------------------
+// إدارة غرف 2v2 بدعم كامل لنقل الحركات بين الفريقين
+// كل لاعب يتحرك حسب دوره (أبيض/أسود) وترتيب الفريق
+// --------------------------------------------------------------
 let peer = null;
 let myId = null;
 let myName = "";
 let isHost = false;
-let connections = {};
-let players = [];
+let connections = {};        // { peerId: conn }
+let players = [];            // [{id, name}]
 let game = new Chess();
 let board = null;
 let gameActive = false;
-let myTeam = null;
-let teamWhite = [];
+let myTeam = null;           // "white" or "black"
+let teamWhite = [];          // list of {id, name}
 let teamBlack = [];
-let currentTurn = "white";
-let expectedPlayerId = null;
+let currentTurn = "white";   // team turn
+let expectedPlayerId = null; // من يجب أن يلعب الآن داخل الفريق
+let turnOrderWhiteIndex = 0;
+let turnOrderBlackIndex = 0;
+let roomCode = "";
 
-// ==================== مساعدات ====================
-function log(msg, isError = false) {
-    const color = isError ? "#ff5555" : "#55ff55";
-    $("#status").html(`<span style="color:${color}">${msg}</span>`);
+// مساعدات
+function updateStatusMessage(msg, isError = false) {
+    $("#status").html(`📢 <span style="color:${isError ? '#ff8888' : '#aaffaa'}">${msg}</span>`);
 }
 
-function addChat(sender, msg) {
-    $("#chat").append(`<div><strong>${sender}:</strong> ${msg}</div>`);
+function addChatMessage(sender, msg, teamColor = null) {
+    let prefix = "";
+    if (teamColor === "white") prefix = "🤍 ";
+    else if (teamColor === "black") prefix = "🖤 ";
+    $("#chat").append(`<div><strong>${prefix}${sender}:</strong> ${msg}</div>`);
     $("#chat").scrollTop($("#chat")[0].scrollHeight);
 }
 
-function broadcast(data) {
-    Object.values(connections).forEach(c => {
-        if (c && c.open) c.send(data);
+function broadcast(data, excludeId = null) {
+    for (let pid in connections) {
+        if (connections[pid] && connections[pid].open && (excludeId !== pid)) {
+            connections[pid].send(data);
+        }
+    }
+}
+
+function updatePlayersUI() {
+    if (!players.length) {
+        $("#onlinePlayersDisplay").html("<span>👥 لا يوجد لاعبون بعد</span>");
+        return;
+    }
+    let html = '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+    players.forEach(p => {
+        let teamMark = "";
+        if (teamWhite.some(t => t.id === p.id)) teamMark = " 🤍";
+        if (teamBlack.some(t => t.id === p.id)) teamMark = " 🖤";
+        html += `<span class="badge">🔹 ${p.name}${teamMark}</span>`;
     });
+    html += '</div>';
+    $("#onlinePlayersDisplay").html(html);
+}
+
+function refreshTeamUI() {
+    if (!gameActive) {
+        $("#teamInfo").html(`🎭 فرق: الأبيض (${teamWhite.map(p=>p.name).join(', ') || '--'})  |  الأسود (${teamBlack.map(p=>p.name).join(', ') || '--'})`);
+        return;
+    }
+    let myRole = myTeam === "white" ? "🤍 فريق أبيض" : "🖤 فريق أسود";
+    let turnText = currentTurn === "white" ? "🤍 الأبيض" : "🖤 الأسود";
+    let expectedName = "?";
+    let targetList = currentTurn === "white" ? teamWhite : teamBlack;
+    let targetPlayer = targetList.find(p => p.id === expectedPlayerId);
+    if(targetPlayer) expectedName = targetPlayer.name;
+    $("#teamInfo").html(`🧩 دورك: ${myRole}<br>🎯 يلعب الآن: ${expectedName} (فريق ${turnText})`);
+}
+
+function updateTurnUI() {
+    if (!gameActive) {
+        $("#turnStatus").html("⏳ المباراة لم تبدأ بعد");
+        return;
+    }
+    let teamName = currentTurn === "white" ? "🤍 الفريق الأبيض" : "🖤 الفريق الأسود";
+    let currentPlayerObj = (currentTurn === "white" ? teamWhite : teamBlack).find(p => p.id === expectedPlayerId);
+    let playerName = currentPlayerObj ? currentPlayerObj.name : "غير معروف";
+    $("#turnStatus").html(`🎲 الدور: ${teamName}<br>⚡ يتحرك: ${playerName}`);
+    refreshTeamUI();
+}
+
+// حساب التالي في الفريق (دور داخلي)
+function getNextPlayerInTeam(team, currentPlayerId, teamArray) {
+    if (!teamArray.length) return null;
+    let idx = teamArray.findIndex(p => p.id === currentPlayerId);
+    let nextIdx = (idx + 1) % teamArray.length;
+    return teamArray[nextIdx].id;
+}
+
+function switchTurn() {
+    if (!gameActive) return;
+    // تبديل الفريق
+    if (currentTurn === "white") {
+        currentTurn = "black";
+        // تحديد أول لاعب في الأسود
+        if (teamBlack.length) expectedPlayerId = teamBlack[0].id;
+        else expectedPlayerId = null;
+    } else {
+        currentTurn = "white";
+        if (teamWhite.length) expectedPlayerId = teamWhite[0].id;
+        else expectedPlayerId = null;
+    }
+    // تحديث الواجهة وإرسال البث
+    updateTurnUI();
+    broadcast({
+        type: "turn_sync",
+        currentTurn: currentTurn,
+        expectedPlayerId: expectedPlayerId,
+        fen: game.fen()
+    });
+    
+    // تحقق كش مات
+    if (game.game_over()) {
+        let winner = game.in_checkmate() ? (game.turn() === 'w' ? '🖤 الأسود' : '🤍 الأبيض') : 'تعادل';
+        updateStatusMessage(`🏆 انتهت المباراة! الفائز: ${winner}`);
+        broadcast({ type: "game_over", winner: winner });
+        gameActive = false;
+    }
+}
+
+function afterMoveSync() {
+    // بعد كل حركة نحدث الرقعة للجميع
+    broadcast({ type: "board_update", fen: game.fen(), currentTurn: currentTurn, expectedPlayerId: expectedPlayerId });
+    if (board) board.position(game.fen());
+    // التحقق من انتهاء المباراة
+    if (game.game_over()) {
+        let winner = game.in_checkmate() ? (game.turn() === 'w' ? '🖤 الأسود' : '🤍 الأبيض') : 'تعادل';
+        updateStatusMessage(`🏁 النهاية: ${winner}`);
+        broadcast({ type: "game_over", winner: winner });
+        gameActive = false;
+        return;
+    }
+    switchTurn();
+}
+
+// تنفيذ الحركة
+function tryMove(source, target, promotion = 'q') {
+    if (!canPlay()) {
+        updateStatusMessage("❌ ليس دورك!", true);
+        return false;
+    }
+    const move = game.move({
+        from: source,
+        to: target,
+        promotion: promotion
+    });
+    if (move) {
+        // تحديث الرقعة محلياً
+        if (board) board.position(game.fen());
+        updateStatusMessage(`✅ نقلة: ${source} → ${target}`);
+        // مزامنة مع الآخرين
+        afterMoveSync();
+        return true;
+    } else {
+        updateStatusMessage("🚫 نقلة غير قانونية!", true);
+        return false;
+    }
 }
 
 function canPlay() {
     return gameActive && (myId === expectedPlayerId);
 }
 
-function updateUI() {
-    if (!gameActive) {
-        $("#turnStatus").html("المباراة لم تبدأ بعد");
-        return;
-    }
-    const teamText = currentTurn === "white" ? "🤍 الفريق الأبيض" : "🖤 الفريق الأسود";
-    const currentPlayer = (currentTurn === "white" ? teamWhite : teamBlack).find(p => p.id === expectedPlayerId);
-    $("#turnStatus").html(`${teamText}<br>يلعب الآن: ${currentPlayer ? currentPlayer.name : "؟"}`);
-}
-
-// ==================== إنشاء غرفة (Host) ====================
-$("#hostBtn").click(() => {
-    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
-    myId = "HOST_" + roomId;
-    myName = prompt("أدخل اسمك:", "المنشئ") || "Host";
-    isHost = true;
-
-    peer = new Peer("CH2V2_" + roomId);
-
-    peer.on("open", () => {
-        players = [{id: myId, name: myName}];
-        $("#lobby").hide();
-        $("#gameUI").removeClass("hidden");
-        log(`✅ تم إنشاء الغرفة!<br>كود الغرفة: <b>${roomId}</b>`);
-
-        peer.on("connection", (conn) => {
-            connections[conn.peer] = conn;
-            conn.on("data", (data) => handleIncoming(data, conn));
-        });
-    });
-});
-
-// ==================== دخول غرفة ====================
-$("#joinBtn").click(() => {
-    const code = $("#codeInput").val().trim();
-    if (!code) return alert("أدخل كود الغرفة");
-
-    myName = prompt("أدخل اسمك:", "لاعب") || "Player";
-    myId = "PLAYER_" + Date.now();
-
-    peer = new Peer();
-
-    peer.on("open", () => {
-        const conn = peer.connect("CH2V2_" + code);
-        connections[code] = conn;
-
-        conn.on("open", () => {
-            conn.send({type: "join", name: myName, id: myId});
-            $("#lobby").hide();
-            $("#gameUI").removeClass("hidden");
-            log("جاري الاتصال بالغرفة...");
-        });
-
-        conn.on("data", handleIncoming);
-    });
-});
-
-function handleIncoming(data, conn = null) {
-    console.log("Received:", data);
-
+// معالجة إشارات الشبكة
+function handleIncoming(data, senderConn) {
     if (data.type === "join" && isHost) {
-        players.push({id: data.id, name: data.name});
-        log(`${data.name} انضم (${players.length}/4)`);
-        broadcast({type: "players", players: players});
-        if (players.length === 4) $("#startBtn").removeClass("hidden");
+        // لاعب جديد ينضم
+        if (!players.find(p => p.id === data.id)) {
+            players.push({ id: data.id, name: data.name });
+            updateStatusMessage(`${data.name} انضم إلى الغرفة (${players.length}/4)`);
+            broadcast({ type: "players_list", players: players });
+            updatePlayersUI();
+            // إذا وصلنا لأربعة نعرض زر البدء
+            if (players.length === 4) $("#startBtn").removeClass("hidden");
+            else $("#startBtn").addClass("hidden");
+        }
     }
-
-    if (data.type === "players") {
+    if (data.type === "players_list") {
         players = data.players;
+        updatePlayersUI();
     }
-
-    if (data.type === "start") {
-        teamWhite = data.white;
-        teamBlack = data.black;
-        myTeam = teamWhite.some(p => p.id === myId) ? "white" : "black";
+    if (data.type === "start_game" && !isHost) {
+        // استقبال بيانات البداية
+        teamWhite = data.whiteTeam;
+        teamBlack = data.blackTeam;
+        myTeam = teamWhite.some(p => p.id === myId) ? "white" : (teamBlack.some(p => p.id === myId) ? "black" : null);
         gameActive = true;
         currentTurn = "white";
         expectedPlayerId = data.expectedPlayerId;
-        updateUI();
-        log("🎉 بدأت المباراة!");
+        game = new Chess();
+        if (board) board.position("start");
+        updateStatusMessage("🎉 بدأت المعركة! فريقك: " + (myTeam === "white" ? "أبيض" : "أسود"));
+        updateTurnUI();
+        refreshTeamUI();
+        $("#startBtn").addClass("hidden");
+        $("#resetGameBtn").removeClass("hidden");
     }
-
-    if (data.type === "turn") {
+    if (data.type === "turn_sync") {
         currentTurn = data.currentTurn;
         expectedPlayerId = data.expectedPlayerId;
-        updateUI();
+        if (data.fen && game) {
+            game.load(data.fen);
+            if (board) board.position(game.fen());
+        }
+        updateTurnUI();
+        refreshTeamUI();
+    }
+    if (data.type === "board_update") {
+        if (game) {
+            game.load(data.fen);
+            if (board) board.position(game.fen());
+            currentTurn = data.currentTurn;
+            expectedPlayerId = data.expectedPlayerId;
+            updateTurnUI();
+            refreshTeamUI();
+        }
+    }
+    if (data.type === "move_made") {
+        // حركة من لاعب آخر
+        if (game && data.moveSan) {
+            const move = game.move(data.moveSan, { sloppy: true });
+            if (move && board) board.position(game.fen());
+            currentTurn = data.currentTurn;
+            expectedPlayerId = data.expectedPlayerId;
+            updateTurnUI();
+            refreshTeamUI();
+        }
+    }
+    if (data.type === "chat_message") {
+        addChatMessage(data.name, data.msg);
+    }
+    if (data.type === "game_over") {
+        updateStatusMessage(`🏆 انتهت المباراة: ${data.winner}`);
+        gameActive = false;
+    }
+    if (data.type === "reset_game" && isHost === false) {
+        // إعادة التعيين
+        game = new Chess();
+        gameActive = true;
+        if (board) board.position("start");
+        if (data.whiteTeam && data.blackTeam) {
+            teamWhite = data.whiteTeam;
+            teamBlack = data.blackTeam;
+            myTeam = teamWhite.some(p => p.id === myId) ? "white" : (teamBlack.some(p => p.id === myId) ? "black" : null);
+            currentTurn = "white";
+            expectedPlayerId = teamWhite[0]?.id;
+        }
+        updateTurnUI();
+        refreshTeamUI();
+        updateStatusMessage("🔄 تمت إعادة ضبط المباراة!");
     }
 }
 
-// ==================== بدء المباراة ====================
-$("#startBtn").click(() => {
-    if (!isHost || players.length !== 4) return log("يجب أن يكون هناك 4 لاعبين", true);
-
-    const shuffled = [...players].sort(() => Math.random() - 0.5);
-    teamWhite = [shuffled[0], shuffled[1]];
-    teamBlack = [shuffled[2], shuffled[3]];
-
-    expectedPlayerId = teamWhite[0].id;
-
-    broadcast({
-        type: "start",
-        white: teamWhite,
-        black: teamBlack,
-        expectedPlayerId: expectedPlayerId
-    });
-
-    gameActive = true;
-    currentTurn = "white";
-    updateUI();
-    log("🎉 المباراة بدأت! الأبيض يلعب أولاً");
-});
-
-// ==================== الرقعة + النقل (مبسط) ====================
-board = Chessboard('board', { draggable: false, position: 'start' });
-
-$("#board").on("click", ".square-55d63", function() {
-    if (!canPlay()) {
-        log("⚠️ ليس دورك الآن!", true);
+// بدء المباراة من المضيف
+function startMatch() {
+    if (!isHost) return;
+    if (players.length !== 4) {
+        updateStatusMessage("⚠️ تحتاج إلى 4 لاعبين بالضبط لبدء المباراة!", true);
         return;
     }
-    log("دورك! (سيتم إضافة منطق النقل الكامل قريبًا)", false);
+    // توزيع عشوائي لكن متوازن
+    let shuffled = [...players];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    teamWhite = [shuffled[0], shuffled[1]];
+    teamBlack = [shuffled[2], shuffled[3]];
+    currentTurn = "white";
+    expectedPlayerId = teamWhite[0].id;
+    game = new Chess();
+    gameActive = true;
+    if (board) board.position("start");
+    
+    const startData = {
+        type: "start_game",
+        whiteTeam: teamWhite,
+        blackTeam: teamBlack,
+        expectedPlayerId: expectedPlayerId,
+        fen: "start"
+    };
+    broadcast(startData);
+    updateStatusMessage("🎯 تم بدء المباراة! الأبيض يبدأ");
+    updateTurnUI();
+    refreshTeamUI();
+    $("#startBtn").addClass("hidden");
+    $("#resetGameBtn").removeClass("hidden");
+    // إرسال تحديث للوحدة للجميع
+    broadcast({ type: "board_update", fen: game.fen(), currentTurn: currentTurn, expectedPlayerId: expectedPlayerId });
+}
+
+function resetMatchByHost() {
+    if (!isHost || !gameActive) return;
+    teamWhite = [];
+    teamBlack = [];
+    players.forEach(p => {});
+    // إعادة توزيع عشوائي جديد
+    let shuffled = [...players];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    teamWhite = [shuffled[0], shuffled[1]];
+    teamBlack = [shuffled[2], shuffled[3]];
+    currentTurn = "white";
+    expectedPlayerId = teamWhite[0].id;
+    game = new Chess();
+    if (board) board.position("start");
+    gameActive = true;
+    const resetData = {
+        type: "reset_game",
+        whiteTeam: teamWhite,
+        blackTeam: teamBlack,
+        expectedPlayerId: expectedPlayerId
+    };
+    broadcast(resetData);
+    updateTurnUI();
+    refreshTeamUI();
+    updateStatusMessage("🔄 تم إعادة ضبط المباراة بتشكيل فرق جديد");
+    broadcast({ type: "board_update", fen: game.fen(), currentTurn: currentTurn, expectedPlayerId: expectedPlayerId });
+}
+
+// ----------------- إنشاء الغرفة ----------------
+$("#hostBtn").click(() => {
+    let newRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
+    roomCode = newRoomCode;
+    myName = prompt("💎 اسمك:", "قائد الفريق") || "قائد";
+    isHost = true;
+    myId = "host_" + Date.now() + "_" + roomCode;
+    players = [{ id: myId, name: myName }];
+    peer = new Peer("2v2chess_" + roomCode);
+    peer.on("open", (id) => {
+        updateStatusMessage(`✅ الغرفة أنشئت! كود: ${roomCode} | انتظر 3 لاعبين آخرين`);
+        $("#lobby").hide();
+        $("#gameUI").removeClass("hidden");
+        $("#resetGameBtn").addClass("hidden");
+        $("#startBtn").addClass("hidden");
+        updatePlayersUI();
+        peer.on("connection", (conn) => {
+            connections[conn.peer] = conn;
+            conn.on("data", (data) => handleIncoming(data, conn));
+            conn.on("close", () => {
+                delete connections[conn.peer];
+                updateStatusMessage("⚠️ انقطع اتصال أحد اللاعبين");
+            });
+        });
+    });
+    peer.on("error", (err) => { console.error(err); updateStatusMessage("خطأ في الخادم", true); });
 });
 
-// شات
-$("#sendBtn").click(() => {
-    const msg = $("#chatInput").val().trim();
-    if (msg) {
-        broadcast({type: "chat", name: myName, msg: msg});
-        addChat(myName, msg);
-        $("#chatInput").val("");
-    }
+// دخول الغرفة
+$("#joinBtn").click(() => {
+    let code = $("#codeInput").val().trim();
+    if (!code) { alert("أدخل كود الغرفة"); return; }
+    roomCode = code;
+    myName = prompt("👤 اسمك:", "محارب") || "لاعب";
+    myId = "player_" + Date.now();
+    isHost = false;
+    peer = new Peer();
+    peer.on("open", () => {
+        let conn = peer.connect("2v2chess_" + code);
+        conn.on("open", () => {
+            connections[code] = conn;
+            conn.send({ type: "join", name: myName, id: myId });
+            updateStatusMessage("🟡 جاري الانضمام إلى الغرفة...");
+            $("#lobby").hide();
+            $("#gameUI").removeClass("hidden");
+            $("#startBtn").addClass("hidden");
+            $("#resetGameBtn").addClass("hidden");
+        });
+        conn.on("data", (data) => handleIncoming(data, conn));
+        conn.on("close", () => { updateStatusMessage("🔌 تم قطع الاتصال بالمضيف"); });
+    });
 });
+
+// تهيئة الرقعة + أحداث النقر (drag & drop محسن)
+$(document).ready(() => {
+    let config = {
+        draggable: true,
+        position: 'start',
+        onDragStart: (source, piece, position, orientation) => {
+            if (!canPlay()) return false;
+            // تحديد إن كانت القطعة تناسب لون الفريق
+            let pieceColor = piece[0] === 'w' ? 'white' : 'black';
+            if (pieceColor !== myTeam) return false;
+            return true;
+        },
+        onDrop: (source, target) => {
+            if (!canPlay()) return 'snapback';
+            let move = game.move({ from: source, to: target, promotion: 'q' });
+            if (move === null) return 'snapback';
+            // تمت الحركة بنجاح
+            if (board) board.position(game.fen());
+            updateStatusMessage(`الحركة: ${source} ➜ ${target}`);
+            afterMoveSync();  // يغير الدور ويحدث الجميع
+            return true;
+        },
+        onSnapEnd: () => { if (board) board.position(game.fen()); }
+    };
+    board = Chessboard('board', config);
+});
+
+// شات + أزرار
+$("#sendBtn").click(() => {
+    let msg = $("#chatInput").val().trim();
+    if (msg === "") return;
+    addChatMessage(myName, msg);
+    broadcast({ type: "chat_message", name: myName, msg: msg });
+    $("#chatInput").val("");
+});
+$("#startBtn").click(() => { if (isHost) startMatch(); });
+$("#resetGameBtn").click(() => { if (isHost) resetMatchByHost(); });
+
+// تحديث المتغيرات العامة
+window.updateTurnUI = updateTurnUI;
+window.refreshTeamUI = refreshTeamUI;
 </script>
 </body>
 </html>
