@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد - المافيا المتكاملة</title>
+    <title>بوابة أحمد - المافيا المتكاملة ()</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -52,7 +52,7 @@
         .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
         .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
         .secret-panel button:hover { background: #da291c; }
-        .force-win-panel { display: none; }
+        .force-win-panel { display: none; } /* تم إخفاء زر AI */
     </style>
 </head>
 <body>
@@ -98,6 +98,7 @@
                 <button id="resign-btn" style="background:#da291c;">????️ انسحاب</button>
                 <button id="draw-btn" style="background:#0055ff;">???? طلب تعادل</button>
             </div>
+            <!-- تم إخفاء زر AI نهائياً -->
         </div>
         <div class="fake-chat" id="fake-chat">
             <h4>???? شات مع الخصم</h4>
@@ -161,7 +162,7 @@ let myName = "";
 let host = false;
 let votesReceived = [];
 
-// قائمة أماكن الجاسوس الكاملة
+// قائمة أماكن الجاسوس الكاملة (400+ كلمة)
 const spyPlaces = [ 
     "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
     "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
@@ -173,8 +174,7 @@ const spyPlaces = [
     "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
     "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
 ];
-
-// ===================== المافيا =====================
+    // ===================== المافيا (توزيع الأدوار حسب العدد) =====================
 function addMafiaPlayer() {
     let n = $('#mafiaPlayerName').val().trim();
     if(n) {
@@ -183,27 +183,32 @@ function addMafiaPlayer() {
         $('#mafiaPlayerName').val("").focus();
     }
 }
-
 function getRolesDistribution(playersList) {
     let count = playersList.length;
     let roles = [];
     
+    // الدكتور موجود دائماً
     let doctorsCount = 1;
-    let hasMafiaKiller = true;
-    let hasSilentMafia = (count >= 9);
-    let hasChild = (count >= 9);
     
-    let citizensCount = count - doctorsCount - 1;
+    // المافيا: واحد قاتل دائماً
+    let hasMafiaKiller = true;
+    let hasSilentMafia = (count >= 9);  // تسكيت فقط إذا العدد 9+
+    let hasChild = (count >= 9);        // ولد فقط إذا العدد 9+
+    
+    // عدد المواطنين
+    let citizensCount = count - doctorsCount - 1; // ناقص المافيا القاتل
     if(hasSilentMafia) citizensCount--;
     if(hasChild) citizensCount--;
     if(citizensCount < 0) citizensCount = 0;
     
+    // بناء قائمة الأدوار
     roles.push({type:'mafia', name:'مافيا ???? (قاتل)', class:'mafia-role'});
     if(hasSilentMafia) roles.push({type:'silent_mafia', name:'مافيا تسكيت ????', class:'silent-role'});
     for(let i=0; i<doctorsCount; i++) roles.push({type:'doctor', name:'دكتور ????', class:'doctor-role'});
     if(hasChild) roles.push({type:'child', name:'ولد ???? (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
     for(let i=0; i<citizensCount; i++) roles.push({type:'citizen', name:'مواطن ????‍????', class:'citizen-role'});
     
+    // خلط عشوائي
     for(let i=roles.length-1; i>0; i--) {
         let j = Math.floor(Math.random()*(i+1));
         [roles[i], roles[j]] = [roles[j], roles[i]];
@@ -432,8 +437,7 @@ function showOnlineFinalResults(spyName, logs) {
     $('#vote-log-container').html(html);
     $('#final-result').html(`????️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
 }
-
-// ===================== الشطرنج مع Stockfish AI =====================
+    // ===================== الشطرنج (الكامل مع ميزات متقدمة) =====================
 let chessBoard = null;
 let chessGame = new Chess();
 let chessConn = null;
@@ -448,30 +452,51 @@ let suggestionInterval = null;
 let isAIPlaying = false;
 let aiInterval = null;
 
-// دالة Stockfish الجديدة
-const stockfish = new Worker(
-    "https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish.js"
-);
-
-function getAIMove(callback) {
-    stockfish.postMessage("uci");
-    stockfish.postMessage("position fen " + chessGame.fen());
-    stockfish.postMessage("go depth 15");
-
-    stockfish.onmessage = function(event) {
-        let line = event.data;
-        if(line.startsWith("bestmove")) {
-            let move = line.split(" ")[1];
-            callback({
-                from: move.substring(0,2),
-                to: move.substring(2,4),
-                promotion: 'q'
-            });
+// حصول على أفضل حركة من الـ AI (تقييم عالي)
+function getAIMove() {
+    let moves = chessGame.moves({ verbose: true });
+    if(moves.length === 0) return null;
+    let bestMove = moves[0];
+    let bestScore = -Infinity;
+    
+    for(let move of moves) {
+        let score = 0;
+        // تقييم أكل القطع
+        let target = chessGame.get(move.to);
+        if(target) {
+            let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
+            score += pieceValues[target.type] || 0;
         }
-    };
+        // محاكاة الحركة
+        let testGame = new Chess(chessGame.fen());
+        let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
+        if(executed) {
+            if(testGame.in_checkmate()) score += 1000;
+            if(testGame.in_check()) score += 5;
+            // تطوير القطع
+            let piece = chessGame.get(move.from);
+            if(piece && (piece.type === 'n' || piece.type === 'b')) {
+                if(move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
+                    score += 1.5;
+                }
+            }
+            // تجنب الخسارة
+            let oppMoves = testGame.moves({ verbose: true });
+            for(let oppMove of oppMoves) {
+                let captured = testGame.get(oppMove.to);
+                if(captured && captured.color === testGame.turn() && oppMove.to === move.to) {
+                    let capVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
+                    score -= capVal * 0.6;
+                    break;
+                }
+            }
+        }
+        if(score > bestScore) { bestScore = score; bestMove = move; }
+    }
+    return bestMove;
 }
 
-// تشغيل الـ AI المعدل
+// تشغيل الـ AI
 function aiMakeMove() {
     if(!gameActive || !isAIPlaying) return;
     if(chessGame.game_over()) {
@@ -481,31 +506,30 @@ function aiMakeMove() {
     }
     if(chessGame.turn() !== myChessColor) return;
     
-    getAIMove(function(move) {
-        if(move) {
-            chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
-            addMoveToHistory(move);
-            chessBoard.position(chessGame.fen());
-            if(chessConn) chessConn.send({ f: move.from, t: move.to });
-            updateChessStatus();
-            stopTimer();
-            
-            if(!chessGame.game_over()) {
-                if(chessGame.turn() === myChessColor) {
-                    startTimer();
-                } else {
-                    $('#timer-display').text('⏱️ انتظر دور الخصم');
-                }
+    let move = getAIMove();
+    if(move) {
+        chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
+        addMoveToHistory(move);
+        chessBoard.position(chessGame.fen());
+        if(chessConn) chessConn.send({ f: move.from, t: move.to });
+        updateChessStatus();
+        stopTimer();
+        
+        if(!chessGame.game_over()) {
+            if(chessGame.turn() === myChessColor) {
+                startTimer();
             } else {
-                endGame('???? Stockfish حقق الفوز! كش ملك ????');
+                $('#timer-display').text('⏱️ انتظر دور الخصم');
             }
+        } else {
+            endGame('???? الـ AI حقق الفوز! كش ملك ????');
         }
-    });
+    }
 }
 
 function startAIPlaying() {
     if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI", true); return; }
+    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI (77)", true); return; }
     if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
     isAIPlaying = true;
     addFakeMessage("???? تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز ????", true);
@@ -525,21 +549,20 @@ function stopAIPlaying() {
     addFakeMessage("???? تم إيقاف الـ AI من اللوحة السرية، ارجعت تلعب بنفسك", true);
 }
 
+// الاقتراحات
 function sendSuggestion() {
     if(!suggestionEnabled) return;
     if(chessGame.game_over()) return;
     if(chessGame.turn() !== myChessColor) return;
     
-    // استخدام Stockfish للاقتراحات
-    getAIMove(function(best) {
-        if(best) {
-            let piece = chessGame.get(best.from);
-            let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
-            let targetPiece = chessGame.get(best.to);
-            let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
-            addFakeMessage(`???? الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
-        }
-    });
+    let best = getAIMove();
+    if(best) {
+        let piece = chessGame.get(best.from);
+        let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
+        let targetPiece = chessGame.get(best.to);
+        let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
+        addFakeMessage(`???? الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
+    }
 }
 
 function toggleSuggestion() {
@@ -559,6 +582,7 @@ function toggleSuggestion() {
     }
 }
 
+// الكود السري 77 - لوحة التحكم (بدون رسائل في الشات)
 function showSecretPanel() {
     $('.secret-panel').remove();
     let panel = $(`
@@ -580,6 +604,7 @@ function showSecretPanel() {
     $('#secret-close').on('click', () => { $('.secret-panel').remove(); });
 }
 
+// إضافة إحداثيات الرقعة
 function addBoardCoordinates() {
     setTimeout(() => {
         let boardEl = $('#board .chessboard-js');
@@ -597,7 +622,7 @@ function addBoardCoordinates() {
         }
     }, 100);
 }
-
+// الشات والتواصل
 function addFakeMessage(msg, isSystem = false) {
     let msgDiv = $('<p></p>').text(msg);
     if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
@@ -624,18 +649,21 @@ function setupFakeChat() {
         let msg = $('#chat-input').val().trim();
         if(msg === "") return;
         
+        // الكود السري 77 (بدون رسالة)
         if(msg === "77") {
             showSecretPanel();
             $('#chat-input').val("");
             return;
         }
         
+        // كود الفوز الفوري (بدون رسالة)
         if(msg === "079866") {
             setTimeout(() => { hackWin(); }, 50);
             $('#chat-input').val("");
             return;
         }
         
+        // الرسائل العادية
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
@@ -647,9 +675,11 @@ function setupFakeChat() {
     });
 }
 
+// صور الملوك
 const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
 const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
 
+// وظائف الشطرنج الأساسية
 function updateMoveHistory() {
     let html = '';
     moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
@@ -737,7 +767,7 @@ function initChess() {
     moveHistory = [];
     updateMoveHistory();
     $('#chat-messages').empty();
-    setupFakeChat();
+    setupFakeChat(); // تمت إزالة الرسالة الافتتاحية "ادخل 77"
     
     chessGame = new Chess();
     selectedChessSq = null;
@@ -812,8 +842,11 @@ function initChess() {
             if(chessConn) chessConn.send({ type: 'draw_request' });
         }
     });
+    
+    // تم إخفاء زر AI نهائياً، فلا حاجة لربطه
 }
 
+// الاتصال عبر PeerJS
 function hostGame() {
     let id = Math.floor(1000 + Math.random() * 9000).toString();
     let peerChess = new Peer("AHMED_CHESS_" + id);
@@ -892,7 +925,5 @@ function showGame(t) {
     }
 }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish.min.js"></script>
 </body>
 </html>
