@@ -3,108 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سين جيم - نظام أحمد</title>
+    <title>سين جيم أحمد - نظام البطولة</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0b0b0b; color: white; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .header { background: #da291c; width: 100%; max-width: 800px; padding: 15px; text-align: center; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(218, 41, 28, 0.5); }
+        :root { --main-red: #da291c; --hacker-green: #0f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: white; margin: 0; padding: 15px; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background: var(--main-red); padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 20px var(--main-red); }
+        input { width: 80%; padding: 12px; margin: 10px; border-radius: 8px; border: 1px solid var(--hacker-green); background: #111; color: #fff; text-align: center; }
+        .btn { padding: 15px 30px; background: #111; border: 2px solid var(--main-red); color: white; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1em; margin: 10px; }
+        .btn:hover { background: var(--main-red); }
         
-        /* لوحة اللعبة */
-        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 800px; }
-        .category-name { background: #222; padding: 15px; text-align: center; font-weight: bold; border: 1px solid #da291c; border-radius: 5px; color: #da291c; }
-        .q-cell { background: #1a1a1a; padding: 25px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 1.5em; font-weight: bold; transition: 0.3s; border: 1px solid #333; }
-        .q-cell:hover { background: #da291c; color: white; transform: scale(1.05); }
-        .q-cell.used { visibility: hidden; pointer-events: none; }
+        /* شبكة الفئات */
+        .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .cat-card { background: #1a1a1a; padding: 20px; border: 1px solid #444; border-radius: 8px; cursor: pointer; }
+        .cat-card:hover { border-color: var(--main-red); color: var(--main-red); }
+        .cat-card.used { opacity: 0.3; pointer-events: none; }
 
-        /* نافذة السؤال */
-        #q-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 2px solid #da291c; max-width: 600px; width: 90%; text-align: center; }
-        .modal-q { font-size: 1.8em; margin-bottom: 30px; }
-        .answer-btn { background: #0f0; color: #000; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; display: inline-block; margin-top: 20px; }
-        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2em; cursor: pointer; color: #f00; }
-
-        /* النقاط */
-        .teams-container { display: flex; justify-content: space-around; width: 100%; max-width: 800px; margin-top: 30px; }
-        .team-box { background: #222; padding: 15px; border-radius: 10px; text-align: center; width: 45%; border-bottom: 4px solid #da291c; }
-        .score-val { font-size: 2em; color: #0f0; display: block; margin: 10px 0; }
-        .score-controls button { background: #333; color: white; border: none; padding: 5px 15px; margin: 0 5px; border-radius: 5px; cursor: pointer; font-size: 1.2em; }
+        /* شاشة اللعب */
+        .game-info { font-size: 1.2em; margin-bottom: 20px; color: var(--hacker-green); }
+        .q-box { background: #111; padding: 25px; border-radius: 15px; border: 2px solid var(--main-red); min-height: 150px; display: flex; align-items: center; justify-content: center; font-size: 1.4em; }
+        .hidden { display: none; }
+        .score-bar { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>♟️ سين جيم - نسخة المحترفين ♟️</h1>
-</div>
+<div class="container">
+    <div class="header"><h2>⚔️ بطولة أحمد - سين جيم ⚔️</h2></div>
 
-<div class="game-grid">
-    <div class="category-name">تكنولوجيا</div>
-    <div class="category-name">أمن سيبراني</div>
-    <div class="category-name">عامة</div>
-
-    <div class="q-cell" onclick="openQ('تكنولوجيا', 100, 'ما هو اختصار كلمة HTML؟')">100</div>
-    <div class="q-cell" onclick="openQ('أمن', 100, 'ما هو الـ Phishing؟')">100</div>
-    <div class="q-cell" onclick="openQ('عامة', 100, 'عاصمة الأردن؟')">100</div>
-
-    <div class="q-cell" onclick="openQ('تكنولوجيا', 200, 'من هو مؤسس شركة مايكروسوفت؟')">200</div>
-    <div class="q-cell" onclick="openQ('أمن', 200, 'ما هو الـ Firewall؟')">200</div>
-    <div class="q-cell" onclick="openQ('عامة', 200, 'أكبر محيط في العالم؟')">200</div>
-
-    <div class="q-cell" onclick="openQ('تكنولوجيا', 300, 'ما هي لغة البرمجة الأكثر استخداماً للذكاء الاصطناعي؟')">300</div>
-    <div class="q-cell" onclick="openQ('أمن', 300, 'ما هو الهجوم بـ Brute Force؟')">300</div>
-    <div class="q-cell" onclick="openQ('عامة', 300, 'أطول نهر في العالم؟')">300</div>
-</div>
-
-<div class="teams-container">
-    <div class="team-box">
-        <h3>الفريق الأول</h3>
-        <span class="score-val" id="score1">0</span>
-        <div class="score-controls">
-            <button onclick="changeScore(1, -50)">-</button>
-            <button onclick="changeScore(1, 50)">+</button>
-        </div>
+    <div id="setup-screen">
+        <h3>تسجيل الفرق</h3>
+        <input type="text" id="t1-name" placeholder="اسم الفريق الأول">
+        <input type="text" id="t2-name" placeholder="اسم الفريق الثاني">
+        <br>
+        <button class="btn" onclick="startSelection()">دخول لساحة الفئات</button>
     </div>
-    <div class="team-box">
-        <h3>الفريق الثاني</h3>
-        <span class="score-val" id="score2">0</span>
-        <div class="score-controls">
-            <button onclick="changeScore(2, -50)">-</button>
-            <button onclick="changeScore(2, 50)">+</button>
-        </div>
-    </div>
-</div>
 
-<div id="q-modal">
-    <span class="close-btn" onclick="closeQ()">&times;</span>
-    <div class="modal-content">
-        <h2 id="modal-cat" style="color:#da291c;"></h2>
-        <div class="modal-q" id="modal-text">السؤال يظهر هنا...</div>
-        <div id="ans-text" style="display:none; color:#0f0; font-size:1.5em; margin-bottom:20px;"></div>
-        <div class="answer-btn" onclick="$('#ans-text').show()">إظهار الإجابة</div>
+    <div id="category-screen" class="hidden">
+        <h3>اختر فئة التحدي (6 أسئلة)</h3>
+        <div class="cat-grid" id="cat-list"></div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div class="game-info">
+            الفئة: <span id="current-cat-name" style="color:#fff;"></span> | 
+            السؤال: <span id="q-num">1</span>/6
+        </div>
+        <div id="turn-display" style="color: yellow; margin-bottom: 10px;"></div>
+        <div class="q-box" id="question-text">السؤال يظهر هنا...</div>
+        
+        <div id="ans-display" class="hidden" style="margin: 15px; color: var(--hacker-green); font-size: 1.2em; border: 1px dashed; padding: 10px;"></div>
+        
+        <button class="btn" id="show-ans-btn" onclick="showAns()">إظهار الإجابة</button>
+        
+        <div id="score-btns" class="hidden">
+            <p>هل الإجابة صحيحة؟</p>
+            <button class="btn" style="border-color:green;" onclick="recordPoint(true)">نعم (+50)</button>
+            <button class="btn" style="border-color:red;" onclick="recordPoint(false)">لا (0)</button>
+        </div>
+
+        <div class="score-bar">
+            <div><span id="name-display-1"></span>: <span id="s1">0</span></div>
+            <div><span id="name-display-2"></span>: <span id="s2">0</span></div>
+        </div>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    let currentCell;
-    let scores = { 1: 0, 2: 0 };
+    let team1 = "", team2 = "";
+    let s1 = 0, s2 = 0;
+    let currentQIndex = 0;
+    let currentCatData = null;
+    let turn = 1; // 1 للفريق الأول، 2 للفريق الثاني
 
-    function openQ(cat, val, text) {
-        currentCell = event.target;
-        $('#modal-cat').text(cat + " - " + val);
-        $('#modal-text').text(text);
-        $('#ans-text').hide();
-        $('#q-modal').css('display', 'flex');
+    // بنك الـ 20 فئة (كل فئة 6 أسئلة)
+    const allCategories = [
+        { name: "أمن سيبراني", q: ["ما معنى كلمة Malware؟", "ما هو الـ Phishing؟", "ما وظيفة الـ Firewall؟", "ما معنى Encryption؟", "ما هو الـ VPN؟", "ما هو أقوى نوع كلمة مرور؟"], a: ["برمجيات خبيثة", "التصيد الاحتيالي", "حماية الشبكة", "التشفير", "شبكة وهمية خاصة", "طويلة ورموز"] },
+        { name: "تكنولوجيا", q: ["من أسس شركة Apple؟", "ما اختصار RAM؟", "أول متصفح إنترنت؟", "ما هي لغة الـ HTML؟", "مخترع لغة C++؟", "ما هو الـ Cloud؟"], a: ["ستيف جوبز", "ذاكرة الوصول العشوائي", "Mosaic", "لغة هيكلة المواقع", "Bjarne Stroustrup", "التخزين السحابي"] },
+        { name: "رياضة", q: ["كم لاعب بالفريق؟", "أين أقيم مونديال 22؟", "من هو ميسي؟", "طول ماراثون الجري؟", "كم مدة شوط الكرة؟", "أكثر فريق فاز بالهلال؟"], a: ["11 لاعب", "قطر", "لاعب أرجنتيني", "42 كم", "45 دقيقة", "النادي السعودي"] },
+        { name: "معلومات عامة", q: ["عاصمة الأردن؟", "أصغر قارة؟", "أكبر محيط؟", "أطول نهر؟", "عدد كواكب المجموعة؟", "معدن سائل؟"], a: ["عمان", "أستراليا", "الهادي", "النيل", "8 كواكب", "الزئبق"] },
+        { name: "تاريخ", q: ["متى بدأت الحرب العالمية 1؟", "من بنى الأهرامات؟", "مكتشف أمريكا؟", "عام استقلال الأردن؟", "قائد معركة حطين؟", "عاصمة الدولة الأموية؟"], a: ["1914", "الفراعنة", "كولومبوس", "1946", "صلاح الدين", "دمشق"] },
+        { name: "أفلام", q: ["بطل فيلم Joker؟", "أعلى فيلم دخلاً؟", "مخرج فيلم Inception؟", "سلسلة أفلام Marvel؟", "بطل المهمة المستحيلة؟", "فيلم السفينة الغارقة؟"], a: ["واكين فينيكس", "Avatar", "نولان", "المنتقمون", "توم كروز", "تيتانيك"] },
+        // ... كرر هنا حتى تصل لـ 20 فئة بأسئلة مختلفة
+    ];
+
+    // ملء الفئات الناقصة للتجربة
+    while(allCategories.length < 20) {
+        allCategories.push({ name: "قسم إضافي " + allCategories.length, q: ["س1", "س2", "س3", "س4", "س5", "س6"], a: ["ج1", "ج2", "ج3", "ج4", "ج5", "ج6"] });
     }
 
-    function closeQ() {
-        $('#q-modal').hide();
-        if (currentCell) $(currentCell).addClass('used');
+    function startSelection() {
+        team1 = $('#t1-name').val() || "الفريق 1";
+        team2 = $('#t2-name').val() || "الفريق 2";
+        $('#name-display-1').text(team1);
+        $('#name-display-2').text(team2);
+        $('#setup-screen').hide();
+        $('#category-screen').removeClass('hidden');
+        renderCategories();
     }
 
-    function changeScore(team, val) {
-        scores[team] += val;
-        $(`#score${team}`).text(scores[team]);
+    function renderCategories() {
+        const list = $('#cat-list');
+        allCategories.forEach((cat, index) => {
+            list.append(`<div class="cat-card" onclick="startLevel(${index})">${cat.name}</div>`);
+        });
+    }
+
+    function startLevel(index) {
+        currentCatData = allCategories[index];
+        currentQIndex = 0;
+        turn = 1;
+        $('#category-screen').hide();
+        $('#game-screen').removeClass('hidden');
+        $('#current-cat-name').text(currentCatData.name);
+        showNextQuestion();
+    }
+
+    function showNextQuestion() {
+        if (currentQIndex >= 6) {
+            alert(`انتهت الفئة! النتيجة: ${team1}: ${s1} | ${team2}: ${s2}`);
+            $('#game-screen').addClass('hidden');
+            $('#category-screen').removeClass('hidden');
+            return;
+        }
+        $('#q-num').text(currentQIndex + 1);
+        $('#turn-display').text("دور: " + (turn === 1 ? team1 : team2));
+        $('#question-text').text(currentCatData.q[currentQIndex]);
+        $('#ans-display').addClass('hidden');
+        $('#score-btns').addClass('hidden');
+        $('#show-ans-btn').show();
+    }
+
+    function showAns() {
+        $('#ans-display').text("الإجابة: " + currentCatData.a[currentQIndex]).removeClass('hidden');
+        $('#show-ans-btn').hide();
+        $('#score-btns').removeClass('hidden');
+    }
+
+    function recordPoint(isCorrect) {
+        if (isCorrect) {
+            if (turn === 1) { s1 += 50; $('#s1').text(s1); }
+            else { s2 += 50; $('#s2').text(s2); }
+        }
+        currentQIndex++;
+        turn = (turn === 1) ? 2 : 1; // تبديل الدور
+        showNextQuestion();
     }
 </script>
-
 </body>
 </html>
