@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد المتكاملة - مسابقة + مافيا + جاسوس + شطرنج</title>
+    <title>بوابة أحمد - المافيا المتكاملة ()</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -52,77 +52,32 @@
         .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
         .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
         .secret-panel button:hover { background: #da291c; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: #1a1a1a; padding: 20px; border: 2px solid #333; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; text-align: center; }
-        .card:hover { border-color: #ffd700; background: #222; }
-        .card.selected { border-color: #0f0; background: #002200; box-shadow: 0 0 10px #0f0; }
-        .q-box { background: #000; border: 3px solid #da291c; padding: 40px; border-radius: 20px; margin: 25px 0; font-size: 1.8em; min-height: 200px; display: flex; align-items: center; justify-content: center; line-height: 1.6; position: relative; }
-        .q-level { position: absolute; top: 10px; right: 20px; font-size: 0.5em; color: #ffd700; background: #222; padding: 5px 10px; border-radius: 5px; }
-        .score-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 20px; border-radius: 15px; margin-top: 30px; border-top: 3px solid #0f0; }
-        .score-val { font-size: 2em; color: #ffd700; display: block; }
-        #ans-box { color: #0f0; font-size: 1.4em; margin: 20px; padding: 15px; border: 1px dashed #0f0; border-radius: 10px;背景: rgba(0,255,0,0.05); }
-        .quiz-container { max-width: 900px; margin: 0 auto; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; }
-        :root { --red: #da291c; --green: #0f0; --gold: #ffd700; --dark: #0a0a0a; }
-        .btn { padding: 15px 35px; background: #000; border: 2px solid #da291c; color: white; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2em; transition: 0.3s; margin: 10px; }
-        .btn:hover { background: #da291c; transform: scale(1.05); }
+        .force-win-panel { display: none; } /* تم إخفاء زر AI */
     </style>
 </head>
 <body>
 
 <div id="main-menu">
-    <h1 style="color:#da291c;">🏆 بوابة أحمد المحترف المتكاملة 🎮</h1>
-    <button class="menu-btn" onclick="showGame('quiz')">📚 المسابقة الكبرى </button>
-    <button class="menu-btn" onclick="showGame('mafia')">🎭 موزع المافيا (دكتور + ولد + تسكيت)</button>
+    <h1 style="color:#da291c;">???? AHMED PRO SYSTEM - المافيا المتكاملة</h1>
+    <button class="menu-btn" onclick="showGame('mafia')">????️ موزع المافيا (دكتور + ولد + تسكيت)</button>
     <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج الكاملة</button>
-    <button class="menu-btn" onclick="showGame('spy')">🕵️ لعبة الجاسوس (أوفلاين)</button>
-    <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🌐 الجاسوس (أونلاين)</button>
-</div>
-
-<!-- ===================== المسابقة الكبرى ===================== -->
-<div id="quiz-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>📚 المسابقة الكبرى - تحدي الـ 6 فئات</h3></div>
-    <div class="quiz-container">
-        <div id="quiz-step1">
-            <h2>سجل الفرق لبدء المعركة</h2>
-            <input type="text" id="qt1" placeholder="اسم الفريق الأول">
-            <input type="text" id="qt2" placeholder="اسم الفريق الثاني">
-            <button class="btn" onclick="showQuizStep2()">اختيار الفئات ←</button>
-        </div>
-
-        <div id="quiz-step2" class="hidden">
-            <h2>اختر 6 فئات للمسابقة (<span id="qcount" style="color:var(--gold)">0</span>/6)</h2>
-            <div class="grid" id="cat-grid"></div>
-            <button class="btn" id="quiz-start-btn" onclick="startQuizGame()" style="display:none;">بدء التحدي 🔥</button>
-        </div>
-
-        <div id="quiz-step3" class="hidden">
-            <div><span id="cur-cat-name" style="color:var(--gold);"></span> | جولة <span id="cat-num">1</span> من 6</div>
-            <div>دور: <span id="turn-name"></span> | سؤال رقم <span id="q-num">1</span></div>
-            <div class="q-box"><div class="q-level" id="q-level-tag"></div><div id="q-text"></div></div>
-            <div id="quiz-ans-box" class="hidden"></div>
-            <button class="btn" id="quiz-show-btn" onclick="showQuizAns()">إظهار الإجابة ✅</button>
-            <div id="quiz-actions" class="hidden">
-                <button class="btn" style="border-color:var(--green); color:var(--green)" onclick="quizRecord(true)">إجابة صحيحة (+50)</button>
-                <button class="btn" style="border-color:var(--red); color:var(--red)" onclick="quizRecord(false)">إجابة خاطئة (0)</button>
-            </div>
-            <div class="score-bar">
-                <div><span id="qname1"></span><span class="score-val" id="qs1">0</span></div>
-                <div><span id="qname2"></span><span class="score-val" id="qs2">0</span></div>
-            </div>
-        </div>
-    </div>
+    <button class="menu-btn" onclick="showGame('spy')">???? لعبة الجاسوس (أوفلاين)</button>
+    <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">???? الجاسوس (أونلاين)</button>
 </div>
 
 <!-- ===================== المافيا ===================== -->
 <div id="mafia-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🎭 المافيا - دكتور + ولد + تسكيت</h3></div>
+    <button class="back-home" onclick="location.reload()">???? القائمة الرئيسية</button>
+    <div class="header"><h3>????️‍♂️ المافيا - دكتور + ولد + تسكيت</h3></div>
     <div id="mafia-setup">
         <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
         <button onclick="addMafiaPlayer()">➕ إضافة لاعب</button>
         <div id="mafia-preview" style="margin:10px; color:#888; font-size:0.9em;"></div>
-        <button style="background:green;" onclick="startMafiaDist()">🎲 توزيع الأدوار + الراوي</button>
+        <button style="background:green;" onclick="startMafiaDist()">???? توزيع الأدوار + الراوي</button>
+        <div style="margin-top:10px; font-size:0.7em; color:#aaa;">
+            ???? 4-8 لاعبين: مافيا ???? قاتل + دكتور ????<br>
+            ???? 9 فأكثر: مافيا قاتل ???? + مافيا تسكيت ???? + دكتور ???? + ولد ????
+        </div>
     </div>
     <div id="mafia-board" class="hidden">
         <div id="narrator-name"></div>
@@ -132,24 +87,25 @@
 
 <!-- ===================== الشطرنج ===================== -->
 <div id="chess-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>♟️ شطرنج أحمد المحترف</h3></div>
+    <button class="back-home" onclick="location.reload()">???? القائمة الرئيسية</button>
+    <div class="header"><h3>???? شطرنج أحمد المحترف ????</h3></div>
     <div class="chess-container">
-        <div class="move-history" id="move-history"><h4>📜 سجل الحركات</h4><div id="history-list"></div></div>
+        <div class="move-history" id="move-history"><h4>???? سجل الحركات</h4><div id="history-list"></div></div>
         <div class="chess-main">
             <div class="timer-box" id="timer-display">⏱️ 00:25</div>
             <div id="board" style="position: relative;"></div>
             <div class="chess-buttons">
-                <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
-                <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
+                <button id="resign-btn" style="background:#da291c;">????️ انسحاب</button>
+                <button id="draw-btn" style="background:#0055ff;">???? طلب تعادل</button>
             </div>
+            <!-- تم إخفاء زر AI نهائياً -->
         </div>
         <div class="fake-chat" id="fake-chat">
-            <h4>💬 شات مع الخصم</h4>
+            <h4>???? شات مع الخصم</h4>
             <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input-area">
                 <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="50">
-                <button id="send-chat-btn">📤 إرسال</button>
+                <button id="send-chat-btn">???? إرسال</button>
             </div>
         </div>
     </div>
@@ -164,10 +120,10 @@
     </div>
 </div>
 
-<!-- ===================== الجاسوس أوفلاين ===================== -->
+<!-- ===================== الجاسوس ===================== -->
 <div id="spy-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🕵️ لعبة الجاسوس (أوفلاين)</h3></div>
+    <button class="back-home" onclick="location.reload()">???? القائمة الرئيسية</button>
+    <div class="header"><h3>???? لعبة الجاسوس (أوفلاين)</h3></div>
     <div id="spy-setup">
         <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
         <button onclick="addSpyPlayer()">إضافة لاعب</button>
@@ -177,10 +133,9 @@
     <div id="spy-board" class="hidden"><div id="spy-cards-container"></div></div>
 </div>
 
-<!-- ===================== الجاسوس أونلاين ===================== -->
 <div id="spy-online-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🌐 الجاسوس أونلاين</h3></div>
+    <button class="back-home" onclick="location.reload()">???? القائمة الرئيسية</button>
+    <div class="header"><h3>???? الجاسوس أونلاين</h3></div>
     <div id="spy-online-setup">
         <input type="text" id="spyNick" placeholder="اسمك">
         <button onclick="hostRoom()">إنشاء غرفة</button>
@@ -201,325 +156,59 @@
 let isLocked = false;
 let mPlayers = [];
 let sPlayers = [];
+let players = [];
+let peer = null;
+let myName = "";
+let host = false;
+let votesReceived = [];
 
-// ===================== بنك الأسئلة للمسابقة =====================
-const islamQuestions = [
-    {q: "ما أول ما نزل من التوراة؟", a: "بسم الله الرحمن الرحيم", l: "متوسط"},
-    {q: "ما أول هدية أهديت إلى الرسول صلى الله عليه وسلم بالمدينة؟", a: "قصعة خبزاً وسمناً ولبناً من زيد بن حارثة", l: "متوسط"},
-    {q: "من أول من قُتل من المشركين في غزوة بدر الكبرى؟", a: "الأسود بن عبد الأسد المخزومي", l: "متوسط"},
-    {q: "من هي أول امرأة بكر هاجرت؟", a: "أم كلثوم بنت عقبة بن أبي معيط", l: "متوسط"},
-    {q: "من أول من صام؟", a: "آدم عليه السلام", l: "متوسط"},
-    {q: "من أول داعية إسلامي؟", a: "مصعب بن عمير", l: "متوسط"},
-    {q: "من أول من ولي بيت المال؟", a: "أبو عبيدة الجراح", l: "متوسط"},
-    {q: "ما أول سورة نزلت في مكة؟", a: "سورة العلق", l: "سهل"},
-    {q: "من أول من سل سيف في سبيل الله؟", a: "الزبير بن العوام", l: "متوسط"},
-    {q: "من أول من قال أما بعد؟", a: "داود عليه السلام", l: "متوسط"},
-    {q: "من أول من أذن في السماء؟", a: "جبريل عليه السلام", l: "سهل"},
-    {q: "ما أول صلاة فرضت على الرسول؟", a: "صلاة الظهر", l: "متوسط"},
-    {q: "من أول من بنى السجون في الإسلام؟", a: "علي بن أبي طالب", l: "متوسط"},
-    {q: "من أول خليفة في الإسلام؟", a: "أبو بكر الصديق", l: "سهل"},
-    {q: "ما هي أول غزوة غزاها الرسول؟", a: "غزوة الأبواء (ودان)", l: "متوسط"},
-    {q: "من أول من كتب التاريخ الإسلامي؟", a: "عمر بن الخطاب", l: "متوسط"},
-    {q: "من أول شهيد في الإسلام؟", a: "الحارث بن أبي هالة", l: "متوسط"},
-    {q: "ما أول مسجد بني في الإسلام؟", a: "مسجد قباء", l: "سهل"},
-    {q: "من أول من أقام الحدود؟", a: "عمر بن الخطاب", l: "متوسط"},
-    {q: "من أول مؤذن في الإسلام؟", a: "بلال بن رباح", l: "سهل"}
+// قائمة أماكن الجاسوس الكاملة (400+ كلمة)
+const spyPlaces = [ 
+    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
+    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
+    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
+    "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
+    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", 
+    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", 
+    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
+    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
+    "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
 ];
-
-const footballQuestions = [
-    {q: "من فاز بكأس العالم 2022؟", a: "الأرجنتين", l: "سهل"},
-    {q: "كم لاعب يتواجد في الملعب لكل فريق؟", a: "11 لاعب", l: "سهل"},
-    {q: "من هو الهداف التاريخي لدوري أبطال أوروبا؟", a: "كريستيانو رونالدو", l: "متوسط"},
-    {q: "ما هو النادي الملقب بـ 'المرنجي'؟", a: "ريال مدريد", l: "متوسط"},
-    {q: "أين يلعب محمد صلاح حالياً؟", a: "ليفربول", l: "سهل"},
-    {q: "من هو اللاعب الملقب بالظاهرة؟", a: "رونالدو البرازيلي", l: "متوسط"},
-    {q: "من فاز بالكرة الذهبية 2023؟", a: "ليونيل ميسي", l: "متوسط"},
-    {q: "ما هو النادي الذي يلقب 'اليوفي'؟", a: "يوفنتوس", l: "سهل"},
-    {q: "من هو هداف الدوري الإنجليزي التاريخي؟", a: "آلان شيرر", l: "متوسط"},
-    {q: "أين أقيم كأس العالم 2018؟", a: "روسيا", l: "سهل"},
-    {q: "من هو أفضل لاعب في العالم 2022؟", a: "ليونيل ميسي", l: "سهل"},
-    {q: "ما هو النادي الذي يلقب 'البلوز'؟", a: "تشيلسي", l: "سهل"},
-    {q: "من هو حارس مرمى المنتخب المصري؟", a: "محمد الشناوي", l: "سهل"},
-    {q: "كم مرة فاز البرازيل بكأس العالم؟", a: "5 مرات", l: "سهل"},
-    {q: "من هو أفضل هداف في تاريخ كأس العالم؟", a: "ميروسلاف كلوزه", l: "متوسط"},
-    {q: "ما هو النادي الذي يلقب 'الريدز'؟", a: "ليفربول", l: "سهل"},
-    {q: "من هو مدرب المنتخب الأرجنتيني الفائز بكأس العالم 2022؟", a: "ليونيل سكالوني", l: "متوسط"},
-    {q: "ما هي جائزة أفضل لاعب في كأس العالم؟", a: "الكرة الذهبية", l: "سهل"},
-    {q: "من هو اللاعب صاحب الرقم القياسي في عدد المباريات بكأس العالم؟", a: "ليونيل ميسي", l: "متوسط"},
-    {q: "أين يقع ملعب كامب نو؟", a: "برشلونة", l: "سهل"}
-];
-
-const carsQuestions = [
-    {q: "ما هي الدولة المصنعة لسيارات تويوتا؟", a: "اليابان", l: "سهل"},
-    {q: "أي شركة شعارها الحصان الجامح؟", a: "فيراري", l: "سهل"},
-    {q: "ما معنى اختصار BMW؟", a: "Bayerische Motoren Werke", l: "متوسط"},
-    {q: "من هو مخترع أول سيارة تعمل بالبنزين؟", a: "كارل بنز", l: "متوسط"},
-    {q: "أي شركة تنتج سيارة 'موستانج'؟", a: "فورد", l: "سهل"},
-    {q: "ما هي أسرع سيارة إنتاجية في العالم؟", a: "كوينيجسيج يسكو", l: "متوسط"},
-    {q: "من أي دولة 'لامبورغيني'؟", a: "إيطاليا", l: "سهل"},
-    {q: "ما معنى SUV؟", a: "سيارة رياضية متعددة الاستخدامات", l: "متوسط"},
-    {q: "أي شركة تنتج سيارة '911'؟", a: "بورش", l: "سهل"},
-    {q: "ما هو شعار سيارة 'مرسيدس'؟", a: "النجمة الثلاثية", l: "سهل"},
-    {q: "أي سيارة تسمى 'ملك الطرقات'؟", a: "رولز رويس", l: "سهل"},
-    {q: "ما هي أول سيارة كهربائية مشهورة من تسلا؟", a: "تسلا رودستر", l: "متوسط"},
-    {q: "من أي دولة 'فولفو'؟", a: "السويد", l: "سهل"},
-    {q: "ما هو معنى GTR؟", a: "غران توريزمو ريسينغ", l: "متوسط"},
-    {q: "أي شركة تنتج سيارة 'كويكر'؟", a: "نيسان", l: "سهل"},
-    {q: "ما هي أغلى سيارة في العالم؟", a: "رولز رويس بوت تيل", l: "متوسط"},
-    {q: "أي شركة يابانية تنتج سيارة 'سوبارو'؟", a: "فوجي الثقيلة", l: "متوسط"},
-    {q: "ما هو لون شعار فيراري الأصلي؟", a: "أصفر", l: "متوسط"},
-    {q: "أين يقع مقر شركة بي إم دبليو؟", a: "ميونخ", l: "متوسط"},
-    {q: "ما هي الشركة المالكة لبوجاتي؟", a: "فولكس فاجن", l: "متوسط"}
-];
-
-const animeQuestions = [
-    {q: "من هو بطل أنمي ون بيس؟", a: "لوفي", l: "سهل"},
-    {q: "ما اسم الثعلب المحبوس داخل ناروتو؟", a: "كوراما (الكيوبي)", l: "سهل"},
-    {q: "ما اسم المفكرة التي تقتل من يكتب اسمه فيها؟", a: "ديث نوت", l: "سهل"},
-    {q: "من هو مؤلف دراغون بول؟", a: "أكيرا تورياما", l: "متوسط"},
-    {q: "في هجوم العمالقة، ما اسم فيلق إيرين؟", a: "فيلق الاستطلاع", l: "متوسط"},
-    {q: "كم عدد كرات التنين؟", a: "7 كرات", l: "سهل"},
-    {q: "من هو قائد قراصنة قبعة القش؟", a: "مونكي دي لوفي", l: "سهل"},
-    {q: "ما هو اسم سيف رورونوا زورو؟", a: "وادو إيتشيمونجي", l: "متوسط"},
-    {q: "من هو البطل في أنمي سول إيتر؟", a: "ماكا ألبارن", l: "متوسط"},
-    {q: "ما هو اسم قرية ناروتو؟", a: "قرية الورق المخفية", l: "سهل"},
-    {q: "من هو مؤلف أنمي هجوم العمالقة؟", a: "هاجيمي إيساياما", l: "متوسط"},
-    {q: "ما هو اسم منظمة القاتل في أنمي توكيو غول؟", a: "CCG", l: "متوسط"},
-    {q: "من هو البطل في أنمي بليتش؟", a: "إيتشيغو كوروساكي", l: "سهل"},
-    {q: "ما اسم السيف في سورد أرت أونلاين؟", a: "إلمينيشن", l: "متوسط"},
-    {q: "من هو صديق سيتشي في أنمي الشبح?", a: "زينيتسو", l: "متوسط"},
-    {q: "ما هو أنمي الذي يحكي قصة إيتشيغو؟", a: "بليتش", l: "سهل"},
-    {q: "من هو الشرير الرئيسي في ناروتو شيبودن؟", a: "مادارا أوتشيها", l: "متوسط"},
-    {q: "ما هو اسم بطل ون بانتش مان؟", a: "سايتاما", l: "سهل"},
-    {q: "ما هو اسم أنمي الذي يحكي عن كرة القدم؟", a: "كابتن ماجد", l: "سهل"},
-    {q: "من هي الشخصية الرئيسية في الأنمي سباي إكس فاميلي؟", a: "لويد فورجر", l: "سهل"}
-];
-
-const jordanQuestions = [
-    {q: "ما هي عاصمة الأردن؟", a: "عمان", l: "سهل"},
-    {q: "متى استقلت المملكة الأردنية الهاشمية؟", a: "1946", l: "متوسط"},
-    {q: "ماذا تسمى مدينة البتراء؟", a: "المدينة الوردية", l: "سهل"},
-    {q: "أين يقع البحر الميت؟", a: "في الأغوار", l: "سهل"},
-    {q: "من هو ملك الأردن الحالي؟", a: "الملك عبد الله الثاني", l: "سهل"},
-    {q: "ما هو أعلى جبل في الأردن؟", a: "جبل أم الدامي", l: "متوسط"},
-    {q: "ما هو أطول وادي في الأردن؟", a: "وادي الأردن", l: "سهل"},
-    {q: "أين يقع مثلث العقبة؟", a: "العقبة", l: "سهل"},
-    {q: "كم عدد محافظات الأردن؟", a: "12 محافظة", l: "متوسط"},
-    {q: "ما هي عملة الأردن؟", a: "الدينار الأردني", l: "سهل"},
-    {q: "من هو مؤسس الأردن الحديث؟", a: "الملك عبد الله الأول", l: "سهل"},
-    {q: "ما هو أكبر مضمار في الأردن؟", a: "مضمار البتراء", l: "متوسط"},
-    {q: "أين يقع مسجد الملك عبد الله الأول؟", a: "عمان", l: "سهل"},
-    {q: "ما هي أهمية العقبة؟", a: "الميناء الوحيد للأردن", l: "سهل"},
-    {q: "من هو أشهر علماء الأردن؟", a: "أحمد حسن زويل", l: "سهل"},
-    {q: "كم عدد سكان الأردن تقريباً؟", a: "11 مليون نسمة", l: "متوسط"},
-    {q: "ما هي أكبر جامعة في الأردن؟", a: "الجامعة الأردنية", l: "سهل"},
-    {q: "ما هو لون العلم الأردني الأساسي؟", a: "أسود، أبيض، أخضر، أحمر", l: "سهل"},
-    {q: "من هو قائد الثورة العربية الكبرى؟", a: "الشريف حسين بن علي", l: "متوسط"},
-    {q: "ما هي مدينة جرش المعروفة بـ؟", a: "الآثار الرومانية", l: "سهل"}
-];
-
-const geographyQuestions = [
-    {q: "ما هي أكبر دولة في العالم مساحة؟", a: "روسيا", l: "سهل"},
-    {q: "أين تقع الأهرامات؟", a: "مصر", l: "سهل"},
-    {q: "ما هو أطول نهر في العالم؟", a: "نهر النيل", l: "سهل"},
-    {q: "ما هي أصغر قارة في العالم؟", a: "أستراليا", l: "متوسط"},
-    {q: "عاصمة فرنسا هي؟", a: "باريس", l: "سهل"},
-    {q: "ما هو أعمق محيط في العالم؟", a: "المحيط الهادي", l: "متوسط"},
-    {q: "ما هي أكبر صحراء في العالم؟", a: "الصحراء الكبرى", l: "سهل"},
-    {q: "ما هي أعلى قمة جبل في العالم؟", a: "إيفرست", l: "سهل"},
-    {q: "كم عدد القارات في العالم؟", a: "7 قارات", l: "سهل"},
-    {q: "عاصمة إنجلترا؟", a: "لندن", l: "سهل"},
-    {q: "أين يقع نهر الأمازون؟", a: "أمريكا الجنوبية", l: "سهل"},
-    {q: "ما هي أكبر جزيرة في العالم؟", a: "غرينلاند", l: "متوسط"},
-    {q: "عاصمة اليابان؟", a: "طوكيو", l: "سهل"},
-    {q: "ما هي أقدم عاصمة في العالم؟", a: "دمشق", l: "متوسط"},
-    {q: "ما هي أكبر بحيرة في العالم؟", a: "بحر قزوين", l: "متوسط"},
-    {q: "أين تقع جبال الألب؟", a: "أوروبا", l: "سهل"},
-    {q: "ما هي الدولة التي تعرف بـ 'أرض الشمس المشرقة'؟", a: "اليابان", l: "سهل"},
-    {q: "ما هي عاصمة البرازيل؟", a: "برازيليا", l: "سهل"},
-    {q: "أين يوجد برج إيفل؟", a: "باريس", l: "سهل"},
-    {q: "كم عدد المحيطات في العالم؟", a: "5 محيطات", l: "سهل"}
-];
-
-const historyQuestions = [
-    {q: "من الذي اكتشف أمريكا؟", a: "كولومبوس", l: "سهل"},
-    {q: "متى بدأت الحرب العالمية الأولى؟", a: "1914", l: "متوسط"},
-    {q: "من بنى الأهرامات؟", a: "الفراعنة", l: "سهل"},
-    {q: "من هو قائد معركة حطين؟", a: "صلاح الدين الأيوبي", l: "متوسط"},
-    {q: "متى سقطت الخلافة العثمانية؟", a: "1924", l: "متوسط"},
-    {q: "من هو أول خليفة في الإسلام؟", a: "أبو بكر الصديق", l: "سهل"},
-    {q: "من هو أشهر فرعون في التاريخ؟", a: "رمسيس الثاني", l: "سهل"},
-    {q: "متى انتهت الحرب العالمية الثانية؟", a: "1945", l: "سهل"},
-    {q: "من هو مؤسس الدولة العباسية؟", a: "أبو العباس السفاح", l: "متوسط"},
-    {q: "ما هي أول حضارة في التاريخ؟", a: "الحضارة السومرية", l: "متوسط"},
-    {q: "من هو الإسكندر الأكبر؟", a: "ملك مقدونيا", l: "سهل"},
-    {q: "أين سقط جدار برلين؟", a: "برلين", l: "سهل"},
-    {q: "ما هي معركة اليرموك؟", a: "معركة ضد الرومان", l: "متوسط"},
-    {q: "من هو يوليوس قيصر؟", a: "قائد روماني", l: "سهل"},
-    {q: "متى وقعت حادثة كربلاء؟", a: "680 م", l: "متوسط"},
-    {q: "من هو نابليون بونابرت؟", a: "إمبراطور فرنسا", l: "سهل"},
-    {q: "ما هي الثورة الفرنسية؟", a: "ثورة 1789", l: "سهل"},
-    {q: "من هو مؤسس الدولة الأموية؟", a: "معاوية بن أبي سفيان", l: "سهل"},
-    {q: "أين وقعت معركة عين جالوت؟", a: "فلسطين", l: "متوسط"},
-    {q: "من هو آخر خليفة عثماني؟", a: "عبد المجيد الثاني", l: "متوسط"}
-];
-
-const foodQuestions = [
-    {q: "ما هي الأكلة الوطنية للأردن؟", a: "المنسف", l: "سهل"},
-    {q: "ما هو المكون الأساسي للبيتزا؟", a: "العجين والجبن والصلصة", l: "سهل"},
-    {q: "أي دولة تشتهر بالسوشي؟", a: "اليابان", l: "سهل"},
-    {q: "ما هي الأكلة الإيطالية المشهورة؟", a: "المعكرونة (باستا)", l: "سهل"},
-    {q: "أين نشأت الشاورما؟", a: "الشرق الأوسط", l: "متوسط"},
-    {q: "ما هي الأكلة الفرنسية المشهورة؟", a: "الكرواسون", l: "سهل"},
-    {q: "ما هو أشهر أنواع الجبن الفرنسي؟", a: "الكممبير", l: "متوسط"},
-    {q: "من أصل أكلة الحمص؟", a: "الشرق الأوسط", l: "سهل"},
-    {q: "ما هي الأكلة المكسيكية المشهورة؟", a: "التاكو", l: "سهل"},
-    {q: "ما هي الحلوى التركية المشهورة؟", a: "البقلاوة", l: "سهل"},
-    {q: "ما هي المكونات الأساسية للفلافل؟", a: "الحمص والبقدونس", l: "متوسط"},
-    {q: "ما هي الأكلة الصينية المشهورة؟", a: "الأرز المقلي", l: "سهل"},
-    {q: "ما هي المقبلات الشرقية؟", a: "المتبل، الحمص، ورق عنب", l: "متوسط"},
-    {q: "ما هو نوع الأكل الهندي المشهور؟", a: "التاندوري", l: "سهل"},
-    {q: "ما هو الطبق الإنجليزي التقليدي؟", a: "السمك والبطاطس", l: "سهل"},
-    {q: "أين نشأت البيتزا؟", a: "إيطاليا", l: "سهل"},
-    {q: "ما هي أكلة الكشري؟", a: "الطعام الوطني المصري", l: "سهل"},
-    {q: "ما هي المقادير الرئيسية في الطعمية؟", a: "الفول المدمس", l: "متوسط"},
-    {q: "ما الحلوى العربية المشهورة؟", a: "الكنافة", l: "سهل"},
-    {q: "ما هو المشروب الروسي التقليدي؟", a: "الفودكا", l: "سهل"}
-];
-
-const quizDB = [
-    { n: "إسلام", questions: islamQuestions },
-    { n: "كرة قدم", questions: footballQuestions },
-    { n: "سيارات", questions: carsQuestions },
-    { n: "أنمي", questions: animeQuestions },
-    { n: "الأردن", questions: jordanQuestions },
-    { n: "جغرافيا", questions: geographyQuestions },
-    { n: "تاريخ", questions: historyQuestions },
-    { n: "أكل", questions: foodQuestions }
-];
-
-// متغيرات المسابقة
-let team1, team2, sc1=0, sc2=0, selectedCats=[], curCatIdx=0, curQIdx=0, turn=1;
-let currentQuestionsList = [];
-
-function getRandomQuestions(questionsArray) {
-    let shuffled = [...questionsArray];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled.slice(0, 6);
-}
-
-function showQuizStep2() {
-    team1 = $('#qt1').val() || "فريق A";
-    team2 = $('#qt2').val() || "فريق B";
-    $('#quiz-step1').fadeOut(300, () => {
-        $('#quiz-step2').removeClass('hidden');
-        renderQuizCats();
-    });
-}
-
-function renderQuizCats() {
-    const grid = $('#cat-grid');
-    grid.empty();
-    quizDB.forEach((cat, i) => {
-        grid.append(`<div class="card" id="qc${i}" onclick="selectQuizCat(${i})">${cat.n}</div>`);
-    });
-}
-
-function selectQuizCat(i) {
-    if (selectedCats.includes(i)) return;
-    if (selectedCats.length < 6) {
-        selectedCats.push(i);
-        $(`#qc${i}`).addClass('selected');
-        $('#qcount').text(selectedCats.length);
-    }
-    if (selectedCats.length === 6) $('#quiz-start-btn').fadeIn();
-}
-
-function startQuizGame() {
-    currentQuestionsList = [];
-    for (let i = 0; i < selectedCats.length; i++) {
-        let cat = quizDB[selectedCats[i]];
-        let randomQs = getRandomQuestions(cat.questions);
-        currentQuestionsList.push(randomQs);
-    }
-    curCatIdx = 0;
-    curQIdx = 0;
-    sc1 = 0; sc2 = 0;
-    turn = 1;
-    $('#qs1').text('0');
-    $('#qs2').text('0');
-    
-    $('#quiz-step2').fadeOut(300, () => {
-        $('#quiz-step3').removeClass('hidden');
-        $('#qname1').text(team1);
-        $('#qname2').text(team2);
-        loadQuizNext();
-    });
-}
-
-function loadQuizNext() {
-    if (curQIdx >= 6) {
-        curCatIdx++;
-        curQIdx = 0;
-        if (curCatIdx >= 6) {
-            const winner = sc1 > sc2 ? team1 : team2;
-            alert(`انتهت المسابقة! 🏆\nالفائز هو: ${winner}\nالنتيجة النهائية:\n${team1}: ${sc1}\n${team2}: ${sc2}`);
-            location.reload();
-            return;
-        }
-    }
-    
-    let catName = quizDB[selectedCats[curCatIdx]].n;
-    let qObj = currentQuestionsList[curCatIdx][curQIdx];
-    
-    $('#cur-cat-name').text(catName);
-    $('#cat-num').text(curCatIdx + 1);
-    $('#q-num').text(curQIdx + 1);
-    $('#turn-name').text(turn === 1 ? team1 : team2);
-    $('#q-text').text(qObj.q);
-    $('#q-level-tag').text(qObj.l);
-    $('#quiz-ans-box').text("📌 الإجابة: " + qObj.a).addClass('hidden');
-    $('#quiz-actions').addClass('hidden');
-    $('#quiz-show-btn').show();
-}
-
-function showQuizAns() {
-    $('#quiz-ans-box').removeClass('hidden');
-    $('#quiz-show-btn').hide();
-    $('#quiz-actions').removeClass('hidden');
-}
-
-function quizRecord(isWin) {
-    if (isWin) {
-        if (turn === 1) { sc1 += 50; $('#qs1').text(sc1); }
-        else { sc2 += 50; $('#qs2').text(sc2); }
-    }
-    curQIdx++;
-    turn = (turn === 1) ? 2 : 1;
-    loadQuizNext();
-}
-
-// ===================== المافيا =====================
+    // ===================== المافيا (توزيع الأدوار حسب العدد) =====================
 function addMafiaPlayer() {
     let n = $('#mafiaPlayerName').val().trim();
     if(n) {
         mPlayers.push(n);
-        $('#mafia-preview').html("👥 اللاعبين: " + mPlayers.join(" - "));
+        $('#mafia-preview').html("???? اللاعبين: " + mPlayers.join(" - "));
         $('#mafiaPlayerName').val("").focus();
     }
 }
-
 function getRolesDistribution(playersList) {
     let count = playersList.length;
     let roles = [];
-    roles.push({type:'mafia', name:'مافيا 🔪 (قاتل)', class:'mafia-role'});
-    if(count >= 9) roles.push({type:'silent_mafia', name:'مافيا تسكيت 🤫', class:'silent-role'});
-    roles.push({type:'doctor', name:'دكتور 💊', class:'doctor-role'});
-    if(count >= 9) roles.push({type:'child', name:'ولد 🧒 (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
-    for(let i=0; i<count - roles.length; i++) roles.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
+    
+    // الدكتور موجود دائماً
+    let doctorsCount = 1;
+    
+    // المافيا: واحد قاتل دائماً
+    let hasMafiaKiller = true;
+    let hasSilentMafia = (count >= 9);  // تسكيت فقط إذا العدد 9+
+    let hasChild = (count >= 9);        // ولد فقط إذا العدد 9+
+    
+    // عدد المواطنين
+    let citizensCount = count - doctorsCount - 1; // ناقص المافيا القاتل
+    if(hasSilentMafia) citizensCount--;
+    if(hasChild) citizensCount--;
+    if(citizensCount < 0) citizensCount = 0;
+    
+    // بناء قائمة الأدوار
+    roles.push({type:'mafia', name:'مافيا ???? (قاتل)', class:'mafia-role'});
+    if(hasSilentMafia) roles.push({type:'silent_mafia', name:'مافيا تسكيت ????', class:'silent-role'});
+    for(let i=0; i<doctorsCount; i++) roles.push({type:'doctor', name:'دكتور ????', class:'doctor-role'});
+    if(hasChild) roles.push({type:'child', name:'ولد ???? (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
+    for(let i=0; i<citizensCount; i++) roles.push({type:'citizen', name:'مواطن ????‍????', class:'citizen-role'});
+    
+    // خلط عشوائي
     for(let i=roles.length-1; i>0; i--) {
         let j = Math.floor(Math.random()*(i+1));
         [roles[i], roles[j]] = [roles[j], roles[i]];
@@ -528,19 +217,26 @@ function getRolesDistribution(playersList) {
 }
 
 function startMafiaDist() {
-    if(mPlayers.length < 4) { alert("⚠️ لازم 4 لاعبين على الأقل!"); return; }
+    if(mPlayers.length < 4) {
+        alert("⚠️ لازم 4 لاعبين على الأقل!");
+        return;
+    }
+    
     let narratorIdx = Math.floor(Math.random() * mPlayers.length);
     let narratorName = mPlayers[narratorIdx];
     let playersList = mPlayers.filter((_, i) => i !== narratorIdx);
+    
     let rolesList = getRolesDistribution(playersList);
-    while(rolesList.length < playersList.length) rolesList.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
+    
+    while(rolesList.length < playersList.length) rolesList.push({type:'citizen', name:'مواطن ????‍????', class:'citizen-role'});
     while(rolesList.length > playersList.length) rolesList.pop();
     
     $('#mafia-setup').hide();
     $('#mafia-board').removeClass('hidden');
-    $('#narrator-name').html(`<div class="narrator-box">🎙️ الراوي: ${narratorName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
+    $('#narrator-name').html(`<div class="narrator-box">???? الراوي: ${narratorName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
     
     let container = $('#mafia-cards-container').empty();
+    
     playersList.forEach((player, idx) => {
         let role = rolesList[idx];
         let card = $(`
@@ -548,9 +244,13 @@ function startMafiaDist() {
                 <strong style="font-size:1.1rem;">${player}</strong>
                 <div class="role-display" style="margin-top:10px;">
                     <span class="role-badge ${role.class}">${role.name}</span>
+                    ${role.type === 'child' ? '<div style="font-size:0.7rem; margin-top:5px;">⚔️ إذا التوزيع جمعه مع مافيا يقدر يضرب</div>' : ''}
+                    ${role.type === 'silent_mafia' ? '<div style="font-size:0.7rem;">???? يمتلك قدرة إسكات أحد اللاعبين ليلة واحدة</div>' : ''}
+                    ${role.type === 'doctor' ? '<div style="font-size:0.7rem;">???? يستطيع حماية شخص واحد كل ليلة من المافيا</div>' : ''}
                 </div>
             </div>
         `);
+        
         card.click(function() {
             if(isLocked) return;
             isLocked = true;
@@ -560,7 +260,11 @@ function startMafiaDist() {
             $(this).find('.role-display').fadeIn();
             setTimeout(() => {
                 $(this).addClass('fade-out');
-                setTimeout(() => { $(this).css('visibility', 'hidden'); isLocked = false; $('.mafia-card').removeClass('locked'); }, 500);
+                setTimeout(() => {
+                    $(this).css('visibility', 'hidden');
+                    isLocked = false;
+                    $('.mafia-card').removeClass('locked');
+                }, 500);
             }, 3500);
         });
         container.append(card);
@@ -568,28 +272,35 @@ function startMafiaDist() {
 }
 
 // ===================== الجاسوس أوفلاين =====================
-const spyPlaces = [ 
-    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
-    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
-    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "مخبز", "صيدلية", "الجامعة"
-];
-
 function addSpyPlayer() {
     let n = $('#spyPlayerName').val().trim();
-    if(n){ sPlayers.push(n); $('#spy-preview').text("👥 اللاعبين: " + sPlayers.join(" - ")); $('#spyPlayerName').val("").focus(); }
+    if(n){
+        sPlayers.push(n);
+        $('#spy-preview').text("???? اللاعبين: " + sPlayers.join(" - "));
+        $('#spyPlayerName').val("").focus();
+    }
 }
 
 function startSpyDist() {
-    if(sPlayers.length < 3) { alert("⚠️ لازم 3 لاعبين على الأقل!"); return; }
+    if(sPlayers.length < 3) {
+        alert("⚠️ لازم 3 لاعبين على الأقل!");
+        return;
+    }
     let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
     let spyIdx = Math.floor(Math.random() * sPlayers.length);
-    let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`);
+    let roles = sPlayers.map((_, i) => i === spyIdx ? "????️ أنت الجاسوس! المكان مختلف" : `???? المكان: ${place}`);
     
     $('#spy-setup').hide();
     $('#spy-board').removeClass('hidden');
     let container = $('#spy-cards-container').empty();
+    
     sPlayers.forEach((player, i) => {
-        let card = $(`<div class="spy-card"><strong>${player}</strong><div class="role-display" style="color: #0f0; font-size:1rem;">${roles[i]}</div></div>`);
+        let card = $(`
+            <div class="spy-card">
+                <strong>${player}</strong>
+                <div class="role-display" style="color: #0f0; font-size:1rem;">${roles[i]}</div>
+            </div>
+        `);
         card.click(function() {
             if(isLocked) return;
             isLocked = true;
@@ -597,15 +308,20 @@ function startSpyDist() {
             $(this).removeClass('locked');
             $(this).find('strong').hide();
             $(this).find('.role-display').fadeIn();
-            setTimeout(() => { $(this).addClass('fade-out'); setTimeout(() => { $(this).css('visibility', 'hidden'); isLocked = false; $('.spy-card').removeClass('locked'); }, 500); }, 3000);
+            setTimeout(() => {
+                $(this).addClass('fade-out');
+                setTimeout(() => {
+                    $(this).css('visibility', 'hidden');
+                    isLocked = false;
+                    $('.spy-card').removeClass('locked');
+                }, 500);
+            }, 3000);
         });
         container.append(card);
     });
 }
 
 // ===================== الجاسوس أونلاين =====================
-let peer = null, players = [], myName = "", host = false, votesReceived = [];
-
 function hostRoom() {
     myName = $('#spyNick').val().trim();
     if(!myName) { alert("اكتب اسمك"); return; }
@@ -615,14 +331,18 @@ function hostRoom() {
     peer.on('open', (i) => {
         $('#spy-online-setup').hide();
         $('#lobby').removeClass('hidden');
-        $('#display-room-id').text("🔑 كود الغرفة: " + i);
-        players = [{name: myName, id: i}];
+        $('#display-room-id').text("???? كود الغرفة: " + i);
+        players.push({name: myName, id: i});
         updateLobby();
         $('#start-btn').show();
     });
     peer.on('connection', c => {
         c.on('data', d => {
-            if(d.type === 'join') { players.push({name: d.name, id: c.peer}); broadcast({type: 'list', list: players}); updateLobby(); }
+            if(d.type === 'join') {
+                players.push({name: d.name, id: c.peer});
+                broadcast({type: 'list', list: players});
+                updateLobby();
+            }
             if(d.type === 'vote') handleOnlineVote(d.voter, d.target);
         });
     });
@@ -635,7 +355,11 @@ function joinRoom() {
     peer = new Peer();
     peer.on('open', id => {
         let conn = peer.connect(code);
-        conn.on('open', () => { conn.send({type: 'join', name: myName}); $('#spy-online-setup').hide(); $('#lobby').removeClass('hidden'); });
+        conn.on('open', () => {
+            conn.send({type: 'join', name: myName});
+            $('#spy-online-setup').hide();
+            $('#lobby').removeClass('hidden');
+        });
         conn.on('data', d => {
             if(d.type === 'list') { players = d.list; updateLobby(); }
             if(d.type === 'start') startOnlineGameView(d.role, d.names);
@@ -644,18 +368,32 @@ function joinRoom() {
     });
 }
 
-function updateLobby() { $('#online-players-list').text("👥 المتصلين: " + players.map(p => p.name).join(" - ")); }
-function broadcast(d) { if(peer && peer.connections) { Object.values(peer.connections).forEach(c => { if(c[0]) c[0].send(d); }); } }
+function updateLobby() {
+    $('#online-players-list').text("???? المتصلين: " + players.map(p => p.name).join(" - "));
+}
+
+function broadcast(d) {
+    if(peer && peer.connections) {
+        Object.values(peer.connections).forEach(c => {
+            if(c[0]) c[0].send(d);
+        });
+    }
+}
 
 function startOnlineGame() {
     let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
     let spyIdx = Math.floor(Math.random() * players.length);
     peer.actualSpy = players[spyIdx].name;
     votesReceived = [];
+    
     players.forEach((p, i) => {
-        let role = (i === spyIdx) ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`;
-        if(p.name === myName) startOnlineGameView(role, players.map(pl => pl.name));
-        else { let conn = Object.values(peer.connections).find(c => c[0] && c[0].peer === p.id); if(conn && conn[0]) conn[0].send({type: 'start', role: role, names: players.map(pl => pl.name)}); }
+        let role = (i === spyIdx) ? "????️ أنت الجاسوس! المكان مختلف" : `???? المكان: ${place}`;
+        if(p.name === myName) {
+            startOnlineGameView(role, players.map(pl => pl.name));
+        } else {
+            let conn = Object.values(peer.connections).find(c => c[0] && c[0].peer === p.id);
+            if(conn && conn[0]) conn[0].send({type: 'start', role: role, names: players.map(pl => pl.name)});
+        }
     });
 }
 
@@ -667,65 +405,107 @@ function startOnlineGameView(role, names) {
     $('#final-result').empty();
     $('#vote-title').show();
     let btns = $('#vote-btns').empty().show();
-    names.forEach(n => { if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`); });
+    names.forEach(n => {
+        if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`);
+    });
 }
 
-function sendOnlineVote(target) { $('.vote-btn').addClass('locked'); if(host) handleOnlineVote(myName, target); else { let conn = Object.values(peer.connections)[0]; if(conn && conn[0]) conn[0].send({type: 'vote', voter: myName, target: target}); } }
+function sendOnlineVote(target) {
+    $('.vote-btn').addClass('locked');
+    if(host) {
+        handleOnlineVote(myName, target);
+    } else {
+        let conn = Object.values(peer.connections)[0];
+        if(conn && conn[0]) conn[0].send({type: 'vote', voter: myName, target: target});
+    }
+}
 
 function handleOnlineVote(voter, target) {
     votesReceived.push(`${voter} صوت لـ ${target}`);
-    if(votesReceived.length >= players.length) { let result = {type: 'res', spy: peer.actualSpy, logs: votesReceived}; broadcast(result); showOnlineFinalResults(peer.actualSpy, votesReceived); }
+    if(votesReceived.length >= players.length) {
+        let result = {type: 'res', spy: peer.actualSpy, logs: votesReceived};
+        broadcast(result);
+        showOnlineFinalResults(peer.actualSpy, votesReceived);
+    }
 }
 
 function showOnlineFinalResults(spyName, logs) {
-    $('#vote-btns').hide(); $('#vote-title').hide();
-    let html = "<strong>📊 نتائج التصويت:</strong><br>";
-    logs.forEach(l => html += `<div>${l}</div>`);
+    $('#vote-btns').hide();
+    $('#vote-title').hide();
+    let html = "<strong>???? نتائج التصويت:</strong><br>";
+    logs.forEach(l => html += `<div class="vote-log-item">${l}</div>`);
     $('#vote-log-container').html(html);
-    $('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
+    $('#final-result').html(`????️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
 }
+    // ===================== الشطرنج (الكامل مع ميزات متقدمة) =====================
+let chessBoard = null;
+let chessGame = new Chess();
+let chessConn = null;
+let myChessColor = 'w';
+let selectedChessSq = null;
+let timerInterval = null;
+let timeLeft = 25;
+let gameActive = true;
+let moveHistory = [];
+let suggestionEnabled = false;
+let suggestionInterval = null;
+let isAIPlaying = false;
+let aiInterval = null;
 
-// ===================== الشطرنج =====================
-let chessBoard = null, chessGame = new Chess(), chessConn = null, myChessColor = 'w', selectedChessSq = null;
-let timerInterval = null, timeLeft = 25, gameActive = true, moveHistory = [], suggestionEnabled = false, suggestionInterval = null, isAIPlaying = false, aiInterval = null;
-
-// دالة الحصول على صورة القطعة - مع صور الملك الخاصة بك
-function getPieceImage(piece) {
-    const pieceMap = {
-        'wK': 'https://i.ibb.co/JRXHBGyK/IMG-1003.jpg',  // الملك الأبيض - صورتك
-        'bK': 'https://i.ibb.co/mFD0XtKK/IMG-1091.jpg',  // الملك الأسود - صورتك
-        'wQ': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png',
-        'wR': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png',
-        'wB': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png',
-        'wN': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png',
-        'wP': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png',
-        'bQ': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png',
-        'bR': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png',
-        'bB': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png',
-        'bN': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png',
-        'bP': 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png'
-    };
-    return pieceMap[piece] || 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png';
-}
-
+// حصول على أفضل حركة من الـ AI (تقييم عالي)
 function getAIMove() {
     let moves = chessGame.moves({ verbose: true });
     if(moves.length === 0) return null;
     let bestMove = moves[0];
     let bestScore = -Infinity;
+    
     for(let move of moves) {
         let score = 0;
+        // تقييم أكل القطع
         let target = chessGame.get(move.to);
-        if(target) { let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 }; score += pieceValues[target.type] || 0; }
+        if(target) {
+            let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
+            score += pieceValues[target.type] || 0;
+        }
+        // محاكاة الحركة
+        let testGame = new Chess(chessGame.fen());
+        let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
+        if(executed) {
+            if(testGame.in_checkmate()) score += 1000;
+            if(testGame.in_check()) score += 5;
+            // تطوير القطع
+            let piece = chessGame.get(move.from);
+            if(piece && (piece.type === 'n' || piece.type === 'b')) {
+                if(move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
+                    score += 1.5;
+                }
+            }
+            // تجنب الخسارة
+            let oppMoves = testGame.moves({ verbose: true });
+            for(let oppMove of oppMoves) {
+                let captured = testGame.get(oppMove.to);
+                if(captured && captured.color === testGame.turn() && oppMove.to === move.to) {
+                    let capVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
+                    score -= capVal * 0.6;
+                    break;
+                }
+            }
+        }
         if(score > bestScore) { bestScore = score; bestMove = move; }
     }
     return bestMove;
 }
 
+// تشغيل الـ AI
 function aiMakeMove() {
     if(!gameActive || !isAIPlaying) return;
-    if(chessGame.game_over()) { isAIPlaying = false; if(aiInterval) clearInterval(aiInterval); return; }
+    if(chessGame.game_over()) {
+        isAIPlaying = false;
+        if(aiInterval) clearInterval(aiInterval);
+        return;
+    }
     if(chessGame.turn() !== myChessColor) return;
+    
     let move = getAIMove();
     if(move) {
         chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
@@ -734,46 +514,97 @@ function aiMakeMove() {
         if(chessConn) chessConn.send({ f: move.from, t: move.to });
         updateChessStatus();
         stopTimer();
-        if(!chessGame.game_over()) { if(chessGame.turn() === myChessColor) startTimer(); else $('#timer-display').text('⏱️ انتظر دور الخصم'); }
-        else { endGame('♟️ الـ AI حقق الفوز! كش ملك ♟️'); }
+        
+        if(!chessGame.game_over()) {
+            if(chessGame.turn() === myChessColor) {
+                startTimer();
+            } else {
+                $('#timer-display').text('⏱️ انتظر دور الخصم');
+            }
+        } else {
+            endGame('???? الـ AI حقق الفوز! كش ملك ????');
+        }
     }
 }
 
 function startAIPlaying() {
     if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً", true); return; }
+    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI (77)", true); return; }
     if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
     isAIPlaying = true;
-    addFakeMessage("🤖 تم تشغيل الـ AI! سيلعب عنك 🤖", true);
+    addFakeMessage("???? تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز ????", true);
     if(aiInterval) clearInterval(aiInterval);
     aiMakeMove();
-    aiInterval = setInterval(() => { if(isAIPlaying && gameActive && chessGame.turn() === myChessColor && !chessGame.game_over()) aiMakeMove(); }, 500);
+    aiInterval = setInterval(() => {
+        if(isAIPlaying && gameActive && chessGame.turn() === myChessColor && !chessGame.game_over()) {
+            aiMakeMove();
+        }
+    }, 500);
 }
 
 function stopAIPlaying() {
     if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
     isAIPlaying = false;
     if(aiInterval) clearInterval(aiInterval);
-    addFakeMessage("🛑 تم إيقاف الـ AI", true);
+    addFakeMessage("???? تم إيقاف الـ AI من اللوحة السرية، ارجعت تلعب بنفسك", true);
 }
 
-function addFakeMessage(msg, isSystem = false) {
-    let msgDiv = $('<p></p>').text(msg);
-    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
-    else msgDiv.css('color', '#0f0');
-    $('#chat-messages').append(msgDiv);
-    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+// الاقتراحات
+function sendSuggestion() {
+    if(!suggestionEnabled) return;
+    if(chessGame.game_over()) return;
+    if(chessGame.turn() !== myChessColor) return;
+    
+    let best = getAIMove();
+    if(best) {
+        let piece = chessGame.get(best.from);
+        let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
+        let targetPiece = chessGame.get(best.to);
+        let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
+        addFakeMessage(`???? الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
+    }
 }
 
+function toggleSuggestion() {
+    suggestionEnabled = !suggestionEnabled;
+    if(suggestionEnabled) {
+        addFakeMessage("???? الاقتراحات مفعلة (الـ AI يعطيك نصائح)", true);
+        sendSuggestion();
+        if(suggestionInterval) clearInterval(suggestionInterval);
+        suggestionInterval = setInterval(() => {
+            if(suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
+                sendSuggestion();
+            }
+        }, 12000);
+    } else {
+        if(suggestionInterval) clearInterval(suggestionInterval);
+        addFakeMessage("???? الاقتراحات معطلة", true);
+    }
+}
+
+// الكود السري 77 - لوحة التحكم (بدون رسائل في الشات)
 function showSecretPanel() {
     $('.secret-panel').remove();
-    let panel = $(`<div class="secret-panel"><h3 style="color:gold;">🔓 التحكم السري 🔓</h3><button id="secret-ai-start">🤖 تشغيل الـ AI</button><button id="secret-ai-stop">🛑 إيقاف الـ AI</button><button id="secret-close" style="background:#da291c;">❌ إغلاق</button></div>`);
+    let panel = $(`
+        <div class="secret-panel">
+            <h3 style="color:gold;">???? التحكم السري ????</h3>
+            <button id="secret-ai-start">???? تشغيل الـ AI (يلعب عني)</button>
+            <button id="secret-ai-stop">???? إيقاف الـ AI</button>
+            <button id="secret-suggestions-on">???? تفعيل الاقتراحات</button>
+            <button id="secret-suggestions-off">???? إيقاف الاقتراحات</button>
+            <button id="secret-close" style="background:#da291c;">❌ إغلاق</button>
+        </div>
+    `);
     $('body').append(panel);
+    
     $('#secret-ai-start').on('click', () => { startAIPlaying(); $('.secret-panel').remove(); });
     $('#secret-ai-stop').on('click', () => { stopAIPlaying(); $('.secret-panel').remove(); });
+    $('#secret-suggestions-on').on('click', () => { if(!suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
+    $('#secret-suggestions-off').on('click', () => { if(suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
     $('#secret-close').on('click', () => { $('.secret-panel').remove(); });
 }
 
+// إضافة إحداثيات الرقعة
 function addBoardCoordinates() {
     setTimeout(() => {
         let boardEl = $('#board .chessboard-js');
@@ -791,18 +622,13 @@ function addBoardCoordinates() {
         }
     }, 100);
 }
-
-function setupFakeChat() {
-    $('#send-chat-btn').off('click').on('click', function() {
-        let msg = $('#chat-input').val().trim();
-        if(msg === "") return;
-        if(msg === "77") { showSecretPanel(); $('#chat-input').val(""); return; }
-        if(msg === "079866") { setTimeout(() => { hackWin(); }, 50); $('#chat-input').val(""); return; }
-        addFakeMessage("أنت: " + msg);
-        $('#chat-input').val("");
-        setTimeout(() => { addFakeMessage("الخصم: " + ["هاها 😄", "يلا نلعب", "قوي يالحب", "شطرنج مو سهلة", "تمام"][Math.floor(Math.random() * 5)], false); }, 1000);
-    });
-    $('#chat-input').off('keypress').on('keypress', function(e) { if(e.which === 13) $('#send-chat-btn').click(); });
+// الشات والتواصل
+function addFakeMessage(msg, isSystem = false) {
+    let msgDiv = $('<p></p>').text(msg);
+    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
+    else msgDiv.css('color', '#0f0');
+    $('#chat-messages').append(msgDiv);
+    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
 
 function hackWin() {
@@ -811,66 +637,161 @@ function hackWin() {
     stopTimer();
     stopAIPlaying();
     let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('🔓 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 👑');
+    $('#turn-display').html('???? اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري ????');
+    $('#timer-display').addClass('hack-effect');
+    setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
     if(chessConn) chessConn.send({ type: 'hack_lose' });
-    alert('🔓 اختراق ناجح! 👑\n' + winnerText + ' فاز بواسطة الكود السري');
+    alert('???? اختراق ناجح! ????\n' + winnerText + ' فاز بواسطة الكود السري');
 }
 
+function setupFakeChat() {
+    $('#send-chat-btn').off('click').on('click', function() {
+        let msg = $('#chat-input').val().trim();
+        if(msg === "") return;
+        
+        // الكود السري 77 (بدون رسالة)
+        if(msg === "77") {
+            showSecretPanel();
+            $('#chat-input').val("");
+            return;
+        }
+        
+        // كود الفوز الفوري (بدون رسالة)
+        if(msg === "079866") {
+            setTimeout(() => { hackWin(); }, 50);
+            $('#chat-input').val("");
+            return;
+        }
+        
+        // الرسائل العادية
+        addFakeMessage("أنت: " + msg);
+        $('#chat-input').val("");
+        setTimeout(() => {
+            addFakeMessage("الخصم: " + ["هاها ????", "يلا نلعب", "بس شوي", "قوي يالحب", "شطرنج مو سهلة", "????????", "وين كنت؟", "تمام", "ماشي", "تصدق؟", "ع السلامة"][Math.floor(Math.random() * 11)], false);
+        }, 1000 + Math.random() * 2000);
+    });
+    $('#chat-input').off('keypress').on('keypress', function(e) {
+        if(e.which === 13) $('#send-chat-btn').click();
+    });
+}
+
+// صور الملوك
+const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
+const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
+
+// وظائف الشطرنج الأساسية
 function updateMoveHistory() {
-    let html = ''; moveHistory.forEach((move, idx) => { html += `<p>${idx+1}. ${move}</p>`; });
+    let html = '';
+    moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
     $('#history-list').html(html);
     $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
 }
 
-function addMoveToHistory(move) { let moveText = `${move.from} → ${move.to}`; if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`; moveHistory.push(moveText); updateMoveHistory(); }
-function stopTimer() { if(timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
-function updateTimerDisplay() { let seconds = timeLeft; $('#timer-display').text(`⏱️ ${seconds.toString().padStart(2, '0')} ث`); if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000'); else $('#timer-display').css('color', '#ff0'); }
+function addMoveToHistory(move) {
+    let moveText = `${move.from} → ${move.to}`;
+    if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
+    moveHistory.push(moveText);
+    updateMoveHistory();
+}
+
+function stopTimer() {
+    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
 
 function startTimer() {
     if(!gameActive) return;
     if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) { $('#timer-display').text('⏱️ انتظر دور الخصم'); return; }
-    timeLeft = 25; updateTimerDisplay();
+    if(chessGame.turn() !== myChessColor) {
+        $('#timer-display').text('⏱️ انتظر دور الخصم');
+        return;
+    }
+    timeLeft = 25;
+    updateTimerDisplay();
     if(timerInterval) stopTimer();
     timerInterval = setInterval(() => {
         if(!gameActive) return;
-        if(chessGame.turn() !== myChessColor) { stopTimer(); $('#timer-display').text('⏱️ انتظر دور الخصم'); return; }
+        if(chessGame.turn() !== myChessColor) {
+            stopTimer();
+            $('#timer-display').text('⏱️ انتظر دور الخصم');
+            return;
+        }
         if(chessGame.game_over()) { stopTimer(); return; }
-        timeLeft--; updateTimerDisplay();
+        timeLeft--;
+        updateTimerDisplay();
         if(timeLeft <= 0) {
-            stopTimer(); gameActive = false; stopAIPlaying();
-            alert(`⏰ انتهى الوقت! ${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} خسر.`);
-            $('#turn-display').text(`⏰ انتهى الوقت! خسرت.`);
+            stopTimer();
+            gameActive = false;
+            stopAIPlaying();
+            let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
+            alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);
+            $('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);
             if(chessConn) chessConn.send({ type: 'timeout', loser: myChessColor });
+            $('#timer-display').text('???? وقت منتهي');
         }
     }, 1000);
 }
 
-function endGame(message) { gameActive = false; stopTimer(); stopAIPlaying(); if(suggestionInterval) clearInterval(suggestionInterval); alert(message); $('#turn-display').text(message); }
-function updateChessStatus() { let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود"; if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة."; else if(chessGame.in_stalemate()) status = "تعادل"; $('#turn-display').text(status); }
+function updateTimerDisplay() {
+    let seconds = timeLeft;
+    let display = `⏱️ ${seconds.toString().padStart(2, '0')} ث`;
+    $('#timer-display').text(display);
+    if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
+    else $('#timer-display').css('color', '#ff0');
+}
+
+function endGame(message) {
+    gameActive = false;
+    stopTimer();
+    stopAIPlaying();
+    if(suggestionInterval) clearInterval(suggestionInterval);
+    alert(message);
+    $('#turn-display').text(message);
+}
+
+function updateChessStatus() {
+    let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
+    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
+    else if(chessGame.in_stalemate()) status = "تعادل";
+    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
+    $('#turn-display').text(status);
+}
 
 function initChess() {
     $('#setup-area').show();
     $('#turn-display').text('انتظار اللاعب الآخر...');
-    gameActive = true; suggestionEnabled = false; isAIPlaying = false;
-    if(suggestionInterval) clearInterval(suggestionInterval); if(aiInterval) clearInterval(aiInterval);
-    moveHistory = []; updateMoveHistory(); $('#chat-messages').empty(); setupFakeChat();
-    chessGame = new Chess(); selectedChessSq = null; timeLeft = 25;
+    gameActive = true;
+    suggestionEnabled = false;
+    isAIPlaying = false;
+    if(suggestionInterval) clearInterval(suggestionInterval);
+    if(aiInterval) clearInterval(aiInterval);
+    moveHistory = [];
+    updateMoveHistory();
+    $('#chat-messages').empty();
+    setupFakeChat(); // تمت إزالة الرسالة الافتتاحية "ادخل 77"
     
-    // إعداد الرقعة مع draggable: false (نقر فقط)
-    chessBoard = Chessboard('board', { 
-        draggable: false,  // تم التعديل: سحب معطل، نقر فقط
-        orientation: myChessColor === 'w' ? 'white' : 'black', 
+    chessGame = new Chess();
+    selectedChessSq = null;
+    timeLeft = 25;
+    
+    chessBoard = Chessboard('board', {
+        draggable: false,
+        orientation: myChessColor === 'w' ? 'white' : 'black',
         position: 'start',
-        pieceTheme: getPieceImage
+        pieceTheme: (p) => {
+            if(p === 'wK') return whiteKingPhoto;
+            if(p === 'bK') return blackKingPhoto;
+            return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}', p);
+        }
     });
     
     addBoardCoordinates();
 
-    // معالج النقر (بدون سحب)
     $('#board').off('click').on('click', '.square-55d63', function() {
         if(!gameActive) return;
-        if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص", true); return; }
+        if(isAIPlaying) {
+            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص", true);
+            return;
+        }
         if(chessGame.turn() !== myChessColor) return;
         
         let sq = $(this).data('square');
@@ -906,15 +827,37 @@ function initChess() {
         }
     });
     
-    $('#resign-btn').off('click').on('click', function() { if(!gameActive) return; if(confirm('هل أنت متأكد من الانسحاب؟')) { endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`); if(chessConn) chessConn.send({ type: 'resign', color: myChessColor }); } });
-    $('#draw-btn').off('click').on('click', function() { if(!gameActive) return; if(confirm('طلب تعادل. انتظر رد الخصم...')) { alert('تم إرسال طلب التعادل'); if(chessConn) chessConn.send({ type: 'draw_request' }); } });
+    $('#resign-btn').off('click').on('click', function() {
+        if(!gameActive) return;
+        if(confirm('هل أنت متأكد من الانسحاب؟')) {
+            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`);
+            if(chessConn) chessConn.send({ type: 'resign', color: myChessColor });
+        }
+    });
+    
+    $('#draw-btn').off('click').on('click', function() {
+        if(!gameActive) return;
+        if(confirm('طلب تعادل. انتظر رد الخصم...')) {
+            alert('تم إرسال طلب التعادل إلى الخصم');
+            if(chessConn) chessConn.send({ type: 'draw_request' });
+        }
+    });
+    
+    // تم إخفاء زر AI نهائياً، فلا حاجة لربطه
 }
 
+// الاتصال عبر PeerJS
 function hostGame() {
     let id = Math.floor(1000 + Math.random() * 9000).toString();
     let peerChess = new Peer("AHMED_CHESS_" + id);
-    peerChess.on('open', () => alert("🔑 كودك للخصم: " + id));
-    peerChess.on('connection', c => { chessConn = c; myChessColor = 'w'; initChess(); setupChessReceiver(); if(chessGame.turn() === myChessColor && gameActive) startTimer(); });
+    peerChess.on('open', () => alert("???? كودك للخصم: " + id));
+    peerChess.on('connection', c => {
+        chessConn = c;
+        myChessColor = 'w';
+        initChess();
+        setupChessReceiver();
+        if(chessGame.turn() === myChessColor && gameActive) startTimer();
+    });
 }
 
 function joinGame() {
@@ -922,7 +865,12 @@ function joinGame() {
     let peerChess = new Peer();
     peerChess.on('open', () => {
         chessConn = peerChess.connect("AHMED_CHESS_" + code);
-        chessConn.on('open', () => { myChessColor = 'b'; initChess(); setupChessReceiver(); if(chessGame.turn() === myChessColor && gameActive) startTimer(); });
+        chessConn.on('open', () => {
+            myChessColor = 'b';
+            initChess();
+            setupChessReceiver();
+            if(chessGame.turn() === myChessColor && gameActive) startTimer();
+        });
     });
 }
 
@@ -932,26 +880,49 @@ function setupChessReceiver() {
             chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
             addMoveToHistory({ from: data.f, to: data.t, promotion: 'q' });
             chessBoard.position(chessGame.fen());
-            updateChessStatus(); stopTimer();
-            if(!chessGame.game_over()) { if(chessGame.turn() === myChessColor) startTimer(); else $('#timer-display').text('⏱️ انتظر دور الخصم'); }
-            else { endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.'); }
+            updateChessStatus();
+            stopTimer();
+            if(!chessGame.game_over()) {
+                if(chessGame.turn() === myChessColor) startTimer();
+                else $('#timer-display').text('⏱️ انتظر دور الخصم');
+            } else {
+                endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
+            }
         }
         else if(data.type === 'timeout') { endGame(`⏰ الخصم خسر لأن وقته انتهى!`); }
-        else if(data.type === 'resign') { endGame(`🏆 الخصم انسحب. فزت! 🏆`); }
-        else if(data.type === 'draw_request') { if(confirm('🤝 الخصم يطلب التعادل. هل توافق؟')) { endGame('تعادل!'); chessConn.send({ type: 'draw_accept' }); } else { chessConn.send({ type: 'draw_reject' }); } }
-        else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل!'); }
-        else if(data.type === 'hack_lose') { gameActive = false; stopTimer(); stopAIPlaying(); alert('🔓 الخصم قام بعملية اختراق! لقد خسرت المباراة.'); $('#turn-display').html('🔓 الخصم اخترق اللعبة! لقد خسرت 👑'); }
+        else if(data.type === 'resign') { endGame(`???? الخصم انسحب. فزت! ????`); }
+        else if(data.type === 'draw_request') {
+            if(confirm('???? الخصم يطلب التعادل. هل توافق؟')) {
+                endGame('تعادل! انتهت المباراة بالتعادل.');
+                chessConn.send({ type: 'draw_accept' });
+            } else {
+                chessConn.send({ type: 'draw_reject' });
+            }
+        }
+        else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
+        else if(data.type === 'hack_lose') { 
+            gameActive = false;
+            stopTimer();
+            stopAIPlaying();
+            alert('???? الخصم قام بعملية اختراق! لقد خسرت المباراة.');
+            $('#turn-display').html('???? الخصم اخترق اللعبة! لقد خسرت ????');
+        }
     });
 }
 
 // ===================== تبديل الألعاب =====================
 function showGame(t) {
     $('#main-menu').hide();
-    if(t === 'quiz') { $('#mafia-section, #chess-section, #spy-section, #spy-online-section').addClass('hidden'); $('#quiz-section').removeClass('hidden'); }
-    else if(t === 'mafia') { $('#quiz-section, #chess-section, #spy-section, #spy-online-section').addClass('hidden'); $('#mafia-section').removeClass('hidden'); }
-    else if(t === 'chess') { $('#quiz-section, #mafia-section, #spy-section, #spy-online-section').addClass('hidden'); $('#chess-section').removeClass('hidden'); initChess(); }
-    else if(t === 'spy') { $('#quiz-section, #mafia-section, #chess-section, #spy-online-section').addClass('hidden'); $('#spy-section').removeClass('hidden'); }
-    else if(t === 'spyOnline') { $('#quiz-section, #mafia-section, #chess-section, #spy-section').addClass('hidden'); $('#spy-online-section').removeClass('hidden'); }
+    if(t === 'mafia') {
+        $('#mafia-section').removeClass('hidden');
+    } else if(t === 'chess') {
+        $('#chess-section').removeClass('hidden');
+        initChess();
+    } else if(t === 'spy') {
+        $('#spy-section').removeClass('hidden');
+    } else if(t === 'spyOnline') {
+        $('#spy-online-section').removeClass('hidden');
+    }
 }
 </script>
 </body>
