@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مونوبولي عمان أونلاين - العب مع أصدقائك</title>
+    <title>مونوبولي عمان - العب مع أصدقائك (Peer to Peer)</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,6 @@
             color: #ffd700;
         }
 
-        /* القائمة الرئيسية */
         .main-menu {
             text-align: center;
             max-width: 500px;
@@ -29,7 +28,6 @@
             border-radius: 30px;
             padding: 30px;
             border: 3px solid #ffd700;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         .main-menu h1 {
@@ -38,32 +36,24 @@
             color: #ffd700;
         }
 
-        .main-menu h3 {
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-
         .menu-btn {
             display: block;
             width: 100%;
             padding: 20px;
             margin: 15px 0;
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
             border: none;
             border-radius: 15px;
             font-size: 1.2em;
             font-weight: bold;
             color: #1a1a2e;
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
         .menu-btn:hover {
             transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
 
-        /* شاشة اللعبة */
         .game-container {
             max-width: 100%;
             margin: 0 auto;
@@ -109,14 +99,12 @@
             font-size: 0.8em;
         }
 
-        /* رقعة عمان */
         .board {
             background: #0a2e1a;
             border-radius: 20px;
             padding: 15px;
             margin-bottom: 15px;
             overflow-x: auto;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 5px 20px rgba(0,0,0,0.4);
         }
 
         .amman-board {
@@ -124,8 +112,6 @@
             border-radius: 20px;
             padding: 15px;
             min-width: 750px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .board-row {
@@ -143,7 +129,6 @@
             font-weight: bold;
             color: #1a1a2e;
             min-width: 110px;
-            box-shadow: inset 0 1px 3px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .side-cell {
@@ -156,14 +141,6 @@
             flex: 1;
             min-width: 70px;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .side-cell:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
 
         .owner-tag {
@@ -174,7 +151,6 @@
             padding: 2px 5px;
             margin-top: 3px;
             display: inline-block;
-            white-space: nowrap;
         }
 
         .houses-display {
@@ -194,10 +170,8 @@
             text-align: center;
             margin: 0 1px;
             border: 1.5px solid white;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* لوحة المعلومات */
         .info-panel {
             background: rgba(0,0,0,0.85);
             border-radius: 15px;
@@ -219,7 +193,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
         }
 
         .player-card.active {
@@ -227,15 +200,9 @@
             border: 2px solid #ffd700;
         }
 
-        .player-name {
-            font-weight: bold;
-            font-size: 1em;
-        }
-
         .player-money {
             color: #4caf50;
             font-weight: bold;
-            font-size: 1.1em;
         }
 
         .controls {
@@ -253,21 +220,11 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .controls button:hover:not(:disabled) {
-            transform: scale(1.02);
         }
 
         .controls button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        .dice-area {
-            text-align: center;
-            margin-bottom: 15px;
         }
 
         .dice {
@@ -283,16 +240,8 @@
             font-size: 2.2em;
             font-weight: bold;
             color: #333;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: roll 0.3s ease-in-out;
         }
 
-        @keyframes roll {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* الاتصال */
         .connection-panel {
             background: rgba(0,0,0,0.5);
             border-radius: 15px;
@@ -320,55 +269,12 @@
         }
 
         .room-code {
-            font-size: 1.5em;
+            font-size: 1.3em;
             background: #1a1a2e;
             padding: 10px;
             border-radius: 10px;
             margin: 10px;
             font-family: monospace;
-        }
-
-        .waiting-players {
-            background: rgba(255,215,0,0.2);
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 3px solid #ffd700;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            z-index: 1000;
-            min-width: 300px;
-            max-width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal button {
-            margin: 8px;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 999;
         }
 
         .log-area {
@@ -391,21 +297,38 @@
             color: #ffd700;
         }
 
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            z-index: 1000;
+            min-width: 280px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
         .hidden {
             display: none;
         }
 
         @media (max-width: 768px) {
-            .side-cell {
-                min-width: 55px;
-                font-size: 0.6em;
-                padding: 6px 2px;
-            }
-            .corner-cell {
-                min-width: 80px;
-                font-size: 0.7em;
-                padding: 8px 3px;
-            }
+            .side-cell { min-width: 55px; font-size: 0.6em; padding: 6px 2px; }
+            .corner-cell { min-width: 80px; font-size: 0.7em; padding: 8px 3px; }
+            .player-token-on-cell { width: 18px; height: 18px; font-size: 8px; line-height: 18px; }
         }
     </style>
 </head>
@@ -413,35 +336,33 @@
 
 <div id="mainMenu" class="main-menu">
     <h1>🏆 مونوبولي عمان أونلاين 🏆</h1>
-    <h3>العب مع أصدقائك عبر الإنترنت</h3>
-    <button class="menu-btn" onclick="showOnlineMenu()">🎮 لعب أونلاين</button>
+    <h3>العب مع أصدقائك - اتصال مباشر</h3>
+    <button class="menu-btn" onclick="showHostMenu()">🎮 إنشاء غرفة (Host)</button>
+    <button class="menu-btn" onclick="showJoinMenu()">🚪 دخول إلى غرفة (Join)</button>
     <button class="menu-btn" onclick="showRules()">📖 قواعد اللعبة</button>
 </div>
 
-<div id="onlineMenu" class="main-menu hidden">
-    <button class="back-btn" onclick="backToMainMenu()" style="margin-bottom:20px;">🔙 رجوع</button>
-    <h1>🎮 مونوبولي أونلاين</h1>
-    <h3>اختر:</h3>
-    <button class="menu-btn" onclick="createRoom()">🏠 إنشاء غرفة جديدة</button>
-    <div style="margin: 20px 0;">
-        <input type="text" id="joinRoomCode" placeholder="أدخل كود الغرفة" style="padding:12px; width:80%; border-radius:10px; border:none; text-align:center;">
-        <button class="menu-btn" onclick="joinRoom()" style="margin-top:10px;">🚪 دخول إلى غرفة</button>
+<div id="hostMenu" class="main-menu hidden">
+    <button class="back-btn" onclick="backToMain()" style="margin-bottom:20px;">🔙 رجوع</button>
+    <h2>🏠 إنشاء غرفة جديدة</h2>
+    <input type="text" id="hostName" placeholder="اسمك" value="المالك">
+    <button onclick="createRoom()" style="background:#4caf50;">✨ إنشاء غرفة</button>
+    <div id="hostWaiting" class="hidden" style="margin-top:20px;">
+        <div class="room-code" id="roomCodeDisplay"></div>
+        <p>📋 أعط هذا الكود لصديقك للانضمام</p>
+        <div id="waitingPlayers"></div>
+        <button onclick="startGame()" id="startGameBtn" style="background:#ffd700;">🎮 بدء اللعبة</button>
     </div>
 </div>
 
-<div id="lobbyPanel" class="main-menu hidden">
-    <button class="back-btn" onclick="backToOnlineMenu()" style="margin-bottom:20px;">🔙 رجوع</button>
-    <div class="connection-panel">
-        <h2>🏠 غرفة اللعبة</h2>
-        <div class="room-code" id="roomCodeDisplay"></div>
-        <div class="waiting-players">
-            <h3>👥 اللاعبين المتصلين:</h3>
-            <div id="playersList"></div>
-        </div>
-        <div id="startGameBtn" class="hidden">
-            <button onclick="startOnlineGame()" style="background:#4caf50; color:white; padding:15px 30px; font-size:1.2em;">🚀 بدء اللعبة</button>
-        </div>
-        <div id="waitingMsg" style="margin-top:15px; color:#ffd700;">⏳ انتظار اللاعبين...</div>
+<div id="joinMenu" class="main-menu hidden">
+    <button class="back-btn" onclick="backToMain()" style="margin-bottom:20px;">🔙 رجوع</button>
+    <h2>🚪 دخول إلى غرفة</h2>
+    <input type="text" id="joinCode" placeholder="أدخل كود الغرفة">
+    <input type="text" id="joinName" placeholder="اسمك" value="زائر">
+    <button onclick="joinRoom()" style="background:#2196F3;">🔗 انضمام</button>
+    <div id="joinWaiting" class="hidden" style="margin-top:20px;">
+        <p>⏳ جاري الاتصال... انتظر بدء اللعبة</p>
     </div>
 </div>
 
@@ -464,11 +385,6 @@
             <button onclick="showBuildMenu()">🏗️ بناء/بيع</button>
         </div>
 
-        <div class="dice-area" id="diceArea" style="display: none;">
-            <div class="dice" id="dice1">⚀</div>
-            <div class="dice" id="dice2">⚀</div>
-        </div>
-
         <div class="players-stats" id="playersStats"></div>
 
         <div class="log-area" id="logArea">
@@ -480,29 +396,29 @@
 <div id="purchaseModal" class="hidden">
     <div class="overlay"></div>
     <div class="modal">
-        <h2 style="color:#ffd700;">💰 شراء عقار</h2>
-        <p id="purchaseText" style="margin:15px 0;"></p>
-        <button onclick="confirmPurchase(true)" style="background: #4caf50; color: white;">✅ شراء</button>
-        <button onclick="confirmPurchase(false)" style="background: #f44336; color: white;">❌ تخطي</button>
+        <h2>💰 شراء عقار</h2>
+        <p id="purchaseText"></p>
+        <button onclick="confirmPurchase(true)" style="background:#4caf50;">✅ شراء</button>
+        <button onclick="confirmPurchase(false)" style="background:#f44336;">❌ تخطي</button>
     </div>
 </div>
 
 <div id="buildModal" class="hidden">
     <div class="overlay"></div>
     <div class="modal">
-        <h2 style="color:#ffd700;">🏗️ بناء وبيع المنازل</h2>
+        <h2>🏗️ بناء وبيع</h2>
         <div id="buildList"></div>
-        <button class="close-btn" onclick="closeBuildModal()" style="background:#da291c; color:white;">إغلاق</button>
+        <button onclick="closeBuildModal()" style="background:#da291c;">إغلاق</button>
     </div>
 </div>
 
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 <script>
-    // ===================== البيانات الأساسية =====================
-    let socket = null;
-    let roomId = null;
-    let myPlayerId = null;
-    let isHost = false;
+    // ===================== بيانات اللعبة =====================
+    let peer = null;
+    let connections = [];
+    let myId = null;
+    let isHostPlayer = false;
     let gameStarted = false;
     
     let players = [];
@@ -516,27 +432,25 @@
 
     // أسماء مناطق عمان
     const ammanPlaces = [
-        "🚀 نقطة الانطلاق", "شارع مكة", "❓ صندوق الحظ", "شارع المدينة المنورة", "💸 ضريبة الدخل",
-        "🚆 محطة مجمع الشمال", "شارع زهران", "❓ صندوق الحظ", "شارع الرينبو", "شارع السلام",
-        "🏆 جائزة مسجد الملك عبدالله", "جبل الحسين", "⚡ كهرباء عمان", "جبل اللويبدة", "جبل عمان",
-        "🚆 محطة مجمع الجيزة", "عبدون", "❓ صندوق الحظ", "الشميساني", "الربوة",
-        "🅿️ دوار الداخلية", "ضاحية الحسين", "❓ صندوق الحظ", "خلدا", "تلاع العلي",
-        "🚆 محطة مجمع رغدان", "الغاردنز", "الصويفية", "💧 مياه عمان", "الدوار السابع",
-        "🚔 اذهب للسجن - ماركا", "مرج الحمام", "ضاحية الرشيد", "❓ صندوق الحظ", "مقابلين",
-        "🚆 محطة مجمع جنوب", "❓ صندوق الحظ", "أم أذينة", "💸 ضريفة البلدية", "خلدا الجديدة"
+        "🚀 الانطلاق", "شارع مكة", "❓ حظ", "شارع المدينة", "💸 ضريبة",
+        "🚆 مجمع الشمال", "شارع زهران", "❓ حظ", "شارع الرينبو", "شارع السلام",
+        "🏆 جائزة", "جبل الحسين", "⚡ كهرباء", "جبل اللويبدة", "جبل عمان",
+        "🚆 مجمع الجيزة", "عبدون", "❓ حظ", "الشميساني", "الربوة",
+        "🅿️ دوار الداخلية", "ضاحية الحسين", "❓ حظ", "خلدا", "تلاع العلي",
+        "🚆 مجمع رغدان", "الغاردنز", "الصويفية", "💧 مياه عمان", "الدوار السابع",
+        "🚔 سجن ماركا", "مرج الحمام", "ضاحية الرشيد", "❓ حظ", "مقابلين",
+        "🚆 مجمع جنوب", "❓ حظ", "أم أذينة", "💸 ضريبة", "خلدا الجديدة"
     ];
 
     const ammanPrices = [
-        0, 70, 0, 90, 0, 220, 110, 0, 130, 150,
-        0, 170, 160, 190, 210, 220, 240, 0, 260, 280,
-        0, 300, 0, 320, 350, 220, 380, 410, 160, 430,
+        0, 70, 0, 90, 0, 220, 110, 0, 130, 150, 0, 170, 160, 190, 210,
+        220, 240, 0, 260, 280, 0, 300, 0, 320, 350, 220, 380, 410, 160, 430,
         0, 470, 500, 0, 540, 220, 0, 600, 0, 650
     ];
 
     const ammanRents = [
-        0, 6, 0, 8, 200, 30, 10, 0, 12, 14,
-        200, 16, 10, 18, 20, 30, 24, 0, 26, 28,
-        0, 30, 0, 32, 35, 30, 38, 45, 10, 50,
+        0, 6, 0, 8, 200, 30, 10, 0, 12, 14, 200, 16, 10, 18, 20,
+        30, 24, 0, 26, 28, 0, 30, 0, 32, 35, 30, 38, 45, 10, 50,
         0, 55, 60, 0, 65, 30, 0, 70, 150, 80
     ];
 
@@ -554,7 +468,6 @@
         else if(i === 12 || i === 28) placeTypes[i] = "utility";
         else placeTypes[i] = "property";
         
-        // ألوان
         if(i === 1 || i === 3) placeColors[i] = "#8B4513";
         else if(i === 6 || i === 8 || i === 9) placeColors[i] = "#87CEEB";
         else if(i === 11 || i === 13 || i === 14) placeColors[i] = "#FF69B4";
@@ -580,17 +493,15 @@
     const playerColors = ['#FF4444', '#44FF44', '#4444FF', '#FFFF44', '#FF44FF', '#44FFFF', '#FF8844', '#88FF44'];
     const playerShapes = ['🔴', '🟢', '🔵', '🟡', '🟣', '🩵', '🟠', '🟤'];
 
-    // ===================== دوال مساعدة =====================
-    function getHousePrice(propertyId) { return Math.floor(properties[propertyId].price / 2); }
-    
+    // دوال مساعدة
     function calculateRent(property) {
         if(property.type === 'railroad') {
-            let railroadCount = properties.filter(p => p.type === 'railroad' && p.owner === property.owner).length;
-            return [30, 60, 120, 240][railroadCount - 1] || 30;
+            let count = properties.filter(p => p.type === 'railroad' && p.owner === property.owner).length;
+            return [30, 60, 120, 240][count - 1] || 30;
         }
         if(property.type === 'utility') {
-            let utilityCount = properties.filter(p => p.type === 'utility' && p.owner === property.owner).length;
-            return property.rent * (utilityCount === 2 ? 10 : 4);
+            let count = properties.filter(p => p.type === 'utility' && p.owner === property.owner).length;
+            return property.rent * (count === 2 ? 10 : 4);
         }
         if(property.type === 'property') {
             if(property.houseCount === 0) return property.rent;
@@ -601,6 +512,27 @@
             if(property.houseCount === 5) return property.rent * 160;
         }
         return property.rent;
+    }
+
+    function sendToAll(data) {
+        connections.forEach(conn => {
+            if(conn.open) conn.send(data);
+        });
+    }
+
+    function sendToHost(data) {
+        if(connections[0] && connections[0].open) connections[0].send(data);
+    }
+
+    function updateGameState(state) {
+        players = state.players;
+        properties = state.properties;
+        currentPlayer = state.currentPlayer;
+        gameActive = state.gameActive;
+        if(!waitingForPurchase) {
+            renderBoard();
+            updateUI();
+        }
     }
 
     function renderBoard() {
@@ -632,7 +564,7 @@
         let tokens = '';
         players.forEach((player, idx) => {
             if(player.isActive && player.position === position) {
-                tokens += `<span class="player-token-on-cell" style="background:${player.color};" title="${player.name}">${idx+1}</span>`;
+                tokens += `<span class="player-token-on-cell" style="background:${player.color};">${idx+1}</span>`;
             }
         });
         
@@ -644,14 +576,13 @@
         
         let housesHtml = '';
         if(prop.type === 'property' && prop.houseCount > 0) {
-            if(prop.houseCount === 5) housesHtml = `<div class="houses-display">🏨 فندق</div>`;
-            else housesHtml = `<div class="houses-display">🏠${'🏠'.repeat(prop.houseCount-1)}</div>`;
+            housesHtml = `<div class="houses-display">${prop.houseCount === 5 ? '🏨 فندق' : '🏠'.repeat(prop.houseCount)}</div>`;
         }
         
         return `
             <div class="${className}" style="${bgStyle}">
                 <div style="font-size:0.7em; font-weight:bold;">${prop.name}</div>
-                ${prop.price > 0 ? `<div class="cell-price">💰 ${prop.price}</div>` : ''}
+                ${prop.price > 0 ? `<div style="font-size:0.6em;">💰${prop.price}</div>` : ''}
                 ${ownerHtml}
                 ${housesHtml}
                 <div style="margin-top: 4px;">${tokens}</div>
@@ -669,10 +600,10 @@
             playerCard.className = `player-card ${idx === currentPlayer && gameActive ? 'active' : ''}`;
             playerCard.innerHTML = `
                 <div>
-                    <div class="player-name" style="color:${player.color}">${playerShapes[idx]} ${player.name}</div>
-                    <div style="font-size:0.75em;">🏠 ${player.properties.length} عقار</div>
+                    <div style="color:${player.color}">${playerShapes[idx]} ${player.name}</div>
+                    <div style="font-size:0.7em;">🏠 ${player.properties.length}</div>
                 </div>
-                <div class="player-money">💰 ${player.money} د.أ</div>
+                <div class="player-money">💰 ${player.money}</div>
             `;
             statsDiv.appendChild(playerCard);
         });
@@ -682,7 +613,7 @@
         const rollBtn = document.getElementById('rollBtn');
         const endTurnBtn = document.getElementById('endTurnBtn');
         
-        if(gameActive && myTurn && players[currentPlayer]?.id === myPlayerId) {
+        if(gameActive && myTurn && players[currentPlayer]?.id === myId) {
             rollBtn.disabled = diceRolledThisTurn;
             endTurnBtn.disabled = !diceRolledThisTurn;
         } else {
@@ -701,276 +632,282 @@
         logArea.scrollTop = logArea.scrollHeight;
     }
 
-    // إرسال الأحداث إلى السيرفر
-    function sendGameAction(action, data) {
-        if(socket && roomId) {
-            socket.emit('game-action', { roomId, action, data });
-        }
-    }
-
-    // ===================== الأونلاين =====================
-    function showOnlineMenu() {
+    // ===================== إنشاء غرفة =====================
+    function showHostMenu() {
         document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('onlineMenu').classList.remove('hidden');
+        document.getElementById('hostMenu').classList.remove('hidden');
     }
 
-    function backToMainMenu() {
-        document.getElementById('onlineMenu').classList.add('hidden');
+    function showJoinMenu() {
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('joinMenu').classList.remove('hidden');
+    }
+
+    function backToMain() {
+        document.getElementById('hostMenu').classList.add('hidden');
+        document.getElementById('joinMenu').classList.add('hidden');
         document.getElementById('mainMenu').classList.remove('hidden');
-    }
-
-    function backToOnlineMenu() {
-        if(socket) socket.disconnect();
-        document.getElementById('lobbyPanel').classList.add('hidden');
-        document.getElementById('onlineMenu').classList.remove('hidden');
+        if(peer) peer.destroy();
     }
 
     function createRoom() {
-        let playerName = prompt("أدخل اسمك:", "لاعب");
-        if(!playerName) playerName = "لاعب";
+        const playerName = document.getElementById('hostName').value.trim() || "المالك";
         
-        socket = io('https://monopoly-amman-server.onrender.com', { transports: ['websocket'], reconnection: true });
+        peer = new Peer();
         
-        socket.on('connect', () => {
-            socket.emit('create-room', { playerName });
+        peer.on('open', (id) => {
+            myId = id;
+            isHostPlayer = true;
+            
+            document.getElementById('roomCodeDisplay').innerHTML = `🔑 كود الغرفة: <strong>${id}</strong>`;
+            document.getElementById('hostWaiting').classList.remove('hidden');
+            
+            // إضافة نفسك كلاعب
+            players = [{
+                id: myId,
+                name: playerName,
+                money: 1500,
+                position: 0,
+                properties: [],
+                color: playerColors[0],
+                isActive: true
+            }];
+            updateWaitingPlayers();
         });
         
-        socket.on('room-created', (data) => {
-            roomId = data.roomId;
-            myPlayerId = data.playerId;
-            isHost = true;
-            document.getElementById('onlineMenu').classList.add('hidden');
-            document.getElementById('lobbyPanel').classList.remove('hidden');
-            document.getElementById('roomCodeDisplay').innerHTML = `🔑 كود الغرفة: <strong style="font-size:1.5em;">${roomId}</strong>`;
-            document.getElementById('startGameBtn').classList.remove('hidden');
-            document.getElementById('waitingMsg').innerHTML = '⏳ انتظر انضمام لاعبين آخرين...';
-        });
-        
-        socket.on('players-update', (data) => {
-            players = data.players;
-            updateLobbyPlayers();
-        });
-        
-        socket.on('game-started', (data) => {
-            startGameWithData(data);
+        peer.on('connection', (conn) => {
+            connections.push(conn);
+            
+            conn.on('data', (data) => {
+                handleGameData(data, conn);
+            });
+            
+            conn.on('open', () => {
+                // إرسال حالة اللعبة الحالية للاعب الجديد
+                conn.send({
+                    type: 'init',
+                    players: players,
+                    properties: properties,
+                    myId: conn.peer
+                });
+            });
         });
     }
 
     function joinRoom() {
-        const code = document.getElementById('joinRoomCode').value.trim();
-        if(!code) {
+        const roomCode = document.getElementById('joinCode').value.trim();
+        const playerName = document.getElementById('joinName').value.trim() || "زائر";
+        
+        if(!roomCode) {
             alert("أدخل كود الغرفة!");
             return;
         }
         
-        let playerName = prompt("أدخل اسمك:", "لاعب");
-        if(!playerName) playerName = "لاعب";
+        peer = new Peer();
         
-        socket = io('https://monopoly-amman-server.onrender.com', { transports: ['websocket'], reconnection: true });
-        
-        socket.on('connect', () => {
-            socket.emit('join-room', { roomId: code, playerName });
-        });
-        
-        socket.on('join-success', (data) => {
-            roomId = data.roomId;
-            myPlayerId = data.playerId;
-            isHost = false;
-            document.getElementById('onlineMenu').classList.add('hidden');
-            document.getElementById('lobbyPanel').classList.remove('hidden');
-            document.getElementById('roomCodeDisplay').innerHTML = `🔑 كود الغرفة: <strong style="font-size:1.5em;">${roomId}</strong>`;
-            document.getElementById('startGameBtn').classList.add('hidden');
-        });
-        
-        socket.on('players-update', (data) => {
-            players = data.players;
-            updateLobbyPlayers();
-            if(data.players.length >= 2 && data.players.length <= 8) {
-                document.getElementById('waitingMsg').innerHTML = '✅ عدد كافٍ من اللاعبين! انتظر بدء اللعبة...';
-            }
-        });
-        
-        socket.on('game-started', (data) => {
-            startGameWithData(data);
+        peer.on('open', (id) => {
+            myId = id;
+            isHostPlayer = false;
+            
+            document.getElementById('joinWaiting').classList.remove('hidden');
+            
+            const conn = peer.connect(roomCode);
+            connections.push(conn);
+            
+            conn.on('open', () => {
+                conn.send({
+                    type: 'join',
+                    player: { id: myId, name: playerName, color: '' }
+                });
+            });
+            
+            conn.on('data', (data) => {
+                handleGameData(data, conn);
+            });
         });
     }
 
-    function updateLobbyPlayers() {
-        const listDiv = document.getElementById('playersList');
-        listDiv.innerHTML = '<h4>👥 اللاعبين:</h4>';
-        players.forEach(p => {
-            listDiv.innerHTML += `<div style="margin:5px; padding:8px; background:rgba(255,255,255,0.1); border-radius:8px;">${p.name} ${p.id === myPlayerId ? '(أنت)' : ''}</div>`;
-        });
-    }
-
-    function startOnlineGame() {
-        if(isHost) {
-            socket.emit('start-game', { roomId });
+    function handleGameData(data, conn) {
+        switch(data.type) {
+            case 'init':
+                players = data.players;
+                properties = data.properties;
+                players.push({ id: myId, name: "اللاعب الجديد", money: 1500, position: 0, properties: [], isActive: true, color: playerColors[players.length] });
+                sendToHost({ type: 'player-joined', player: players[players.length-1] });
+                renderBoard();
+                updateUI();
+                break;
+                
+            case 'player-joined':
+                players.push(data.player);
+                updateWaitingPlayers();
+                break;
+                
+            case 'game-start':
+                gameStarted = true;
+                gameActive = true;
+                currentPlayer = 0;
+                players = data.players;
+                properties = data.properties;
+                document.getElementById('hostWaiting').classList.add('hidden');
+                document.getElementById('joinWaiting').classList.add('hidden');
+                document.getElementById('hostMenu').classList.add('hidden');
+                document.getElementById('joinMenu').classList.add('hidden');
+                document.getElementById('gameArea').classList.remove('hidden');
+                myTurn = players[currentPlayer]?.id === myId;
+                renderBoard();
+                updateUI();
+                addLog(`🎉 بدأت اللعبة!`, true);
+                break;
+                
+            case 'game-state':
+                players = data.players;
+                properties = data.properties;
+                currentPlayer = data.currentPlayer;
+                diceRolledThisTurn = data.diceRolledThisTurn;
+                gameActive = data.gameActive;
+                myTurn = players[currentPlayer]?.id === myId;
+                renderBoard();
+                updateUI();
+                if(data.message) addLog(data.message, true);
+                break;
+                
+            case 'dice-result':
+                addLog(`🎲 ${data.playerName} رمى: ${data.dice1} + ${data.dice2} = ${data.steps}`);
+                break;
+                
+            case 'purchase-request':
+                currentPropertyIndex = data.propertyId;
+                showPurchaseModal(properties[currentPropertyIndex].name, properties[currentPropertyIndex].price);
+                break;
         }
     }
 
-    function startGameWithData(data) {
-        players = data.players;
-        properties = data.properties;
-        currentPlayer = data.currentPlayer;
-        gameActive = true;
-        gameStarted = true;
-        
-        document.getElementById('lobbyPanel').classList.add('hidden');
-        document.getElementById('gameArea').classList.remove('hidden');
-        
-        renderBoard();
-        updateUI();
-        addLog(`🎉 بدأت اللعبة! ${players.length} لاعبين.`, true);
-        addLog(`💰 ${players[currentPlayer]?.name} يبدأ اللعب!`, true);
-        
-        // تحديد ما إذا كان دور اللاعب الحالي
-        myTurn = players[currentPlayer]?.id === myPlayerId;
-        if(myTurn) {
-            addLog(`🎲 دورك الآن! اضغط على زر النرد`, true);
+    function updateWaitingPlayers() {
+        const div = document.getElementById('waitingPlayers');
+        if(div) {
+            div.innerHTML = '<h4>👥 اللاعبين:</h4>';
+            players.forEach(p => {
+                div.innerHTML += `<div style="margin:5px; padding:5px; background:rgba(255,255,255,0.1); border-radius:5px;">${p.name} ${p.id === myId ? '(أنت)' : ''}</div>`;
+            });
         }
     }
 
-    // استقبال الأحداث من السيرفر
-    function setupSocketEvents() {
-        if(!socket) return;
-        
-        socket.on('action-update', (data) => {
-            switch(data.action) {
-                case 'move':
-                    players = data.players;
-                    properties = data.properties;
-                    currentPlayer = data.currentPlayer;
-                    diceRolledThisTurn = data.diceRolledThisTurn;
-                    myTurn = players[currentPlayer]?.id === myPlayerId;
-                    renderBoard();
-                    updateUI();
-                    addLog(data.message, true);
-                    break;
-                case 'dice-rolled':
-                    addLog(`🎲 ${data.playerName} رمى: ${data.dice1} + ${data.dice2} = ${data.steps}`);
-                    break;
-                case 'purchase':
-                    players = data.players;
-                    properties = data.properties;
-                    renderBoard();
-                    updateUI();
-                    addLog(data.message, true);
-                    break;
-                case 'build':
-                    players = data.players;
-                    properties = data.properties;
-                    renderBoard();
-                    updateUI();
-                    addLog(data.message, true);
-                    break;
-                case 'turn-ended':
-                    players = data.players;
-                    currentPlayer = data.currentPlayer;
-                    diceRolledThisTurn = false;
-                    doubleCount = 0;
-                    myTurn = players[currentPlayer]?.id === myPlayerId;
-                    renderBoard();
-                    updateUI();
-                    addLog(`🔄 دور ${players[currentPlayer]?.name} يبدأ الآن`, true);
-                    if(myTurn) addLog(`🎲 دورك الآن!`, true);
-                    break;
-                case 'game-over':
-                    gameActive = false;
-                    addLog(`🏆 ${data.winner} فاز باللعبة! 🏆`, true);
-                    alert(`🏆 الفائز هو ${data.winner}! 🏆`);
-                    break;
-            }
-        });
+    function startGame() {
+        if(isHostPlayer && players.length >= 2) {
+            sendToAll({ type: 'game-start', players: players, properties: properties });
+            gameStarted = true;
+            gameActive = true;
+            currentPlayer = 0;
+            document.getElementById('hostWaiting').classList.add('hidden');
+            document.getElementById('hostMenu').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            myTurn = players[currentPlayer]?.id === myId;
+            renderBoard();
+            updateUI();
+            addLog(`🎉 بدأت اللعبة!`, true);
+        } else {
+            alert("يجب أن يكون هناك على الأقل لاعبين لبدء اللعبة!");
+        }
     }
 
-    // ===================== ألعاب اللعبة (ترسل إلى السيرفر) =====================
+    // ===================== حركات اللعبة =====================
     function rollDice() {
         if(!gameActive || !myTurn || diceRolledThisTurn) return;
-        sendGameAction('roll-dice', { playerId: myPlayerId });
+        
+        const dice1 = Math.floor(Math.random() * 6) + 1;
+        const dice2 = Math.floor(Math.random() * 6) + 1;
+        const steps = dice1 + dice2;
+        
+        sendToAll({ type: 'dice-result', playerName: players.find(p => p.id === myId)?.name, dice1, dice2, steps });
+        
+        // تحديث الموقع
+        const player = players.find(p => p.id === myId);
+        const newPos = (player.position + steps) % 40;
+        player.position = newPos;
+        
+        diceRolledThisTurn = true;
+        sendGameState();
+        renderBoard();
     }
 
     function endTurn() {
         if(!gameActive || !myTurn || !diceRolledThisTurn) return;
-        sendGameAction('end-turn', { playerId: myPlayerId });
+        
+        currentPlayer = (currentPlayer + 1) % players.length;
+        diceRolledThisTurn = false;
+        doubleCount = 0;
+        myTurn = players[currentPlayer]?.id === myId;
+        
+        sendGameState();
+        addLog(`🔄 دور ${players[currentPlayer]?.name} يبدأ الآن`, true);
     }
 
     function confirmPurchase(buy) {
         if(buy) {
-            sendGameAction('buy-property', { playerId: myPlayerId, propertyId: currentPropertyIndex });
+            const player = players.find(p => p.id === myId);
+            const prop = properties[currentPropertyIndex];
+            if(player.money >= prop.price) {
+                player.money -= prop.price;
+                prop.owner = players.findIndex(p => p.id === myId);
+                player.properties.push(currentPropertyIndex);
+                addLog(`🏠 ${player.name} اشترى ${prop.name} بـ ${prop.price} دينار!`, true);
+            }
         }
         document.getElementById('purchaseModal').classList.add('hidden');
         waitingForPurchase = false;
+        sendGameState();
     }
 
-    function buildHouse(propertyId) {
-        sendGameAction('build', { playerId: myPlayerId, propertyId, type: 'house' });
-        closeBuildModal();
-    }
-
-    function sellHouse(propertyId) {
-        sendGameAction('sell', { playerId: myPlayerId, propertyId });
-        closeBuildModal();
+    function showPurchaseModal(propertyName, price) {
+        waitingForPurchase = true;
+        document.getElementById('purchaseText').innerHTML = `شراء ${propertyName}؟<br>السعر: ${price} دينار`;
+        document.getElementById('purchaseModal').classList.remove('hidden');
     }
 
     function showMyProperties() {
-        const player = players.find(p => p.id === myPlayerId);
+        const player = players.find(p => p.id === myId);
         if(!player) return;
         alert(player.properties.map(pid => {
             const prop = properties[pid];
-            return `${prop.name} - ${prop.houseCount === 5 ? '🏨 فندق' : prop.houseCount > 0 ? `🏠${'🏠'.repeat(prop.houseCount-1)}` : 'لا بيوت'} - إيجار: ${calculateRent(prop)} د.أ`;
+            return `${prop.name} - ${prop.houseCount === 5 ? '🏨 فندق' : prop.houseCount > 0 ? `🏠${'🏠'.repeat(prop.houseCount-1)}` : 'لا بيوت'}`;
         }).join('\n') || 'لا تمتلك عقارات بعد');
     }
 
     function showBuildMenu() {
-        const player = players.find(p => p.id === myPlayerId);
-        if(!player) return;
-        
-        const buildList = document.getElementById('buildList');
-        buildList.innerHTML = '';
-        
-        player.properties.forEach(propId => {
-            const prop = properties[propId];
-            if(prop.type !== 'property') return;
-            
-            const propDiv = document.createElement('div');
-            propDiv.className = 'property-list-item';
-            let housesText = prop.houseCount === 5 ? '🏨 فندق' : prop.houseCount > 0 ? '🏠'.repeat(prop.houseCount) : 'لا بيوت';
-            
-            propDiv.innerHTML = `
-                <div><strong>${prop.name}</strong></div>
-                <div>🏠 البيوت: ${housesText}</div>
-                <div>💰 الإيجار: ${calculateRent(prop)} د.أ</div>
-                ${prop.houseCount < 5 ? `<button onclick="buildHouse(${propId})" style="background:#4caf50; margin:5px;">🏠 بناء</button>` : ''}
-                ${prop.houseCount > 0 ? `<button onclick="sellHouse(${propId})" style="background:#ff9800; margin:5px;">💰 بيع</button>` : ''}
-            `;
-            buildList.appendChild(propDiv);
-        });
-        
-        document.getElementById('buildModal').classList.remove('hidden');
+        alert("🏗️ نظام البناء:\n\nاشتري جميع عقارات نفس اللون، ثم ابنِ بيوت وفنادق لزيادة الإيجار!");
     }
 
     function closeBuildModal() {
         document.getElementById('buildModal').classList.add('hidden');
     }
 
+    function sendGameState() {
+        const state = {
+            type: 'game-state',
+            players: players,
+            properties: properties,
+            currentPlayer: currentPlayer,
+            diceRolledThisTurn: diceRolledThisTurn,
+            gameActive: gameActive
+        };
+        sendToAll(state);
+    }
+
     function exitGame() {
-        if(socket) socket.disconnect();
+        if(peer) peer.destroy();
         location.reload();
     }
 
     function showRules() {
-        alert("📖 قواعد لعبة مونوبولي عمان أونلاين:\n\n" +
+        alert("🎲 قواعد مونوبولي عمان:\n\n" +
               "💰 كل لاعب يبدأ بـ 1500 دينار\n" +
               "🎲 رمي النرد لتحريك القطعة\n" +
               "🏠 شراء العقارات غير المملوكة\n" +
-              "🏗️ امتلك مجموعة كاملة من نفس اللون لبناء البيوت والفنادق\n" +
+              "🏗️ امتلك جميع عقارات نفس اللون لبناء البيوت\n" +
               "💸 الإيجار يزيد مع كل بيت وفندق\n" +
-              "🏆 الفائز هو آخر لاعب لم يفلس");
+              "🏆 آخر لاعب لم يفلس هو الفائز");
     }
-
-    // تشغيل استقبال الأحداث
-    setupSocketEvents();
 </script>
 </body>
 </html>
