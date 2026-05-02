@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مونوبولي عمان - العب مع أصدقائك (Peer to Peer)</title>
+    <title>مونوبولي عمان - بناء المنازل والفنادق</title>
     <style>
         * {
             margin: 0;
@@ -28,6 +28,7 @@
             border-radius: 30px;
             padding: 30px;
             border: 3px solid #ffd700;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         .main-menu h1 {
@@ -36,22 +37,29 @@
             color: #ffd700;
         }
 
+        .main-menu h3 {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
         .menu-btn {
             display: block;
             width: 100%;
             padding: 20px;
             margin: 15px 0;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
             border: none;
             border-radius: 15px;
             font-size: 1.2em;
             font-weight: bold;
             color: #1a1a2e;
             cursor: pointer;
+            transition: transform 0.2s;
         }
 
         .menu-btn:hover {
             transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
 
         .game-container {
@@ -91,20 +99,13 @@
             font-weight: bold;
         }
 
-        .online-status {
-            background: #4caf50;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-        }
-
         .board {
             background: #0a2e1a;
             border-radius: 20px;
             padding: 15px;
             margin-bottom: 15px;
             overflow-x: auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 5px 20px rgba(0,0,0,0.4);
         }
 
         .amman-board {
@@ -112,6 +113,8 @@
             border-radius: 20px;
             padding: 15px;
             min-width: 750px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .board-row {
@@ -129,6 +132,7 @@
             font-weight: bold;
             color: #1a1a2e;
             min-width: 110px;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .side-cell {
@@ -141,6 +145,21 @@
             flex: 1;
             min-width: 70px;
             position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .side-cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .cell-price {
+            font-size: 0.65em;
+            color: #2e7d32;
+            margin-top: 3px;
+            font-weight: bold;
         }
 
         .owner-tag {
@@ -151,12 +170,14 @@
             padding: 2px 5px;
             margin-top: 3px;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .houses-display {
             font-size: 0.6em;
             margin-top: 3px;
             color: #8B4513;
+            font-weight: bold;
         }
 
         .player-token-on-cell {
@@ -170,6 +191,7 @@
             text-align: center;
             margin: 0 1px;
             border: 1.5px solid white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .info-panel {
@@ -181,18 +203,19 @@
 
         .players-stats {
             margin-bottom: 15px;
-            max-height: 250px;
+            max-height: 280px;
             overflow-y: auto;
         }
 
         .player-card {
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
-            padding: 8px;
+            padding: 10px;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s;
         }
 
         .player-card.active {
@@ -200,9 +223,15 @@
             border: 2px solid #ffd700;
         }
 
+        .player-name {
+            font-weight: bold;
+            font-size: 1em;
+        }
+
         .player-money {
             color: #4caf50;
             font-weight: bold;
+            font-size: 1.1em;
         }
 
         .controls {
@@ -220,11 +249,21 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .controls button:hover:not(:disabled) {
+            transform: scale(1.02);
         }
 
         .controls button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .dice-area {
+            text-align: center;
+            margin-bottom: 15px;
         }
 
         .dice {
@@ -240,41 +279,49 @@
             font-size: 2.2em;
             font-weight: bold;
             color: #333;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: roll 0.3s ease-in-out;
         }
 
-        .connection-panel {
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 25px;
             text-align: center;
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .connection-panel input {
-            padding: 10px;
-            margin: 10px;
-            border-radius: 10px;
+        .modal button {
+            margin: 8px;
+            padding: 10px 18px;
             border: none;
-            width: 200px;
-            text-align: center;
-        }
-
-        .connection-panel button {
-            background: #ffd700;
-            border: none;
-            padding: 10px 20px;
             border-radius: 10px;
-            font-weight: bold;
             cursor: pointer;
+            font-weight: bold;
         }
 
-        .room-code {
-            font-size: 1.3em;
-            background: #1a1a2e;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px;
-            font-family: monospace;
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
         }
 
         .log-area {
@@ -297,28 +344,48 @@
             color: #ffd700;
         }
 
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 3px solid #ffd700;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            z-index: 1000;
-            min-width: 280px;
+        .properties-list {
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 999;
+        .property-item {
+            background: rgba(255,255,255,0.1);
+            margin: 5px;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        .build-item {
+            background: rgba(255,255,255,0.1);
+            margin: 8px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: right;
+        }
+
+        .build-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .sell-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
         }
 
         .hidden {
@@ -326,51 +393,47 @@
         }
 
         @media (max-width: 768px) {
-            .side-cell { min-width: 55px; font-size: 0.6em; padding: 6px 2px; }
-            .corner-cell { min-width: 80px; font-size: 0.7em; padding: 8px 3px; }
-            .player-token-on-cell { width: 18px; height: 18px; font-size: 8px; line-height: 18px; }
+            .side-cell {
+                min-width: 55px;
+                font-size: 0.6em;
+                padding: 6px 2px;
+            }
+            .corner-cell {
+                min-width: 80px;
+                font-size: 0.7em;
+                padding: 8px 3px;
+            }
+            .player-token-on-cell {
+                width: 18px;
+                height: 18px;
+                font-size: 8px;
+                line-height: 18px;
+            }
+            .controls button {
+                font-size: 0.75em;
+                padding: 6px;
+            }
+            .dice {
+                width: 45px;
+                height: 45px;
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
 <body>
 
 <div id="mainMenu" class="main-menu">
-    <h1>🏆 مونوبولي عمان أونلاين 🏆</h1>
-    <h3>العب مع أصدقائك - اتصال مباشر</h3>
-    <button class="menu-btn" onclick="showHostMenu()">🎮 إنشاء غرفة (Host)</button>
-    <button class="menu-btn" onclick="showJoinMenu()">🚪 دخول إلى غرفة (Join)</button>
+    <h1>🏆 مونوبولي عمان 🏆</h1>
+    <h3>لعبة العقارات الأردنية - بناء المنازل والفنادق</h3>
+    <button class="menu-btn" onclick="startGameSetup()">🎮 بدء لعبة جديدة</button>
     <button class="menu-btn" onclick="showRules()">📖 قواعد اللعبة</button>
-</div>
-
-<div id="hostMenu" class="main-menu hidden">
-    <button class="back-btn" onclick="backToMain()" style="margin-bottom:20px;">🔙 رجوع</button>
-    <h2>🏠 إنشاء غرفة جديدة</h2>
-    <input type="text" id="hostName" placeholder="اسمك" value="المالك">
-    <button onclick="createRoom()" style="background:#4caf50;">✨ إنشاء غرفة</button>
-    <div id="hostWaiting" class="hidden" style="margin-top:20px;">
-        <div class="room-code" id="roomCodeDisplay"></div>
-        <p>📋 أعط هذا الكود لصديقك للانضمام</p>
-        <div id="waitingPlayers"></div>
-        <button onclick="startGame()" id="startGameBtn" style="background:#ffd700;">🎮 بدء اللعبة</button>
-    </div>
-</div>
-
-<div id="joinMenu" class="main-menu hidden">
-    <button class="back-btn" onclick="backToMain()" style="margin-bottom:20px;">🔙 رجوع</button>
-    <h2>🚪 دخول إلى غرفة</h2>
-    <input type="text" id="joinCode" placeholder="أدخل كود الغرفة">
-    <input type="text" id="joinName" placeholder="اسمك" value="زائر">
-    <button onclick="joinRoom()" style="background:#2196F3;">🔗 انضمام</button>
-    <div id="joinWaiting" class="hidden" style="margin-top:20px;">
-        <p>⏳ جاري الاتصال... انتظر بدء اللعبة</p>
-    </div>
 </div>
 
 <div id="gameArea" class="game-container hidden">
     <div class="game-header">
-        <button class="back-btn" onclick="exitGame()">🏠 القائمة الرئيسية</button>
+        <button class="back-btn" onclick="backToMenu()">🏠 القائمة الرئيسية</button>
         <div class="turn-indicator" id="turnIndicator"></div>
-        <div class="online-status" id="onlineStatus">🟢 متصل</div>
     </div>
 
     <div class="board">
@@ -379,16 +442,22 @@
 
     <div class="info-panel">
         <div class="controls">
-            <button id="rollBtn" onclick="rollDice()" disabled>🎲 رمي النرد</button>
+            <button id="rollBtn" onclick="rollDice()">🎲 رمي النرد</button>
             <button id="endTurnBtn" onclick="endTurn()" disabled>⏭️ إنهاء الدور</button>
             <button onclick="showMyProperties()">🏠 عقاراتي</button>
             <button onclick="showBuildMenu()">🏗️ بناء/بيع</button>
         </div>
 
+        <div class="dice-area" id="diceArea" style="display: none;">
+            <div class="dice" id="dice1">⚀</div>
+            <div class="dice" id="dice2">⚀</div>
+        </div>
+
         <div class="players-stats" id="playersStats"></div>
 
         <div class="log-area" id="logArea">
-            <div class="log-entry special">✨ مرحباً بك في مونوبولي عمان أونلاين! ✨</div>
+            <div class="log-entry special">✨ مرحباً بك في مونوبولي عمان! ✨</div>
+            <div class="log-entry special">🏗️ نظام البناء: امتلك جميع عقارات نفس اللون، ثم ابنِ بيوت وفنادق</div>
         </div>
     </div>
 </div>
@@ -396,67 +465,61 @@
 <div id="purchaseModal" class="hidden">
     <div class="overlay"></div>
     <div class="modal">
-        <h2>💰 شراء عقار</h2>
-        <p id="purchaseText"></p>
-        <button onclick="confirmPurchase(true)" style="background:#4caf50;">✅ شراء</button>
-        <button onclick="confirmPurchase(false)" style="background:#f44336;">❌ تخطي</button>
+        <h2 style="color:#ffd700;">💰 شراء عقار</h2>
+        <p id="purchaseText" style="margin:15px 0;"></p>
+        <button onclick="confirmPurchase(true)" style="background: #4caf50; color: white;">✅ شراء</button>
+        <button onclick="confirmPurchase(false)" style="background: #f44336; color: white;">❌ تخطي</button>
+    </div>
+</div>
+
+<div id="propertiesModal" class="hidden">
+    <div class="overlay"></div>
+    <div class="modal">
+        <h2 style="color:#ffd700;">🏠 عقاراتي</h2>
+        <div id="propertiesList" class="properties-list"></div>
+        <button onclick="closePropertiesModal()" style="background: #da291c; color: white;">إغلاق</button>
     </div>
 </div>
 
 <div id="buildModal" class="hidden">
     <div class="overlay"></div>
     <div class="modal">
-        <h2>🏗️ بناء وبيع</h2>
+        <h2 style="color:#ffd700;">🏗️ بناء وبيع المنازل</h2>
+        <p style="margin:5px 0; font-size:0.8em;">💰 سعر البيت = نصف سعر العقار | 🏨 الفندق = 4 أضعاف سعر البيت</p>
         <div id="buildList"></div>
-        <button onclick="closeBuildModal()" style="background:#da291c;">إغلاق</button>
+        <button onclick="closeBuildModal()" style="background: #da291c; color: white;">إغلاق</button>
     </div>
 </div>
 
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 <script>
-    // ===================== بيانات اللعبة =====================
-    let peer = null;
-    let connections = [];
-    let myId = null;
-    let isHostPlayer = false;
-    let gameStarted = false;
-    
-    let players = [];
-    let currentPlayer = 0;
-    let gameActive = false;
-    let diceRolledThisTurn = false;
-    let doubleCount = 0;
-    let waitingForPurchase = false;
-    let currentPropertyIndex = -1;
-    let myTurn = false;
-
-    // أسماء مناطق عمان
+    // ===================== أسماء مناطق عمان =====================
     const ammanPlaces = [
-        "🚀 الانطلاق", "شارع مكة", "❓ حظ", "شارع المدينة", "💸 ضريبة",
-        "🚆 مجمع الشمال", "شارع زهران", "❓ حظ", "شارع الرينبو", "شارع السلام",
-        "🏆 جائزة", "جبل الحسين", "⚡ كهرباء", "جبل اللويبدة", "جبل عمان",
-        "🚆 مجمع الجيزة", "عبدون", "❓ حظ", "الشميساني", "الربوة",
-        "🅿️ دوار الداخلية", "ضاحية الحسين", "❓ حظ", "خلدا", "تلاع العلي",
-        "🚆 مجمع رغدان", "الغاردنز", "الصويفية", "💧 مياه عمان", "الدوار السابع",
-        "🚔 سجن ماركا", "مرج الحمام", "ضاحية الرشيد", "❓ حظ", "مقابلين",
-        "🚆 مجمع جنوب", "❓ حظ", "أم أذينة", "💸 ضريبة", "خلدا الجديدة"
+        "🚀 نقطة الانطلاق", "شارع مكة", "❓ صندوق الحظ", "شارع المدينة المنورة", "💸 ضريبة الدخل",
+        "🚆 محطة مجمع الشمال", "شارع زهران", "❓ صندوق الحظ", "شارع الرينبو", "شارع السلام",
+        "🏆 جائزة مسجد الملك عبدالله", "جبل الحسين", "⚡ كهرباء عمان", "جبل اللويبدة", "جبل عمان",
+        "🚆 محطة مجمع الجيزة", "عبدون", "❓ صندوق الحظ", "الشميساني", "الربوة",
+        "🅿️ دوار الداخلية", "ضاحية الحسين", "❓ صندوق الحظ", "خلدا", "تلاع العلي",
+        "🚆 محطة مجمع رغدان", "الغاردنز", "الصويفية", "💧 مياه عمان", "الدوار السابع",
+        "🚔 اذهب للسجن - ماركا", "مرج الحمام", "ضاحية الرشيد", "❓ صندوق الحظ", "مقابلين",
+        "🚆 محطة مجمع جنوب", "❓ صندوق الحظ", "أم أذينة", "💸 ضريفة البلدية", "خلدا الجديدة"
     ];
 
     const ammanPrices = [
-        0, 70, 0, 90, 0, 220, 110, 0, 130, 150, 0, 170, 160, 190, 210,
-        220, 240, 0, 260, 280, 0, 300, 0, 320, 350, 220, 380, 410, 160, 430,
+        0, 70, 0, 90, 0, 220, 110, 0, 130, 150,
+        0, 170, 160, 190, 210, 220, 240, 0, 260, 280,
+        0, 300, 0, 320, 350, 220, 380, 410, 160, 430,
         0, 470, 500, 0, 540, 220, 0, 600, 0, 650
     ];
 
     const ammanRents = [
-        0, 6, 0, 8, 200, 30, 10, 0, 12, 14, 200, 16, 10, 18, 20,
-        30, 24, 0, 26, 28, 0, 30, 0, 32, 35, 30, 38, 45, 10, 50,
+        0, 6, 0, 8, 200, 30, 10, 0, 12, 14,
+        200, 16, 10, 18, 20, 30, 24, 0, 26, 28,
+        0, 30, 0, 32, 35, 30, 38, 45, 10, 50,
         0, 55, 60, 0, 65, 30, 0, 70, 150, 80
     ];
 
+    // أنواع الخانات
     const placeTypes = [];
-    const placeColors = [];
-    
     for(let i = 0; i < 40; i++) {
         if(i === 0) placeTypes[i] = "start";
         else if(i === 2 || i === 7 || i === 17 || i === 22 || i === 33 || i === 36) placeTypes[i] = "chance";
@@ -467,41 +530,113 @@
         else if(i === 5 || i === 15 || i === 25 || i === 35) placeTypes[i] = "railroad";
         else if(i === 12 || i === 28) placeTypes[i] = "utility";
         else placeTypes[i] = "property";
-        
-        if(i === 1 || i === 3) placeColors[i] = "#8B4513";
-        else if(i === 6 || i === 8 || i === 9) placeColors[i] = "#87CEEB";
-        else if(i === 11 || i === 13 || i === 14) placeColors[i] = "#FF69B4";
-        else if(i === 16 || i === 18 || i === 19) placeColors[i] = "#FF4500";
-        else if(i === 21 || i === 23 || i === 24) placeColors[i] = "#9370DB";
-        else if(i === 26 || i === 27 || i === 29) placeColors[i] = "#2E8B57";
-        else if(i === 31 || i === 32 || i === 34) placeColors[i] = "#1E90FF";
-        else if(i === 37 || i === 39) placeColors[i] = "#8B008B";
-        else if(i === 5 || i === 15 || i === 25 || i === 35) placeColors[i] = "#808080";
-        else if(i === 12 || i === 28) placeColors[i] = "#FFA500";
-        else placeColors[i] = "#D2B48C";
     }
 
+    // ألوان المناطق ومجموعات البناء
+    const placeColors = [
+        "#8B0000", "#8B4513", "#D2B48C", "#8B4513", "#FF6347",
+        "#808080", "#87CEEB", "#D2B48C", "#87CEEB", "#87CEEB",
+        "#FFD700", "#FF69B4", "#FFA500", "#FF69B4", "#FF69B4",
+        "#808080", "#FF4500", "#D2B48C", "#FF4500", "#FF4500",
+        "#90EE90", "#9370DB", "#D2B48C", "#9370DB", "#9370DB",
+        "#808080", "#2E8B57", "#2E8B57", "#4169E1", "#2E8B57",
+        "#FF0000", "#1E90FF", "#1E90FF", "#D2B48C", "#1E90FF",
+        "#808080", "#D2B48C", "#8B008B", "#FF6347", "#8B008B"
+    ];
+
+    // مجموعات الألوان للبناء
+    const colorGroups = {
+        "#8B4513": { name: "المناطق الشرقية", properties: [1, 3] },
+        "#87CEEB": { name: "المناطق الغربية", properties: [6, 8, 9] },
+        "#FF69B4": { name: "الأحياء التراثية", properties: [11, 13, 14] },
+        "#FF4500": { name: "المناطق التجارية", properties: [16, 18, 19] },
+        "#9370DB": { name: "الضواحي", properties: [21, 23, 24] },
+        "#2E8B57": { name: "المناطق الخضراء", properties: [26, 27, 29] },
+        "#1E90FF": { name: "المناطق الحديثة", properties: [31, 32, 34] },
+        "#8B008B": { name: "المناطق الفاخرة", properties: [37, 39] }
+    };
+
+    // بناء قائمة العقارات
     let properties = [];
     for(let i = 0; i < 40; i++) {
         properties.push({
-            id: i, name: ammanPlaces[i], type: placeTypes[i],
-            price: ammanPrices[i], rent: ammanRents[i],
-            houseCount: 0, owner: -1, color: placeColors[i]
+            id: i,
+            name: ammanPlaces[i],
+            type: placeTypes[i],
+            price: ammanPrices[i],
+            rent: ammanRents[i],
+            houseCount: 0, // 0-4 = عدد البيوت, 5 = فندق
+            owner: -1,
+            color: placeColors[i]
         });
     }
+
+    // ===================== متغيرات اللعبة =====================
+    let players = [];
+    let currentPlayer = 0;
+    let gameActive = false;
+    let diceRolledThisTurn = false;
+    let doubleCount = 0;
+    let waitingForPurchase = false;
+    let currentPropertyIndex = -1;
 
     const playerColors = ['#FF4444', '#44FF44', '#4444FF', '#FFFF44', '#FF44FF', '#44FFFF', '#FF8844', '#88FF44'];
     const playerShapes = ['🔴', '🟢', '🔵', '🟡', '🟣', '🩵', '🟠', '🟤'];
 
-    // دوال مساعدة
+    // ===================== دوال البناء =====================
+    function getHousePrice(propertyId) {
+        return Math.floor(properties[propertyId].price / 2);
+    }
+
+    function getHotelPrice(propertyId) {
+        return getHousePrice(propertyId) * 4;
+    }
+
+    // التحقق من امتلاك مجموعة كاملة من نفس اللون
+    function ownsCompleteColorGroup(playerId, color) {
+        const group = colorGroups[color];
+        if(!group) return false;
+        
+        for(let propId of group.properties) {
+            if(properties[propId].owner !== playerId) return false;
+        }
+        return true;
+    }
+
+    // التحقق من إمكانية البناء على عقار
+    function canBuildOnProperty(playerId, propertyId) {
+        const prop = properties[propertyId];
+        if(prop.type !== 'property') return false;
+        if(prop.owner !== playerId) return false;
+        if(prop.houseCount >= 5) return false;
+        
+        // لازم يمتلك جميع عقارات المجموعة
+        if(!ownsCompleteColorGroup(playerId, prop.color)) return false;
+        
+        // التحقق من توازن البيوت بين عقارات المجموعة
+        const group = colorGroups[prop.color];
+        if(group) {
+            for(let pId of group.properties) {
+                const otherProp = properties[pId];
+                if(otherProp.owner === playerId) {
+                    if(Math.abs(otherProp.houseCount - prop.houseCount) > 1) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // حساب الإيجار مع البيوت والفندق
     function calculateRent(property) {
         if(property.type === 'railroad') {
-            let count = properties.filter(p => p.type === 'railroad' && p.owner === property.owner).length;
-            return [30, 60, 120, 240][count - 1] || 30;
+            const owner = property.owner;
+            let railroadCount = properties.filter(p => p.type === 'railroad' && p.owner === owner).length;
+            return [30, 60, 120, 240][railroadCount - 1] || 30;
         }
         if(property.type === 'utility') {
-            let count = properties.filter(p => p.type === 'utility' && p.owner === property.owner).length;
-            return property.rent * (count === 2 ? 10 : 4);
+            const owner = property.owner;
+            let utilityCount = properties.filter(p => p.type === 'utility' && p.owner === owner).length;
+            return property.rent * (utilityCount === 2 ? 10 : 4);
         }
         if(property.type === 'property') {
             if(property.houseCount === 0) return property.rent;
@@ -514,27 +649,78 @@
         return property.rent;
     }
 
-    function sendToAll(data) {
-        connections.forEach(conn => {
-            if(conn.open) conn.send(data);
-        });
-    }
-
-    function sendToHost(data) {
-        if(connections[0] && connections[0].open) connections[0].send(data);
-    }
-
-    function updateGameState(state) {
-        players = state.players;
-        properties = state.properties;
-        currentPlayer = state.currentPlayer;
-        gameActive = state.gameActive;
-        if(!waitingForPurchase) {
-            renderBoard();
-            updateUI();
+    // بناء منزل
+    function buildHouse(propertyId) {
+        const prop = properties[propertyId];
+        const player = players[currentPlayer];
+        const housePrice = getHousePrice(propertyId);
+        
+        if(!canBuildOnProperty(currentPlayer, propertyId)) {
+            addLog(`❌ لا يمكن بناء منزل على ${prop.name} - يجب امتلاك جميع عقارات المجموعة أولاً!`, true);
+            return false;
+        }
+        
+        if(prop.houseCount === 4) {
+            const hotelPrice = getHotelPrice(propertyId);
+            if(player.money >= hotelPrice) {
+                player.money -= hotelPrice;
+                prop.houseCount = 5;
+                addLog(`🏨 ${player.name} بنى فندقاً فاخراً في ${prop.name} بـ ${hotelPrice} دينار! الإيجار الآن ${calculateRent(prop)} دينار`, true);
+                updateUI();
+                renderBoard();
+                return true;
+            } else {
+                addLog(`💰 رصيد غير كافٍ لبناء فندق (تحتاج ${hotelPrice} دينار)`, true);
+                return false;
+            }
+        } else {
+            if(player.money >= housePrice) {
+                player.money -= housePrice;
+                prop.houseCount++;
+                addLog(`🏠 ${player.name} بنى بيتاً في ${prop.name} (الآن ${prop.houseCount} بيوت). الإيجار الآن ${calculateRent(prop)} دينار`, true);
+                updateUI();
+                renderBoard();
+                return true;
+            } else {
+                addLog(`💰 رصيد غير كافٍ لبناء منزل (تحتاج ${housePrice} دينار)`, true);
+                return false;
+            }
         }
     }
 
+    // بيع منزل
+    function sellHouse(propertyId) {
+        const prop = properties[propertyId];
+        const player = players[currentPlayer];
+        
+        if(prop.owner !== currentPlayer) {
+            addLog(`❌ ${prop.name} ليس ملكك!`, true);
+            return false;
+        }
+        
+        if(prop.houseCount === 0) {
+            addLog(`❌ لا توجد منازل لبيعها في ${prop.name}`, true);
+            return false;
+        }
+        
+        const housePrice = getHousePrice(propertyId);
+        
+        if(prop.houseCount === 5) {
+            const hotelPrice = getHotelPrice(propertyId);
+            player.money += hotelPrice;
+            prop.houseCount = 0;
+            addLog(`🏨 ${player.name} باع الفندق في ${prop.name} وحصل على ${hotelPrice} دينار`, true);
+        } else {
+            player.money += housePrice;
+            prop.houseCount--;
+            addLog(`🏠 ${player.name} باع بيتاً في ${prop.name} وحصل على ${housePrice} دينار`, true);
+        }
+        updateUI();
+        renderBoard();
+        return true;
+    }
+
+    // ===================== رسم رقعة عمان =====================
     function renderBoard() {
         const board = document.getElementById('ammanBoard');
         if(!board) return;
@@ -564,25 +750,36 @@
         let tokens = '';
         players.forEach((player, idx) => {
             if(player.isActive && player.position === position) {
-                tokens += `<span class="player-token-on-cell" style="background:${player.color};">${idx+1}</span>`;
+                tokens += `<span class="player-token-on-cell" style="background:${player.color};" title="${player.name}">${idx+1}</span>`;
             }
         });
         
         let className = (position === 0 || position === 10 || position === 20 || position === 30) ? 'corner-cell' : 'side-cell';
         let bgStyle = className === 'corner-cell' ? '' : `background:${prop.color};`;
         
+        let priceHtml = '';
+        if(prop.price > 0) {
+            priceHtml = `<div class="cell-price">💰 ${prop.price} د.أ</div>`;
+        }
+        
         let ownerHtml = '';
-        if(owner) ownerHtml = `<div class="owner-tag" style="background:${owner.color};">${owner.name}</div>`;
+        if(owner) {
+            ownerHtml = `<div class="owner-tag" style="background:${owner.color};">${owner.name}</div>`;
+        }
         
         let housesHtml = '';
         if(prop.type === 'property' && prop.houseCount > 0) {
-            housesHtml = `<div class="houses-display">${prop.houseCount === 5 ? '🏨 فندق' : '🏠'.repeat(prop.houseCount)}</div>`;
+            if(prop.houseCount === 5) {
+                housesHtml = `<div class="houses-display">🏨 فندق</div>`;
+            } else {
+                housesHtml = `<div class="houses-display">🏠${'🏠'.repeat(prop.houseCount-1)}</div>`;
+            }
         }
         
         return `
             <div class="${className}" style="${bgStyle}">
-                <div style="font-size:0.7em; font-weight:bold;">${prop.name}</div>
-                ${prop.price > 0 ? `<div style="font-size:0.6em;">💰${prop.price}</div>` : ''}
+                <div style="font-size:0.7em; font-weight:bold; line-height:1.2;">${prop.name}</div>
+                ${priceHtml}
                 ${ownerHtml}
                 ${housesHtml}
                 <div style="margin-top: 4px;">${tokens}</div>
@@ -590,9 +787,69 @@
         `;
     }
 
+    // ===================== بدء اللعبة =====================
+    function startGameSetup() {
+        let numPlayers = prompt("كم عدد اللاعبين؟ (2-8)", "4");
+        numPlayers = Math.min(8, Math.max(2, parseInt(numPlayers) || 4));
+        
+        players = [];
+        for(let i = 0; i < numPlayers; i++) {
+            let name = prompt(`اسم اللاعب ${i+1}:`, `لاعب ${i+1}`);
+            players.push({
+                id: i,
+                name: name || `لاعب ${i+1}`,
+                money: 1500,
+                position: 0,
+                properties: [],
+                color: playerColors[i % playerColors.length],
+                inJail: false,
+                jailTurns: 0,
+                isActive: true
+            });
+        }
+        
+        for(let i = 0; i < properties.length; i++) {
+            properties[i].owner = -1;
+            properties[i].houseCount = 0;
+        }
+        
+        currentPlayer = 0;
+        gameActive = true;
+        diceRolledThisTurn = false;
+        doubleCount = 0;
+        waitingForPurchase = false;
+        
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('gameArea').classList.remove('hidden');
+        
+        renderBoard();
+        updateUI();
+        addLog(`🎉 أهلاً وسهلاً! ${players.length} لاعبين في مونوبولي عمان.`);
+        addLog(`💰 ${players[0].name} يبدأ اللعب!`, true);
+        addLog(`🏗️ نظام البناء: اشتري جميع عقارات نفس اللون، ثم ابنِ بيوت وفنادق لزيادة الإيجار!`, true);
+    }
+
+    function backToMenu() {
+        if(confirm("هل تريد العودة للقائمة الرئيسية؟")) {
+            location.reload();
+        }
+    }
+
+    function showRules() {
+        alert("📖 قواعد لعبة مونوبولي عمان - النسخة الكاملة:\n\n" +
+              "💰 1⃣ كل لاعب يبدأ بـ 1500 دينار أردني\n" +
+              "🎲 2⃣ رمي النرد لتحريك القطعة\n" +
+              "🏠 3⃣ شراء العقارات غير المملوكة\n" +
+              "🏗️ 4⃣ البناء: امتلك جميع عقارات نفس اللون، ثم ابنِ بيوت\n" +
+              "🏨 5⃣ بعد 4 بيوت، يمكنك بناء فندق\n" +
+              "💸 6⃣ الإيجار يزيد مع كل بيت وفندق\n" +
+              "🚔 7⃣ السجن يمنعك من اللعب لمدة 3 أدوار\n" +
+              "🏆 8⃣ الفائز هو آخر لاعب لم يفلس\n\n" +
+              "📍 أسعار البناء: البيت = نصف سعر العقار، الفندق = سعر 4 بيوت");
+    }
+
     function updateUI() {
         const statsDiv = document.getElementById('playersStats');
-        if(!statsDiv) return;
         statsDiv.innerHTML = '';
         
         players.forEach((player, idx) => {
@@ -600,20 +857,20 @@
             playerCard.className = `player-card ${idx === currentPlayer && gameActive ? 'active' : ''}`;
             playerCard.innerHTML = `
                 <div>
-                    <div style="color:${player.color}">${playerShapes[idx]} ${player.name}</div>
-                    <div style="font-size:0.7em;">🏠 ${player.properties.length}</div>
+                    <div class="player-name" style="color:${player.color}">${playerShapes[idx]} ${player.name}</div>
+                    <div style="font-size:0.75em;">🏠 ${player.properties.length} عقار</div>
                 </div>
-                <div class="player-money">💰 ${player.money}</div>
+                <div class="player-money">💰 ${player.money} د.أ</div>
             `;
             statsDiv.appendChild(playerCard);
         });
         
-        document.getElementById('turnIndicator').innerHTML = `🎮 دور: ${players[currentPlayer]?.name || '...'}`;
+        document.getElementById('turnIndicator').innerHTML = `🎮 دور: ${players[currentPlayer].name}`;
         
         const rollBtn = document.getElementById('rollBtn');
         const endTurnBtn = document.getElementById('endTurnBtn');
         
-        if(gameActive && myTurn && players[currentPlayer]?.id === myId) {
+        if(gameActive && players[currentPlayer].isActive) {
             rollBtn.disabled = diceRolledThisTurn;
             endTurnBtn.disabled = !diceRolledThisTurn;
         } else {
@@ -624,289 +881,411 @@
 
     function addLog(message, isSpecial = false) {
         const logArea = document.getElementById('logArea');
-        if(!logArea) return;
         const logEntry = document.createElement('div');
         logEntry.className = `log-entry ${isSpecial ? 'special' : ''}`;
         logEntry.textContent = message;
         logArea.appendChild(logEntry);
         logArea.scrollTop = logArea.scrollHeight;
-    }
-
-    // ===================== إنشاء غرفة =====================
-    function showHostMenu() {
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('hostMenu').classList.remove('hidden');
-    }
-
-    function showJoinMenu() {
-        document.getElementById('mainMenu').classList.add('hidden');
-        document.getElementById('joinMenu').classList.remove('hidden');
-    }
-
-    function backToMain() {
-        document.getElementById('hostMenu').classList.add('hidden');
-        document.getElementById('joinMenu').classList.add('hidden');
-        document.getElementById('mainMenu').classList.remove('hidden');
-        if(peer) peer.destroy();
-    }
-
-    function createRoom() {
-        const playerName = document.getElementById('hostName').value.trim() || "المالك";
         
-        peer = new Peer();
-        
-        peer.on('open', (id) => {
-            myId = id;
-            isHostPlayer = true;
-            
-            document.getElementById('roomCodeDisplay').innerHTML = `🔑 كود الغرفة: <strong>${id}</strong>`;
-            document.getElementById('hostWaiting').classList.remove('hidden');
-            
-            // إضافة نفسك كلاعب
-            players = [{
-                id: myId,
-                name: playerName,
-                money: 1500,
-                position: 0,
-                properties: [],
-                color: playerColors[0],
-                isActive: true
-            }];
-            updateWaitingPlayers();
-        });
-        
-        peer.on('connection', (conn) => {
-            connections.push(conn);
-            
-            conn.on('data', (data) => {
-                handleGameData(data, conn);
-            });
-            
-            conn.on('open', () => {
-                // إرسال حالة اللعبة الحالية للاعب الجديد
-                conn.send({
-                    type: 'init',
-                    players: players,
-                    properties: properties,
-                    myId: conn.peer
-                });
-            });
-        });
+        while(logArea.children.length > 50) {
+            logArea.removeChild(logArea.firstChild);
+        }
     }
 
-    function joinRoom() {
-        const roomCode = document.getElementById('joinCode').value.trim();
-        const playerName = document.getElementById('joinName').value.trim() || "زائر";
-        
-        if(!roomCode) {
-            alert("أدخل كود الغرفة!");
+    // ===================== رمي النرد =====================
+    async function rollDice() {
+        if(!gameActive || diceRolledThisTurn || waitingForPurchase) return;
+        if(players[currentPlayer].inJail) {
+            handleJailTurn();
             return;
         }
         
-        peer = new Peer();
-        
-        peer.on('open', (id) => {
-            myId = id;
-            isHostPlayer = false;
-            
-            document.getElementById('joinWaiting').classList.remove('hidden');
-            
-            const conn = peer.connect(roomCode);
-            connections.push(conn);
-            
-            conn.on('open', () => {
-                conn.send({
-                    type: 'join',
-                    player: { id: myId, name: playerName, color: '' }
-                });
-            });
-            
-            conn.on('data', (data) => {
-                handleGameData(data, conn);
-            });
-        });
-    }
-
-    function handleGameData(data, conn) {
-        switch(data.type) {
-            case 'init':
-                players = data.players;
-                properties = data.properties;
-                players.push({ id: myId, name: "اللاعب الجديد", money: 1500, position: 0, properties: [], isActive: true, color: playerColors[players.length] });
-                sendToHost({ type: 'player-joined', player: players[players.length-1] });
-                renderBoard();
-                updateUI();
-                break;
-                
-            case 'player-joined':
-                players.push(data.player);
-                updateWaitingPlayers();
-                break;
-                
-            case 'game-start':
-                gameStarted = true;
-                gameActive = true;
-                currentPlayer = 0;
-                players = data.players;
-                properties = data.properties;
-                document.getElementById('hostWaiting').classList.add('hidden');
-                document.getElementById('joinWaiting').classList.add('hidden');
-                document.getElementById('hostMenu').classList.add('hidden');
-                document.getElementById('joinMenu').classList.add('hidden');
-                document.getElementById('gameArea').classList.remove('hidden');
-                myTurn = players[currentPlayer]?.id === myId;
-                renderBoard();
-                updateUI();
-                addLog(`🎉 بدأت اللعبة!`, true);
-                break;
-                
-            case 'game-state':
-                players = data.players;
-                properties = data.properties;
-                currentPlayer = data.currentPlayer;
-                diceRolledThisTurn = data.diceRolledThisTurn;
-                gameActive = data.gameActive;
-                myTurn = players[currentPlayer]?.id === myId;
-                renderBoard();
-                updateUI();
-                if(data.message) addLog(data.message, true);
-                break;
-                
-            case 'dice-result':
-                addLog(`🎲 ${data.playerName} رمى: ${data.dice1} + ${data.dice2} = ${data.steps}`);
-                break;
-                
-            case 'purchase-request':
-                currentPropertyIndex = data.propertyId;
-                showPurchaseModal(properties[currentPropertyIndex].name, properties[currentPropertyIndex].price);
-                break;
-        }
-    }
-
-    function updateWaitingPlayers() {
-        const div = document.getElementById('waitingPlayers');
-        if(div) {
-            div.innerHTML = '<h4>👥 اللاعبين:</h4>';
-            players.forEach(p => {
-                div.innerHTML += `<div style="margin:5px; padding:5px; background:rgba(255,255,255,0.1); border-radius:5px;">${p.name} ${p.id === myId ? '(أنت)' : ''}</div>`;
-            });
-        }
-    }
-
-    function startGame() {
-        if(isHostPlayer && players.length >= 2) {
-            sendToAll({ type: 'game-start', players: players, properties: properties });
-            gameStarted = true;
-            gameActive = true;
-            currentPlayer = 0;
-            document.getElementById('hostWaiting').classList.add('hidden');
-            document.getElementById('hostMenu').classList.add('hidden');
-            document.getElementById('gameArea').classList.remove('hidden');
-            myTurn = players[currentPlayer]?.id === myId;
-            renderBoard();
-            updateUI();
-            addLog(`🎉 بدأت اللعبة!`, true);
-        } else {
-            alert("يجب أن يكون هناك على الأقل لاعبين لبدء اللعبة!");
-        }
-    }
-
-    // ===================== حركات اللعبة =====================
-    function rollDice() {
-        if(!gameActive || !myTurn || diceRolledThisTurn) return;
+        const diceArea = document.getElementById('diceArea');
+        diceArea.style.display = 'block';
         
         const dice1 = Math.floor(Math.random() * 6) + 1;
         const dice2 = Math.floor(Math.random() * 6) + 1;
+        
+        animateDice(dice1, dice2);
+        
+        await sleep(700);
+        
+        const isDouble = dice1 === dice2;
         const steps = dice1 + dice2;
         
-        sendToAll({ type: 'dice-result', playerName: players.find(p => p.id === myId)?.name, dice1, dice2, steps });
+        addLog(`🎲 ${players[currentPlayer].name} رمى: ${dice1} + ${dice2} = ${steps} ${isDouble ? '(مزدوج! 🎯)' : ''}`);
         
-        // تحديث الموقع
-        const player = players.find(p => p.id === myId);
-        const newPos = (player.position + steps) % 40;
-        player.position = newPos;
+        if(isDouble) {
+            doubleCount++;
+            if(doubleCount === 3) {
+                addLog(`🚔 ${players[currentPlayer].name} رمى مزدوج 3 مرات -> يذهب إلى سجن ماركا!`, true);
+                goToJail(currentPlayer);
+                diceRolledThisTurn = true;
+                updateUI();
+                return;
+            }
+        } else {
+            doubleCount = 0;
+        }
+        
+        await movePlayer(currentPlayer, steps);
         
         diceRolledThisTurn = true;
-        sendGameState();
+        
+        if(isDouble && !players[currentPlayer].inJail) {
+            addLog(`🎲 ${players[currentPlayer].name} حصل على مزدوج -> يلعب مرة أخرى!`, true);
+            diceRolledThisTurn = false;
+            document.getElementById('endTurnBtn').disabled = true;
+        }
+        
+        updateUI();
+        renderBoard();
+        
+        if(diceRolledThisTurn && !isDouble) {
+            document.getElementById('endTurnBtn').disabled = false;
+        }
+    }
+
+    function animateDice(value1, value2) {
+        const dice1El = document.getElementById('dice1');
+        const dice2El = document.getElementById('dice2');
+        
+        const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+        dice1El.textContent = diceFaces[value1 - 1];
+        dice2El.textContent = diceFaces[value2 - 1];
+        
+        dice1El.style.animation = 'none';
+        dice2El.style.animation = 'none';
+        setTimeout(() => {
+            dice1El.style.animation = 'roll 0.3s ease-in-out';
+            dice2El.style.animation = 'roll 0.3s ease-in-out';
+        }, 10);
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function movePlayer(playerIdx, steps) {
+        const player = players[playerIdx];
+        const oldPosition = player.position;
+        let newPosition = (oldPosition + steps) % 40;
+        
+        if(newPosition < oldPosition || oldPosition + steps >= 40) {
+            player.money += 200;
+            addLog(`💰 ${player.name} مر من نقطة الانطلاق وحصل على 200 دينار!`, true);
+        }
+        
+        player.position = newPosition;
+        renderBoard();
+        
+        addLog(`🚶 ${player.name} انتقل من ${properties[oldPosition].name} إلى ${properties[newPosition].name}`);
+        
+        await sleep(500);
+        
+        await handleCell(playerIdx);
+    }
+
+    async function handleCell(playerIdx) {
+        const player = players[playerIdx];
+        const cell = properties[player.position];
+        
+        addLog(`📍 وقف ${player.name} على: ${cell.name}`);
+        
+        switch(cell.type) {
+            case 'property':
+            case 'railroad':
+            case 'utility':
+                if(cell.owner === -1 && cell.price > 0) {
+                    currentPropertyIndex = player.position;
+                    showPurchaseModal(cell.name, cell.price);
+                } else if(cell.owner !== -1 && cell.owner !== player.id) {
+                    let rent = calculateRent(cell);
+                    const owner = players[cell.owner];
+                    if(owner && owner.isActive) {
+                        if(player.money >= rent) {
+                            player.money -= rent;
+                            owner.money += rent;
+                            let houseText = '';
+                            if(cell.type === 'property') {
+                                if(cell.houseCount === 5) houseText = ' (فندق)';
+                                else if(cell.houseCount > 0) houseText = ` (${cell.houseCount} بيوت)`;
+                            }
+                            addLog(`💰 ${player.name} دفع ${rent} دينار إيجار لـ ${owner.name} في ${cell.name}${houseText}`);
+                            checkBankruptcy(playerIdx);
+                        } else {
+                            addLog(`💀 ${player.name} ليس لديه مال كافٍ لدفع ${rent} دينار! افلاس!`, true);
+                            handleBankruptcy(playerIdx, cell.owner);
+                        }
+                    }
+                }
+                break;
+                
+            case 'tax':
+                player.money -= cell.rent;
+                addLog(`💸 ${player.name} دفع ${cell.rent} دينار ضريبة!`);
+                checkBankruptcy(playerIdx);
+                break;
+                
+            case 'reward':
+                player.money += cell.rent;
+                addLog(`🎉 ${player.name} حصل على ${cell.rent} دينار مكافأة!`, true);
+                break;
+                
+            case 'chance':
+                await handleChance(playerIdx);
+                break;
+                
+            case 'goToJail':
+                goToJail(playerIdx);
+                break;
+        }
+        
+        updateUI();
+        renderBoard();
+        checkWinner();
+    }
+
+    async function handleChance(playerIdx) {
+        const player = players[playerIdx];
+        const chances = [
+            { text: "تقدم إلى نقطة الانطلاق واحصل على 200 دينار", action: () => {
+                player.position = 0;
+                player.money += 200;
+                addLog(`🚀 ${player.name} تقدم إلى نقطة الانطلاق!`);
+                renderBoard();
+            }},
+            { text: "البنك يمنحك 200 دينار أردني", action: () => player.money += 200 },
+            { text: "ادفع 100 دينار كضريبة", action: () => { player.money -= 100; checkBankruptcy(playerIdx); } },
+            { text: "تقدم 3 خطوات للأمام", action: async () => await movePlayer(playerIdx, 3) },
+            { text: "اخرج من السجن مجاناً", action: () => { if(player.inJail) { player.inJail = false; addLog(`🔓 ${player.name} حصل على بطاقة الخروج من سجن ماركا!`); } } },
+            { text: "اربح 150 دينار من مؤسسة الضمان", action: () => player.money += 150 },
+            { text: "اربح 100 دينار من أمانة عمان", action: () => player.money += 100 }
+        ];
+        
+        const chance = chances[Math.floor(Math.random() * chances.length)];
+        addLog(`🎲 ${player.name} حصل على: ${chance.text}`);
+        await chance.action();
+        updateUI();
         renderBoard();
     }
 
-    function endTurn() {
-        if(!gameActive || !myTurn || !diceRolledThisTurn) return;
-        
-        currentPlayer = (currentPlayer + 1) % players.length;
-        diceRolledThisTurn = false;
-        doubleCount = 0;
-        myTurn = players[currentPlayer]?.id === myId;
-        
-        sendGameState();
-        addLog(`🔄 دور ${players[currentPlayer]?.name} يبدأ الآن`, true);
+    function goToJail(playerIdx) {
+        const player = players[playerIdx];
+        player.inJail = true;
+        player.jailTurns = 0;
+        player.position = 30;
+        addLog(`🚔 ${player.name} دخل سجن ماركا! غيّب 3 أدوار`, true);
+        renderBoard();
     }
 
-    function confirmPurchase(buy) {
-        if(buy) {
-            const player = players.find(p => p.id === myId);
-            const prop = properties[currentPropertyIndex];
-            if(player.money >= prop.price) {
-                player.money -= prop.price;
-                prop.owner = players.findIndex(p => p.id === myId);
-                player.properties.push(currentPropertyIndex);
-                addLog(`🏠 ${player.name} اشترى ${prop.name} بـ ${prop.price} دينار!`, true);
-            }
+    function handleJailTurn() {
+        const player = players[currentPlayer];
+        player.jailTurns++;
+        
+        if(player.jailTurns >= 3) {
+            player.inJail = false;
+            addLog(`🔓 ${player.name} خرج من سجن ماركا بعد 3 أدوار`, true);
+            rollDice();
+        } else {
+            addLog(`⛓️ ${player.name} في سجن ماركا (الدور ${player.jailTurns}/3)`);
+            diceRolledThisTurn = true;
+            updateUI();
         }
-        document.getElementById('purchaseModal').classList.add('hidden');
-        waitingForPurchase = false;
-        sendGameState();
     }
 
     function showPurchaseModal(propertyName, price) {
         waitingForPurchase = true;
-        document.getElementById('purchaseText').innerHTML = `شراء ${propertyName}؟<br>السعر: ${price} دينار`;
+        document.getElementById('purchaseText').innerHTML = `
+            هل تريد شراء ${propertyName}؟<br>
+            السعر: ${price} دينار أردني<br>
+            رصيدك: ${players[currentPlayer].money} دينار
+        `;
         document.getElementById('purchaseModal').classList.remove('hidden');
     }
 
+    function confirmPurchase(buy) {
+        if(buy && players[currentPlayer].money >= properties[currentPropertyIndex].price) {
+            players[currentPlayer].money -= properties[currentPropertyIndex].price;
+            properties[currentPropertyIndex].owner = currentPlayer;
+            players[currentPlayer].properties.push(currentPropertyIndex);
+            addLog(`🏠 ${players[currentPlayer].name} اشترى ${properties[currentPropertyIndex].name} بـ ${properties[currentPropertyIndex].price} دينار!`, true);
+        } else if(buy) {
+            addLog(`💰 رصيد غير كافٍ لشراء ${properties[currentPropertyIndex].name}`);
+        } else {
+            addLog(`❌ ${players[currentPlayer].name} رفض شراء ${properties[currentPropertyIndex].name}`);
+        }
+        
+        document.getElementById('purchaseModal').classList.add('hidden');
+        waitingForPurchase = false;
+        updateUI();
+        renderBoard();
+    }
+
+    function endTurn() {
+        if(!diceRolledThisTurn) return;
+        
+        currentPlayer = (currentPlayer + 1) % players.length;
+        while(!players[currentPlayer].isActive && players.filter(p => p.isActive).length > 1) {
+            currentPlayer = (currentPlayer + 1) % players.length;
+        }
+        
+        diceRolledThisTurn = false;
+        doubleCount = 0;
+        
+        addLog(`🔄 دور ${players[currentPlayer].name} يبدأ الآن`, true);
+        updateUI();
+        renderBoard();
+        
+        document.getElementById('diceArea').style.display = 'none';
+    }
+
+    function checkBankruptcy(playerIdx) {
+        if(players[playerIdx].money < 0) {
+            handleBankruptcy(playerIdx, -1);
+        }
+    }
+
+    function handleBankruptcy(bankruptIdx, debtToIdx) {
+        const bankrupt = players[bankruptIdx];
+        addLog(`💀 إفلاس! ${bankrupt.name} خسر اللعبة!`, true);
+        
+        if(debtToIdx !== -1 && players[debtToIdx]) {
+            bankrupt.properties.forEach(propId => {
+                properties[propId].owner = debtToIdx;
+                players[debtToIdx].properties.push(propId);
+                addLog(`🏠 تم نقل ${properties[propId].name} إلى ${players[debtToIdx].name}`);
+            });
+        } else {
+            bankrupt.properties.forEach(propId => {
+                properties[propId].owner = -1;
+                properties[propId].houseCount = 0;
+                addLog(`🏠 تم إعادة ${properties[propId].name} إلى البنك`);
+            });
+        }
+        
+        bankrupt.isActive = false;
+        bankrupt.properties = [];
+        
+        updateUI();
+        renderBoard();
+        checkWinner();
+    }
+
+    function checkWinner() {
+        const activePlayers = players.filter(p => p.isActive);
+        if(activePlayers.length === 1) {
+            gameActive = false;
+            addLog(`🏆 🎉 الفائز هو ${activePlayers[0].name}! ملك عقارات عمان! 🎉 🏆`, true);
+            setTimeout(() => {
+                alert(`🏆 الفائز باللعبة هو ${activePlayers[0].name}! 🏆\nأصبح أغنى شخص في عمان!`);
+            }, 500);
+        }
+    }
+
     function showMyProperties() {
-        const player = players.find(p => p.id === myId);
-        if(!player) return;
-        alert(player.properties.map(pid => {
-            const prop = properties[pid];
-            return `${prop.name} - ${prop.houseCount === 5 ? '🏨 فندق' : prop.houseCount > 0 ? `🏠${'🏠'.repeat(prop.houseCount-1)}` : 'لا بيوت'}`;
-        }).join('\n') || 'لا تمتلك عقارات بعد');
+        const player = players[currentPlayer];
+        const propsList = document.getElementById('propertiesList');
+        propsList.innerHTML = '';
+        
+        if(player.properties.length === 0) {
+            propsList.innerHTML = '<div style="text-align:center; padding:20px;">لا تمتلك أي عقارات في عمان بعد</div>';
+        } else {
+            player.properties.forEach(propId => {
+                const prop = properties[propId];
+                let housesText = '';
+                if(prop.houseCount === 5) housesText = '🏨 فندق';
+                else if(prop.houseCount > 0) housesText = `🏠${'🏠'.repeat(prop.houseCount-1)}`;
+                else housesText = 'لا بيوت';
+                
+                const propDiv = document.createElement('div');
+                propDiv.className = 'property-item';
+                propDiv.innerHTML = `
+                    <div>
+                        <strong>🏘️ ${prop.name}</strong>
+                        <div style="font-size:0.75em;">💰 اشتراه بـ: ${prop.price} دينار</div>
+                        <div style="font-size:0.75em;">🏠 البيوت: ${housesText}</div>
+                        <div style="font-size:0.75em;">💵 الإيجار الحالي: ${calculateRent(prop)} دينار</div>
+                    </div>
+                `;
+                propsList.appendChild(propDiv);
+            });
+        }
+        
+        document.getElementById('propertiesModal').classList.remove('hidden');
+    }
+
+    function closePropertiesModal() {
+        document.getElementById('propertiesModal').classList.add('hidden');
     }
 
     function showBuildMenu() {
-        alert("🏗️ نظام البناء:\n\nاشتري جميع عقارات نفس اللون، ثم ابنِ بيوت وفنادق لزيادة الإيجار!");
+        const player = players[currentPlayer];
+        const buildList = document.getElementById('buildList');
+        buildList.innerHTML = '';
+        
+        let hasBuildable = false;
+        
+        player.properties.forEach(propId => {
+            const prop = properties[propId];
+            if(prop.type !== 'property') return;
+            
+            const canBuild = canBuildOnProperty(currentPlayer, propId);
+            const housePrice = getHousePrice(propId);
+            const hotelPrice = getHotelPrice(propId);
+            
+            let housesText = '';
+            if(prop.houseCount === 5) housesText = '🏨 فندق';
+            else if(prop.houseCount > 0) housesText = `🏠${'🏠'.repeat(prop.houseCount-1)}`;
+            else housesText = 'لا بيوت';
+            
+            let buildButtons = '';
+            if(prop.houseCount < 5 && canBuild) {
+                if(prop.houseCount === 4) {
+                    buildButtons = `<button class="build-btn" onclick="buildHouse(${propId})">🏨 بناء فندق (${hotelPrice} د.أ)</button>`;
+                } else {
+                    buildButtons = `<button class="build-btn" onclick="buildHouse(${propId})">🏠 بناء بيت (${housePrice} د.أ)</button>`;
+                }
+                hasBuildable = true;
+            }
+            
+            if(prop.houseCount > 0) {
+                buildButtons += `<button class="sell-btn" onclick="sellHouse(${propId})">💰 بيع ${prop.houseCount === 5 ? 'فندق' : 'بيت'}</button>`;
+            }
+            
+            let groupStatus = '';
+            if(!ownsCompleteColorGroup(currentPlayer, prop.color)) {
+                groupStatus = '<div style="color:#ff9800; font-size:0.75em;">⚠️ تحتاج لامتلاك جميع عقارات هذه المجموعة للبناء</div>';
+            }
+            
+            const buildDiv = document.createElement('div');
+            buildDiv.className = 'build-item';
+            buildDiv.innerHTML = `
+                <div><strong>${prop.name}</strong></div>
+                <div>🏠 البيوت: ${housesText}</div>
+                <div>💰 الإيجار الحالي: ${calculateRent(prop)} دينار</div>
+                ${groupStatus}
+                <div style="margin-top: 8px;">${buildButtons || 'لا يمكن البناء أو البيع حالياً'}</div>
+            `;
+            buildList.appendChild(buildDiv);
+        });
+        
+        if(player.properties.length === 0) {
+            buildList.innerHTML = '<div style="text-align:center; padding:20px;">لا تمتلك أي عقارات للبناء عليها</div>';
+        } else if(!hasBuildable && player.properties.length > 0) {
+            const msg = document.createElement('div');
+            msg.className = 'build-item';
+            msg.innerHTML = '<div style="color:#ff9800;">⚠️ لا يمكنك البناء حالياً.<br>تحتاج لامتلاك جميع عقارات نفس اللون أولاً!</div>';
+            buildList.appendChild(msg);
+        }
+        
+        document.getElementById('buildModal').classList.remove('hidden');
     }
 
     function closeBuildModal() {
         document.getElementById('buildModal').classList.add('hidden');
-    }
-
-    function sendGameState() {
-        const state = {
-            type: 'game-state',
-            players: players,
-            properties: properties,
-            currentPlayer: currentPlayer,
-            diceRolledThisTurn: diceRolledThisTurn,
-            gameActive: gameActive
-        };
-        sendToAll(state);
-    }
-
-    function exitGame() {
-        if(peer) peer.destroy();
-        location.reload();
-    }
-
-    function showRules() {
-        alert("🎲 قواعد مونوبولي عمان:\n\n" +
-              "💰 كل لاعب يبدأ بـ 1500 دينار\n" +
-              "🎲 رمي النرد لتحريك القطعة\n" +
-              "🏠 شراء العقارات غير المملوكة\n" +
-              "🏗️ امتلك جميع عقارات نفس اللون لبناء البيوت\n" +
-              "💸 الإيجار يزيد مع كل بيت وفندق\n" +
-              "🏆 آخر لاعب لم يفلس هو الفائز");
+        updateUI();
+        renderBoard();
     }
 </script>
 </body>
