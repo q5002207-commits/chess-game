@@ -2,171 +2,273 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Clash Royale Pro - Ahmad System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة هروب السيارة - مصف الألغاز</title>
     <style>
-        :root { --p-color: #007bff; --e-color: #ff4757; }
-        body { background: #2f3542; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; }
-        
-        /* الساحة */
-        #game-board { 
-            width: 360px; height: 560px; background: #2ed573; 
-            border: 8px solid #57606f; position: relative; overflow: hidden;
-            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* لمنع السحب في الموبايل */
         }
 
-        /* الجسر والمسارات */
-        .river { width: 100%; height: 40px; background: #1e90ff; position: absolute; top: 260px; z-index: 1; }
-        .bridge { width: 60px; height: 50px; background: #747d8c; position: absolute; top: 255px; z-index: 2; border-radius: 5px; }
-        #bridge-left { left: 40px; } #bridge-right { right: 40px; }
+        h1 { margin-bottom: 10px; font-size: 24px; }
+        p { margin-top: 0; color: #bdc3c7; }
 
-        /* القلاع */
-        .tower { width: 44px; height: 44px; position: absolute; border-radius: 8px; z-index: 3; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .king { width: 54px; height: 54px; border-radius: 12px; }
-        
-        .player-t { background: var(--p-color); }
-        .enemy-t { background: var(--e-color); }
+        /* منطقة اللعبة الرئيسية */
+        #game-container {
+            position: relative;
+            width: 360px; /* 6 مستطيلات * 60 بكسل */
+            height: 360px;
+            background-color: #34495e;
+            border: 10px solid #2c3e50;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
 
-        /* توزيع القلاع */
-        .t-left { left: 40px; } .t-right { right: 40px; } .t-king { left: 153px; }
-        .enemy-pos { top: 20px; } .player-pos { bottom: 20px; }
+        /* المخرج */
+        #exit {
+            position: absolute;
+            right: -20px; /* خارج المصف قليلاً */
+            top: 120px; /* السطر الثالث */
+            width: 20px;
+            height: 60px;
+            background-color: #27ae60;
+            border-radius: 0 5px 5px 0;
+            z-index: 1;
+        }
 
-        /* الجنود */
-        .unit { width: 24px; height: 24px; position: absolute; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid #fff; transition: transform 0.2s; }
-        .hp-bar { width: 30px; height: 4px; background: #000; position: absolute; top: -10px; left: -5px; }
-        .hp-val { height: 100%; background: #2ecc71; width: 100%; }
+        /* تصميم المركبات العام */
+        .vehicle {
+            position: absolute;
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            user-select: none; /* لمنع تحديد النص أثناء السحب */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.1s ease; /* تنعيم بسيط للحركة */
+        }
 
-        /* واجهة المستخدم */
-        #ui { width: 360px; background: #333; padding: 15px; box-sizing: border-box; }
-        #elixir-container { width: 100%; height: 20px; background: #555; border-radius: 10px; margin-bottom: 10px; border: 2px solid #a29bfe; }
-        #elixir-bar { height: 100%; background: #6c5ce7; width: 0%; transition: width 0.3s linear; }
-        .cards { display: flex; gap: 10px; justify-content: center; }
-        .card { width: 75px; height: 95px; background: #f1f2f6; color: #2f3542; border-radius: 8px; cursor: pointer; text-align: center; font-size: 11px; border-bottom: 5px solid #ccc; }
-        .card.selected { border-color: #f1c40f; transform: translateY(-5px); }
-        .cost { color: #6c5ce7; font-weight: bold; }
+        .vehicle:active { cursor: grabbing; scale: 1.05; }
+
+        /* سيارتك (السيارة الحمراء) */
+        .player-car {
+            background-color: #e74c3c;
+            color: white;
+            z-index: 10;
+        }
+
+        /* السيارات الأخرى */
+        .car-h { background-color: #f1c40f; color: #333; } /* أفقية صفراء */
+        .car-v { background-color: #3498db; color: white; } /* عمودية زرقاء */
+        .truck { background-color: #95a5a6; color: #333; } /* شاحنة رمادية */
+
     </style>
 </head>
 <body>
 
-    <h3 style="margin: 10px;">نظام أحمد المحترف ♟️</h3>
+    <h1>🚗 هروب السيارة 🚗</h1>
+    <p>اسحب السيارات لفتح طريق للسيارة الحمراء (R) للمخرج الأخضر.</p>
 
-    <div id="game-board" onclick="placeUnit(event)">
-        <div class="river"></div>
-        <div id="bridge-left" class="bridge"></div>
-        <div id="bridge-right" class="bridge"></div>
-
-        <!-- قلاع الخصم -->
-        <div class="tower enemy-t t-left enemy-pos" id="e-l"></div>
-        <div class="tower enemy-t t-right enemy-pos" id="e-r"></div>
-        <div class="tower enemy-t t-king enemy-pos king" id="e-k"></div>
-
-        <!-- قلاع اللاعب -->
-        <div class="tower player-t t-left player-pos" id="p-l"></div>
-        <div class="tower player-t t-right player-pos" id="p-r"></div>
-        <div class="tower player-t t-king player-pos king" id="p-k"></div>
-    </div>
-
-    <div id="ui">
-        <div id="elixir-container"><div id="elixir-bar"></div></div>
-        <div class="cards">
-            <div class="card" onclick="pickCard(event, 'Knight', 3, '⚔️')">فارس<br><span class="cost">3</span><br>⚔️</div>
-            <div class="card" onclick="pickCard(event, 'Giant', 5, '🛡️')">عملاق<br><span class="cost">5</span><br>🛡️</div>
-            <div class="card" onclick="pickCard(event, 'Archer', 2, '🏹')">رامية<br><span class="cost">2</span><br>🏹</div>
-        </div>
-    </div>
-
-<script>
-    let elixir = 5;
-    let selected = null;
-    let gameUnits = [];
-    
-    // إدارة الإكسير
-    setInterval(() => {
-        if (elixir < 10) {
-            elixir += 0.2;
-            document.getElementById('elixir-bar').style.width = (elixir * 10) + '%';
-        }
-    }, 500);
-
-    function pickCard(e, type, cost, icon) {
-        if (elixir < cost) return;
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-        e.currentTarget.classList.add('selected');
-        selected = { type, cost, icon };
-    }
-
-    function placeUnit(e) {
-        if (!selected || elixir < selected.cost) return;
+    <div id="game-container">
+        <div id="exit"></div>
         
-        const rect = document.getElementById('game-board').getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        <!-- R = سيارة اللاعب، C = سيارة، T = شاحنة -->
+        <!-- داتا attributes لتحديد النوع والاتجاه والطول والسطر/العمود الأولي -->
+        <div class="vehicle player-car car-h" data-id="R" data-dir="h" data-len="2" data-row="2" data-col="1">R</div>
+        
+        <div class="vehicle car-v" data-id="C1" data-dir="v" data-len="2" data-row="0" data-col="0">C1</div>
+        <div class="vehicle car-h" data-id="C2" data-dir="h" data-len="2" data-row="0" data-col="1">C2</div>
+        <div class="vehicle truck car-v" data-id="T1" data-dir="v" data-len="3" data-row="1" data-col="3">T1</div>
+        <div class="vehicle car-h" data-id="C3" data-dir="h" data-len="2" data-row="4" data-col="1">C3</div>
+        <div class="vehicle car-v" data-id="C4" data-dir="v" data-len="2" data-row="4" data-col="4">C4</div>
+    </div>
 
-        if (y < 280) return; // منع الإنزال في منطقة الخصم
+    <script>
+        const GRID_SIZE = 60; // حجم المربع الواحد بـ البكسل
+        const BOARD_DIM = 6;  // 6x6 مربع
+        const container = document.getElementById('game-container');
+        const vehicles = document.querySelectorAll('.vehicle');
 
-        createUnit(x, y, 'player', selected.icon, selected.type);
-        elixir -= selected.cost;
-        selected = null;
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-    }
+        let isDragging = false;
+        let currentVehicle = null;
+        let initialMouseX, initialMouseY;
+        let initialVehicleX, initialVehicleY;
 
-    function createUnit(x, y, team, icon, type) {
-        const id = Math.random().toString(36).substr(2, 9);
-        const div = document.createElement('div');
-        div.className = `unit ${team}`;
-        div.style.left = x + 'px';
-        div.style.top = y + 'px';
-        div.innerHTML = `<div class="hp-bar"><div id="hp-${id}" class="hp-val"></div></div>${icon}`;
-        document.getElementById('game-board').appendChild(div);
+        // تجهيز القائمة لتخزين مواضع جميع المركبات لمنع التصادم
+        let gameState = {};
 
-        gameUnits.push({
-            id, el: div, x, y, team, 
-            hp: type === 'Giant' ? 200 : 100, 
-            maxHp: type === 'Giant' ? 200 : 100,
-            speed: type === 'Giant' ? 1 : 2
-        });
-    }
+        function initGame() {
+            vehicles.forEach(veh => {
+                const id = veh.dataset.id;
+                const dir = veh.dataset.dir;
+                const len = parseInt(veh.dataset.len);
+                const row = parseInt(veh.dataset.row);
+                const col = parseInt(veh.dataset.col);
 
-    // محرك اللعبة الرئيسي
-    setInterval(() => {
-        gameUnits.forEach((unit, index) => {
-            if (unit.hp <= 0) return;
-
-            // تحديد الهدف (أقرب برج خصم)
-            let targetY = unit.team === 'player' ? 20 : 500;
-            let targetX = unit.x < 180 ? 60 : 300; // الذهاب لأقرب مسار (يمين أو يسار)
-
-            const dx = targetX - unit.x;
-            const dy = targetY - unit.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-
-            if (dist > 10) {
-                unit.x += (dx / dist) * unit.speed;
-                unit.y += (dy / dist) * unit.speed;
-                unit.el.style.left = unit.x + 'px';
-                unit.el.style.top = unit.y + 'px';
-            }
-            
-            // نظام تصادم بسيط وهجوم
-            gameUnits.forEach(other => {
-                if (other.team !== unit.team && Math.abs(other.x - unit.x) < 20 && Math.abs(other.y - unit.y) < 20) {
-                    other.hp -= 2;
-                    document.getElementById(`hp-${other.id}`).style.width = (other.hp / other.maxHp * 100) + '%';
-                    if (other.hp <= 0) other.el.remove();
+                // ضبط الحجم والموضع الأولي بناءً على الداتا
+                if (dir === 'h') {
+                    veh.style.width = (len * GRID_SIZE - 4) + 'px';
+                    veh.style.height = (GRID_SIZE - 4) + 'px';
+                    veh.style.left = (col * GRID_SIZE + 2) + 'px';
+                    veh.style.top = (row * GRID_SIZE + 2) + 'px';
+                } else {
+                    veh.style.width = (GRID_SIZE - 4) + 'px';
+                    veh.style.height = (len * GRID_SIZE - 4) + 'px';
+                    veh.style.left = (col * GRID_SIZE + 2) + 'px';
+                    veh.style.top = (row * GRID_SIZE + 2) + 'px';
                 }
+
+                gameState[id] = { dir, len, row, col };
+
+                // إضافة أحداث الماوس واللمس
+                veh.addEventListener('mousedown', startDrag);
+                veh.addEventListener('touchstart', startDrag, { passive: false });
             });
-        });
+        }
 
-        // تنظيف الموتى
-        gameUnits = gameUnits.filter(u => u.hp > 0);
-    }, 50);
+        function startDrag(e) {
+            e.preventDefault(); // منع التمرير في الموبايل
+            isDragging = true;
+            currentVehicle = e.target;
+            
+            // تحديد نقطة الماوس/اللمس الأولية
+            if (e.type === 'touchstart') {
+                initialMouseX = e.touches[0].clientX;
+                initialMouseY = e.touches[0].clientY;
+            } else {
+                initialMouseX = e.clientX;
+                initialMouseY = e.clientY;
+            }
 
-    // ذكاء اصطناعي للخصم
-    setInterval(() => {
-        const xPos = Math.random() > 0.5 ? 60 : 300;
-        createUnit(xPos, 50, 'enemy', '👺', 'Goblin');
-    }, 5000);
+            initialVehicleX = parseInt(currentVehicle.style.left);
+            initialVehicleY = parseInt(currentVehicle.style.top);
 
-</script>
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging || !currentVehicle) return;
+            e.preventDefault();
+
+            let currentMouseX, currentMouseY;
+            if (e.type === 'touchmove') {
+                currentMouseX = e.touches[0].clientX;
+                currentMouseY = e.touches[0].clientY;
+            } else {
+                currentMouseX = e.clientX;
+                currentMouseY = e.clientY;
+            }
+
+            const vehId = currentVehicle.dataset.id;
+            const data = gameState[vehId];
+            
+            let newX = initialVehicleX;
+            let newY = initialVehicleY;
+
+            // حساب الموضع الجديد بناءً على الاتجاه المسموح (أفقي أو عمودي)
+            if (data.dir === 'h') {
+                const dx = currentMouseX - initialMouseX;
+                newX = initialVehicleX + dx;
+                
+                // القيود: منع الخروج من المصف أفقياً
+                const minX = 2;
+                const maxX = (BOARD_DIM - data.len) * GRID_SIZE + 2;
+                newX = Math.max(minX, Math.min(newX, maxX));
+                
+                // القيود: منع التصادم مع السيارات الأخرى أفقياً
+                const currentCol = Math.round((newX - 2) / GRID_SIZE);
+                if (canMoveTo(vehId, data.row, currentCol)) {
+                   currentVehicle.style.left = newX + 'px';
+                   data.col = currentCol; // تحديث الموضع المنطقي
+                }
+
+                // التحقق من الفوز (إذا كانت السيارة الحمراء)
+                if (vehId === 'R' && data.col === (BOARD_DIM - data.len)) {
+                    currentVehicle.style.left = (newX + GRID_SIZE) + 'px'; // تحريكها خارجاً قليلاً
+                    setTimeout(() => alert('🎉 مبروك! لقد أخرجت السيارة! 🎉'), 100);
+                    stopDrag();
+                }
+
+            } else {
+                const dy = currentMouseY - initialMouseY;
+                newY = initialVehicleY + dy;
+
+                // القيود: منع الخروج من المصف عمودياً
+                const minY = 2;
+                const maxY = (BOARD_DIM - data.len) * GRID_SIZE + 2;
+                newY = Math.max(minY, Math.min(newY, maxY));
+
+                // القيود: منع التصادم عمودياً
+                const currentRow = Math.round((newY - 2) / GRID_SIZE);
+                if (canMoveTo(vehId, currentRow, data.col)) {
+                    currentVehicle.style.top = newY + 'px';
+                    data.row = currentRow; // تحديث الموضع المنطقي
+                }
+            }
+        }
+
+        function stopDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // تثبيت السيارة في أقرب مربع (Snap to grid)
+            if (currentVehicle) {
+                const data = gameState[currentVehicle.dataset.id];
+                currentVehicle.style.left = (data.col * GRID_SIZE + 2) + 'px';
+                currentVehicle.style.top = (data.row * GRID_SIZE + 2) + 'px';
+            }
+
+            currentVehicle = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+        }
+
+        // دالة للتحقق مما إذا كان المربع المستهدف محجوزاً
+        function canMoveTo(vId, targetRow, targetCol) {
+            const vData = gameState[vId];
+            
+            // إنشاء خريطة مؤقتة للمربعات المحجوزة بواسطة السيارات الأخرى
+            let occupiedOccupied = {};
+            for (const id in gameState) {
+                if (id === vId) continue; // تخطي السيارة الحالية
+                const other = gameState[id];
+                for (let i = 0; i < other.len; i++) {
+                    if (other.dir === 'h') {
+                        occupiedOccupied[`${other.row},${other.col + i}`] = true;
+                    } else {
+                        occupiedOccupied[`${other.row + i},${other.col}`] = true;
+                    }
+                }
+            }
+
+            // التحقق مما إذا كانت السيارة الحالية في موضعها الجديد ستصطدم
+            for (let i = 0; i < vData.len; i++) {
+                let r = targetRow;
+                let c = targetCol;
+                if (vData.dir === 'h') c += i; else r += i;
+                
+                if (occupiedOccupied[`${r},${c}`]) return false; // تصادم!
+            }
+
+            return true; // الطريق سالك
+        }
+
+        initGame();
+
+    </script>
 </body>
 </html>
