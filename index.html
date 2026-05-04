@@ -2,131 +2,170 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Clash Arena - Advanced Edition</title>
+    <title>Clash Royale Pro - Ahmad System</title>
     <style>
-        :root { --player-color: #3498db; --enemy-color: #e74c3c; }
-        body { background: #1a1a1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        :root { --p-color: #007bff; --e-color: #ff4757; }
+        body { background: #2f3542; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; }
         
         /* الساحة */
-        #arena { width: 350px; height: 500px; background: #4caf50; border: 10px solid #5d4037; position: relative; margin-top: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); background-image: radial-gradient(#66bb6a 20%, transparent 20%), radial-gradient(#66bb6a 20%, transparent 20%); background-size: 40px 40px; }
+        #game-board { 
+            width: 360px; height: 560px; background: #2ed573; 
+            border: 8px solid #57606f; position: relative; overflow: hidden;
+            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* الجسر والمسارات */
+        .river { width: 100%; height: 40px; background: #1e90ff; position: absolute; top: 260px; z-index: 1; }
+        .bridge { width: 60px; height: 50px; background: #747d8c; position: absolute; top: 255px; z-index: 2; border-radius: 5px; }
+        #bridge-left { left: 40px; } #bridge-right { right: 40px; }
 
         /* القلاع */
-        .tower { width: 50px; height: 50px; position: absolute; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: all 0.3s; }
-        .tower.player { bottom: 10px; left: 150px; background: var(--player-color); border: 3px solid #fff; }
-        .tower.enemy { top: 10px; left: 150px; background: var(--enemy-color); border: 3px solid #fff; }
-        .hp-bar { width: 40px; height: 5px; background: #000; position: absolute; top: -10px; }
-        .hp-fill { height: 100%; background: #2ecc71; width: 100%; transition: width 0.2s; }
+        .tower { width: 44px; height: 44px; position: absolute; border-radius: 8px; z-index: 3; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .king { width: 54px; height: 54px; border-radius: 12px; }
+        
+        .player-t { background: var(--p-color); }
+        .enemy-t { background: var(--e-color); }
+
+        /* توزيع القلاع */
+        .t-left { left: 40px; } .t-right { right: 40px; } .t-king { left: 153px; }
+        .enemy-pos { top: 20px; } .player-pos { bottom: 20px; }
 
         /* الجنود */
-        .unit { width: 25px; height: 25px; position: absolute; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.2s; }
-        .unit.player { background: var(--player-color); border: 2px solid white; }
-        .unit.enemy { background: var(--enemy-color); border: 2px solid white; }
+        .unit { width: 24px; height: 24px; position: absolute; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid #fff; transition: transform 0.2s; }
+        .hp-bar { width: 30px; height: 4px; background: #000; position: absolute; top: -10px; left: -5px; }
+        .hp-val { height: 100%; background: #2ecc71; width: 100%; }
 
-        /* التحكم والإكسير */
-        #ui { width: 350px; padding: 10px; background: #333; display: flex; flex-direction: column; gap: 10px; }
-        #elixir-bar { width: 100%; height: 15px; background: #444; border-radius: 10px; overflow: hidden; border: 2px solid #8e44ad; }
-        #elixir-fill { height: 100%; background: #9b59b6; width: 0%; transition: width 0.1s linear; }
-        .cards { display: flex; justify-content: space-around; }
-        .card { width: 70px; height: 90px; background: #ecf0f1; border-radius: 5px; color: #333; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; border: 3px solid transparent; }
-        .card.active { border-color: #f1c40f; transform: scale(1.05); }
-        .cost { font-weight: bold; color: #8e44ad; }
+        /* واجهة المستخدم */
+        #ui { width: 360px; background: #333; padding: 15px; box-sizing: border-box; }
+        #elixir-container { width: 100%; height: 20px; background: #555; border-radius: 10px; margin-bottom: 10px; border: 2px solid #a29bfe; }
+        #elixir-bar { height: 100%; background: #6c5ce7; width: 0%; transition: width 0.3s linear; }
+        .cards { display: flex; gap: 10px; justify-content: center; }
+        .card { width: 75px; height: 95px; background: #f1f2f6; color: #2f3542; border-radius: 8px; cursor: pointer; text-align: center; font-size: 11px; border-bottom: 5px solid #ccc; }
+        .card.selected { border-color: #f1c40f; transform: translateY(-5px); }
+        .cost { color: #6c5ce7; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="arena">
-        <!-- قلاع -->
-        <div class="tower enemy" id="e-tower"><div class="hp-bar"><div id="e-hp" class="hp-fill"></div></div>قلعة الخصم</div>
-        <div class="tower player" id="p-tower"><div class="hp-bar"><div id="p-hp" class="hp-fill"></div></div>قلعتك</div>
+    <h3 style="margin: 10px;">نظام أحمد المحترف ♟️</h3>
+
+    <div id="game-board" onclick="placeUnit(event)">
+        <div class="river"></div>
+        <div id="bridge-left" class="bridge"></div>
+        <div id="bridge-right" class="bridge"></div>
+
+        <!-- قلاع الخصم -->
+        <div class="tower enemy-t t-left enemy-pos" id="e-l"></div>
+        <div class="tower enemy-t t-right enemy-pos" id="e-r"></div>
+        <div class="tower enemy-t t-king enemy-pos king" id="e-k"></div>
+
+        <!-- قلاع اللاعب -->
+        <div class="tower player-t t-left player-pos" id="p-l"></div>
+        <div class="tower player-t t-right player-pos" id="p-r"></div>
+        <div class="tower player-t t-king player-pos king" id="p-k"></div>
     </div>
 
     <div id="ui">
-        <div id="elixir-bar"><div id="elixir-fill"></div></div>
-        <div style="font-size: 12px; text-align: left;">الإكسير: <span id="elixir-text">0</span>/10</div>
+        <div id="elixir-container"><div id="elixir-bar"></div></div>
         <div class="cards">
-            <div class="card" onclick="selectCard(this, 3, '⚔️')">فارس<br><span class="cost">3</span><br>⚔️</div>
-            <div class="card" onclick="selectCard(this, 5, '🛡️')">عملاق<br><span class="cost">5</span><br>🛡️</div>
-            <div class="card" onclick="selectCard(this, 2, '🏹')">رامية<br><span class="cost">2</span><br>🏹</div>
+            <div class="card" onclick="pickCard(event, 'Knight', 3, '⚔️')">فارس<br><span class="cost">3</span><br>⚔️</div>
+            <div class="card" onclick="pickCard(event, 'Giant', 5, '🛡️')">عملاق<br><span class="cost">5</span><br>🛡️</div>
+            <div class="card" onclick="pickCard(event, 'Archer', 2, '🏹')">رامية<br><span class="cost">2</span><br>🏹</div>
         </div>
     </div>
 
 <script>
-    let elixir = 0;
-    let selectedCard = null;
-    let units = [];
-    let towers = {
-        enemy: { hp: 100, x: 150, y: 10, element: document.getElementById('e-hp') },
-        player: { hp: 100, x: 150, y: 440, element: document.getElementById('p-hp') }
-    };
-
-    // زيادة الإكسير
+    let elixir = 5;
+    let selected = null;
+    let gameUnits = [];
+    
+    // إدارة الإكسير
     setInterval(() => {
         if (elixir < 10) {
-            elixir += 0.1;
-            document.getElementById('elixir-fill').style.width = (elixir * 10) + '%';
-            document.getElementById('elixir-text').innerText = Math.floor(elixir);
+            elixir += 0.2;
+            document.getElementById('elixir-bar').style.width = (elixir * 10) + '%';
         }
-    }, 200);
+    }, 500);
 
-    function selectCard(el, cost, icon) {
+    function pickCard(e, type, cost, icon) {
         if (elixir < cost) return;
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        selectedCard = { cost, icon };
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        e.currentTarget.classList.add('selected');
+        selected = { type, cost, icon };
     }
 
-    document.getElementById('arena').onclick = function(e) {
-        if (!selectedCard || elixir < selectedCard.cost) return;
+    function placeUnit(e) {
+        if (!selected || elixir < selected.cost) return;
+        
+        const rect = document.getElementById('game-board').getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        const rect = this.getBoundingClientRect();
-        spawnUnit(e.clientX - rect.left - 12, e.clientY - rect.top - 12, 'player', selectedCard.icon);
-        elixir -= selectedCard.cost;
-        selectedCard = null;
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-    };
+        if (y < 280) return; // منع الإنزال في منطقة الخصم
 
-    function spawnUnit(x, y, team, icon) {
+        createUnit(x, y, 'player', selected.icon, selected.type);
+        elixir -= selected.cost;
+        selected = null;
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    }
+
+    function createUnit(x, y, team, icon, type) {
+        const id = Math.random().toString(36).substr(2, 9);
         const div = document.createElement('div');
         div.className = `unit ${team}`;
         div.style.left = x + 'px';
         div.style.top = y + 'px';
-        div.innerText = icon;
-        document.getElementById('arena').appendChild(div);
-        
-        units.push({
-            el: div, x, y, team, hp: 20, 
-            target: team === 'player' ? towers.enemy : towers.player
+        div.innerHTML = `<div class="hp-bar"><div id="hp-${id}" class="hp-val"></div></div>${icon}`;
+        document.getElementById('game-board').appendChild(div);
+
+        gameUnits.push({
+            id, el: div, x, y, team, 
+            hp: type === 'Giant' ? 200 : 100, 
+            maxHp: type === 'Giant' ? 200 : 100,
+            speed: type === 'Giant' ? 1 : 2
         });
     }
 
-    // محرك اللعبة (الحركة والقتال)
+    // محرك اللعبة الرئيسي
     setInterval(() => {
-        units.forEach((unit, index) => {
+        gameUnits.forEach((unit, index) => {
             if (unit.hp <= 0) return;
 
-            // التحرك نحو الهدف
-            const dx = unit.target.x - unit.x;
-            const dy = unit.target.y - unit.y;
+            // تحديد الهدف (أقرب برج خصم)
+            let targetY = unit.team === 'player' ? 20 : 500;
+            let targetX = unit.x < 180 ? 60 : 300; // الذهاب لأقرب مسار (يمين أو يسار)
+
+            const dx = targetX - unit.x;
+            const dy = targetY - unit.y;
             const dist = Math.sqrt(dx*dx + dy*dy);
 
-            if (dist > 30) {
-                unit.x += dx / dist * 2;
-                unit.y += dy / dist * 2;
+            if (dist > 10) {
+                unit.x += (dx / dist) * unit.speed;
+                unit.y += (dy / dist) * unit.speed;
                 unit.el.style.left = unit.x + 'px';
                 unit.el.style.top = unit.y + 'px';
-            } else {
-                // الهجوم على البرج
-                unit.target.hp -= 0.5;
-                unit.target.element.style.width = unit.target.hp + '%';
-                if (unit.target.hp <= 0) alert(unit.team === 'player' ? "فزت!" : "خسرت!");
             }
+            
+            // نظام تصادم بسيط وهجوم
+            gameUnits.forEach(other => {
+                if (other.team !== unit.team && Math.abs(other.x - unit.x) < 20 && Math.abs(other.y - unit.y) < 20) {
+                    other.hp -= 2;
+                    document.getElementById(`hp-${other.id}`).style.width = (other.hp / other.maxHp * 100) + '%';
+                    if (other.hp <= 0) other.el.remove();
+                }
+            });
         });
-    }, 50).
 
-    // إنزال عشوائي للخصم
+        // تنظيف الموتى
+        gameUnits = gameUnits.filter(u => u.hp > 0);
+    }, 50);
+
+    // ذكاء اصطناعي للخصم
     setInterval(() => {
-        spawnUnit(Math.random() * 300, 50, 'enemy', '👺');
-    }, 4000);
+        const xPos = Math.random() > 0.5 ? 60 : 300;
+        createUnit(xPos, 50, 'enemy', '👺', 'Goblin');
+    }, 5000);
 
 </script>
 </body>
