@@ -467,7 +467,9 @@ function showOnlineFinalResults(spyName, logs) {
     logs.forEach(l => html += `<div class="vote-log-item">${l}</div>`);
     $('#vote-log-container').html(html);
     $('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
-}// ===================== الشطرنج =====================
+}// ===================== الجزء الثالث - الشطرنج + لعبة كرم (مكتمل) =====================
+
+// ===================== الشطرنج =====================
 let chessBoard = null;
 let chessGame = new Chess();
 let chessConn = null;
@@ -549,10 +551,10 @@ function aiMakeMove() {
 
 function startAIPlaying() {
     if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI", true); return; }
+    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك", true); return; }
     if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
     isAIPlaying = true;
-    addFakeMessage("🤖 تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز 🤖", true);
+    addFakeMessage("🤖 تم تشغيل الـ AI سيلعب عنك 🤖", true);
     if(aiInterval) clearInterval(aiInterval);
     aiMakeMove();
     aiInterval = setInterval(() => {
@@ -566,7 +568,7 @@ function stopAIPlaying() {
     if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
     isAIPlaying = false;
     if(aiInterval) clearInterval(aiInterval);
-    addFakeMessage("🛑 تم إيقاف الـ AI، ارجعت تلعب بنفسك", true);
+    addFakeMessage("🛑 تم إيقاف الـ AI", true);
 }
 
 function sendSuggestion() {
@@ -578,16 +580,14 @@ function sendSuggestion() {
     if(best) {
         let piece = chessGame.get(best.from);
         let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
-        let targetPiece = chessGame.get(best.to);
-        let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
-        addFakeMessage(`💡 الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
+        addFakeMessage(`💡 الاقتراح: حرك ${pieceName} من ${best.from} إلى ${best.to}`, true);
     }
 }
 
 function toggleSuggestion() {
     suggestionEnabled = !suggestionEnabled;
     if(suggestionEnabled) {
-        addFakeMessage("💡 الاقتراحات مفعلة (الـ AI يعطيك نصائح)", true);
+        addFakeMessage("💡 الاقتراحات مفعلة", true);
         sendSuggestion();
         if(suggestionInterval) clearInterval(suggestionInterval);
         suggestionInterval = setInterval(() => {
@@ -606,7 +606,7 @@ function showSecretPanel() {
     let panel = $(`
         <div class="secret-panel">
             <h3 style="color:gold;">🔓 التحكم السري 🔓</h3>
-            <button id="secret-ai-start">🤖 تشغيل الـ AI (يلعب عني)</button>
+            <button id="secret-ai-start">🤖 تشغيل الـ AI</button>
             <button id="secret-ai-stop">🛑 إيقاف الـ AI</button>
             <button id="secret-suggestions-on">💡 تفعيل الاقتراحات</button>
             <button id="secret-suggestions-off">🔕 إيقاف الاقتراحات</button>
@@ -654,11 +654,9 @@ function hackWin() {
     stopTimer();
     stopAIPlaying();
     let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 💀');
-    $('#timer-display').addClass('hack-effect');
-    setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
+    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز 💀');
     if(chessConn) chessConn.send({ type: 'hack_lose' });
-    alert('💀 اختراق ناجح! 💀\n' + winnerText + ' فاز بواسطة الكود السري');
+    alert('💀 اختراق ناجح! ' + winnerText + ' فاز');
 }
 
 function setupFakeChat() {
@@ -680,7 +678,7 @@ function setupFakeChat() {
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
-            addFakeMessage("الخصم: " + ["هاها 😄", "يلا نلعب", "بس شوي", "قوي يالحب", "شطرنج مو سهلة", "🤔🤔", "وين كنت؟", "تمام", "ماشي", "تصدق؟", "ع السلامة"][Math.floor(Math.random() * 11)], false);
+            addFakeMessage("الخصم: " + ["هاها", "يلا نلعب", "بس شوي", "قوي", "شطرنج", "🤔", "وين كنت؟", "تمام", "ماشي"][Math.floor(Math.random() * 9)], false);
         }, 1000 + Math.random() * 2000);
     });
     $('#chat-input').off('keypress').on('keypress', function(e) {
@@ -700,7 +698,7 @@ function updateMoveHistory() {
 
 function addMoveToHistory(move) {
     let moveText = `${move.from} → ${move.to}`;
-    if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
+    if(move.promotion) moveText += ` (ترقية)`;
     moveHistory.push(moveText);
     updateMoveHistory();
 }
@@ -734,8 +732,8 @@ function startTimer() {
             gameActive = false;
             stopAIPlaying();
             let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-            alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);
-            $('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);
+            alert(`⏰ انتهى الوقت! ${loser} خسر`);
+            $('#turn-display').text(`⏰ ${loser} خسر`);
             if(chessConn) chessConn.send({ type: 'timeout', loser: myChessColor });
             $('#timer-display').text('⏰ وقت منتهي');
         }
@@ -761,15 +759,14 @@ function endGame(message) {
 
 function updateChessStatus() {
     let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
-    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
+    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة";
     else if(chessGame.in_stalemate()) status = "تعادل";
-    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
     $('#turn-display').text(status);
 }
 
 function initChess() {
     $('#setup-area').show();
-    $('#turn-display').text('انتظار اللاعب الآخر...');
+    $('#turn-display').text('انتظار اللاعب...');
     gameActive = true;
     suggestionEnabled = false;
     isAIPlaying = false;
@@ -800,7 +797,7 @@ function initChess() {
     $('#board').off('click').on('click', '.square-55d63', function() {
         if(!gameActive) return;
         if(isAIPlaying) {
-            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص", true);
+            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً", true);
             return;
         }
         if(chessGame.turn() !== myChessColor) return;
@@ -829,7 +826,7 @@ function initChess() {
                     if(chessGame.turn() === myChessColor) startTimer();
                     else $('#timer-display').text('⏱️ انتظر دور الخصم');
                 } else {
-                    endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
+                    endGame(chessGame.in_checkmate() ? 'كش ملك!' : 'انتهت اللعبة');
                 }
             }
             $('.square-55d63').removeClass('highlight-selected');
@@ -841,15 +838,15 @@ function initChess() {
     $('#resign-btn').off('click').on('click', function() {
         if(!gameActive) return;
         if(confirm('هل أنت متأكد من الانسحاب؟')) {
-            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`);
+            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب`);
             if(chessConn) chessConn.send({ type: 'resign', color: myChessColor });
         }
     });
     
     $('#draw-btn').off('click').on('click', function() {
         if(!gameActive) return;
-        if(confirm('طلب تعادل. انتظر رد الخصم...')) {
-            alert('تم إرسال طلب التعادل إلى الخصم');
+        if(confirm('طلب تعادل؟')) {
+            alert('تم إرسال طلب التعادل');
             if(chessConn) chessConn.send({ type: 'draw_request' });
         }
     });
@@ -858,7 +855,7 @@ function initChess() {
 function hostGame() {
     let id = Math.floor(1000 + Math.random() * 9000).toString();
     let peerChess = new Peer("AHMED_CHESS_" + id);
-    peerChess.on('open', () => alert("🔑 كودك للخصم: " + id));
+    peerChess.on('open', () => alert("🔑 كودك: " + id));
     peerChess.on('connection', c => {
         chessConn = c;
         myChessColor = 'w';
@@ -894,35 +891,33 @@ function setupChessReceiver() {
                 if(chessGame.turn() === myChessColor) startTimer();
                 else $('#timer-display').text('⏱️ انتظر دور الخصم');
             } else {
-                endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
+                endGame(chessGame.in_checkmate() ? 'كش ملك!' : 'انتهت اللعبة');
             }
         }
-        else if(data.type === 'timeout') { endGame(`⏰ الخصم خسر لأن وقته انتهى!`); }
-        else if(data.type === 'resign') { endGame(`🏆 الخصم انسحب. فزت! 🏆`); }
+        else if(data.type === 'timeout') { endGame(`⏰ الخصم خسر`); }
+        else if(data.type === 'resign') { endGame(`🏆 الخصم انسحب. فزت!`); }
         else if(data.type === 'draw_request') {
-            if(confirm('🤝 الخصم يطلب التعادل. هل توافق؟')) {
-                endGame('تعادل! انتهت المباراة بالتعادل.');
+            if(confirm('🤝 الخصم يطلب التعادل. توافق؟')) {
+                endGame('تعادل!');
                 chessConn.send({ type: 'draw_accept' });
             } else {
                 chessConn.send({ type: 'draw_reject' });
             }
         }
-        else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
+        else if(data.type === 'draw_accept') { endGame('تم قبول التعادل'); }
         else if(data.type === 'hack_lose') { 
             gameActive = false;
             stopTimer();
             stopAIPlaying();
-            alert('💀 الخصم قام بعملية اختراق! لقد خسرت المباراة.');
-            $('#turn-display').html('💀 الخصم اخترق اللعبة! لقد خسرت 💀');
+            alert('💀 الخصم اخترق اللعبة! خسرت');
         }
     });
 }
 
-// ===================== لعبة كرم (القفز) =====================
+// ===================== لعبة كرم (القفز) - إصلاح الشخصية =====================
 const OBSTACLE_IMG = 'https://i.imgur.com/Prv0riC.jpeg';
 const PLAYER_IMG = 'https://i.imgur.com/IpswxEw.jpeg';
 
-let karmRunning = false;
 let karmScore = 0;
 let karmHighScore = localStorage.getItem('karmHighScore') || 0;
 let karmHealth = 3;
@@ -1040,8 +1035,12 @@ function karmDraw() {
         karmCtx.fill();
     }
     
-    if(playerImg.complete) karmCtx.drawImage(playerImg, karmPlayer.x, karmPlayer.y, 45, 45);
-    else { karmCtx.fillStyle = '#3498db'; karmCtx.fillRect(karmPlayer.x, karmPlayer.y, 45, 45); karmCtx.fillStyle='white'; karmCtx.font='28px Arial'; karmCtx.fillText('🦘', karmPlayer.x+8, karmPlayer.y+35); }
+    if(playerImg.complete && playerImg.naturalWidth > 0) {
+        karmCtx.drawImage(playerImg, karmPlayer.x, karmPlayer.y, 45, 45);
+    } else {
+        karmCtx.fillStyle = '#3498db'; karmCtx.fillRect(karmPlayer.x, karmPlayer.y, 45, 45);
+        karmCtx.fillStyle = 'white'; karmCtx.font='28px Arial'; karmCtx.fillText('🦘', karmPlayer.x+8, karmPlayer.y+35);
+    }
     
     for(let p of karmParticles) { karmCtx.fillStyle = `rgba(255,215,0,${p.life/15})`; karmCtx.fillRect(p.x, p.y, 4, 4); }
     
@@ -1065,7 +1064,7 @@ function karmReset() {
     initKarm();
 }
 
-// ===================== التحكم بين الألعاب =====================
+// ===================== التحكم بين الألعاب (آخر قطعة) =====================
 function showGame(t) {
     $('#main-menu').hide();
     if(t === 'mafia') {
@@ -1078,7 +1077,7 @@ function showGame(t) {
     } else if(t === 'spyOnline') {
         $('#spy-online-section').removeClass('hidden');
     } else if(t === 'karm') {
-        let pwd = prompt("🔐 لعبة كرم محمية\nأدخل كلمة السر:");
+        let pwd = prompt("🔐 أدخل كلمة السر:");
         if(pwd === "0798") {
             $('#karm-section').removeClass('hidden');
             initKarm();
