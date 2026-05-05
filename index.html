@@ -1,1096 +1,466 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة كرما - المافيا المتكاملة</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>لعبة القفز - للجوال والكمبيوتر</title>
     <style>
-        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
-        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
-        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
-        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
-        .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
-        .role-display { display: none; color: #ff0000; font-size: 1.2em; font-weight: bold; margin-top: 10px; }
-        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; text-align: center; }
-        .hidden { display: none; }
-        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
-        .locked { pointer-events: none; opacity: 0.4; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .role-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; }
-        .mafia-role { background: #8b0000; color: white; }
-        .citizen-role { background: #006400; color: white; }
-        .doctor-role { background: #00008b; color: white; }
-        .child-role { background: #daa520; color: black; }
-        .silent-role { background: #4b0082; color: white; }
-        .chess-container { display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
-        .chess-main { display: flex; flex-direction: column; align-items: center; }
-        .move-history { background: #111; border: 1px solid #da291c; border-radius: 8px; padding: 10px; width: 180px; max-height: 400px; overflow-y: auto; font-size: 0.8em; color: #0f0; }
-        .move-history h4 { margin: 0 0 8px 0; color: #da291c; text-align: center; }
-        .move-history p { margin: 3px 0; border-bottom: 1px solid #333; padding: 2px; }
-        .fake-chat { background: #0a0a0a; border: 2px solid #0f0; border-radius: 8px; width: 200px; max-height: 400px; display: flex; flex-direction: column; padding: 8px; }
-        .fake-chat h4 { margin: 0 0 8px 0; color: #0f0; text-align: center; font-size: 0.9em; }
-        .chat-messages { flex: 1; overflow-y: auto; font-size: 0.7em; color: #0f0; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px; max-height: 300px; }
-        .chat-messages p { margin: 4px 0; word-break: break-word; }
-        .chat-input-area { display: flex; gap: 5px; }
-        .chat-input-area input { flex: 1; padding: 6px; font-size: 0.7em; margin: 0; background: #000; border: 1px solid #0f0; color: #0f0; }
-        .chat-input-area button { width: auto; padding: 6px 8px; background: #111; border: 1px solid #0f0; color: #0f0; font-size: 0.7em; }
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218, 41, 28, 0.3); position: relative; }
-        .turn-box { margin-top: 15px; font-size: 1.2em; font-weight: bold; color: #fff; }
-        .timer-box { font-size: 1.5em; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; color: #ff0; }
-        .chess-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
-        .highlight-selected { background-color: rgba(255, 255, 0, 0.5) !important; }
-        .highlight-hint { width: 16px; height: 16px; background: rgba(0, 255, 0, 0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        .board-coords { position: absolute; pointer-events: none; z-index: 50; font-size: 11px; font-weight: bold; color: #ff0; text-shadow: 0 0 3px #000; }
-        .file-coord { bottom: 2px; text-align: center; width: 12.5%; position: absolute; }
-        .rank-coord { right: 2px; text-align: center; height: 12.5%; display: flex; align-items: center; position: absolute; }
-        .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
-        .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
-        .secret-panel button:hover { background: #da291c; }
-        .force-win-panel { display: none; }
-        
-        /* ستايل لعبة كرم */
-        #karm-section canvas {
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        body {
+            background: linear-gradient(145deg, #0a2f1f, #051a0e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            margin: 0;
+            padding: 10px;
+        }
+        .game-container {
+            background: #2c4a2e;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+            border: 2px solid #d4af37;
+            text-align: center;
+            max-width: 100%;
+        }
+        canvas {
             display: block;
             margin: 0 auto;
             border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             cursor: pointer;
             background: #2c3e50;
+            width: 100%;
+            height: auto;
         }
-        .karm-jump-btn { background: #2ecc71; color: white; font-size: 1.3rem; padding: 12px 30px; width: auto; margin: 5px; }
-        .score-panel {
+        .score-board {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
             gap: 10px;
             flex-wrap: wrap;
-            max-width: 800px;
-            margin: 0 auto 15px auto;
         }
         .score-card {
             background: #000000aa;
-            padding: 8px 20px;
+            padding: 5px 12px;
             border-radius: 40px;
             font-weight: bold;
             color: #ffd966;
             font-size: 1rem;
         }
+        .controls { margin-top: 15px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        button {
+            background: #dba53f;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.05s;
+            touch-action: manipulation;
+        }
+        button:active { transform: scale(0.95); }
+        .reset-btn { background: #e74c3c; color: white; }
+        .jump-btn { background: #2ecc71; color: white; font-size: 1.3rem; padding: 12px 30px; }
+        .info {
+            margin-top: 15px;
+            padding: 8px;
+            border-radius: 30px;
+            background: #000000aa;
+            color: #ffd966;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0a2f1f, #051a0e);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .lock-box {
+            background: #2c4a2e;
+            padding: 30px;
+            border-radius: 60px;
+            border: 2px solid #d4af37;
+            text-align: center;
+            width: 280px;
+        }
+        .lock-box input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 50px;
+            border: none;
+            margin: 20px 0;
+            font-weight: bold;
+            background: #f5e6c4;
+        }
+        .lock-box button {
+            background: #dba53f;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            .score-card { font-size: 0.8rem; padding: 4px 10px; }
+            button { padding: 10px 18px; font-size: 0.9rem; }
+            .jump-btn { padding: 12px 25px; font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
-<div id="main-menu">
-    <h1 style="color:#da291c;">🏆 AHMED PRO SYSTEM - المافيا المتكاملة</h1>
-    <button class="menu-btn" onclick="showGame('mafia')">🔪 موزع المافيا (دكتور + ولد + تسكيت)</button>
-    <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج الكاملة</button>
-    <button class="menu-btn" onclick="showGame('spy')">🕵️ لعبة الجاسوس (أوفلاين)</button>
-    <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🕵️ الجاسوس (أونلاين)</button>
-    <button class="menu-btn" style="border-color: #2ecc71; background:#1a5a2a;" onclick="showGame('karm')">🦘 لعبة كرم (القفز)</button>
-</div>
-
-<!-- ===================== أقسام الألعاب ===================== -->
-
-<!-- المافيا -->
-<div id="mafia-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🗡️ المافيا - دكتور + ولد + تسكيت</h3></div>
-    <div id="mafia-setup">
-        <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
-        <button onclick="addMafiaPlayer()">➕ إضافة لاعب</button>
-        <div id="mafia-preview" style="margin:10px; color:#888; font-size:0.9em;"></div>
-        <button style="background:green;" onclick="startMafiaDist()">🎲 توزيع الأدوار + الراوي</button>
-        <div style="margin-top:10px; font-size:0.7em; color:#aaa;">
-            👥 4-8 لاعبين: مافيا 🔪 قاتل + دكتور 💉<br>
-            👥 9 فأكثر: مافيا قاتل 🔪 + مافيا تسكيت 🤐 + دكتور 💉 + ولد 🧒
-        </div>
-    </div>
-    <div id="mafia-board" class="hidden">
-        <div id="narrator-name"></div>
-        <div id="mafia-cards-container" style="margin-top:15px;"></div>
+<div id="lockScreen" class="lock-screen">
+    <div class="lock-box">
+        <div style="font-size: 3rem;">🔐</div>
+        <h2 style="color:#ffd966;">أدخل كلمة السر</h2>
+        <input type="password" id="passwordInput" placeholder="***" maxlength="10" autocomplete="off">
+        <button id="unlockBtn">فتح البوابة</button>
     </div>
 </div>
 
-<!-- الشطرنج -->
-<div id="chess-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>♟️ شطرنج أحمد المحترف ♟️</h3></div>
-    <div class="chess-container">
-        <div class="move-history" id="move-history"><h4>📜 سجل الحركات</h4><div id="history-list"></div></div>
-        <div class="chess-main">
-            <div class="timer-box" id="timer-display">⏱️ 00:25</div>
-            <div id="board" style="position: relative;"></div>
-            <div class="chess-buttons">
-                <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
-                <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
-            </div>
+<div id="gameApp" style="display: none;">
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-card">⭐ النقاط: <span id="score">0</span></div>
+            <div class="score-card">🏆 أعلى نتيجة: <span id="highScore">0</span></div>
+            <div class="score-card">❤️ الصحة: <span id="health">3</span></div>
         </div>
-        <div class="fake-chat" id="fake-chat">
-            <h4>💬 شات مع الخصم</h4>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="50">
-                <button id="send-chat-btn">📩 إرسال</button>
-            </div>
+        
+        <canvas id="gameCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400"></canvas>
+        
+        <div class="controls">
+            <button class="jump-btn" id="jumpButtonMobile">🦘 قفز</button>
+            <button class="reset-btn" id="resetBtn">🔄 إعادة</button>
         </div>
-    </div>
-    <div style="margin-top:10px; text-align:center;">
-        <div id="setup-area">
-            <button onclick="hostGame()">إنشاء طاولة (Host)</button>
-            <p>أو</p>
-            <input type="number" id="joinCode" placeholder="أدخل كود الخصم">
-            <button onclick="joinGame()">دخول (Join)</button>
-        </div>
-        <div class="turn-box" id="turn-display">انتظار اللاعب...</div>
+        
+        <div class="info" id="info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
     </div>
 </div>
-
-<!-- الجاسوس أوفلاين -->
-<div id="spy-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🕵️ لعبة الجاسوس (أوفلاين)</h3></div>
-    <div id="spy-setup">
-        <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
-        <button onclick="addSpyPlayer()">إضافة لاعب</button>
-        <div id="spy-preview" style="margin:10px; color:#888;"></div>
-        <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
-    </div>
-    <div id="spy-board" class="hidden"><div id="spy-cards-container"></div></div>
-</div>
-
-<!-- الجاسوس أونلاين -->
-<div id="spy-online-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🕵️ الجاسوس أونلاين</h3></div>
-    <div id="spy-online-setup">
-        <input type="text" id="spyNick" placeholder="اسمك">
-        <button onclick="hostRoom()">إنشاء غرفة</button>
-        <input type="text" id="roomCode" placeholder="كود الغرفة">
-        <button onclick="joinRoom()">دخول</button>
-    </div>
-    <div id="lobby" class="hidden"><div id="display-room-id"></div><div id="online-players-list"></div><button id="start-btn" onclick="startOnlineGame()">ابدأ</button></div>
-    <div id="game-play" class="hidden"><div class="spy-card" onclick="$(this).find('.role-display').toggle()"><p>اضغط لإظهار المكان</p><div id="my-role" class="role-display"></div></div><div id="voting-area"><h4 id="vote-title">صوّت للجاسوس:</h4><div id="vote-btns"></div><div id="vote-log-container"></div><div id="final-result"></div></div></div>
-</div>
-
-<!-- لعبة كرم -->
-<div id="karm-section" class="hidden">
-    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <div class="header"><h3>🦘 لعبة كرم - القفز المذهل 🦘</h3></div>
-    <div style="text-align:center;">
-        <div class="score-panel">
-            <div class="score-card">⭐ النقاط: <span id="karm-score">0</span></div>
-            <div class="score-card">🏆 أعلى نتيجة: <span id="karm-highScore">0</span></div>
-            <div class="score-card">❤️ الصحة: <span id="karm-health">3</span></div>
-        </div>
-        <canvas id="karmCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400; border-radius:20px;"></canvas>
-        <div style="margin-top:15px; display:flex; gap:15px; justify-content:center;">
-            <button id="karmJumpBtn" class="karm-jump-btn">🦘 قفز</button>
-            <button id="karmResetBtn" style="background:#e74c3c; padding:12px 25px; border-radius:50px;">🔄 إعادة</button>
-        </div>
-        <div style="margin-top:15px; padding:8px; border-radius:30px; background:#000000aa; color:#ffd966;" id="karm-info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
 <script>
-// ===================== المتغيرات العامة =====================
-let isLocked = false;
-let mPlayers = [];
-let sPlayers = [];
-let players = [];
-let peer = null;
-let myName = "";
-let host = false;
-let votesReceived = [];
-
-const spyPlaces = [ 
-    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
-    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
-    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
-    "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
-    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات",
-    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان",
-    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير",
-    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء",
-    "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
-];
-
-// ===================== المافيا =====================
-function addMafiaPlayer() {
-    let n = $('#mafiaPlayerName').val().trim();
-    if(n) {
-        mPlayers.push(n);
-        $('#mafia-preview').html("👥 اللاعبين: " + mPlayers.join(" - "));
-        $('#mafiaPlayerName').val("").focus();
-    }
-}
-
-function getRolesDistribution(playersList) {
-    let count = playersList.length;
-    let roles = [];
-    let doctorsCount = 1;
-    let hasSilentMafia = (count >= 9);
-    let hasChild = (count >= 9);
-    let citizensCount = count - doctorsCount - 1;
-    if(hasSilentMafia) citizensCount--;
-    if(hasChild) citizensCount--;
-    if(citizensCount < 0) citizensCount = 0;
+    // كلمة المرور
+    const SECRET_CODE = "567";
     
-    roles.push({type:'mafia', name:'مافيا 🔪 (قاتل)', class:'mafia-role'});
-    if(hasSilentMafia) roles.push({type:'silent_mafia', name:'مافيا تسكيت 🤐', class:'silent-role'});
-    for(let i=0; i<doctorsCount; i++) roles.push({type:'doctor', name:'دكتور 💉', class:'doctor-role'});
-    if(hasChild) roles.push({type:'child', name:'ولد 🧒 (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
-    for(let i=0; i<citizensCount; i++) roles.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
-    
-    for(let i=roles.length-1; i>0; i--) {
-        let j = Math.floor(Math.random()*(i+1));
-        [roles[i], roles[j]] = [roles[j], roles[i]];
-    }
-    return roles;
-}
-
-function startMafiaDist() {
-    if(mPlayers.length < 4) { alert("⚠️ لازم 4 لاعبين على الأقل!"); return; }
-    let narratorIdx = Math.floor(Math.random() * mPlayers.length);
-    let narratorName = mPlayers[narratorIdx];
-    let playersList = mPlayers.filter((_, i) => i !== narratorIdx);
-    let rolesList = getRolesDistribution(playersList);
-    
-    while(rolesList.length < playersList.length) rolesList.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
-    while(rolesList.length > playersList.length) rolesList.pop();
-    
-    $('#mafia-setup').hide();
-    $('#mafia-board').removeClass('hidden');
-    $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
-    
-    let container = $('#mafia-cards-container').empty();
-    playersList.forEach((player, idx) => {
-        let role = rolesList[idx];
-        let card = $(`
-            <div class="mafia-card" data-player="${player}" data-role-type="${role.type}">
-                <strong style="font-size:1.1rem;">${player}</strong>
-                <div class="role-display" style="margin-top:10px;">
-                    <span class="role-badge ${role.class}">${role.name}</span>
-                    ${role.type === 'child' ? '<div style="font-size:0.7rem; margin-top:5px;">⚔️ إذا التوزيع جمعه مع مافيا يقدر يضرب</div>' : ''}
-                    ${role.type === 'silent_mafia' ? '<div style="font-size:0.7rem;">🤐 يمتلك قدرة إسكات أحد اللاعبين ليلة واحدة</div>' : ''}
-                    ${role.type === 'doctor' ? '<div style="font-size:0.7rem;">💉 يستطيع حماية شخص واحد كل ليلة من المافيا</div>' : ''}
-                </div>
-            </div>
-        `);
-        card.click(function() {
-            if(isLocked) return;
-            isLocked = true;
-            $('.mafia-card').addClass('locked');
-            $(this).removeClass('locked');
-            $(this).find('strong').hide();
-            $(this).find('.role-display').fadeIn();
-            setTimeout(() => {
-                $(this).addClass('fade-out');
-                setTimeout(() => {
-                    $(this).css('visibility', 'hidden');
-                    isLocked = false;
-                    $('.mafia-card').removeClass('locked');
-                }, 500);
-            }, 3500);
-        });
-        container.append(card);
-    });
-}
-
-// ===================== الجاسوس أوفلاين =====================
-function addSpyPlayer() {
-    let n = $('#spyPlayerName').val().trim();
-    if(n){
-        sPlayers.push(n);
-        $('#spy-preview').text("👥 اللاعبين: " + sPlayers.join(" - "));
-        $('#spyPlayerName').val("").focus();
-    }
-}
-
-function startSpyDist() {
-    if(sPlayers.length < 3) { alert("⚠️ لازم 3 لاعبين على الأقل!"); return; }
-    let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-    let spyIdx = Math.floor(Math.random() * sPlayers.length);
-    let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`);
-    
-    $('#spy-setup').hide();
-    $('#spy-board').removeClass('hidden');
-    let container = $('#spy-cards-container').empty();
-    
-    sPlayers.forEach((player, i) => {
-        let card = $(`
-            <div class="spy-card">
-                <strong>${player}</strong>
-                <div class="role-display" style="color: #0f0; font-size:1rem;">${roles[i]}</div>
-            </div>
-        `);
-        card.click(function() {
-            if(isLocked) return;
-            isLocked = true;
-            $('.spy-card').addClass('locked');
-            $(this).removeClass('locked');
-            $(this).find('strong').hide();
-            $(this).find('.role-display').fadeIn();
-            setTimeout(() => {
-                $(this).addClass('fade-out');
-                setTimeout(() => {
-                    $(this).css('visibility', 'hidden');
-                    isLocked = false;
-                    $('.spy-card').removeClass('locked');
-                }, 500);
-            }, 3000);
-        });
-        container.append(card);
-    });
-}
-
-// ===================== الجاسوس أونلاين =====================
-function hostRoom() {
-    myName = $('#spyNick').val().trim();
-    if(!myName) { alert("اكتب اسمك"); return; }
-    host = true;
-    let id = "ROOM_" + Math.floor(100 + Math.random() * 899);
-    peer = new Peer(id);
-    peer.on('open', (i) => {
-        $('#spy-online-setup').hide();
-        $('#lobby').removeClass('hidden');
-        $('#display-room-id').text("🔑 كود الغرفة: " + i);
-        players.push({name: myName, id: i});
-        updateLobby();
-        $('#start-btn').show();
-    });
-    peer.on('connection', c => {
-        c.on('data', d => {
-            if(d.type === 'join') {
-                players.push({name: d.name, id: c.peer});
-                broadcast({type: 'list', list: players});
-                updateLobby();
-            }
-            if(d.type === 'vote') handleOnlineVote(d.voter, d.target);
-        });
-    });
-}
-
-function joinRoom() {
-    myName = $('#spyNick').val().trim();
-    let code = $('#roomCode').val().trim();
-    if(!myName || !code) { alert("اكتب اسمك والكود"); return; }
-    peer = new Peer();
-    peer.on('open', id => {
-        let conn = peer.connect(code);
-        conn.on('open', () => {
-            conn.send({type: 'join', name: myName});
-            $('#spy-online-setup').hide();
-            $('#lobby').removeClass('hidden');
-        });
-        conn.on('data', d => {
-            if(d.type === 'list') { players = d.list; updateLobby(); }
-            if(d.type === 'start') startOnlineGameView(d.role, d.names);
-            if(d.type === 'res') showOnlineFinalResults(d.spy, d.logs);
-        });
-    });
-}
-
-function updateLobby() {
-    $('#online-players-list').text("👥 المتصلين: " + players.map(p => p.name).join(" - "));
-}
-
-function broadcast(d) {
-    if(peer && peer.connections) {
-        Object.values(peer.connections).forEach(c => {
-            if(c[0]) c[0].send(d);
-        });
-    }
-}
-
-function startOnlineGame() {
-    let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-    let spyIdx = Math.floor(Math.random() * players.length);
-    peer.actualSpy = players[spyIdx].name;
-    votesReceived = [];
-    
-    players.forEach((p, i) => {
-        let role = (i === spyIdx) ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`;
-        if(p.name === myName) {
-            startOnlineGameView(role, players.map(pl => pl.name));
+    document.getElementById("unlockBtn").addEventListener("click", function() {
+        const inputVal = document.getElementById("passwordInput").value;
+        if (inputVal === SECRET_CODE) {
+            document.getElementById("lockScreen").style.display = "none";
+            document.getElementById("gameApp").style.display = "block";
+            startGameLogic();
         } else {
-            let conn = Object.values(peer.connections).find(c => c[0] && c[0].peer === p.id);
-            if(conn && conn[0]) conn[0].send({type: 'start', role: role, names: players.map(pl => pl.name)});
+            document.getElementById("passwordInput").value = "";
         }
     });
-}
-
-function startOnlineGameView(role, names) {
-    $('#lobby').hide();
-    $('#game-play').removeClass('hidden');
-    $('#my-role').text(role).hide();
-    $('#vote-log-container').empty();
-    $('#final-result').empty();
-    $('#vote-title').show();
-    let btns = $('#vote-btns').empty().show();
-    names.forEach(n => {
-        if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`);
-    });
-}
-
-function sendOnlineVote(target) {
-    $('.vote-btn').addClass('locked');
-    if(host) {
-        handleOnlineVote(myName, target);
-    } else {
-        let conn = Object.values(peer.connections)[0];
-        if(conn && conn[0]) conn[0].send({type: 'vote', voter: myName, target: target});
-    }
-}
-
-function handleOnlineVote(voter, target) {
-    votesReceived.push(`${voter} صوت لـ ${target}`);
-    if(votesReceived.length >= players.length) {
-        let result = {type: 'res', spy: peer.actualSpy, logs: votesReceived};
-        broadcast(result);
-        showOnlineFinalResults(peer.actualSpy, votesReceived);
-    }
-}
-
-function showOnlineFinalResults(spyName, logs) {
-    $('#vote-btns').hide();
-    $('#vote-title').hide();
-    let html = "<strong>🗳️ نتائج التصويت:</strong><br>";
-    logs.forEach(l => html += `<div class="vote-log-item">${l}</div>`);
-    $('#vote-log-container').html(html);
-    $('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
-}
-
-// ===================== الشطرنج =====================
-let chessBoard = null;
-let chessGame = new Chess();
-let chessConn = null;
-let myChessColor = 'w';
-let selectedChessSq = null;
-let timerInterval = null;
-let timeLeft = 25;
-let gameActive = true;
-let moveHistory = [];
-let suggestionEnabled = false;
-let suggestionInterval = null;
-let isAIPlaying = false;
-let aiInterval = null;
-
-function getAIMove() {
-    let moves = chessGame.moves({ verbose: true });
-    if(moves.length === 0) return null;
-    let bestMove = moves[0];
-    let bestScore = -Infinity;
     
-    for(let move of moves) {
+    document.getElementById("passwordInput").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") document.getElementById("unlockBtn").click();
+    });
+    
+    function startGameLogic() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // ضبط أبعاد canvas الحقيقية (لأن CSS تغير الحجم)
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = 800;
+            canvas.height = 400;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        const OBSTACLE_IMG_URL = 'https://i.imgur.com/Prv0riC.jpeg';
+        const PLAYER_IMG_URL = 'https://i.imgur.com/IpswxEw.jpeg';
+        
+        const GROUND_Y = 340;
         let score = 0;
-        let target = chessGame.get(move.to);
-        if(target) {
-            let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
-            score += pieceValues[target.type] || 0;
+        let highScore = localStorage.getItem('jumpHighScore567') || 0;
+        let health = 3;
+        let gameRunning = true;
+        let jumpRequest = false;
+        
+        const player = { x: 100, y: GROUND_Y - 40, width: 45, height: 45, velocityY: 0, isJumping: false, originalY: GROUND_Y - 40 };
+        let obstacles = [];
+        let stars = [];
+        let particles = [];
+        let obstacleTimer = 0, starTimer = 0;
+        
+        const GRAVITY = 0.8, JUMP_POWER = -12;
+        
+        document.getElementById('highScore').innerHTML = highScore;
+        
+        // تحميل الصور مع fallback
+        const playerImg = new Image();
+        const obstacleImg = new Image();
+        playerImg.src = PLAYER_IMG_URL;
+        obstacleImg.src = OBSTACLE_IMG_URL;
+        
+        let playerImgFailed = false;
+        let obstacleImgFailed = false;
+        
+        playerImg.onerror = () => { playerImgFailed = true; };
+        obstacleImg.onerror = () => { obstacleImgFailed = true; };
+        
+        // دالة القفز المحسنة
+        function performJump() {
+            if (!gameRunning) return false;
+            if (!player.isJumping) {
+                player.velocityY = JUMP_POWER;
+                player.isJumping = true;
+                // تأثيرات
+                for(let i = 0; i < 8; i++) {
+                    particles.push({ 
+                        x: player.x + player.width/2, 
+                        y: player.y + player.height, 
+                        vx: (Math.random() - 0.5) * 4, 
+                        vy: Math.random() * 4, 
+                        life: 15 
+                    });
+                }
+                return true;
+            }
+            return false;
         }
-        let testGame = new Chess(chessGame.fen());
-        let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
-        if(executed) {
-            if(testGame.in_checkmate()) score += 1000;
-            if(testGame.in_check()) score += 5;
-            let piece = chessGame.get(move.from);
-            if(piece && (piece.type === 'n' || piece.type === 'b')) {
-                if(move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
-                    score += 1.5;
+        
+        function addObstacle() { 
+            if (gameRunning) obstacles.push({ x: canvas.width, y: GROUND_Y - 40, width: 45, height: 45 }); 
+        }
+        function addStar() { 
+            if (gameRunning) stars.push({ x: canvas.width, y: GROUND_Y - 60 - Math.random() * 40, width: 28, height: 28, collected: false }); 
+        }
+        
+        function updatePlayer() {
+            if (!gameRunning) return;
+            player.velocityY += GRAVITY;
+            player.y += player.velocityY;
+            if (player.y >= player.originalY) { 
+                player.y = player.originalY; 
+                player.isJumping = false; 
+                player.velocityY = 0; 
+            }
+            if (player.y > canvas.height) takeDamage();
+            if (player.y < 0) { player.y = 0; player.velocityY = 0; }
+        }
+        
+        function takeDamage() {
+            if (!gameRunning) return;
+            health--;
+            document.getElementById('health').innerHTML = health;
+            canvas.style.transform = 'translateX(5px)';
+            setTimeout(() => { canvas.style.transform = ''; }, 100);
+            if (health <= 0) { 
+                gameRunning = false; 
+                document.getElementById('info').innerHTML = '💀 انتهت اللعبة! اضغط إعادة 💀'; 
+            }
+        }
+        
+        function addPoints(points) {
+            if (!gameRunning) return;
+            score += points;
+            document.getElementById('score').innerHTML = score;
+            if (score > highScore) { 
+                highScore = score; 
+                localStorage.setItem('jumpHighScore567', highScore); 
+                document.getElementById('highScore').innerHTML = highScore; 
+            }
+        }
+        
+        function updateObjects() {
+            if (!gameRunning) return;
+            for (let i=0; i<obstacles.length; i++) {
+                obstacles[i].x -= 5;
+                if (obstacles[i].x < player.x + player.width && obstacles[i].x + obstacles[i].width > player.x &&
+                    obstacles[i].y < player.y + player.height && obstacles[i].y + obstacles[i].height > player.y) {
+                    takeDamage();
+                    obstacles.splice(i,1); i--;
                 }
             }
-            let oppMoves = testGame.moves({ verbose: true });
-            for(let oppMove of oppMoves) {
-                let captured = testGame.get(oppMove.to);
-                if(captured && captured.color === testGame.turn() && oppMove.to === move.to) {
-                    let capVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
-                    score -= capVal * 0.6;
-                    break;
+            obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
+            
+            for (let i=0; i<stars.length; i++) {
+                stars[i].x -= 5;
+                if (!stars[i].collected && stars[i].x < player.x + player.width && stars[i].x + stars[i].width > player.x &&
+                    stars[i].y < player.y + player.height && stars[i].y + stars[i].height > player.y) {
+                    stars[i].collected = true;
+                    addPoints(10);
+                    for(let j=0;j<8;j++) particles.push({ x: stars[i].x + stars[i].width/2, y: stars[i].y + stars[i].height/2, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
                 }
             }
+            stars = stars.filter(star => !star.collected && star.x + star.width > 0);
         }
-        if(score > bestScore) { bestScore = score; bestMove = move; }
-    }
-    return bestMove;
-}
-
-function aiMakeMove() {
-    if(!gameActive || !isAIPlaying) return;
-    if(chessGame.game_over()) {
-        isAIPlaying = false;
-        if(aiInterval) clearInterval(aiInterval);
-        return;
-    }
-    if(chessGame.turn() !== myChessColor) return;
-    
-    let move = getAIMove();
-    if(move) {
-        chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
-        addMoveToHistory(move);
-        chessBoard.position(chessGame.fen());
-        if(chessConn) chessConn.send({ f: move.from, t: move.to });
-        updateChessStatus();
-        stopTimer();
-        if(!chessGame.game_over()) {
-            if(chessGame.turn() === myChessColor) startTimer();
-            else $('#timer-display').text('⏱️ انتظر دور الخصم');
-        } else {
-            endGame('🤖 الـ AI حقق الفوز! كش ملك 🤖');
-        }
-    }
-}
-
-function startAIPlaying() {
-    if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك", true); return; }
-    if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
-    isAIPlaying = true;
-    addFakeMessage("🤖 تم تشغيل الـ AI سيلعب عنك 🤖", true);
-    if(aiInterval) clearInterval(aiInterval);
-    aiMakeMove();
-    aiInterval = setInterval(() => {
-        if(isAIPlaying && gameActive && chessGame.turn() === myChessColor && !chessGame.game_over()) {
-            aiMakeMove();
-        }
-    }, 500);
-}
-
-function stopAIPlaying() {
-    if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
-    isAIPlaying = false;
-    if(aiInterval) clearInterval(aiInterval);
-    addFakeMessage("🛑 تم إيقاف الـ AI", true);
-}
-
-function sendSuggestion() {
-    if(!suggestionEnabled) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) return;
-    
-    let best = getAIMove();
-    if(best) {
-        let piece = chessGame.get(best.from);
-        let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
-        addFakeMessage(`💡 الاقتراح: حرك ${pieceName} من ${best.from} إلى ${best.to}`, true);
-    }
-}
-
-function toggleSuggestion() {
-    suggestionEnabled = !suggestionEnabled;
-    if(suggestionEnabled) {
-        addFakeMessage("💡 الاقتراحات مفعلة", true);
-        sendSuggestion();
-        if(suggestionInterval) clearInterval(suggestionInterval);
-        suggestionInterval = setInterval(() => {
-            if(suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
-                sendSuggestion();
+        
+        function updateParticles() {
+            for (let i=0; i<particles.length; i++) { 
+                particles[i].x += particles[i].vx; 
+                particles[i].y += particles[i].vy; 
+                particles[i].life--; 
             }
-        }, 12000);
-    } else {
-        if(suggestionInterval) clearInterval(suggestionInterval);
-        addFakeMessage("🔕 الاقتراحات معطلة", true);
-    }
-}
-
-function showSecretPanel() {
-    $('.secret-panel').remove();
-    let panel = $(`
-        <div class="secret-panel">
-            <h3 style="color:gold;">🔓 التحكم السري 🔓</h3>
-            <button id="secret-ai-start">🤖 تشغيل الـ AI</button>
-            <button id="secret-ai-stop">🛑 إيقاف الـ AI</button>
-            <button id="secret-suggestions-on">💡 تفعيل الاقتراحات</button>
-            <button id="secret-suggestions-off">🔕 إيقاف الاقتراحات</button>
-            <button id="secret-close" style="background:#da291c;">❌ إغلاق</button>
-        </div>
-    `);
-    $('body').append(panel);
-    
-    $('#secret-ai-start').on('click', () => { startAIPlaying(); $('.secret-panel').remove(); });
-    $('#secret-ai-stop').on('click', () => { stopAIPlaying(); $('.secret-panel').remove(); });
-    $('#secret-suggestions-on').on('click', () => { if(!suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
-    $('#secret-suggestions-off').on('click', () => { if(suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
-    $('#secret-close').on('click', () => { $('.secret-panel').remove(); });
-}
-
-function addBoardCoordinates() {
-    setTimeout(() => {
-        let boardEl = $('#board .chessboard-js');
-        if(!boardEl.length) boardEl = $('#board');
-        boardEl.css('position', 'relative');
-        $('.board-coords').remove();
-        let files = ['a','b','c','d','e','f','g','h'];
-        let ranks = ['8','7','6','5','4','3','2','1'];
-        let squareSize = boardEl.width() / 8;
-        for(let i = 0; i < 8; i++) {
-            let fileDiv = $(`<div class="board-coords file-coord" style="left: ${i * squareSize + squareSize/2 - 8}px; bottom: 2px;">${files[i]}</div>`);
-            boardEl.append(fileDiv);
-            let rankDiv = $(`<div class="board-coords rank-coord" style="top: ${i * squareSize + squareSize/2 - 8}px; right: 2px;">${ranks[i]}</div>`);
-            boardEl.append(rankDiv);
-        }
-    }, 100);
-}
-
-function addFakeMessage(msg, isSystem = false) {
-    let msgDiv = $('<p></p>').text(msg);
-    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
-    else msgDiv.css('color', '#0f0');
-    $('#chat-messages').append(msgDiv);
-    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
-}
-
-function hackWin() {
-    if(!gameActive) return;
-    gameActive = false;
-    stopTimer();
-    stopAIPlaying();
-    let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('💀 اختراق ناجح! ' + winnerText + ' فاز 💀');
-    if(chessConn) chessConn.send({ type: 'hack_lose' });
-    alert('💀 اختراق ناجح! ' + winnerText + ' فاز');
-}
-
-function setupFakeChat() {
-    $('#send-chat-btn').off('click').on('click', function() {
-        let msg = $('#chat-input').val().trim();
-        if(msg === "") return;
-        
-        if(msg === "77") {
-            showSecretPanel();
-            $('#chat-input').val("");
-            return;
-        }
-        if(msg === "079866") {
-            setTimeout(() => { hackWin(); }, 50);
-            $('#chat-input').val("");
-            return;
+            particles = particles.filter(p => p.life > 0);
         }
         
-        addFakeMessage("أنت: " + msg);
-        $('#chat-input').val("");
-        setTimeout(() => {
-            addFakeMessage("الخصم: " + ["هاها", "يلا نلعب", "بس شوي", "قوي", "شطرنج", "🤔", "وين كنت؟", "تمام", "ماشي"][Math.floor(Math.random() * 9)], false);
-        }, 1000 + Math.random() * 2000);
-    });
-    $('#chat-input').off('keypress').on('keypress', function(e) {
-        if(e.which === 13) $('#send-chat-btn').click();
-    });
-}
-
-const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
-const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
-
-function updateMoveHistory() {
-    let html = '';
-    moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
-    $('#history-list').html(html);
-    $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
-}
-
-function addMoveToHistory(move) {
-    let moveText = `${move.from} → ${move.to}`;
-    if(move.promotion) moveText += ` (ترقية)`;
-    moveHistory.push(moveText);
-    updateMoveHistory();
-}
-
-function stopTimer() {
-    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-
-function startTimer() {
-    if(!gameActive) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) {
-        $('#timer-display').text('⏱️ انتظر دور الخصم');
-        return;
-    }
-    timeLeft = 25;
-    updateTimerDisplay();
-    if(timerInterval) stopTimer();
-    timerInterval = setInterval(() => {
-        if(!gameActive) return;
-        if(chessGame.turn() !== myChessColor) {
-            stopTimer();
-            $('#timer-display').text('⏱️ انتظر دور الخصم');
-            return;
+        function generateObjects() {
+            if (!gameRunning) return;
+            obstacleTimer++;
+            if (obstacleTimer > 60) { 
+                obstacleTimer = 0; 
+                if (Math.random() < 0.6) addObstacle(); 
+            }
+            starTimer++;
+            if (starTimer > 40) { 
+                starTimer = 0; 
+                if (Math.random() < 0.4) addStar(); 
+            }
         }
-        if(chessGame.game_over()) { stopTimer(); return; }
-        timeLeft--;
-        updateTimerDisplay();
-        if(timeLeft <= 0) {
-            stopTimer();
-            gameActive = false;
-            stopAIPlaying();
-            let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-            alert(`⏰ انتهى الوقت! ${loser} خسر`);
-            $('#turn-display').text(`⏰ ${loser} خسر`);
-            if(chessConn) chessConn.send({ type: 'timeout', loser: myChessColor });
-            $('#timer-display').text('⏰ وقت منتهي');
-        }
-    }, 1000);
-}
-
-function updateTimerDisplay() {
-    let seconds = timeLeft;
-    let display = `⏱️ ${seconds.toString().padStart(2, '0')} ث`;
-    $('#timer-display').text(display);
-    if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
-    else $('#timer-display').css('color', '#ff0');
-}
-
-function endGame(message) {
-    gameActive = false;
-    stopTimer();
-    stopAIPlaying();
-    if(suggestionInterval) clearInterval(suggestionInterval);
-    alert(message);
-    $('#turn-display').text(message);
-}
-
-function updateChessStatus() {
-    let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
-    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة";
-    else if(chessGame.in_stalemate()) status = "تعادل";
-    $('#turn-display').text(status);
-}
-
-function initChess() {
-    $('#setup-area').show();
-    $('#turn-display').text('انتظار اللاعب...');
-    gameActive = true;
-    suggestionEnabled = false;
-    isAIPlaying = false;
-    if(suggestionInterval) clearInterval(suggestionInterval);
-    if(aiInterval) clearInterval(aiInterval);
-    moveHistory = [];
-    updateMoveHistory();
-    $('#chat-messages').empty();
-    setupFakeChat();
-    
-    chessGame = new Chess();
-    selectedChessSq = null;
-    timeLeft = 25;
-    
-    chessBoard = Chessboard('board', {
-        draggable: false,
-        orientation: myChessColor === 'w' ? 'white' : 'black',
-        position: 'start',
-        pieceTheme: (p) => {
-            if(p === 'wK') return whiteKingPhoto;
-            if(p === 'bK') return blackKingPhoto;
-            return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}', p);
-        }
-    });
-    
-    addBoardCoordinates();
-
-    $('#board').off('click').on('click', '.square-55d63', function() {
-        if(!gameActive) return;
-        if(isAIPlaying) {
-            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً", true);
-            return;
-        }
-        if(chessGame.turn() !== myChessColor) return;
         
-        let sq = $(this).data('square');
-        let piece = chessGame.get(sq);
-        
-        if(piece && piece.color === myChessColor) {
-            $('.square-55d63').removeClass('highlight-selected');
-            $('.highlight-hint').remove();
-            selectedChessSq = sq;
-            $(this).addClass('highlight-selected');
-            chessGame.moves({ square: sq, verbose: true }).forEach(m => {
-                $('.square-' + m.to).append('<div class="highlight-hint"></div>');
-            });
-        } 
-        else if(selectedChessSq) {
-            let move = chessGame.move({ from: selectedChessSq, to: sq, promotion: 'q' });
-            if(move) {
-                addMoveToHistory(move);
-                chessBoard.position(chessGame.fen());
-                if(chessConn) chessConn.send({ f: selectedChessSq, t: sq });
-                updateChessStatus();
-                stopTimer();
-                if(!chessGame.game_over()) {
-                    if(chessGame.turn() === myChessColor) startTimer();
-                    else $('#timer-display').text('⏱️ انتظر دور الخصم');
+        function draw() {
+            // السماء
+            const grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+            grad.addColorStop(0, '#1a252f'); grad.addColorStop(1, '#2c3e50');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, GROUND_Y);
+            // أرض
+            ctx.fillStyle = '#5d4e30'; ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+            ctx.fillStyle = '#4caf50';
+            for(let i = 0; i < canvas.width; i += 20) ctx.fillRect(i, GROUND_Y - 5, 10, 8);
+            
+            // عقبات
+            for (let obs of obstacles) {
+                if (obstacleImg.complete && obstacleImg.naturalWidth > 0 && !obstacleImgFailed) {
+                    ctx.drawImage(obstacleImg, obs.x, obs.y, obs.width, obs.height);
                 } else {
-                    endGame(chessGame.in_checkmate() ? 'كش ملك!' : 'انتهت اللعبة');
+                    ctx.fillStyle = '#e74c3c'; ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                    ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.fillText('👾', obs.x+10, obs.y+30);
                 }
             }
-            $('.square-55d63').removeClass('highlight-selected');
-            $('.highlight-hint').remove();
-            selectedChessSq = null;
+            
+            // نجوم
+            for (let star of stars) {
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                let cx = star.x + star.width/2, cy = star.y + star.height/2, outerR = 12, innerR = 5;
+                for(let i = 0; i < 5; i++) {
+                    let angle = (i * 72 - 90) * Math.PI/180;
+                    let x1 = cx + Math.cos(angle) * outerR;
+                    let y1 = cy + Math.sin(angle) * outerR;
+                    let angle2 = (i * 72 + 36 - 90) * Math.PI/180;
+                    let x2 = cx + Math.cos(angle2) * innerR;
+                    let y2 = cy + Math.sin(angle2) * innerR;
+                    if(i===0) ctx.moveTo(x1,y1);
+                    ctx.lineTo(x2,y2);
+                    ctx.lineTo(x1,y1);
+                }
+                ctx.fill();
+                ctx.fillStyle = '#f39c12';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 7, 0, Math.PI*2);
+                ctx.fill();
+            }
+            
+            // البطل
+            if (playerImg.complete && playerImg.naturalWidth > 0 && !playerImgFailed) {
+                ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+            } else {
+                ctx.fillStyle = '#3498db'; ctx.fillRect(player.x, player.y, player.width, player.height);
+                ctx.fillStyle = 'white'; ctx.font = '28px Arial'; ctx.fillText('🦸', player.x+8, player.y+35);
+            }
+            
+            // جسيمات
+            for (let p of particles) { 
+                ctx.fillStyle = `rgba(255, 215, 0, ${p.life / 15})`; 
+                ctx.fillRect(p.x, p.y, 4, 4); 
+            }
+            
+            if (!gameRunning) {
+                ctx.fillStyle = '#000000aa'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 30px "Segoe UI"'; ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
+                ctx.font = '20px "Segoe UI"'; ctx.fillStyle = '#ffd966';
+                ctx.fillText('اضغط زر إعادة اللعبة', canvas.width/2, canvas.height/2 + 30);
+                ctx.textAlign = 'left';
+            }
         }
-    });
-    
-    $('#resign-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('هل أنت متأكد من الانسحاب؟')) {
-            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب`);
-            if(chessConn) chessConn.send({ type: 'resign', color: myChessColor });
+        
+        function gameLoop() {
+            if (gameRunning) {
+                updatePlayer();
+                updateObjects();
+                updateParticles();
+                generateObjects();
+            }
+            draw();
+            requestAnimationFrame(gameLoop);
         }
-    });
-    
-    $('#draw-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('طلب تعادل؟')) {
-            alert('تم إرسال طلب التعادل');
-            if(chessConn) chessConn.send({ type: 'draw_request' });
+        
+        function resetGame() {
+            gameRunning = true; 
+            score = 0; 
+            health = 3; 
+            obstacles = []; 
+            stars = []; 
+            particles = [];
+            obstacleTimer = 0; 
+            starTimer = 0; 
+            player.y = player.originalY; 
+            player.velocityY = 0; 
+            player.isJumping = false;
+            document.getElementById('score').innerHTML = '0'; 
+            document.getElementById('health').innerHTML = '3';
+            document.getElementById('info').innerHTML = '🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾';
         }
-    });
-}
-
-function hostGame() {
-    let id = Math.floor(1000 + Math.random() * 9000).toString();
-    let peerChess = new Peer("AHMED_CHESS_" + id);
-    peerChess.on('open', () => alert("🔑 كودك: " + id));
-    peerChess.on('connection', c => {
-        chessConn = c;
-        myChessColor = 'w';
-        initChess();
-        setupChessReceiver();
-        if(chessGame.turn() === myChessColor && gameActive) startTimer();
-    });
-}
-
-function joinGame() {
-    let code = $('#joinCode').val();
-    let peerChess = new Peer();
-    peerChess.on('open', () => {
-        chessConn = peerChess.connect("AHMED_CHESS_" + code);
-        chessConn.on('open', () => {
-            myChessColor = 'b';
-            initChess();
-            setupChessReceiver();
-            if(chessGame.turn() === myChessColor && gameActive) startTimer();
+        
+        // === أحداث القفز المحسنة للجوال والكمبيوتر ===
+        // 1- زر القفز الموجود
+        document.getElementById('jumpButtonMobile').addEventListener('click', (e) => {
+            e.preventDefault();
+            performJump();
         });
-    });
-}
-
-function setupChessReceiver() {
-    chessConn.on('data', data => {
-        if(data.f && data.t) {
-            chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
-            addMoveToHistory({ from: data.f, to: data.t, promotion: 'q' });
-            chessBoard.position(chessGame.fen());
-            updateChessStatus();
-            stopTimer();
-            if(!chessGame.game_over()) {
-                if(chessGame.turn() === myChessColor) startTimer();
-                else $('#timer-display').text('⏱️ انتظر دور الخصم');
-            } else {
-                endGame(chessGame.in_checkmate() ? 'كش ملك!' : 'انتهت اللعبة');
-            }
-        }
-        else if(data.type === 'timeout') { endGame(`⏰ الخصم خسر`); }
-        else if(data.type === 'resign') { endGame(`🏆 الخصم انسحب. فزت!`); }
-        else if(data.type === 'draw_request') {
-            if(confirm('🤝 الخصم يطلب التعادل. توافق؟')) {
-                endGame('تعادل!');
-                chessConn.send({ type: 'draw_accept' });
-            } else {
-                chessConn.send({ type: 'draw_reject' });
-            }
-        }
-        else if(data.type === 'draw_accept') { endGame('تم قبول التعادل'); }
-        else if(data.type === 'hack_lose') { 
-            gameActive = false;
-            stopTimer();
-            stopAIPlaying();
-            alert('💀 الخصم اخترق اللعبة! خسرت');
-        }
-    });
-}
-
-// ===================== لعبة كرم (القفز) - نسخة مصححة بالكامل =====================
-const OBSTACLE_IMG = 'https://i.imgur.com/Prv0riC.jpeg';
-const PLAYER_IMG = 'https://i.imgur.com/IpswxEw.jpeg';
-
-let karmScore = 0;
-let karmHighScore = localStorage.getItem('karmHighScore') || 0;
-let karmHealth = 3;
-let karmGameActive = true;
-
-let karmPlayer = { x: 100, y: 240, width: 45, height: 45, vy: 0, jumping: false };
-let karmObstacles = [];
-let karmStars = [];
-let karmParticles = [];
-let karmObsTimer = 0, karmStarTimer = 0;
-let karmCtx, karmCanvas, karmAnimId;
-
-let playerImg = new Image();
-let obstacleImg = new Image();
-playerImg.src = PLAYER_IMG;
-obstacleImg.src = OBSTACLE_IMG;
-
-function initKarm() {
-    karmCanvas = document.getElementById('karmCanvas');
-    karmCtx = karmCanvas.getContext('2d');
-    karmCanvas.width = 800; karmCanvas.height = 400;
-    karmGameActive = true;
-    karmScore = 0; karmHealth = 3;
-    karmObstacles = []; karmStars = []; karmParticles = [];
-    karmObsTimer = 0; karmStarTimer = 0;
-    karmPlayer = { x: 100, y: 240, width: 45, height: 45, vy: 0, jumping: false };
-    document.getElementById('karm-score').innerText = '0';
-    document.getElementById('karm-health').innerText = '3';
-    document.getElementById('karm-highScore').innerText = karmHighScore;
-    if(karmAnimId) cancelAnimationFrame(karmAnimId);
-    karmGameLoop();
-}
-
-function karmJumpFunc() {
-    if(!karmGameActive) return;
-    if(!karmPlayer.jumping) {
-        karmPlayer.vy = -12;
-        karmPlayer.jumping = true;
-        for(let i=0;i<6;i++) karmParticles.push({ x: karmPlayer.x+22, y: karmPlayer.y+45, vx: (Math.random()-0.5)*4, vy: Math.random()*4, life: 15 });
+        document.getElementById('jumpButtonMobile').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            performJump();
+        });
+        
+        // 2- الضغط على canvas (الشاشة)
+        canvas.addEventListener('click', (e) => { 
+            e.preventDefault();
+            performJump(); 
+        });
+        canvas.addEventListener('touchstart', (e) => { 
+            e.preventDefault();
+            performJump(); 
+        });
+        
+        // 3- مفتاح المسافة للكمبيوتر
+        document.addEventListener('keydown', (e) => { 
+            if (e.code === 'Space' || e.code === 'ArrowUp') { 
+                e.preventDefault(); 
+                performJump(); 
+            } 
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+        
+        resetGame();
+        gameLoop();
     }
-}
-
-function karmUpdate() {
-    if(!karmGameActive) return;
-    karmPlayer.vy += 0.8;
-    karmPlayer.y += karmPlayer.vy;
-    if(karmPlayer.y >= 240) { karmPlayer.y = 240; karmPlayer.jumping = false; karmPlayer.vy = 0; }
-    if(karmPlayer.y > 400) karmTakeDamage();
-    if(karmPlayer.y < 0) { karmPlayer.y = 0; karmPlayer.vy = 0; }
-    
-    for(let i=0;i<karmObstacles.length;i++) {
-        karmObstacles[i].x -= 5;
-        if(karmObstacles[i].x < karmPlayer.x+45 && karmObstacles[i].x+45 > karmPlayer.x &&
-           karmObstacles[i].y < karmPlayer.y+45 && karmObstacles[i].y+45 > karmPlayer.y) {
-            karmTakeDamage();
-            karmObstacles.splice(i,1); i--;
-        }
-    }
-    karmObstacles = karmObstacles.filter(o => o.x+45 > 0);
-    
-    for(let i=0;i<karmStars.length;i++) {
-        karmStars[i].x -= 5;
-        if(!karmStars[i].collected && karmStars[i].x < karmPlayer.x+45 && karmStars[i].x+28 > karmPlayer.x &&
-           karmStars[i].y < karmPlayer.y+45 && karmStars[i].y+28 > karmPlayer.y) {
-            karmStars[i].collected = true;
-            karmScore += 10;
-            document.getElementById('karm-score').innerText = karmScore;
-            if(karmScore > karmHighScore) { karmHighScore = karmScore; localStorage.setItem('karmHighScore', karmHighScore); document.getElementById('karm-highScore').innerHTML = karmHighScore; }
-            for(let j=0;j<8;j++) karmParticles.push({ x: karmStars[i].x+14, y: karmStars[i].y+14, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
-        }
-    }
-    karmStars = karmStars.filter(s => !s.collected && s.x+28 > 0);
-    
-    for(let i=0;i<karmParticles.length;i++) { karmParticles[i].x += karmParticles[i].vx; karmParticles[i].y += karmParticles[i].vy; karmParticles[i].life--; }
-    karmParticles = karmParticles.filter(p => p.life > 0);
-    
-    karmObsTimer++;
-    if(karmObsTimer > 60) { karmObsTimer = 0; if(Math.random()<0.6) karmObstacles.push({ x: 800, y: 200, width: 45, height: 45 }); }
-    karmStarTimer++;
-    if(karmStarTimer > 40) { karmStarTimer = 0; if(Math.random()<0.4) karmStars.push({ x: 800, y: 160+Math.random()*60, width: 28, height: 28, collected: false }); }
-}
-
-function karmTakeDamage() {
-    if(!karmGameActive) return;
-    karmHealth--;
-    document.getElementById('karm-health').innerText = karmHealth;
-    if(karmHealth <= 0) karmGameActive = false;
-}
-
-function karmDraw() {
-    let grad = karmCtx.createLinearGradient(0,0,0,240);
-    grad.addColorStop(0,'#1a252f'); grad.addColorStop(1,'#2c3e50');
-    karmCtx.fillStyle = grad; karmCtx.fillRect(0,0,800,240);
-    karmCtx.fillStyle = '#5d4e30'; karmCtx.fillRect(0,240,800,160);
-    karmCtx.fillStyle = '#4caf50';
-    for(let i=0;i<800;i+=20) karmCtx.fillRect(i,235,10,8);
-    
-    for(let o of karmObstacles) {
-        if(obstacleImg.complete) karmCtx.drawImage(obstacleImg, o.x, o.y, 45, 45);
-        else { karmCtx.fillStyle = '#e74c3c'; karmCtx.fillRect(o.x, o.y, 45, 45); karmCtx.fillStyle='white'; karmCtx.font='20px Arial'; karmCtx.fillText('👾', o.x+10, o.y+30); }
-    }
-    
-    for(let s of karmStars) {
-        karmCtx.fillStyle = '#f1c40f';
-        karmCtx.beginPath();
-        let cx=s.x+14, cy=s.y+14;
-        for(let i=0;i<5;i++) {
-            let ang = (i*72-90)*Math.PI/180;
-            let x1=cx+Math.cos(ang)*12, y1=cy+Math.sin(ang)*12;
-            let ang2=(i*72+36-90)*Math.PI/180;
-            let x2=cx+Math.cos(ang2)*5, y2=cy+Math.sin(ang2)*5;
-            if(i===0) karmCtx.moveTo(x1,y1);
-            karmCtx.lineTo(x2,y2); karmCtx.lineTo(x1,y1);
-        }
-        karmCtx.fill();
-    }
-    
-    if(playerImg.complete && playerImg.naturalWidth > 0) {
-        karmCtx.drawImage(playerImg, karmPlayer.x, karmPlayer.y, 45, 45);
-    } else {
-        karmCtx.fillStyle = '#3498db'; karmCtx.fillRect(karmPlayer.x, karmPlayer.y, 45, 45);
-        karmCtx.fillStyle = 'white'; karmCtx.font='28px Arial'; karmCtx.fillText('🦘', karmPlayer.x+8, karmPlayer.y+35);
-    }
-    
-    for(let p of karmParticles) { karmCtx.fillStyle = `rgba(255,215,0,${p.life/15})`; karmCtx.fillRect(p.x, p.y, 4, 4); }
-    
-    if(!karmGameActive) {
-        karmCtx.fillStyle = '#000000aa'; karmCtx.fillRect(0,0,800,400);
-        karmCtx.fillStyle = '#f1c40f'; karmCtx.font='bold 30px Arial'; karmCtx.textAlign='center';
-        karmCtx.fillText('GAME OVER', 400, 200);
-        karmCtx.fillText('اضغط إعادة', 400, 260);
-        karmCtx.textAlign='left';
-    }
-}
-
-function karmGameLoop() {
-    karmUpdate();
-    karmDraw();
-    karmAnimId = requestAnimationFrame(karmGameLoop);
-}
-
-function karmReset() {
-    if(karmAnimId) cancelAnimationFrame(karmAnimId);
-    initKarm();
-}
-
-// ===================== التحكم بين الألعاب =====================
-function showGame(t) {
-    $('#main-menu').hide();
-    if(t === 'mafia') {
-        $('#mafia-section').removeClass('hidden');
-    } else if(t === 'chess') {
-        $('#chess-section').removeClass('hidden');
-        initChess();
-    } else if(t === 'spy') {
-        $('#spy-section').removeClass('hidden');
-    } else if(t === 'spyOnline') {
-        $('#spy-online-section').removeClass('hidden');
-    } else if(t === 'karm') {
-        let pwd = prompt("🔐 لعبة كرم محمية\nأدخل كلمة السر:");
-        if(pwd === "0798") {
-            $('#karm-section').removeClass('hidden');
-            initKarm();
-            document.getElementById('karmJumpBtn').onclick = () => karmJumpFunc();
-            document.getElementById('karmResetBtn').onclick = () => karmReset();
-            karmCanvas.addEventListener('click', () => karmJumpFunc());
-            document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); karmJumpFunc(); } });
-        } else {
-            alert("❌ كلمة سر خاطئة!");
-            location.reload();
-        }
-    }
-}
 </script>
 </body>
 </html>
