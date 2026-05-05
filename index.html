@@ -55,17 +55,31 @@
         .force-win-panel { display: none; }
         
         /* ستايل لعبة كرم */
-        #karm-game-container canvas {
+        #karm-section canvas {
             display: block;
             margin: 0 auto;
             border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             cursor: pointer;
             background: #2c3e50;
-            width: 100%;
-            height: auto;
         }
         .karm-jump-btn { background: #2ecc71; color: white; font-size: 1.3rem; padding: 12px 30px; width: auto; margin: 5px; }
+        .score-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto 15px auto;
+        }
+        .score-card {
+            background: #000000aa;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #ffd966;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -79,7 +93,9 @@
     <button class="menu-btn" style="border-color: #2ecc71; background:#1a5a2a;" onclick="showGame('karm')">🦘 لعبة كرم (القفز)</button>
 </div>
 
-<!-- ===================== المافيا ===================== -->
+<!-- ===================== أقسام الألعاب ===================== -->
+
+<!-- المافيا -->
 <div id="mafia-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="header"><h3>🗡️ المافيا - دكتور + ولد + تسكيت</h3></div>
@@ -99,7 +115,7 @@
     </div>
 </div>
 
-<!-- ===================== الشطرنج ===================== -->
+<!-- الشطرنج -->
 <div id="chess-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="header"><h3>♟️ شطرنج أحمد المحترف ♟️</h3></div>
@@ -133,7 +149,7 @@
     </div>
 </div>
 
-<!-- ===================== الجاسوس ===================== -->
+<!-- الجاسوس أوفلاين -->
 <div id="spy-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="header"><h3>🕵️ لعبة الجاسوس (أوفلاين)</h3></div>
@@ -146,7 +162,7 @@
     <div id="spy-board" class="hidden"><div id="spy-cards-container"></div></div>
 </div>
 
-<!-- ===================== الجاسوس أونلاين ===================== -->
+<!-- الجاسوس أونلاين -->
 <div id="spy-online-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="header"><h3>🕵️ الجاسوس أونلاين</h3></div>
@@ -160,22 +176,22 @@
     <div id="game-play" class="hidden"><div class="spy-card" onclick="$(this).find('.role-display').toggle()"><p>اضغط لإظهار المكان</p><div id="my-role" class="role-display"></div></div><div id="voting-area"><h4 id="vote-title">صوّت للجاسوس:</h4><div id="vote-btns"></div><div id="vote-log-container"></div><div id="final-result"></div></div></div>
 </div>
 
-<!-- ===================== لعبة كرم (القفز) ===================== -->
+<!-- لعبة كرم -->
 <div id="karm-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="header"><h3>🦘 لعبة كرم - القفز المذهل 🦘</h3></div>
-    <div id="karm-game-container" style="text-align:center;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:10px; flex-wrap:wrap;">
-            <div style="background:#000000aa; padding:8px 20px; border-radius:40px;">⭐ النقاط: <span id="karm-score">0</span></div>
-            <div style="background:#000000aa; padding:8px 20px; border-radius:40px;">🏆 أعلى نتيجة: <span id="karm-highScore">0</span></div>
-            <div style="background:#000000aa; padding:8px 20px; border-radius:40px;">❤️ الصحة: <span id="karm-health">3</span></div>
+    <div style="text-align:center;">
+        <div class="score-panel">
+            <div class="score-card">⭐ النقاط: <span id="karm-score">0</span></div>
+            <div class="score-card">🏆 أعلى نتيجة: <span id="karm-highScore">0</span></div>
+            <div class="score-card">❤️ الصحة: <span id="karm-health">3</span></div>
         </div>
-        <canvas id="karmCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400; border-radius:20px; background:#2c3e50;"></canvas>
+        <canvas id="karmCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400; border-radius:20px;"></canvas>
         <div style="margin-top:15px; display:flex; gap:15px; justify-content:center;">
             <button id="karmJumpBtn" class="karm-jump-btn">🦘 قفز</button>
             <button id="karmResetBtn" style="background:#e74c3c; padding:12px 25px; border-radius:50px;">🔄 إعادة</button>
         </div>
-        <div style="margin-top:15px; padding:8px; border-radius:30px; background:#000000aa; color:#ffd966;">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
+        <div style="margin-top:15px; padding:8px; border-radius:30px; background:#000000aa; color:#ffd966;" id="karm-info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
     </div>
 </div>
 
@@ -185,7 +201,7 @@
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
 <script>
-// ===================== المتغيرات العامة =====================
+// ===================== الجزء الثاني - المتغيرات العامة والمافيا والجاسوس =====================// ===================== المتغيرات العامة =====================
 let isLocked = false;
 let mPlayers = [];
 let sPlayers = [];
@@ -200,10 +216,10 @@ const spyPlaces = [
     "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
     "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
     "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
-    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", 
-    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", 
-    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
-    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
+    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات",
+    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان",
+    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير",
+    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء",
     "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
 ];
 
@@ -216,6 +232,7 @@ function addMafiaPlayer() {
         $('#mafiaPlayerName').val("").focus();
     }
 }
+
 function getRolesDistribution(playersList) {
     let count = playersList.length;
     let roles = [];
@@ -226,28 +243,34 @@ function getRolesDistribution(playersList) {
     if(hasSilentMafia) citizensCount--;
     if(hasChild) citizensCount--;
     if(citizensCount < 0) citizensCount = 0;
+    
     roles.push({type:'mafia', name:'مافيا 🔪 (قاتل)', class:'mafia-role'});
     if(hasSilentMafia) roles.push({type:'silent_mafia', name:'مافيا تسكيت 🤐', class:'silent-role'});
     for(let i=0; i<doctorsCount; i++) roles.push({type:'doctor', name:'دكتور 💉', class:'doctor-role'});
     if(hasChild) roles.push({type:'child', name:'ولد 🧒 (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
     for(let i=0; i<citizensCount; i++) roles.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
+    
     for(let i=roles.length-1; i>0; i--) {
         let j = Math.floor(Math.random()*(i+1));
         [roles[i], roles[j]] = [roles[j], roles[i]];
     }
     return roles;
 }
+
 function startMafiaDist() {
     if(mPlayers.length < 4) { alert("⚠️ لازم 4 لاعبين على الأقل!"); return; }
     let narratorIdx = Math.floor(Math.random() * mPlayers.length);
     let narratorName = mPlayers[narratorIdx];
     let playersList = mPlayers.filter((_, i) => i !== narratorIdx);
     let rolesList = getRolesDistribution(playersList);
+    
     while(rolesList.length < playersList.length) rolesList.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
     while(rolesList.length > playersList.length) rolesList.pop();
+    
     $('#mafia-setup').hide();
     $('#mafia-board').removeClass('hidden');
     $('#narrator-name').html(`<div class="narrator-box">🎤 الراوي: ${narratorName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
+    
     let container = $('#mafia-cards-container').empty();
     playersList.forEach((player, idx) => {
         let role = rolesList[idx];
@@ -291,14 +314,17 @@ function addSpyPlayer() {
         $('#spyPlayerName').val("").focus();
     }
 }
+
 function startSpyDist() {
     if(sPlayers.length < 3) { alert("⚠️ لازم 3 لاعبين على الأقل!"); return; }
     let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
     let spyIdx = Math.floor(Math.random() * sPlayers.length);
     let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`);
+    
     $('#spy-setup').hide();
     $('#spy-board').removeClass('hidden');
     let container = $('#spy-cards-container').empty();
+    
     sPlayers.forEach((player, i) => {
         let card = $(`
             <div class="spy-card">
@@ -352,6 +378,7 @@ function hostRoom() {
         });
     });
 }
+
 function joinRoom() {
     myName = $('#spyNick').val().trim();
     let code = $('#roomCode').val().trim();
@@ -371,9 +398,11 @@ function joinRoom() {
         });
     });
 }
+
 function updateLobby() {
     $('#online-players-list').text("👥 المتصلين: " + players.map(p => p.name).join(" - "));
 }
+
 function broadcast(d) {
     if(peer && peer.connections) {
         Object.values(peer.connections).forEach(c => {
@@ -381,11 +410,13 @@ function broadcast(d) {
         });
     }
 }
+
 function startOnlineGame() {
     let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
     let spyIdx = Math.floor(Math.random() * players.length);
     peer.actualSpy = players[spyIdx].name;
     votesReceived = [];
+    
     players.forEach((p, i) => {
         let role = (i === spyIdx) ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`;
         if(p.name === myName) {
@@ -396,6 +427,7 @@ function startOnlineGame() {
         }
     });
 }
+
 function startOnlineGameView(role, names) {
     $('#lobby').hide();
     $('#game-play').removeClass('hidden');
@@ -408,6 +440,7 @@ function startOnlineGameView(role, names) {
         if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`);
     });
 }
+
 function sendOnlineVote(target) {
     $('.vote-btn').addClass('locked');
     if(host) {
@@ -417,6 +450,7 @@ function sendOnlineVote(target) {
         if(conn && conn[0]) conn[0].send({type: 'vote', voter: myName, target: target});
     }
 }
+
 function handleOnlineVote(voter, target) {
     votesReceived.push(`${voter} صوت لـ ${target}`);
     if(votesReceived.length >= players.length) {
@@ -425,6 +459,7 @@ function handleOnlineVote(voter, target) {
         showOnlineFinalResults(peer.actualSpy, votesReceived);
     }
 }
+
 function showOnlineFinalResults(spyName, logs) {
     $('#vote-btns').hide();
     $('#vote-title').hide();
@@ -432,9 +467,7 @@ function showOnlineFinalResults(spyName, logs) {
     logs.forEach(l => html += `<div class="vote-log-item">${l}</div>`);
     $('#vote-log-container').html(html);
     $('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
-}
-
-// ===================== الشطرنج =====================
+}// ===================== الشطرنج =====================
 let chessBoard = null;
 let chessGame = new Chess();
 let chessConn = null;
@@ -454,6 +487,7 @@ function getAIMove() {
     if(moves.length === 0) return null;
     let bestMove = moves[0];
     let bestScore = -Infinity;
+    
     for(let move of moves) {
         let score = 0;
         let target = chessGame.get(move.to);
@@ -486,6 +520,7 @@ function getAIMove() {
     }
     return bestMove;
 }
+
 function aiMakeMove() {
     if(!gameActive || !isAIPlaying) return;
     if(chessGame.game_over()) {
@@ -494,6 +529,7 @@ function aiMakeMove() {
         return;
     }
     if(chessGame.turn() !== myChessColor) return;
+    
     let move = getAIMove();
     if(move) {
         chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
@@ -510,6 +546,7 @@ function aiMakeMove() {
         }
     }
 }
+
 function startAIPlaying() {
     if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
     if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI", true); return; }
@@ -524,16 +561,19 @@ function startAIPlaying() {
         }
     }, 500);
 }
+
 function stopAIPlaying() {
     if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
     isAIPlaying = false;
     if(aiInterval) clearInterval(aiInterval);
     addFakeMessage("🛑 تم إيقاف الـ AI، ارجعت تلعب بنفسك", true);
 }
+
 function sendSuggestion() {
     if(!suggestionEnabled) return;
     if(chessGame.game_over()) return;
     if(chessGame.turn() !== myChessColor) return;
+    
     let best = getAIMove();
     if(best) {
         let piece = chessGame.get(best.from);
@@ -543,6 +583,7 @@ function sendSuggestion() {
         addFakeMessage(`💡 الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
     }
 }
+
 function toggleSuggestion() {
     suggestionEnabled = !suggestionEnabled;
     if(suggestionEnabled) {
@@ -559,6 +600,7 @@ function toggleSuggestion() {
         addFakeMessage("🔕 الاقتراحات معطلة", true);
     }
 }
+
 function showSecretPanel() {
     $('.secret-panel').remove();
     let panel = $(`
@@ -572,12 +614,14 @@ function showSecretPanel() {
         </div>
     `);
     $('body').append(panel);
+    
     $('#secret-ai-start').on('click', () => { startAIPlaying(); $('.secret-panel').remove(); });
     $('#secret-ai-stop').on('click', () => { stopAIPlaying(); $('.secret-panel').remove(); });
     $('#secret-suggestions-on').on('click', () => { if(!suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
     $('#secret-suggestions-off').on('click', () => { if(suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
     $('#secret-close').on('click', () => { $('.secret-panel').remove(); });
 }
+
 function addBoardCoordinates() {
     setTimeout(() => {
         let boardEl = $('#board .chessboard-js');
@@ -595,6 +639,7 @@ function addBoardCoordinates() {
         }
     }, 100);
 }
+
 function addFakeMessage(msg, isSystem = false) {
     let msgDiv = $('<p></p>').text(msg);
     if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
@@ -602,6 +647,7 @@ function addFakeMessage(msg, isSystem = false) {
     $('#chat-messages').append(msgDiv);
     $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
+
 function hackWin() {
     if(!gameActive) return;
     gameActive = false;
@@ -614,10 +660,12 @@ function hackWin() {
     if(chessConn) chessConn.send({ type: 'hack_lose' });
     alert('💀 اختراق ناجح! 💀\n' + winnerText + ' فاز بواسطة الكود السري');
 }
+
 function setupFakeChat() {
     $('#send-chat-btn').off('click').on('click', function() {
         let msg = $('#chat-input').val().trim();
         if(msg === "") return;
+        
         if(msg === "77") {
             showSecretPanel();
             $('#chat-input').val("");
@@ -628,6 +676,7 @@ function setupFakeChat() {
             $('#chat-input').val("");
             return;
         }
+        
         addFakeMessage("أنت: " + msg);
         $('#chat-input').val("");
         setTimeout(() => {
@@ -638,23 +687,28 @@ function setupFakeChat() {
         if(e.which === 13) $('#send-chat-btn').click();
     });
 }
+
 const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
 const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
+
 function updateMoveHistory() {
     let html = '';
     moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
     $('#history-list').html(html);
     $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
 }
+
 function addMoveToHistory(move) {
     let moveText = `${move.from} → ${move.to}`;
     if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
     moveHistory.push(moveText);
     updateMoveHistory();
 }
+
 function stopTimer() {
     if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 }
+
 function startTimer() {
     if(!gameActive) return;
     if(chessGame.game_over()) return;
@@ -687,6 +741,7 @@ function startTimer() {
         }
     }, 1000);
 }
+
 function updateTimerDisplay() {
     let seconds = timeLeft;
     let display = `⏱️ ${seconds.toString().padStart(2, '0')} ث`;
@@ -694,6 +749,7 @@ function updateTimerDisplay() {
     if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
     else $('#timer-display').css('color', '#ff0');
 }
+
 function endGame(message) {
     gameActive = false;
     stopTimer();
@@ -702,6 +758,7 @@ function endGame(message) {
     alert(message);
     $('#turn-display').text(message);
 }
+
 function updateChessStatus() {
     let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
     if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
@@ -709,6 +766,7 @@ function updateChessStatus() {
     else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
     $('#turn-display').text(status);
 }
+
 function initChess() {
     $('#setup-area').show();
     $('#turn-display').text('انتظار اللاعب الآخر...');
@@ -721,9 +779,11 @@ function initChess() {
     updateMoveHistory();
     $('#chat-messages').empty();
     setupFakeChat();
+    
     chessGame = new Chess();
     selectedChessSq = null;
     timeLeft = 25;
+    
     chessBoard = Chessboard('board', {
         draggable: false,
         orientation: myChessColor === 'w' ? 'white' : 'black',
@@ -734,7 +794,9 @@ function initChess() {
             return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}', p);
         }
     });
+    
     addBoardCoordinates();
+
     $('#board').off('click').on('click', '.square-55d63', function() {
         if(!gameActive) return;
         if(isAIPlaying) {
@@ -742,8 +804,10 @@ function initChess() {
             return;
         }
         if(chessGame.turn() !== myChessColor) return;
+        
         let sq = $(this).data('square');
         let piece = chessGame.get(sq);
+        
         if(piece && piece.color === myChessColor) {
             $('.square-55d63').removeClass('highlight-selected');
             $('.highlight-hint').remove();
@@ -773,6 +837,7 @@ function initChess() {
             selectedChessSq = null;
         }
     });
+    
     $('#resign-btn').off('click').on('click', function() {
         if(!gameActive) return;
         if(confirm('هل أنت متأكد من الانسحاب؟')) {
@@ -780,6 +845,7 @@ function initChess() {
             if(chessConn) chessConn.send({ type: 'resign', color: myChessColor });
         }
     });
+    
     $('#draw-btn').off('click').on('click', function() {
         if(!gameActive) return;
         if(confirm('طلب تعادل. انتظر رد الخصم...')) {
@@ -788,6 +854,7 @@ function initChess() {
         }
     });
 }
+
 function hostGame() {
     let id = Math.floor(1000 + Math.random() * 9000).toString();
     let peerChess = new Peer("AHMED_CHESS_" + id);
@@ -800,6 +867,7 @@ function hostGame() {
         if(chessGame.turn() === myChessColor && gameActive) startTimer();
     });
 }
+
 function joinGame() {
     let code = $('#joinCode').val();
     let peerChess = new Peer();
@@ -813,6 +881,7 @@ function joinGame() {
         });
     });
 }
+
 function setupChessReceiver() {
     chessConn.on('data', data => {
         if(data.f && data.t) {
@@ -850,212 +919,153 @@ function setupChessReceiver() {
 }
 
 // ===================== لعبة كرم (القفز) =====================
-let karmGameRunning = false;
+const OBSTACLE_IMG = 'https://i.imgur.com/Prv0riC.jpeg';
+const PLAYER_IMG = 'https://i.imgur.com/IpswxEw.jpeg';
+
+let karmRunning = false;
 let karmScore = 0;
 let karmHighScore = localStorage.getItem('karmHighScore') || 0;
 let karmHealth = 3;
-let karmPlayer = { x: 100, y: 340, width: 45, height: 45, velocityY: 0, isJumping: false };
+let karmGameActive = true;
+
+let karmPlayer = { x: 100, y: 300, width: 45, height: 45, vy: 0, jumping: false };
 let karmObstacles = [];
 let karmStars = [];
 let karmParticles = [];
-let karmObstacleTimer = 0;
-let karmStarTimer = 0;
-let karmAnimationId = null;
-let karmCanvas, karmCtx;
-let karmGameActive = true;
+let karmObsTimer = 0, karmStarTimer = 0;
+let karmCtx, karmCanvas, karmAnimId;
 
-function initKarmGame() {
+let playerImg = new Image();
+let obstacleImg = new Image();
+playerImg.src = PLAYER_IMG;
+obstacleImg.src = OBSTACLE_IMG;
+
+function initKarm() {
     karmCanvas = document.getElementById('karmCanvas');
     karmCtx = karmCanvas.getContext('2d');
-    karmCanvas.width = 800;
-    karmCanvas.height = 400;
+    karmCanvas.width = 800; karmCanvas.height = 400;
     karmGameActive = true;
-    karmScore = 0;
-    karmHealth = 3;
-    karmObstacles = [];
-    karmStars = [];
-    karmParticles = [];
-    karmObstacleTimer = 0;
-    karmStarTimer = 0;
-    karmPlayer = { x: 100, y: 340, width: 45, height: 45, velocityY: 0, isJumping: false };
+    karmScore = 0; karmHealth = 3;
+    karmObstacles = []; karmStars = []; karmParticles = [];
+    karmObsTimer = 0; karmStarTimer = 0;
+    karmPlayer = { x: 100, y: 300, width: 45, height: 45, vy: 0, jumping: false };
     document.getElementById('karm-score').innerText = '0';
     document.getElementById('karm-health').innerText = '3';
     document.getElementById('karm-highScore').innerText = karmHighScore;
-    if(karmAnimationId) cancelAnimationFrame(karmAnimationId);
+    if(karmAnimId) cancelAnimationFrame(karmAnimId);
     karmGameLoop();
 }
 
-function karmJump() {
+function karmJumpFunc() {
     if(!karmGameActive) return;
-    if(!karmPlayer.isJumping) {
-        karmPlayer.velocityY = -12;
-        karmPlayer.isJumping = true;
-        for(let i=0;i<8;i++) {
-            karmParticles.push({
-                x: karmPlayer.x + karmPlayer.width/2,
-                y: karmPlayer.y + karmPlayer.height,
-                vx: (Math.random() - 0.5) * 4,
-                vy: Math.random() * 4,
-                life: 15
-            });
-        }
+    if(!karmPlayer.jumping) {
+        karmPlayer.vy = -12;
+        karmPlayer.jumping = true;
+        for(let i=0;i<6;i++) karmParticles.push({ x: karmPlayer.x+22, y: karmPlayer.y+45, vx: (Math.random()-0.5)*4, vy: Math.random()*4, life: 15 });
     }
-}
-
-function karmAddObstacle() {
-    if(karmGameActive) karmObstacles.push({ x: 800, y: 300, width: 45, height: 45 });
-}
-function karmAddStar() {
-    if(karmGameActive) karmStars.push({ x: 800, y: 280 - Math.random() * 60, width: 28, height: 28, collected: false });
 }
 
 function karmUpdate() {
     if(!karmGameActive) return;
-    karmPlayer.velocityY += 0.8;
-    karmPlayer.y += karmPlayer.velocityY;
-    if(karmPlayer.y >= 340) {
-        karmPlayer.y = 340;
-        karmPlayer.isJumping = false;
-        karmPlayer.velocityY = 0;
-    }
+    karmPlayer.vy += 0.8;
+    karmPlayer.y += karmPlayer.vy;
+    if(karmPlayer.y >= 300) { karmPlayer.y = 300; karmPlayer.jumping = false; karmPlayer.vy = 0; }
     if(karmPlayer.y > 400) karmTakeDamage();
-    if(karmPlayer.y < 0) { karmPlayer.y = 0; karmPlayer.velocityY = 0; }
+    if(karmPlayer.y < 0) { karmPlayer.y = 0; karmPlayer.vy = 0; }
     
     for(let i=0;i<karmObstacles.length;i++) {
         karmObstacles[i].x -= 5;
-        if(karmObstacles[i].x < karmPlayer.x + karmPlayer.width && karmObstacles[i].x + karmObstacles[i].width > karmPlayer.x &&
-            karmObstacles[i].y < karmPlayer.y + karmPlayer.height && karmObstacles[i].y + karmObstacles[i].height > karmPlayer.y) {
+        if(karmObstacles[i].x < karmPlayer.x+45 && karmObstacles[i].x+45 > karmPlayer.x &&
+           karmObstacles[i].y < karmPlayer.y+45 && karmObstacles[i].y+45 > karmPlayer.y) {
             karmTakeDamage();
-            karmObstacles.splice(i,1);
-            i--;
+            karmObstacles.splice(i,1); i--;
         }
     }
-    karmObstacles = karmObstacles.filter(obs => obs.x + obs.width > 0);
+    karmObstacles = karmObstacles.filter(o => o.x+45 > 0);
     
     for(let i=0;i<karmStars.length;i++) {
         karmStars[i].x -= 5;
-        if(!karmStars[i].collected && karmStars[i].x < karmPlayer.x + karmPlayer.width && karmStars[i].x + karmStars[i].width > karmPlayer.x &&
-            karmStars[i].y < karmPlayer.y + karmPlayer.height && karmStars[i].y + karmStars[i].height > karmPlayer.y) {
+        if(!karmStars[i].collected && karmStars[i].x < karmPlayer.x+45 && karmStars[i].x+28 > karmPlayer.x &&
+           karmStars[i].y < karmPlayer.y+45 && karmStars[i].y+28 > karmPlayer.y) {
             karmStars[i].collected = true;
             karmScore += 10;
             document.getElementById('karm-score').innerText = karmScore;
-            if(karmScore > karmHighScore) {
-                karmHighScore = karmScore;
-                localStorage.setItem('karmHighScore', karmHighScore);
-                document.getElementById('karm-highScore').innerText = karmHighScore;
-            }
-            for(let j=0;j<8;j++) {
-                karmParticles.push({
-                    x: karmStars[i].x + karmStars[i].width/2,
-                    y: karmStars[i].y + karmStars[i].height/2,
-                    vx: (Math.random()-0.5)*4,
-                    vy: (Math.random()-0.5)*4,
-                    life: 15
-                });
-            }
+            if(karmScore > karmHighScore) { karmHighScore = karmScore; localStorage.setItem('karmHighScore', karmHighScore); document.getElementById('karm-highScore').innerText = karmHighScore; }
+            for(let j=0;j<8;j++) karmParticles.push({ x: karmStars[i].x+14, y: karmStars[i].y+14, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
         }
     }
-    karmStars = karmStars.filter(star => !star.collected && star.x + star.width > 0);
+    karmStars = karmStars.filter(s => !s.collected && s.x+28 > 0);
     
-    for(let i=0;i<karmParticles.length;i++) {
-        karmParticles[i].x += karmParticles[i].vx;
-        karmParticles[i].y += karmParticles[i].vy;
-        karmParticles[i].life--;
-    }
+    for(let i=0;i<karmParticles.length;i++) { karmParticles[i].x += karmParticles[i].vx; karmParticles[i].y += karmParticles[i].vy; karmParticles[i].life--; }
     karmParticles = karmParticles.filter(p => p.life > 0);
     
-    karmObstacleTimer++;
-    if(karmObstacleTimer > 60) {
-        karmObstacleTimer = 0;
-        if(Math.random() < 0.6) karmAddObstacle();
-    }
+    karmObsTimer++;
+    if(karmObsTimer > 60) { karmObsTimer = 0; if(Math.random()<0.6) karmObstacles.push({ x: 800, y: 260, width: 45, height: 45 }); }
     karmStarTimer++;
-    if(karmStarTimer > 40) {
-        karmStarTimer = 0;
-        if(Math.random() < 0.4) karmAddStar();
-    }
+    if(karmStarTimer > 40) { karmStarTimer = 0; if(Math.random()<0.4) karmStars.push({ x: 800, y: 220+Math.random()*60, width: 28, height: 28, collected: false }); }
 }
 
 function karmTakeDamage() {
     if(!karmGameActive) return;
     karmHealth--;
     document.getElementById('karm-health').innerText = karmHealth;
-    if(karmHealth <= 0) {
-        karmGameActive = false;
-        document.getElementById('karm-info').innerHTML = '💀 انتهت اللعبة! اضغط إعادة 💀';
-    }
+    if(karmHealth <= 0) karmGameActive = false;
 }
 
 function karmDraw() {
-    const grad = karmCtx.createLinearGradient(0, 0, 0, 340);
-    grad.addColorStop(0, '#1a252f'); grad.addColorStop(1, '#2c3e50');
-    karmCtx.fillStyle = grad; karmCtx.fillRect(0, 0, 800, 340);
-    karmCtx.fillStyle = '#5d4e30'; karmCtx.fillRect(0, 340, 800, 60);
+    let grad = karmCtx.createLinearGradient(0,0,0,300);
+    grad.addColorStop(0,'#1a252f'); grad.addColorStop(1,'#2c3e50');
+    karmCtx.fillStyle = grad; karmCtx.fillRect(0,0,800,300);
+    karmCtx.fillStyle = '#5d4e30'; karmCtx.fillRect(0,300,800,100);
     karmCtx.fillStyle = '#4caf50';
-    for(let i = 0; i < 800; i += 20) karmCtx.fillRect(i, 335, 10, 8);
+    for(let i=0;i<800;i+=20) karmCtx.fillRect(i,295,10,8);
     
-    for(let obs of karmObstacles) {
-        karmCtx.fillStyle = '#e74c3c';
-        karmCtx.fillRect(obs.x, obs.y, obs.width, obs.height);
-        karmCtx.fillStyle = 'white';
-        karmCtx.font = '20px Arial';
-        karmCtx.fillText('👾', obs.x+10, obs.y+30);
+    for(let o of karmObstacles) {
+        if(obstacleImg.complete) karmCtx.drawImage(obstacleImg, o.x, o.y, 45, 45);
+        else { karmCtx.fillStyle = '#e74c3c'; karmCtx.fillRect(o.x, o.y, 45, 45); karmCtx.fillStyle='white'; karmCtx.font='20px Arial'; karmCtx.fillText('👾', o.x+10, o.y+30); }
     }
     
-    for(let star of karmStars) {
+    for(let s of karmStars) {
         karmCtx.fillStyle = '#f1c40f';
         karmCtx.beginPath();
-        let cx = star.x + star.width/2, cy = star.y + star.height/2;
-        for(let i = 0; i < 5; i++) {
-            let angle = (i * 72 - 90) * Math.PI/180;
-            let x1 = cx + Math.cos(angle) * 12;
-            let y1 = cy + Math.sin(angle) * 12;
-            let angle2 = (i * 72 + 36 - 90) * Math.PI/180;
-            let x2 = cx + Math.cos(angle2) * 5;
-            let y2 = cy + Math.sin(angle2) * 5;
+        let cx=s.x+14, cy=s.y+14;
+        for(let i=0;i<5;i++) {
+            let ang = (i*72-90)*Math.PI/180;
+            let x1=cx+Math.cos(ang)*12, y1=cy+Math.sin(ang)*12;
+            let ang2=(i*72+36-90)*Math.PI/180;
+            let x2=cx+Math.cos(ang2)*5, y2=cy+Math.sin(ang2)*5;
             if(i===0) karmCtx.moveTo(x1,y1);
-            karmCtx.lineTo(x2,y2);
-            karmCtx.lineTo(x1,y1);
+            karmCtx.lineTo(x2,y2); karmCtx.lineTo(x1,y1);
         }
         karmCtx.fill();
     }
     
-    karmCtx.fillStyle = '#3498db';
-    karmCtx.fillRect(karmPlayer.x, karmPlayer.y, karmPlayer.width, karmPlayer.height);
-    karmCtx.fillStyle = 'white';
-    karmCtx.font = '28px Arial';
-    karmCtx.fillText('🦘', karmPlayer.x+8, karmPlayer.y+35);
+    if(playerImg.complete) karmCtx.drawImage(playerImg, karmPlayer.x, karmPlayer.y, 45, 45);
+    else { karmCtx.fillStyle = '#3498db'; karmCtx.fillRect(karmPlayer.x, karmPlayer.y, 45, 45); karmCtx.fillStyle='white'; karmCtx.font='28px Arial'; karmCtx.fillText('🦘', karmPlayer.x+8, karmPlayer.y+35); }
     
-    for(let p of karmParticles) {
-        karmCtx.fillStyle = `rgba(255, 215, 0, ${p.life / 15})`;
-        karmCtx.fillRect(p.x, p.y, 4, 4);
-    }
+    for(let p of karmParticles) { karmCtx.fillStyle = `rgba(255,215,0,${p.life/15})`; karmCtx.fillRect(p.x, p.y, 4, 4); }
     
     if(!karmGameActive) {
-        karmCtx.fillStyle = '#000000aa';
-        karmCtx.fillRect(0, 0, 800, 400);
-        karmCtx.fillStyle = '#f1c40f';
-        karmCtx.font = 'bold 30px "Segoe UI"';
-        karmCtx.textAlign = 'center';
+        karmCtx.fillStyle = '#000000aa'; karmCtx.fillRect(0,0,800,400);
+        karmCtx.fillStyle = '#f1c40f'; karmCtx.font='bold 30px Arial'; karmCtx.textAlign='center';
         karmCtx.fillText('GAME OVER', 400, 200);
-        karmCtx.font = '20px "Segoe UI"';
-        karmCtx.fillText('اضغط زر إعادة', 400, 260);
-        karmCtx.textAlign = 'left';
+        karmCtx.fillText('اضغط إعادة', 400, 260);
+        karmCtx.textAlign='left';
     }
 }
 
 function karmGameLoop() {
     karmUpdate();
     karmDraw();
-    karmAnimationId = requestAnimationFrame(karmGameLoop);
+    karmAnimId = requestAnimationFrame(karmGameLoop);
 }
 
-function karmResetGame() {
-    if(karmAnimationId) cancelAnimationFrame(karmAnimationId);
-    initKarmGame();
+function karmReset() {
+    if(karmAnimId) cancelAnimationFrame(karmAnimId);
+    initKarm();
 }
 
-// ===================== تبديل الألعاب =====================
+// ===================== التحكم بين الألعاب =====================
 function showGame(t) {
     $('#main-menu').hide();
     if(t === 'mafia') {
@@ -1068,17 +1078,16 @@ function showGame(t) {
     } else if(t === 'spyOnline') {
         $('#spy-online-section').removeClass('hidden');
     } else if(t === 'karm') {
-        $('#karm-section').removeClass('hidden');
-        // قفل لعبة كرم بكلمة سر 0798
-        let password = prompt("🔐 لعبة كرم محمية بكلمة سر\nأدخل كلمة السر:");
-        if(password === "0798") {
-            initKarmGame();
-            document.getElementById('karmJumpBtn').onclick = () => karmJump();
-            document.getElementById('karmResetBtn').onclick = () => karmResetGame();
-            karmCanvas.addEventListener('click', () => karmJump());
-            document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); karmJump(); } });
+        let pwd = prompt("🔐 لعبة كرم محمية\nأدخل كلمة السر:");
+        if(pwd === "0798") {
+            $('#karm-section').removeClass('hidden');
+            initKarm();
+            document.getElementById('karmJumpBtn').onclick = () => karmJumpFunc();
+            document.getElementById('karmResetBtn').onclick = () => karmReset();
+            karmCanvas.addEventListener('click', () => karmJumpFunc());
+            document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); karmJumpFunc(); } });
         } else {
-            alert("❌ كلمة سر خاطئة! العودة للقائمة الرئيسية.");
+            alert("❌ كلمة سر خاطئة!");
             location.reload();
         }
     }
