@@ -3,123 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>لعبة القفز - مع صوت الخبطة</title>
+    <title>لعبة القفز - البطل والخصم</title>
     <style>
-        * {
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        body {
-            background: linear-gradient(145deg, #0a2f1f, #051a0e);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
-            margin: 0;
-            padding: 10px;
-        }
-        .game-container {
-            background: #2c4a2e;
-            border-radius: 40px;
-            padding: 15px;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
-            border: 2px solid #d4af37;
-            text-align: center;
-            max-width: 100%;
-        }
-        canvas {
-            display: block;
-            margin: 0 auto;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            cursor: pointer;
-            background: #2c3e50;
-            width: 100%;
-            height: auto;
-        }
-        .score-board {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .score-card {
-            background: #000000aa;
-            padding: 5px 12px;
-            border-radius: 40px;
-            font-weight: bold;
-            color: #ffd966;
-            font-size: 1rem;
-        }
+        * { user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { background: linear-gradient(145deg, #0a2f1f, #051a0e); display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 10px; }
+        .game-container { background: #2c4a2e; border-radius: 40px; padding: 15px; box-shadow: 0 20px 35px rgba(0,0,0,0.5); border: 2px solid #d4af37; text-align: center; max-width: 100%; }
+        canvas { display: block; margin: 0 auto; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); cursor: pointer; background: #2c3e50; width: 100%; height: auto; }
+        .score-board { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
+        .score-card { background: #000000aa; padding: 5px 12px; border-radius: 40px; font-weight: bold; color: #ffd966; font-size: 1rem; }
         .controls { margin-top: 15px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        button {
-            background: #dba53f;
-            border: none;
-            font-family: inherit;
-            font-weight: bold;
-            padding: 12px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: transform 0.05s;
-            touch-action: manipulation;
-        }
+        button { background: #dba53f; border: none; font-weight: bold; padding: 12px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; transition: transform 0.05s; }
         button:active { transform: scale(0.95); }
         .reset-btn { background: #e74c3c; color: white; }
         .jump-btn { background: #2ecc71; color: white; font-size: 1.3rem; padding: 12px 30px; }
-        .info {
-            margin-top: 15px;
-            padding: 8px;
-            border-radius: 30px;
-            background: #000000aa;
-            color: #ffd966;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-        .lock-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(145deg, #0a2f1f, #051a0e);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .lock-box {
-            background: #2c4a2e;
-            padding: 30px;
-            border-radius: 60px;
-            border: 2px solid #d4af37;
-            text-align: center;
-            width: 280px;
-        }
-        .lock-box input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.5rem;
-            text-align: center;
-            border-radius: 50px;
-            border: none;
-            margin: 20px 0;
-            font-weight: bold;
-            background: #f5e6c4;
-        }
-        .lock-box button {
-            background: #dba53f;
-            padding: 10px 25px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: none;
-            cursor: pointer;
-        }
+        .info { margin-top: 15px; padding: 8px; border-radius: 30px; background: #000000aa; color: #ffd966; font-weight: bold; font-size: 0.8rem; }
+        .lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(145deg, #0a2f1f, #051a0e); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .lock-box { background: #2c4a2e; padding: 30px; border-radius: 60px; border: 2px solid #d4af37; text-align: center; width: 280px; }
+        .lock-box input { width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; border-radius: 50px; border: none; margin: 20px 0; font-weight: bold; background: #f5e6c4; }
+        .lock-box button { background: #dba53f; padding: 10px 25px; border-radius: 40px; font-weight: bold; font-size: 1.2rem; border: none; cursor: pointer; }
         @media (max-width: 700px) {
             .score-card { font-size: 0.8rem; padding: 4px 10px; }
             button { padding: 10px 18px; font-size: 0.9rem; }
@@ -145,205 +46,135 @@
             <div class="score-card">🏆 أعلى نتيجة: <span id="highScore">0</span></div>
             <div class="score-card">❤️ الصحة: <span id="health">3</span></div>
         </div>
-        
         <canvas id="gameCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400"></canvas>
-        
         <div class="controls">
             <button class="jump-btn" id="jumpButtonMobile">🦘 قفز</button>
             <button class="reset-btn" id="resetBtn">🔄 إعادة</button>
         </div>
-        
         <div class="info" id="info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
     </div>
 </div>
 
 <script>
-    // ===================== كلمة المرور =====================
     const SECRET_CODE = "567";
-    
     document.getElementById("unlockBtn").addEventListener("click", function() {
-        const inputVal = document.getElementById("passwordInput").value;
-        if (inputVal === SECRET_CODE) {
+        if (document.getElementById("passwordInput").value === SECRET_CODE) {
             document.getElementById("lockScreen").style.display = "none";
             document.getElementById("gameApp").style.display = "block";
             startGameLogic();
-        } else {
-            document.getElementById("passwordInput").value = "";
-        }
+        } else { document.getElementById("passwordInput").value = ""; }
     });
-    
     document.getElementById("passwordInput").addEventListener("keypress", function(e) {
         if (e.key === "Enter") document.getElementById("unlockBtn").click();
     });
-    
-    // ===================== بداية منطق اللعبة =====================
+
     function startGameLogic() {
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = 800;
-            canvas.height = 400;
-        }
+        function resizeCanvas() { canvas.width = 800; canvas.height = 400; }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        
-        // ========== الصوت ==========
+
         const hitSound = new Audio('https://files.catbox.moe/cbh2mv.mp3');
-        // تحميل الصوت مسبقاً عشان ما يتأخر أول مرة
         hitSound.load();
-        
+
+        // ======== روابط الصور ========
         const OBSTACLE_IMG_URL = 'https://i.imgur.com/Prv0riC.jpeg';
-        const PLAYER_IMG_URL = 'https://i.imgur.com/IpswxEw.jpeg';
-        
+        const PLAYER_IMG_URL = 'https://i.ibb.co/GfM5hw66/IMG-1082.jpg';  // صورتك الجديدة
+
         const GROUND_Y = 340;
-        let score = 0;
-        let highScore = localStorage.getItem('jumpHighScore567') || 0;
-        let health = 3;
-        let gameRunning = true;
-        
+        let score = 0, highScore = localStorage.getItem('jumpHighScore567') || 0, health = 3, gameRunning = true;
         const player = { x: 100, y: GROUND_Y - 40, width: 45, height: 45, velocityY: 0, isJumping: false, originalY: GROUND_Y - 40 };
-        let obstacles = [];
-        let stars = [];
-        let particles = [];
-        let obstacleTimer = 0, starTimer = 0;
-        
+        let obstacles = [], stars = [], particles = [], obstacleTimer = 0, starTimer = 0;
         const GRAVITY = 0.8, JUMP_POWER = -12;
-        
+
         document.getElementById('highScore').innerHTML = highScore;
-        
-        // تحميل الصور
+
         const playerImg = new Image();
         const obstacleImg = new Image();
         playerImg.src = PLAYER_IMG_URL;
         obstacleImg.src = OBSTACLE_IMG_URL;
-        
-        let playerImgFailed = false;
-        let obstacleImgFailed = false;
+
+        let playerImgFailed = false, obstacleImgFailed = false;
         playerImg.onerror = () => { playerImgFailed = true; };
         obstacleImg.onerror = () => { obstacleImgFailed = true; };
-        
+
         function performJump() {
-            if (!gameRunning) return false;
-            if (!player.isJumping) {
-                player.velocityY = JUMP_POWER;
-                player.isJumping = true;
-                for(let i = 0; i < 8; i++) {
-                    particles.push({ 
-                        x: player.x + player.width/2, 
-                        y: player.y + player.height, 
-                        vx: (Math.random() - 0.5) * 4, 
-                        vy: Math.random() * 4, 
-                        life: 15 
-                    });
-                }
-                return true;
-            }
-            return false;
+            if (!gameRunning || player.isJumping) return false;
+            player.velocityY = JUMP_POWER;
+            player.isJumping = true;
+            for(let i = 0; i < 8; i++) particles.push({ x: player.x + 22, y: player.y + 45, vx: (Math.random() - 0.5) * 4, vy: Math.random() * 4, life: 15 });
+            return true;
         }
-        
-        function addObstacle() { 
-            if (gameRunning) obstacles.push({ x: canvas.width, y: GROUND_Y - 40, width: 45, height: 45 }); 
-        }
-        function addStar() { 
-            if (gameRunning) stars.push({ x: canvas.width, y: GROUND_Y - 60 - Math.random() * 40, width: 28, height: 28, collected: false }); 
-        }
-        
+
+        function addObstacle() { if (gameRunning) obstacles.push({ x: canvas.width, y: GROUND_Y - 40, width: 45, height: 45 }); }
+        function addStar() { if (gameRunning) stars.push({ x: canvas.width, y: GROUND_Y - 60 - Math.random() * 40, width: 28, height: 28, collected: false }); }
+
         function updatePlayer() {
             if (!gameRunning) return;
             player.velocityY += GRAVITY;
             player.y += player.velocityY;
-            if (player.y >= player.originalY) { 
-                player.y = player.originalY; 
-                player.isJumping = false; 
-                player.velocityY = 0; 
-            }
+            if (player.y >= player.originalY) { player.y = player.originalY; player.isJumping = false; player.velocityY = 0; }
             if (player.y > canvas.height) takeDamage();
             if (player.y < 0) { player.y = 0; player.velocityY = 0; }
         }
-        
+
         function takeDamage() {
             if (!gameRunning) return;
             health--;
             document.getElementById('health').innerHTML = health;
-            
-            // 🎵 تشغيل صوت الخبطة
-            hitSound.currentTime = 0;  // يرجّع الصوت للبداية
-            hitSound.play().catch(e => console.log("الصوت ما اشتغل:", e));
-            
+            hitSound.currentTime = 0;
+            hitSound.play().catch(e => console.log("صوت ما اشتغل"));
             canvas.style.transform = 'translateX(5px)';
             setTimeout(() => { canvas.style.transform = ''; }, 100);
-            if (health <= 0) { 
-                gameRunning = false; 
-                document.getElementById('info').innerHTML = '💀 انتهت اللعبة! اضغط إعادة 💀'; 
-            }
+            if (health <= 0) { gameRunning = false; document.getElementById('info').innerHTML = '💀 انتهت اللعبة! اضغط إعادة 💀'; }
         }
-        
+
         function addPoints(points) {
             if (!gameRunning) return;
             score += points;
             document.getElementById('score').innerHTML = score;
-            if (score > highScore) { 
-                highScore = score; 
-                localStorage.setItem('jumpHighScore567', highScore); 
-                document.getElementById('highScore').innerHTML = highScore; 
-            }
+            if (score > highScore) { highScore = score; localStorage.setItem('jumpHighScore567', highScore); document.getElementById('highScore').innerHTML = highScore; }
         }
-        
+
         function updateObjects() {
             if (!gameRunning) return;
             for (let i=0; i<obstacles.length; i++) {
                 obstacles[i].x -= 5;
-                if (obstacles[i].x < player.x + player.width && obstacles[i].x + obstacles[i].width > player.x &&
-                    obstacles[i].y < player.y + player.height && obstacles[i].y + obstacles[i].height > player.y) {
+                if (obstacles[i].x < player.x + 45 && obstacles[i].x + 45 > player.x && obstacles[i].y < player.y + 45 && obstacles[i].y + 45 > player.y) {
                     takeDamage();
                     obstacles.splice(i,1); i--;
                 }
             }
-            obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
-            
+            obstacles = obstacles.filter(obs => obs.x + 45 > 0);
             for (let i=0; i<stars.length; i++) {
                 stars[i].x -= 5;
-                if (!stars[i].collected && stars[i].x < player.x + player.width && stars[i].x + stars[i].width > player.x &&
-                    stars[i].y < player.y + player.height && stars[i].y + stars[i].height > player.y) {
+                if (!stars[i].collected && stars[i].x < player.x + 45 && stars[i].x + 28 > player.x && stars[i].y < player.y + 45 && stars[i].y + 28 > player.y) {
                     stars[i].collected = true;
                     addPoints(10);
-                    for(let j=0;j<8;j++) particles.push({ x: stars[i].x + stars[i].width/2, y: stars[i].y + stars[i].height/2, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
+                    for(let j=0;j<8;j++) particles.push({ x: stars[i].x + 14, y: stars[i].y + 14, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
                 }
             }
-            stars = stars.filter(star => !star.collected && star.x + star.width > 0);
+            stars = stars.filter(star => !star.collected && star.x + 28 > 0);
         }
-        
+
         function updateParticles() {
-            for (let i=0; i<particles.length; i++) { 
-                particles[i].x += particles[i].vx; 
-                particles[i].y += particles[i].vy; 
-                particles[i].life--; 
-            }
+            for (let i=0; i<particles.length; i++) { particles[i].x += particles[i].vx; particles[i].y += particles[i].vy; particles[i].life--; }
             particles = particles.filter(p => p.life > 0);
         }
-        
+
         function generateObjects() {
             if (!gameRunning) return;
             obstacleTimer++;
-            if (obstacleTimer > 60) { 
-                obstacleTimer = 0; 
-                if (Math.random() < 0.6) addObstacle(); 
-            }
+            if (obstacleTimer > 60) { obstacleTimer = 0; if (Math.random() < 0.6) addObstacle(); }
             starTimer++;
-            if (starTimer > 40) { 
-                starTimer = 0; 
-                if (Math.random() < 0.4) addStar(); 
-            }
+            if (starTimer > 40) { starTimer = 0; if (Math.random() < 0.4) addStar(); }
         }
-        
+
         function draw() {
-            // السماء
             const grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
             grad.addColorStop(0, '#1a252f'); grad.addColorStop(1, '#2c3e50');
             ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, GROUND_Y);
-            // أرض
             ctx.fillStyle = '#5d4e30'; ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
             ctx.fillStyle = '#4caf50';
             for(let i = 0; i < canvas.width; i += 20) ctx.fillRect(i, GROUND_Y - 5, 10, 8);
@@ -354,7 +185,7 @@
                     ctx.drawImage(obstacleImg, obs.x, obs.y, obs.width, obs.height);
                 } else {
                     ctx.fillStyle = '#e74c3c'; ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-                    ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.fillText('👾', obs.x+10, obs.y+30);
+                    ctx.fillStyle = 'white'; ctx.font = '26px Arial'; ctx.fillText('👾', obs.x+10, obs.y+32);
                 }
             }
             
@@ -362,17 +193,14 @@
             for (let star of stars) {
                 ctx.fillStyle = '#f1c40f';
                 ctx.beginPath();
-                let cx = star.x + star.width/2, cy = star.y + star.height/2, outerR = 12, innerR = 5;
+                let cx = star.x + 14, cy = star.y + 14;
                 for(let i = 0; i < 5; i++) {
                     let angle = (i * 72 - 90) * Math.PI/180;
-                    let x1 = cx + Math.cos(angle) * outerR;
-                    let y1 = cy + Math.sin(angle) * outerR;
+                    let x1 = cx + Math.cos(angle) * 12, y1 = cy + Math.sin(angle) * 12;
                     let angle2 = (i * 72 + 36 - 90) * Math.PI/180;
-                    let x2 = cx + Math.cos(angle2) * innerR;
-                    let y2 = cy + Math.sin(angle2) * innerR;
+                    let x2 = cx + Math.cos(angle2) * 5, y2 = cy + Math.sin(angle2) * 5;
                     if(i===0) ctx.moveTo(x1,y1);
-                    ctx.lineTo(x2,y2);
-                    ctx.lineTo(x1,y1);
+                    ctx.lineTo(x2,y2); ctx.lineTo(x1,y1);
                 }
                 ctx.fill();
                 ctx.fillStyle = '#f39c12';
@@ -381,19 +209,15 @@
                 ctx.fill();
             }
             
-            // البطل
+            // البطل (صورتك + إيموجي احتياطي)
             if (playerImg.complete && playerImg.naturalWidth > 0 && !playerImgFailed) {
                 ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
             } else {
                 ctx.fillStyle = '#3498db'; ctx.fillRect(player.x, player.y, player.width, player.height);
-                ctx.fillStyle = 'white'; ctx.font = '28px Arial'; ctx.fillText('🦸', player.x+8, player.y+35);
+                ctx.fillStyle = 'white'; ctx.font = '32px Arial'; ctx.fillText('🦘', player.x+8, player.y+35);
             }
             
-            // جسيمات
-            for (let p of particles) { 
-                ctx.fillStyle = `rgba(255, 215, 0, ${p.life / 15})`; 
-                ctx.fillRect(p.x, p.y, 4, 4); 
-            }
+            for (let p of particles) { ctx.fillStyle = `rgba(255, 215, 0, ${p.life / 15})`; ctx.fillRect(p.x, p.y, 4, 4); }
             
             if (!gameRunning) {
                 ctx.fillStyle = '#000000aa'; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -404,60 +228,27 @@
                 ctx.textAlign = 'left';
             }
         }
-        
+
         function gameLoop() {
-            if (gameRunning) {
-                updatePlayer();
-                updateObjects();
-                updateParticles();
-                generateObjects();
-            }
+            if (gameRunning) { updatePlayer(); updateObjects(); updateParticles(); generateObjects(); }
             draw();
             requestAnimationFrame(gameLoop);
         }
-        
+
         function resetGame() {
-            gameRunning = true; 
-            score = 0; 
-            health = 3; 
-            obstacles = []; 
-            stars = []; 
-            particles = [];
-            obstacleTimer = 0; 
-            starTimer = 0; 
-            player.y = player.originalY; 
-            player.velocityY = 0; 
-            player.isJumping = false;
-            document.getElementById('score').innerHTML = '0'; 
-            document.getElementById('health').innerHTML = '3';
+            gameRunning = true; score = 0; health = 3; obstacles = []; stars = []; particles = [];
+            obstacleTimer = 0; starTimer = 0; player.y = player.originalY; player.velocityY = 0; player.isJumping = false;
+            document.getElementById('score').innerHTML = '0'; document.getElementById('health').innerHTML = '3';
             document.getElementById('info').innerHTML = '🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾';
         }
-        
-        // أحداث القفز
-        document.getElementById('jumpButtonMobile').addEventListener('click', (e) => {
-            e.preventDefault();
-            performJump();
-        });
-        document.getElementById('jumpButtonMobile').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            performJump();
-        });
-        canvas.addEventListener('click', (e) => { 
-            e.preventDefault();
-            performJump(); 
-        });
-        canvas.addEventListener('touchstart', (e) => { 
-            e.preventDefault();
-            performJump(); 
-        });
-        document.addEventListener('keydown', (e) => { 
-            if (e.code === 'Space' || e.code === 'ArrowUp') { 
-                e.preventDefault(); 
-                performJump(); 
-            } 
-        });
+
+        document.getElementById('jumpButtonMobile').addEventListener('click', (e) => { e.preventDefault(); performJump(); });
+        document.getElementById('jumpButtonMobile').addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); });
+        canvas.addEventListener('click', (e) => { e.preventDefault(); performJump(); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); });
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); performJump(); } });
         document.getElementById('resetBtn').addEventListener('click', resetGame);
-        
+
         resetGame();
         gameLoop();
     }
