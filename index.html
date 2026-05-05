@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>لعبة القفز - للجوال والكمبيوتر</title>
+    <title>لعبة القفز - مع صوت الخبطة</title>
     <style>
         * {
             user-select: none;
@@ -158,7 +158,7 @@
 </div>
 
 <script>
-    // كلمة المرور
+    // ===================== كلمة المرور =====================
     const SECRET_CODE = "567";
     
     document.getElementById("unlockBtn").addEventListener("click", function() {
@@ -176,11 +176,11 @@
         if (e.key === "Enter") document.getElementById("unlockBtn").click();
     });
     
+    // ===================== بداية منطق اللعبة =====================
     function startGameLogic() {
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // ضبط أبعاد canvas الحقيقية (لأن CSS تغير الحجم)
         function resizeCanvas() {
             const rect = canvas.getBoundingClientRect();
             canvas.width = 800;
@@ -188,6 +188,11 @@
         }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        
+        // ========== الصوت ==========
+        const hitSound = new Audio('https://files.catbox.moe/cbh2mv.mp3');
+        // تحميل الصوت مسبقاً عشان ما يتأخر أول مرة
+        hitSound.load();
         
         const OBSTACLE_IMG_URL = 'https://i.imgur.com/Prv0riC.jpeg';
         const PLAYER_IMG_URL = 'https://i.imgur.com/IpswxEw.jpeg';
@@ -197,7 +202,6 @@
         let highScore = localStorage.getItem('jumpHighScore567') || 0;
         let health = 3;
         let gameRunning = true;
-        let jumpRequest = false;
         
         const player = { x: 100, y: GROUND_Y - 40, width: 45, height: 45, velocityY: 0, isJumping: false, originalY: GROUND_Y - 40 };
         let obstacles = [];
@@ -209,7 +213,7 @@
         
         document.getElementById('highScore').innerHTML = highScore;
         
-        // تحميل الصور مع fallback
+        // تحميل الصور
         const playerImg = new Image();
         const obstacleImg = new Image();
         playerImg.src = PLAYER_IMG_URL;
@@ -217,17 +221,14 @@
         
         let playerImgFailed = false;
         let obstacleImgFailed = false;
-        
         playerImg.onerror = () => { playerImgFailed = true; };
         obstacleImg.onerror = () => { obstacleImgFailed = true; };
         
-        // دالة القفز المحسنة
         function performJump() {
             if (!gameRunning) return false;
             if (!player.isJumping) {
                 player.velocityY = JUMP_POWER;
                 player.isJumping = true;
-                // تأثيرات
                 for(let i = 0; i < 8; i++) {
                     particles.push({ 
                         x: player.x + player.width/2, 
@@ -266,6 +267,11 @@
             if (!gameRunning) return;
             health--;
             document.getElementById('health').innerHTML = health;
+            
+            // 🎵 تشغيل صوت الخبطة
+            hitSound.currentTime = 0;  // يرجّع الصوت للبداية
+            hitSound.play().catch(e => console.log("الصوت ما اشتغل:", e));
+            
             canvas.style.transform = 'translateX(5px)';
             setTimeout(() => { canvas.style.transform = ''; }, 100);
             if (health <= 0) { 
@@ -427,8 +433,7 @@
             document.getElementById('info').innerHTML = '🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾';
         }
         
-        // === أحداث القفز المحسنة للجوال والكمبيوتر ===
-        // 1- زر القفز الموجود
+        // أحداث القفز
         document.getElementById('jumpButtonMobile').addEventListener('click', (e) => {
             e.preventDefault();
             performJump();
@@ -437,8 +442,6 @@
             e.preventDefault();
             performJump();
         });
-        
-        // 2- الضغط على canvas (الشاشة)
         canvas.addEventListener('click', (e) => { 
             e.preventDefault();
             performJump(); 
@@ -447,15 +450,12 @@
             e.preventDefault();
             performJump(); 
         });
-        
-        // 3- مفتاح المسافة للكمبيوتر
         document.addEventListener('keydown', (e) => { 
             if (e.code === 'Space' || e.code === 'ArrowUp') { 
                 e.preventDefault(); 
                 performJump(); 
             } 
         });
-        
         document.getElementById('resetBtn').addEventListener('click', resetGame);
         
         resetGame();
