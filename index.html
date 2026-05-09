@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة أحمد - المافيا المتكاملة + القمار</title>
+    <title>بوابة أحمد - المافيا المتكاملة + القمار أونلاين</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
@@ -52,132 +52,32 @@
         .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
         .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
         .secret-panel button:hover { background: #da291c; }
-        .force-win-panel { display: none; }
         .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; justify-content: center; align-items: center; }
         .password-box { background: #1a1a1a; border: 3px solid #da291c; border-radius: 20px; padding: 30px; text-align: center; width: 300px; }
         .password-box input { width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; margin: 20px 0; background: #000; color: #0f0; border: 2px solid #da291c; }
         .password-box h3 { color: #da291c; margin-bottom: 10px; }
-        .password-box p { color: #888; font-size: 0.8rem; }
         
-        /* ===== ستايل لعبة القمار ===== */
-        .casino-container {
-            max-width: 500px;
-            width: 100%;
-            background: #1e1e1e;
-            border-radius: 40px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px #da291c;
-            text-align: center;
-            margin: auto;
-        }
-        .casino-container h2 {
-            color: #da291c;
-            margin: 0 0 10px 0;
-        }
-        .balance-box {
-            background: #000000aa;
-            border-radius: 60px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #da291c;
-        }
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #f1c40f;
-        }
-        .dice-area {
-            background: #2c2c2c;
-            border-radius: 30px;
-            padding: 25px;
-            margin: 15px 0;
-        }
-        .dice {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 20px;
-        }
-        .die {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3rem;
-            font-weight: bold;
-            box-shadow: 0 5px 0 #999;
-            transition: all 0.1s ease;
-        }
-        .die.rolling {
-            animation: shake 0.3s infinite;
-        }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px) rotate(-10deg); }
-            75% { transform: translateX(5px) rotate(10deg); }
-            100% { transform: translateX(0); }
-        }
-        .bet-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-        .bet-btn {
-            background: #2c3e50;
-            border: none;
-            padding: 12px 5px;
-            border-radius: 50px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .bet-btn.selected {
-            background: #da291c;
-            box-shadow: 0 0 15px #da291c;
-            border: 1px solid gold;
-        }
-        .bet-amount input {
-            width: 80%;
-            padding: 12px;
-            border-radius: 50px;
-            border: 2px solid #da291c;
-            background: #000;
-            color: #ffd966;
-            font-size: 1.2rem;
-            text-align: center;
-        }
-        .roll-btn {
-            background: #27ae60;
-            padding: 18px;
-            font-size: 1.3rem;
-        }
-        .reset-btn {
-            background: #e74c3c;
-        }
-        .history {
-            background: #0a0a0a;
-            border-radius: 20px;
-            padding: 12px;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 0.75rem;
-        }
-        .result-message {
-            font-size: 1rem;
-            font-weight: bold;
-            margin: 10px 0;
-            padding: 8px;
-            border-radius: 30px;
-            background: #000000aa;
-        }
-        .win { color: #2ecc71; }
-        .lose { color: #e74c3c; }
+        /* ستايل القمار أونلاين */
+        .casino-container { max-width: 500px; width: 100%; background: #1e1e1e; border-radius: 40px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px #da291c; text-align: center; margin: auto; }
+        .casino-container h2 { color: #da291c; margin: 0 0 10px 0; }
+        .balance-box { background: #000000aa; border-radius: 60px; padding: 15px; margin: 15px 0; border: 1px solid #da291c; }
+        .balance-amount { font-size: 2.5rem; font-weight: bold; color: #f1c40f; }
+        .dice-area { background: #2c2c2c; border-radius: 30px; padding: 25px; margin: 15px 0; }
+        .dice { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .die { width: 80px; height: 80px; background: white; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; box-shadow: 0 5px 0 #999; transition: all 0.1s ease; }
+        .die.rolling { animation: shake 0.3s infinite; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-10deg); } 75% { transform: translateX(5px) rotate(10deg); } 100% { transform: translateX(0); } }
+        .bet-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        .bet-btn { background: #2c3e50; border: none; padding: 12px 5px; border-radius: 50px; color: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        .bet-btn.selected { background: #da291c; box-shadow: 0 0 15px #da291c; border: 1px solid gold; }
+        .bet-amount input { width: 80%; padding: 12px; border-radius: 50px; border: 2px solid #da291c; background: #000; color: #ffd966; font-size: 1.2rem; text-align: center; }
+        .roll-btn { background: #27ae60; padding: 18px; font-size: 1.3rem; }
+        .reset-btn { background: #e74c3c; }
+        .history { background: #0a0a0a; border-radius: 20px; padding: 12px; margin-top: 20px; max-height: 200px; overflow-y: auto; font-size: 0.75rem; }
+        .result-message { font-size: 1rem; font-weight: bold; margin: 10px 0; padding: 8px; border-radius: 30px; background: #000000aa; }
+        .online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; }
+        .waiting-message { color: #f39c12; }
+        .enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -189,7 +89,7 @@
     <button class="menu-btn" onclick="showGame('spy')">🕵️ لعبة الجاسوس (أوفلاين)</button>
     <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🌐 الجاسوس (أونلاين)</button>
     <button class="menu-btn" style="border-color: #2ecc71;" onclick="showGameWithPassword()">🦘 لعبة القفز - متجر القوى</button>
-    <button class="menu-btn" style="border-color: #f39c12;" onclick="showGame('casino')">🎲 كازينو النرد - القمار 🎲</button>
+    <button class="menu-btn" style="border-color: #f39c12;" onclick="showGame('casinoOnline')">🎲 كازينو النرد أونلاين 🎲</button>
 </div>
 
 <!-- ===================== المافيا ===================== -->
@@ -278,52 +178,66 @@
     <div id="jumpGameContainer"></div>
 </div>
 
-<!-- ===================== لعبة القمار (كازينو النرد) ===================== -->
-<div id="casino-section" class="hidden">
+<!-- ===================== كازينو النرد أونلاين ===================== -->
+<div id="casinoOnline-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
     <div class="casino-container">
-        <h2>🎲 كازينو النرد 🎲</h2>
-        <div class="sub" style="color:#888; font-size:0.8rem;">⚡ راهن واختبِر حظك ⚡</div>
-        
-        <div class="balance-box">
-            <div class="balance-label" style="color:#aaa;">💰 رصيدك الحالي</div>
-            <div class="balance-amount" id="casinoBalance">1000</div>
+        <h2>🎲 كازينو النرد - أونلاين 🎲</h2>
+        <div id="casinoOnlineSetup">
+            <input type="text" id="casinoPlayerName" placeholder="اسمك...">
+            <button onclick="casinoHostGame()">👑 إنشاء غرفة (Host)</button>
+            <p style="margin:10px 0; color:#888;">أو</p>
+            <input type="text" id="casinoRoomCode" placeholder="كود الغرفة">
+            <button onclick="casinoJoinGame()">🚪 دخول الغرفة</button>
         </div>
         
-        <div class="dice-area">
-            <div class="dice">
-                <div class="die" id="casinoDie1">🎲</div>
-                <div class="die" id="casinoDie2">🎲</div>
+        <div id="casinoLobby" class="hidden">
+            <div class="online-status" id="casinoRoomDisplay"></div>
+            <div class="enemy-info" id="casinoEnemyInfo">⏳ انتظار اتصال الخصم...</div>
+            <div id="casinoGameArea" style="display:none;">
+                <div class="balance-box">
+                    <div class="balance-label" style="color:#aaa;">💰 رصيدك</div>
+                    <div class="balance-amount" id="casinoBalance">1000</div>
+                </div>
+                <div class="balance-box" style="background:#1a1a1a;">
+                    <div class="balance-label" style="color:#aaa;">💰 رصيد الخصم</div>
+                    <div class="balance-amount" id="casinoEnemyBalance">1000</div>
+                </div>
+                
+                <div class="dice-area">
+                    <div class="dice">
+                        <div class="die" id="casinoDie1">🎲</div>
+                        <div class="die" id="casinoDie2">🎲</div>
+                    </div>
+                    <div class="dice-total" id="casinoTotalDisplay" style="font-size:1.2rem; color:#da291c;">المجموع: --</div>
+                </div>
+                
+                <div class="bet-options">
+                    <button class="bet-btn" data-casino-bet="small">📉 صغير (4-9)<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="big">📈 كبير (10-12)<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="seven">🎯 7 بالضبط<br><span style="font-size:0.6rem;">×5</span></button>
+                    <button class="bet-btn" data-casino-bet="even">🔢 زوجي<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="odd">🔢 فردي<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="double">🔄 زوج متطابق<br><span style="font-size:0.6rem;">×10</span></button>
+                </div>
+                
+                <div class="bet-amount">
+                    <input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10">
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <button class="roll-btn" id="casinoRollBtn" style="flex:2;">🎲 ارمي النرد 🎲</button>
+                    <button class="reset-btn" id="casinoResetBtn" style="flex:1;">🔄 إعادة</button>
+                </div>
+                
+                <div id="casinoResultMessage" class="result-message"></div>
+                
+                <div class="history">
+                    <h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4>
+                    <div id="casinoHistoryList"></div>
+                </div>
             </div>
-            <div class="dice-total" id="casinoTotalDisplay" style="font-size:1.2rem; color:#da291c;">المجموع: --</div>
         </div>
-        
-        <div class="bet-options">
-            <button class="bet-btn" data-casino-bet="small">📉 صغير (4-9)<br><span style="font-size:0.6rem;">×2</span></button>
-            <button class="bet-btn" data-casino-bet="big">📈 كبير (10-12)<br><span style="font-size:0.6rem;">×2</span></button>
-            <button class="bet-btn" data-casino-bet="seven">🎯 7 بالضبط<br><span style="font-size:0.6rem;">×5</span></button>
-            <button class="bet-btn" data-casino-bet="even">🔢 زوجي<br><span style="font-size:0.6rem;">×2</span></button>
-            <button class="bet-btn" data-casino-bet="odd">🔢 فردي<br><span style="font-size:0.6rem;">×2</span></button>
-            <button class="bet-btn" data-casino-bet="double">🔄 زوج متطابق<br><span style="font-size:0.6rem;">×10</span></button>
-        </div>
-        
-        <div class="bet-amount">
-            <input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10">
-        </div>
-        
-        <div style="display: flex; gap: 15px; margin: 15px 0;">
-            <button class="roll-btn" id="casinoRollBtn" style="flex:2;">🎲 ارمي النرد 🎲</button>
-            <button class="reset-btn" id="casinoResetBtn" style="flex:1;">🔄 إعادة</button>
-        </div>
-        
-        <div id="casinoResultMessage" class="result-message"></div>
-        
-        <div class="history">
-            <h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4>
-            <div id="casinoHistoryList"></div>
-        </div>
-        
-        <div style="font-size:0.6rem; color:#555; margin-top:10px;">⚠️ لعبة حظ للمتعة فقط | المضاعفات: ×2 ×5 ×10</div>
     </div>
 </div>
 
@@ -369,7 +283,6 @@ function getRolesDistribution(playersList) {
     let count = playersList.length;
     let roles = [];
     let doctorsCount = 1;
-    let hasMafiaKiller = true;
     let hasSilentMafia = (count >= 9);
     let hasChild = (count >= 9);
     let citizensCount = count - doctorsCount - 1;
@@ -1493,34 +1406,46 @@ function startJumpGame(isEasyMode) {
     });
 }
 
-// ===================== لعبة القمار (كازينو النرد) =====================
-let casinoBalance = 1000;
+// ===================== كازينو النرد أونلاين =====================
+let casinoPeer = null;
+let casinoConn = null;
+let casinoMyName = "";
+let casinoMyBalance = 1000;
+let casinoEnemyBalance = 1000;
 let casinoCurrentBet = null;
 let casinoIsRolling = false;
+let casinoIsMyTurn = true; // المضيف يبدأ أولاً
+let casinoRoomHost = false;
 
-function casinoUpdateBalanceUI() {
-    $('#casinoBalance').text(casinoBalance);
-    if(casinoBalance <= 0) $('#casinoBalance').css('color', '#e74c3c');
+function casinoBetName(betType) {
+    const names = { small: 'صغير (4-9)', big: 'كبير (10-12)', seven: 'رقم 7', even: 'زوجي', odd: 'فردي', double: 'زوج متطابق' };
+    return names[betType] || betType;
+}
+
+function casinoDisplayDice(value1, value2) {
+    const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    $('#casinoDie1').text(diceSymbols[value1 - 1]);
+    $('#casinoDie2').text(diceSymbols[value2 - 1]);
+    $('#casinoTotalDisplay').text(`المجموع: ${value1 + value2}`);
+}
+
+function casinoUpdateUI() {
+    $('#casinoBalance').text(casinoMyBalance);
+    $('#casinoEnemyBalance').text(casinoEnemyBalance);
+    if(casinoMyBalance <= 0) $('#casinoBalance').css('color', '#e74c3c');
     else $('#casinoBalance').css('color', '#f1c40f');
+    if(casinoEnemyBalance <= 0) $('#casinoEnemyBalance').css('color', '#e74c3c');
+    else $('#casinoEnemyBalance').css('color', '#f1c40f');
 }
 
 function casinoAddToHistory(message, isWin) {
     const historyDiv = $('#casinoHistoryList');
-    const item = $('<div class="history-item" style="border-bottom:1px solid #333; padding:5px;"></div>');
+    const item = $('<div style="border-bottom:1px solid #333; padding:5px;"></div>');
     item.html(message);
     if(isWin === true) item.css('color', '#2ecc71');
     else if(isWin === false) item.css('color', '#e74c3c');
     historyDiv.prepend(item);
     while(historyDiv.children().length > 20) historyDiv.children().last().remove();
-}
-
-function casinoPlayDiceSound() {
-    $('#casinoDie1').addClass('rolling');
-    $('#casinoDie2').addClass('rolling');
-    setTimeout(() => {
-        $('#casinoDie1').removeClass('rolling');
-        $('#casinoDie2').removeClass('rolling');
-    }, 300);
 }
 
 function casinoEvaluateBet(dice1, dice2, betType) {
@@ -1539,21 +1464,22 @@ function casinoEvaluateBet(dice1, dice2, betType) {
     }
 }
 
-function casinoDisplayDice(value1, value2) {
-    const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-    $('#casinoDie1').text(diceSymbols[value1 - 1]);
-    $('#casinoDie2').text(diceSymbols[value2 - 1]);
-    $('#casinoTotalDisplay').text(`المجموع: ${value1 + value2}`);
-}
-
-function casinoBetName(betType) {
-    const names = { small: 'صغير (4-9)', big: 'كبير (10-12)', seven: 'رقم 7', even: 'زوجي', odd: 'فردي', double: 'زوج متطابق' };
-    return names[betType] || betType;
+function casinoPlayDiceSound() {
+    $('#casinoDie1').addClass('rolling');
+    $('#casinoDie2').addClass('rolling');
+    setTimeout(() => {
+        $('#casinoDie1').removeClass('rolling');
+        $('#casinoDie2').removeClass('rolling');
+    }, 300);
 }
 
 function casinoRollDice() {
     if(casinoIsRolling) return;
-    
+    if(!casinoIsMyTurn) {
+        $('#casinoResultMessage').html('⏳ دور الخصم حالياً، انتظر دورك').css('color', '#f39c12');
+        setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ دور الخصم حالياً، انتظر دورك') $('#casinoResultMessage').html(''); }, 1500);
+        return;
+    }
     if(!casinoCurrentBet) {
         $('#casinoResultMessage').html('⚠️ اختر نوع الرهان أولاً!').css('color', '#f39c12');
         setTimeout(() => { if($('#casinoResultMessage').html() === '⚠️ اختر نوع الرهان أولاً!') $('#casinoResultMessage').html(''); }, 1500);
@@ -1563,19 +1489,14 @@ function casinoRollDice() {
     let betAmount = parseInt($('#casinoBetAmount').val());
     if(isNaN(betAmount) || betAmount < 10) {
         $('#casinoResultMessage').html('⚠️ أقل رهان 10 عملات!').css('color', '#e74c3c');
-        setTimeout(() => { if($('#casinoResultMessage').html() === '⚠️ أقل رهان 10 عملات!') $('#casinoResultMessage').html(''); }, 1500);
         return;
     }
-    
-    if(betAmount > casinoBalance) {
+    if(betAmount > casinoMyBalance) {
         $('#casinoResultMessage').html('❌ رصيدك غير كافي!').css('color', '#e74c3c');
-        setTimeout(() => { if($('#casinoResultMessage').html() === '❌ رصيدك غير كافي!') $('#casinoResultMessage').html(''); }, 1500);
         return;
     }
-    
     if(betAmount > 10000) {
         $('#casinoResultMessage').html('⚠️ الحد الأقصى للرهان 10000').css('color', '#e74c3c');
-        setTimeout(() => { if($('#casinoResultMessage').html() === '⚠️ الحد الأقصى للرهان 10000') $('#casinoResultMessage').html(''); }, 1500);
         return;
     }
     
@@ -1609,80 +1530,164 @@ function casinoRollDice() {
         
         if(result.win) {
             winAmount = betAmountVal * result.multiplier;
-            casinoBalance += winAmount;
+            casinoMyBalance += winAmount;
             message = `🎉 ربحت! 🎉 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${dice1}+${dice2}=${total}) | ربحت ${winAmount} عملة!`;
             $('#casinoResultMessage').html(message).css('color', '#2ecc71');
             casinoAddToHistory(`✅ ${message}`, true);
+            // إرسال النتيجة للخصم
+            if(casinoConn) casinoConn.send({ type: 'opponent_result', win: true, amount: winAmount, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
         } else {
-            casinoBalance -= betAmountVal;
+            casinoMyBalance -= betAmountVal;
             message = `💔 خسرت! 💔 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${dice1}+${dice2}=${total}) | خسرت ${betAmountVal} عملة.`;
             $('#casinoResultMessage').html(message).css('color', '#e74c3c');
             casinoAddToHistory(`❌ ${message}`, false);
+            if(casinoConn) casinoConn.send({ type: 'opponent_result', win: false, amount: betAmountVal, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
         }
         
-        casinoUpdateBalanceUI();
+        casinoUpdateUI();
+        casinoIsMyTurn = false;
+        casinoCurrentBet = null;
+        $('.bet-btn').removeClass('selected');
         
-        if(casinoBalance <= 0) {
-            $('#casinoResultMessage').html(message + '<br>💀 أفلست! اضغط "إعادة" للبدء من جديد 💀');
+        if(casinoMyBalance <= 0) {
+            $('#casinoResultMessage').html(message + '<br>💀 أفلست! لقد خسرت اللعبة 💀');
             $('#casinoRollBtn').prop('disabled', true);
-            casinoIsRolling = true;
+            if(casinoConn) casinoConn.send({ type: 'game_over', loser: casinoMyName });
         } else {
             $('#casinoRollBtn').prop('disabled', false);
-            casinoIsRolling = false;
+            $('#casinoResultMessage').append('<br>⏳ انتظر دور الخصم...');
         }
+        casinoIsRolling = false;
         
         setTimeout(() => {
-            if($('#casinoResultMessage').html() === message) $('#casinoResultMessage').html('');
+            if($('#casinoResultMessage').html().includes('انتظر دور الخصم')) {
+                $('#casinoResultMessage').html('⏳ انتظر دور الخصم...');
+            } else if($('#casinoResultMessage').html() === message) {
+                $('#casinoResultMessage').html('');
+            }
         }, 3000);
     }, 500);
 }
 
-function casinoResetGame() {
-    casinoBalance = 1000;
-    casinoCurrentBet = null;
-    casinoIsRolling = false;
-    casinoUpdateBalanceUI();
-    $('#casinoResultMessage').html('🔄 تمت إعادة اللعبة! ابدأ رهانك').css('color', '#ffd966');
-    casinoDisplayDice(1, 1);
-    $('.bet-btn').removeClass('selected');
-    $('#casinoRollBtn').prop('disabled', false);
-    setTimeout(() => {
-        if($('#casinoResultMessage').html() === '🔄 تمت إعادة اللعبة! ابدأ رهانك') $('#casinoResultMessage').html('');
-    }, 2000);
-    casinoAddToHistory('🔄 تمت إعادة الرصيد إلى 1000', null);
+function casinoHostGame() {
+    casinoMyName = $('#casinoPlayerName').val().trim();
+    if(!casinoMyName) { alert("اكتب اسمك"); return; }
+    casinoRoomHost = true;
+    casinoIsMyTurn = true;
+    let roomId = "CASINO_" + Math.floor(1000 + Math.random() * 9000);
+    casinoPeer = new Peer(roomId);
+    casinoPeer.on('open', () => {
+        $('#casinoOnlineSetup').hide();
+        $('#casinoLobby').removeClass('hidden');
+        $('#casinoRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>🎲 انتظر اتصال الخصم...`);
+        $('#casinoEnemyInfo').html('⏳ جاري انتظار الخصم...');
+        $('#casinoGameArea').hide();
+    });
+    casinoPeer.on('connection', conn => {
+        casinoConn = conn;
+        $('#casinoEnemyInfo').html('✅ تم اتصال الخصم! اللعبة تبدأ الآن.');
+        $('#casinoGameArea').fadeIn();
+        casinoSetupReceiver();
+        casinoConn.send({ type: 'init', myName: casinoMyName, myBalance: casinoMyBalance });
+        casinoUpdateUI();
+        casinoDisplayDice(1, 1);
+    });
 }
 
-function initCasino() {
-    casinoBalance = 1000;
-    casinoCurrentBet = null;
-    casinoUpdateBalanceUI();
-    casinoDisplayDice(1, 1);
-    $('#casinoHistoryList').empty();
-    
-    $('.bet-btn').off('click').on('click', function() {
-        if(casinoIsRolling) {
-            $('#casinoResultMessage').html('⏳ انتظر حتى ينتهي الرمي...');
-            setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ انتظر حتى ينتهي الرمي...') $('#casinoResultMessage').html(''); }, 1000);
-            return;
+function casinoJoinGame() {
+    casinoMyName = $('#casinoPlayerName').val().trim();
+    let roomCode = $('#casinoRoomCode').val().trim();
+    if(!casinoMyName) { alert("اكتب اسمك"); return; }
+    if(!roomCode) { alert("اكتب كود الغرفة"); return; }
+    casinoRoomHost = false;
+    casinoIsMyTurn = false;
+    casinoPeer = new Peer();
+    casinoPeer.on('open', () => {
+        casinoConn = casinoPeer.connect(roomCode);
+        casinoConn.on('open', () => {
+            $('#casinoOnlineSetup').hide();
+            $('#casinoLobby').removeClass('hidden');
+            $('#casinoRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${roomCode}`);
+            $('#casinoEnemyInfo').html('✅ تم الاتصال! جاري بدء اللعبة...');
+            $('#casinoGameArea').fadeIn();
+            casinoConn.send({ type: 'join', myName: casinoMyName, myBalance: casinoMyBalance });
+            casinoSetupReceiver();
+            casinoUpdateUI();
+            casinoDisplayDice(1, 1);
+        });
+    });
+}
+
+function casinoSetupReceiver() {
+    casinoConn.on('data', data => {
+        if(data.type === 'init') {
+            casinoEnemyBalance = data.myBalance;
+            casinoUpdateUI();
+            casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null);
+            $('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);
         }
-        const betType = $(this).attr('data-casino-bet');
-        casinoCurrentBet = betType;
-        $('.bet-btn').removeClass('selected');
-        $(this).addClass('selected');
-        $('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(betType)}`).css('color', '#3498db');
-        setTimeout(() => { if($('#casinoResultMessage').html() === `🎲 تم اختيار الرهان: ${casinoBetName(betType)}`) $('#casinoResultMessage').html(''); }, 1200);
+        if(data.type === 'join') {
+            casinoEnemyBalance = data.myBalance;
+            casinoUpdateUI();
+            casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null);
+            $('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);
+            if(casinoRoomHost) {
+                casinoConn.send({ type: 'start_turn', turn: true });
+            }
+        }
+        if(data.type === 'start_turn') {
+            casinoIsMyTurn = true;
+            $('#casinoResultMessage').html('🎲 دورك الآن! اختر رهانك وارمِ النرد').css('color', '#2ecc71');
+            setTimeout(() => {
+                if($('#casinoResultMessage').html() === '🎲 دورك الآن! اختر رهانك وارمِ النرد') $('#casinoResultMessage').html('');
+            }, 3000);
+        }
+        if(data.type === 'opponent_result') {
+            if(data.win) {
+                casinoEnemyBalance += data.amount;
+                casinoAddToHistory(`👤 الخصم ربح ${data.amount} عملة (رهان ${casinoBetName(data.bet)} | نرد ${data.dice1}+${data.dice2})`, true);
+                $('#casinoResultMessage').html(`💥 الخصم ربح ${data.amount} عملة! دورك الآن`).css('color', '#f39c12');
+            } else {
+                casinoEnemyBalance -= data.amount;
+                casinoAddToHistory(`👤 الخصم خسر ${data.amount} عملة (رهان ${casinoBetName(data.bet)} | نرد ${data.dice1}+${data.dice2})`, false);
+                $('#casinoResultMessage').html(`✅ الخصم خسر ${data.amount} عملة! دورك الآن`).css('color', '#2ecc71');
+            }
+            casinoUpdateUI();
+            casinoIsMyTurn = true;
+            casinoCurrentBet = null;
+            $('.bet-btn').removeClass('selected');
+            $('#casinoRollBtn').prop('disabled', false);
+            setTimeout(() => {
+                if($('#casinoResultMessage').html() === `💥 الخصم ربح ${data.amount} عملة! دورك الآن` || 
+                   $('#casinoResultMessage').html() === `✅ الخصم خسر ${data.amount} عملة! دورك الآن`) {
+                    $('#casinoResultMessage').html('🎲 دورك الآن');
+                    setTimeout(() => $('#casinoResultMessage').html(''), 2000);
+                }
+            }, 3000);
+        }
+        if(data.type === 'game_over') {
+            $('#casinoResultMessage').html(`🏆 فزت! الخصم أفلست 🏆`).css('color', '#2ecc71');
+            $('#casinoRollBtn').prop('disabled', true);
+            casinoAddToHistory(`🏆 فوز! الخصم خسر اللعبة`, true);
+        }
     });
-    
-    $('#casinoRollBtn').off('click').on('click', casinoRollDice);
-    $('#casinoResetBtn').off('click').on('click', casinoResetGame);
-    
-    $('#casinoBetAmount').off('change').on('change', function() {
-        let val = parseInt($(this).val());
-        if(isNaN(val)) $(this).val(50);
-        if(val < 10) $(this).val(10);
-        if(val > 10000) $(this).val(10000);
-        if(val > casinoBalance && casinoBalance > 0) $(this).val(casinoBalance);
-    });
+}
+
+function casinoResetGame() {
+    if(casinoConn) casinoConn.send({ type: 'reset_request' });
+    casinoMyBalance = 1000;
+    casinoEnemyBalance = 1000;
+    casinoCurrentBet = null;
+    casinoIsMyTurn = casinoRoomHost;
+    casinoUpdateUI();
+    casinoDisplayDice(1, 1);
+    $('#casinoResultMessage').html('🔄 تمت إعادة اللعبة!').css('color', '#ffd966');
+    $('.bet-btn').removeClass('selected');
+    $('#casinoRollBtn').prop('disabled', false);
+    $('#casinoHistoryList').empty();
+    setTimeout(() => {
+        if($('#casinoResultMessage').html() === '🔄 تمت إعادة اللعبة!') $('#casinoResultMessage').html('');
+    }, 2000);
 }
 
 // ===================== تبديل الألعاب =====================
@@ -1697,11 +1702,39 @@ function showGame(t) {
         $('#spy-section').removeClass('hidden');
     } else if(t === 'spyOnline') {
         $('#spy-online-section').removeClass('hidden');
-    } else if(t === 'casino') {
-        $('#casino-section').removeClass('hidden');
-        initCasino();
+    } else if(t === 'casinoOnline') {
+        $('#casinoOnline-section').removeClass('hidden');
     }
 }
+
+// ربط أزرار القمار بعد تحميل الصفحة
+$(document).ready(function() {
+    $(document).on('click', '.bet-btn', function() {
+        if(casinoIsRolling) return;
+        if(!casinoIsMyTurn) {
+            $('#casinoResultMessage').html('⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان').css('color', '#f39c12');
+            setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان') $('#casinoResultMessage').html(''); }, 1500);
+            return;
+        }
+        const betType = $(this).attr('data-casino-bet');
+        casinoCurrentBet = betType;
+        $('.bet-btn').removeClass('selected');
+        $(this).addClass('selected');
+        $('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(betType)}`).css('color', '#3498db');
+        setTimeout(() => { if($('#casinoResultMessage').html() === `🎲 تم اختيار الرهان: ${casinoBetName(betType)}`) $('#casinoResultMessage').html(''); }, 1200);
+    });
+    
+    $(document).on('click', '#casinoRollBtn', casinoRollDice);
+    $(document).on('click', '#casinoResetBtn', casinoResetGame);
+    
+    $('#casinoBetAmount').on('change', function() {
+        let val = parseInt($(this).val());
+        if(isNaN(val)) $(this).val(50);
+        if(val < 10) $(this).val(10);
+        if(val > 10000) $(this).val(10000);
+        if(val > casinoMyBalance && casinoMyBalance > 0) $(this).val(casinoMyBalance);
+    });
+});
 </script>
 </body>
 </html>
