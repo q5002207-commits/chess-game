@@ -2,561 +2,611 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🏁 سباق السيارات أونلاين - سباق واحد للجميع 🏎️</title>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة أحمد - المافيا المتكاملة + القمار أونلاين</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        * { box-sizing: border-box; user-select: none; touch-action: manipulation; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
-            background: linear-gradient(145deg, #0a2f1f, #051a0e);
-            margin: 0;
-            padding: 20px;
-            color: #ffd966;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: #1e2a1a;
-            border-radius: 60px;
-            padding: 20px;
-            border: 3px solid #f1c40f;
-        }
-        h1, h2 { text-align: center; color: #f1c40f; margin: 0 0 10px 0; }
-        .room-box {
-            background: #0f1f0f;
-            border-radius: 30px;
-            padding: 20px;
-            text-align: center;
-            margin: 15px 0;
-        }
-        input {
-            width: 80%;
-            padding: 12px;
-            border-radius: 30px;
-            border: 2px solid #f1c40f;
-            background: #0a1a0a;
-            color: #f39c12;
-            text-align: center;
-            font-size: 1rem;
-            margin: 10px 0;
-        }
-        button {
-            background: #f39c12;
-            color: #1e2a1a;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:active { transform: scale(0.97); }
-        .danger-btn { background: #e74c3c; color: white; }
-        .success-btn { background: #27ae60; color: white; }
+        * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
+        .menu-btn { display: block; width: 100%; padding: 25px; margin: 15px 0; background: #111; border: 2px solid #da291c; color: white; border-radius: 15px; font-size: 1.4em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .menu-btn:hover { background: #da291c; box-shadow: 0 0 20px #da291c; }
+        .back-home { background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; border: none; font-size: 0.8em; }
+        .header { width: 100%; max-width: 400px; background: #da291c; padding: 12px; border-radius: 12px; text-align: center; color: white; margin-bottom: 10px; }
+        .mafia-card, .spy-card { background: #1a1a1a; padding: 20px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; transition: 0.5s; cursor: pointer; text-align: center; }
+        .role-display { display: none; color: #ff0000; font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+        .narrator-box { background: #0055ff; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; border: 2px solid white; text-align: center; }
         .hidden { display: none; }
-        .race-track { background: #2c3e2f; border-radius: 30px; padding: 15px; margin: 15px 0; }
-        .car-lane {
-            background: #1a2a1a;
-            margin-bottom: 10px;
-            border-radius: 25px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .car-icon { font-size: 1.8rem; width: 50px; text-align: center; }
-        .car-name { width: 80px; font-weight: bold; font-size: 0.8rem; }
-        .track-bar { flex: 1; background: #3a4a2a; border-radius: 20px; height: 35px; overflow: hidden; }
-        .car-progress {
-            width: 0%;
-            height: 100%;
-            border-radius: 20px;
-            transition: width 0.02s linear;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.7rem;
-        }
-        .car-red .car-progress { background: #e74c3c; }
-        .car-blue .car-progress { background: #3498db; }
-        .car-green .car-progress { background: #2ecc71; }
-        .car-yellow .car-progress { background: #f1c40f; color: #1e2a1a; }
-        .cars-selector { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 15px 0; }
-        .car-card {
-            background: #1e2a1a;
-            border: 2px solid #f1c40f;
-            border-radius: 25px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            min-width: 80px;
-        }
-        .car-card.selected { background: #f39c12; color: #1e2a1a; border-color: white; }
-        .car-card .emoji { font-size: 1.8rem; }
-        .car-card .multiplier { font-size: 0.7rem; }
-        .bet-control { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
-        .bet-control input { width: 120px; margin: 0; }
-        .bet-control button { margin: 0; }
-        .race-btn { width: 100%; padding: 15px; font-size: 1.2rem; margin-top: 10px; }
-        .result { background: #000000aa; border-radius: 25px; padding: 10px; margin: 10px 0; text-align: center; font-weight: bold; }
-        .history { background: #0f1f0f; border-radius: 20px; padding: 10px; margin-top: 15px; max-height: 120px; overflow-y: auto; font-size: 0.7rem; }
-        .players-list { display: flex; gap: 10px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
-        .player-badge { background: #0f1f0f; border-radius: 25px; padding: 5px 12px; text-align: center; border: 1px solid #f1c40f; }
-        .player-badge.host { border-color: gold; background: #2c5a2e; }
-        .status { text-align: center; padding: 8px; border-radius: 25px; margin: 10px 0; font-size: 0.9rem; }
-        .status.waiting { background: #e67e22; color: white; }
-        .status.ready { background: #27ae60; color: white; }
-        .status.racing { background: #e74c3c; color: white; }
-        .back-home { background: #333; color: white; width: auto; margin-bottom: 10px; }
+        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        .locked { pointer-events: none; opacity: 0.4; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #0f0; background: #000; color: #0f0; margin-bottom: 8px; text-align: center; }
+        button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .role-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; }
+        .mafia-role { background: #8b0000; color: white; }
+        .citizen-role { background: #006400; color: white; }
+        .doctor-role { background: #00008b; color: white; }
+        .child-role { background: #daa520; color: black; }
+        .silent-role { background: #4b0082; color: white; }
+        .chess-container { display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+        .chess-main { display: flex; flex-direction: column; align-items: center; }
+        .move-history { background: #111; border: 1px solid #da291c; border-radius: 8px; padding: 10px; width: 180px; max-height: 400px; overflow-y: auto; font-size: 0.8em; color: #0f0; }
+        .move-history h4 { margin: 0 0 8px 0; color: #da291c; text-align: center; }
+        .move-history p { margin: 3px 0; border-bottom: 1px solid #333; padding: 2px; }
+        .fake-chat { background: #0a0a0a; border: 2px solid #0f0; border-radius: 8px; width: 200px; max-height: 400px; display: flex; flex-direction: column; padding: 8px; }
+        .fake-chat h4 { margin: 0 0 8px 0; color: #0f0; text-align: center; font-size: 0.9em; }
+        .chat-messages { flex: 1; overflow-y: auto; font-size: 0.7em; color: #0f0; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px; max-height: 300px; }
+        .chat-messages p { margin: 4px 0; word-break: break-word; }
+        .chat-input-area { display: flex; gap: 5px; }
+        .chat-input-area input { flex: 1; padding: 6px; font-size: 0.7em; margin: 0; background: #000; border: 1px solid #0f0; color: #0f0; }
+        .chat-input-area button { width: auto; padding: 6px 8px; background: #111; border: 1px solid #0f0; color: #0f0; font-size: 0.7em; }
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218, 41, 28, 0.3); position: relative; }
+        .turn-box { margin-top: 15px; font-size: 1.2em; font-weight: bold; color: #fff; }
+        .timer-box { font-size: 1.5em; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; color: #ff0; }
+        .chess-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
+        .highlight-selected { background-color: rgba(255, 255, 0, 0.5) !important; }
+        .highlight-hint { width: 16px; height: 16px; background: rgba(0, 255, 0, 0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .board-coords { position: absolute; pointer-events: none; z-index: 50; font-size: 11px; font-weight: bold; color: #ff0; text-shadow: 0 0 3px #000; }
+        .file-coord { bottom: 2px; text-align: center; width: 12.5%; position: absolute; }
+        .rank-coord { right: 2px; text-align: center; height: 12.5%; display: flex; align-items: center; position: absolute; }
+        .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
+        .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
+        .secret-panel button:hover { background: #da291c; }
+        .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; justify-content: center; align-items: center; }
+        .password-box { background: #1a1a1a; border: 3px solid #da291c; border-radius: 20px; padding: 30px; text-align: center; width: 300px; }
+        .password-box input { width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; margin: 20px 0; background: #000; color: #0f0; border: 2px solid #da291c; }
+        .password-box h3 { color: #da291c; margin-bottom: 10px; }
+        
+        /* ستايل القمار أونلاين */
+        .casino-container { max-width: 500px; width: 100%; background: #1e1e1e; border-radius: 40px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px #da291c; text-align: center; margin: auto; }
+        .casino-container h2 { color: #da291c; margin: 0 0 10px 0; }
+        .balance-box { background: #000000aa; border-radius: 60px; padding: 15px; margin: 15px 0; border: 1px solid #da291c; }
+        .balance-amount { font-size: 2.5rem; font-weight: bold; color: #f1c40f; }
+        .dice-area { background: #2c2c2c; border-radius: 30px; padding: 25px; margin: 15px 0; }
+        .dice { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .die { width: 80px; height: 80px; background: white; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; box-shadow: 0 5px 0 #999; transition: all 0.1s ease; }
+        .die.rolling { animation: shake 0.3s infinite; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-10deg); } 75% { transform: translateX(5px) rotate(10deg); } 100% { transform: translateX(0); } }
+        .bet-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        .bet-btn { background: #2c3e50; border: none; padding: 12px 5px; border-radius: 50px; color: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        .bet-btn.selected { background: #da291c; box-shadow: 0 0 15px #da291c; border: 1px solid gold; }
+        .bet-amount input { width: 80%; padding: 12px; border-radius: 50px; border: 2px solid #da291c; background: #000; color: #ffd966; font-size: 1.2rem; text-align: center; }
+        .roll-btn { background: #27ae60; padding: 18px; font-size: 1.3rem; }
+        .reset-btn { background: #e74c3c; }
+        .history { background: #0a0a0a; border-radius: 20px; padding: 12px; margin-top: 20px; max-height: 200px; overflow-y: auto; font-size: 0.75rem; }
+        .result-message { font-size: 1rem; font-weight: bold; margin: 10px 0; padding: 8px; border-radius: 30px; background: #000000aa; }
+        .online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; }
+        .waiting-message { color: #f39c12; }
+        .enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; }
+        
+        /* ------------------- منطقة إضافة CSS جديدة ------------------- */
+        /* ======= ضع هنا أي CSS جديد لأي لعبة تضيفها ======= */
+        
     </style>
 </head>
 <body>
-<div class="container" id="app">
+
+<div id="main-menu">
+    <h1 style="color:#da291c;">🔥 AHMED PRO SYSTEM - المافيا المتكاملة 🔥</h1>
+    <button class="menu-btn" onclick="showGame('mafia')">🎲 موزع المافيا (دكتور + ولد + تسكيت)</button>
+    <button class="menu-btn" onclick="showGame('chess')">♟️ ساحة الشطرنج الكاملة</button>
+    <button class="menu-btn" onclick="showGame('spy')">🕵️ لعبة الجاسوس (أوفلاين)</button>
+    <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🌐 الجاسوس (أونلاين)</button>
+    <button class="menu-btn" style="border-color: #2ecc71;" onclick="showGameWithPassword()">🦘 لعبة القفز - متجر القوى</button>
+    <button class="menu-btn" style="border-color: #f39c12;" onclick="showGame('casinoOnline')">🎲 كازينو النرد أونلاين 🎲</button>
+    
+    <!-- ------------------- منطقة إضافة أزرار جديدة ------------------- -->
+   /* ===================== سباق السيارات أونلاين ===================== */
+.race-container {
+    max-width: 800px;
+    width: 100%;
+    background: #1e2a1a;
+    border-radius: 60px;
+    padding: 20px;
+    border: 3px solid #f1c40f;
+    box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+}
+.race-container h1 { text-align: center; color: #f1c40f; margin: 0 0 10px 0; }
+.race-container .balance-card {
+    background: #0f1f0f;
+    border-radius: 40px;
+    padding: 12px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid #f1c40f;
+}
+.race-container .balance-amount { font-size: 2.2rem; font-weight: bold; color: #f39c12; }
+.race-container .race-track { background: #2c3e2f; border-radius: 30px; padding: 20px; margin: 20px 0; }
+.race-container .car-lane {
+    background: #1a2a1a;
+    margin-bottom: 12px;
+    border-radius: 30px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #5d6e3a;
+}
+.race-container .car-icon { font-size: 2rem; width: 60px; text-align: center; }
+.race-container .car-name { width: 70px; font-weight: bold; font-size: 0.9rem; }
+.race-container .track-bar { flex: 1; background: #3a4a2a; border-radius: 20px; height: 45px; position: relative; overflow: hidden; }
+.race-container .car-progress {
+    width: 0%;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.03s linear;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+.race-container .car-red .car-progress { background: radial-gradient(circle at left, #e74c3c, #c0392b); }
+.race-container .car-blue .car-progress { background: radial-gradient(circle at left, #3498db, #2980b9); }
+.race-container .car-green .car-progress { background: radial-gradient(circle at left, #2ecc71, #27ae60); }
+.race-container .car-yellow .car-progress { background: radial-gradient(circle at left, #f1c40f, #f39c12); }
+.race-container .odds-info { font-size: 0.7rem; color: #ffd966; background: #000000aa; padding: 2px 8px; border-radius: 20px; }
+.race-container .cars-selector { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.race-container .car-bet-card {
+    background: #1e2a1a;
+    border: 2px solid #f1c40f;
+    border-radius: 30px;
+    padding: 12px 15px;
+    text-align: center;
+    cursor: pointer;
+    min-width: 100px;
+}
+.race-container .car-bet-card.selected { background: #f39c12; color: #1e2a1a; border-color: white; }
+.race-container .car-bet-card .car-emoji { font-size: 2rem; }
+.race-container .car-bet-card .multiplier { font-size: 0.8rem; color: #aaa; }
+.race-container .selected .multiplier { color: #1e2a1a; }
+.race-container .bet-control { display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+.race-container .bet-control input { width: 150px; padding: 10px; border-radius: 30px; border: 2px solid #f1c40f; background: #0a1a0a; color: #f39c12; text-align: center; font-size: 1.1rem; }
+.race-container .race-btn { background: #27ae60; color: white; font-size: 1.3rem; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; width: 100%; }
+.race-container .race-btn:disabled { background: #555; cursor: not-allowed; }
+.race-container .result-message { background: #000000aa; border-radius: 30px; padding: 12px; margin-top: 15px; font-weight: bold; text-align: center; }
+.race-container .history { background: #0f1f0f; border-radius: 20px; padding: 10px; margin-top: 20px; max-height: 150px; overflow-y: auto; font-size: 0.75rem; }
+.race-container .online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; }
+.race-container .enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; text-align: center; }
+.race-container button { width: 100%; padding: 12px; background: #da291c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.race-container .back-home { background: #333; width: auto; margin-bottom: 10px; }
+<!-- ===================== المافيا ===================== -->
+<div id="mafia-section" class="hidden">
     <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
-    <h1>🏁 سباق السيارات 🏎️</h1>
-    <h2>🏆 سباق واحد للجميع 🏆</h2>
-
-    <!-- شاشة الدخول -->
-    <div id="loginScreen">
-        <div class="room-box">
-            <input type="text" id="playerName" placeholder="اسمك...">
-            <button onclick="createRoom()">👑 إنشاء غرفة</button>
-            <p style="margin: 10px;">أو</p>
-            <input type="text" id="roomCode" placeholder="كود الغرفة">
-            <button onclick="joinRoom()">🚪 دخول الغرفة</button>
+    <div class="header"><h3>🕵️‍♂️ المافيا - دكتور + ولد + تسكيت</h3></div>
+    <div id="mafia-setup">
+        <input type="text" id="mafiaPlayerName" placeholder="اسم اللاعب...">
+        <button onclick="addMafiaPlayer()">➕ إضافة لاعب</button>
+        <div id="mafia-preview" style="margin:10px; color:#888; font-size:0.9em;"></div>
+        <button style="background:green;" onclick="startMafiaDist()">🎲 توزيع الأدوار + الراوي</button>
+        <div style="margin-top:10px; font-size:0.7em; color:#aaa;">
+            📌 4-8 لاعبين: مافيا 🔪 قاتل + دكتور 💉<br>
+            📌 9 فأكثر: مافيا قاتل 🔪 + مافيا تسكيت 🤐 + دكتور 💉 + ولد 👶
         </div>
     </div>
-
-    <!-- شاشة اللوبي -->
-    <div id="lobbyScreen" class="hidden">
-        <div class="status waiting" id="statusBox">⏳ انتظار اتصال الخصم...</div>
-        <div class="players-list" id="playersList"></div>
-        <div class="room-box">
-            <div id="roomCodeDisplay"></div>
-            <button onclick="startRaceFromHost()" id="startRaceHostBtn" class="success-btn hidden" style="width:100%;">🏁 ابدأ السباق 🏁</button>
-        </div>
-    </div>
-
-    <!-- شاشة اللعب -->
-    <div id="gameScreen" class="hidden">
-        <div class="players-list" id="gamePlayersList"></div>
-        
-        <div class="balance-card">
-            <div>💰 رصيدك</div>
-            <div class="balance-amount" id="myBalance">1000</div>
-        </div>
-
-        <div class="race-track" id="raceTrack">
-            <div class="car-lane car-red"><div class="car-icon">🏎️</div><div class="car-name">الأحمر ×2.5</div><div class="track-bar"><div class="car-progress" id="prog0" style="width:0%">0%</div></div></div>
-            <div class="car-lane car-blue"><div class="car-icon">🏎️</div><div class="car-name">الأزرق ×3.0</div><div class="track-bar"><div class="car-progress" id="prog1" style="width:0%">0%</div></div></div>
-            <div class="car-lane car-green"><div class="car-icon">🏎️</div><div class="car-name">الأخضر ×4.0</div><div class="track-bar"><div class="car-progress" id="prog2" style="width:0%">0%</div></div></div>
-            <div class="car-lane car-yellow"><div class="car-icon">🏎️</div><div class="car-name">الأصفر ×5.0</div><div class="track-bar"><div class="car-progress" id="prog3" style="width:0%">0%</div></div></div>
-        </div>
-
-        <div class="cars-selector" id="carSelector">
-            <div class="car-card" data-car="0"><div class="emoji">🏎️</div><div>الأحمر</div><div class="multiplier">×2.5</div></div>
-            <div class="car-card" data-car="1"><div class="emoji">🏎️</div><div>الأزرق</div><div class="multiplier">×3.0</div></div>
-            <div class="car-card" data-car="2"><div class="emoji">🏎️</div><div>الأخضر</div><div class="multiplier">×4.0</div></div>
-            <div class="car-card" data-car="3"><div class="emoji">🏎️</div><div>الأصفر</div><div class="multiplier">×5.0</div></div>
-        </div>
-
-        <div class="bet-control">
-            <input type="number" id="betAmount" value="50" min="10" max="10000" step="10">
-            <button id="placeBetBtn" style="background:#e67e22;">💰 ضع الرهان</button>
-        </div>
-
-        <div id="resultArea" class="result"></div>
-        <div class="history" id="historyArea"></div>
+    <div id="mafia-board" class="hidden">
+        <div id="narrator-name"></div>
+        <div id="mafia-cards-container" style="margin-top:15px;"></div>
     </div>
 </div>
 
+<!-- ===================== الشطرنج ===================== -->
+<div id="chess-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div class="header"><h3>👑 شطرنج أحمد المحترف 👑</h3></div>
+    <div class="chess-container">
+        <div class="move-history" id="move-history"><h4>📜 سجل الحركات</h4><div id="history-list"></div></div>
+        <div class="chess-main">
+            <div class="timer-box" id="timer-display">⏱️ 00:25</div>
+            <div id="board" style="position: relative;"></div>
+            <div class="chess-buttons">
+                <button id="resign-btn" style="background:#da291c;">🏳️ انسحاب</button>
+                <button id="draw-btn" style="background:#0055ff;">🤝 طلب تعادل</button>
+            </div>
+        </div>
+        <div class="fake-chat" id="fake-chat">
+            <h4>💬 شات مع الخصم</h4>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="50">
+                <button id="send-chat-btn">📤 إرسال</button>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:10px; text-align:center;">
+        <div id="setup-area">
+            <button onclick="hostGame()">إنشاء طاولة (Host)</button>
+            <p>أو</p>
+            <input type="number" id="joinCode" placeholder="أدخل كود الخصم">
+            <button onclick="joinGame()">دخول (Join)</button>
+        </div>
+        <div class="turn-box" id="turn-display">انتظار اللاعب...</div>
+    </div>
+</div>
+
+<!-- ===================== الجاسوس أوفلاين ===================== -->
+<div id="spy-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div class="header"><h3>🕵️ لعبة الجاسوس (أوفلاين)</h3></div>
+    <div id="spy-setup">
+        <input type="text" id="spyPlayerName" placeholder="اسم اللاعب...">
+        <button onclick="addSpyPlayer()">إضافة لاعب</button>
+        <div id="spy-preview" style="margin:10px; color:#888;"></div>
+        <button style="background:green;" onclick="startSpyDist()">توزيع الأماكن</button>
+    </div>
+    <div id="spy-board" class="hidden"><div id="spy-cards-container"></div></div>
+</div>
+
+<!-- ===================== الجاسوس أونلاين ===================== -->
+<div id="spy-online-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div class="header"><h3>🌐 الجاسوس أونلاين</h3></div>
+    <div id="spy-online-setup">
+        <input type="text" id="spyNick" placeholder="اسمك">
+        <button onclick="hostRoom()">إنشاء غرفة</button>
+        <input type="text" id="roomCode" placeholder="كود الغرفة">
+        <button onclick="joinRoom()">دخول</button>
+    </div>
+    <div id="lobby" class="hidden"><div id="display-room-id"></div><div id="online-players-list"></div><button id="start-btn" onclick="startOnlineGame()">ابدأ</button></div>
+    <div id="game-play" class="hidden"><div class="spy-card" onclick="$(this).find('.role-display').toggle()"><p>اضغط لإظهار المكان</p><div id="my-role" class="role-display"></div></div><div id="voting-area"><h4 id="vote-title">صوّت للجاسوس:</h4><div id="vote-btns"></div><div id="vote-log-container"></div><div id="final-result"></div></div></div>
+</div>
+
+<!-- ===================== لعبة القفز ===================== -->
+<div id="jump-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div id="jumpGameContainer"></div>
+</div>
+
+<!-- ===================== كازينو النرد أونلاين ===================== -->
+<div id="casinoOnline-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div class="casino-container">
+        <h2>🎲 كازينو النرد - أونلاين 🎲</h2>
+        <div id="casinoOnlineSetup">
+            <input type="text" id="casinoPlayerName" placeholder="اسمك...">
+            <button onclick="casinoHostGame()">👑 إنشاء غرفة (Host)</button>
+            <p style="margin:10px 0; color:#888;">أو</p>
+            <input type="text" id="casinoRoomCode" placeholder="كود الغرفة">
+            <button onclick="casinoJoinGame()">🚪 دخول الغرفة</button>
+        </div>
+        
+        <div id="casinoLobby" class="hidden">
+            <div class="online-status" id="casinoRoomDisplay"></div>
+            <div class="enemy-info" id="casinoEnemyInfo">⏳ انتظار اتصال الخصم...</div>
+            <div id="casinoGameArea" style="display:none;">
+                <div class="balance-box">
+                    <div class="balance-label" style="color:#aaa;">💰 رصيدك</div>
+                    <div class="balance-amount" id="casinoBalance">1000</div>
+                </div>
+                <div class="balance-box" style="background:#1a1a1a;">
+                    <div class="balance-label" style="color:#aaa;">💰 رصيد الخصم</div>
+                    <div class="balance-amount" id="casinoEnemyBalance">1000</div>
+                </div>
+                
+                <div class="dice-area">
+                    <div class="dice">
+                        <div class="die" id="casinoDie1">🎲</div>
+                        <div class="die" id="casinoDie2">🎲</div>
+                    </div>
+                    <div class="dice-total" id="casinoTotalDisplay" style="font-size:1.2rem; color:#da291c;">المجموع: --</div>
+                </div>
+                
+                <div class="bet-options">
+                    <button class="bet-btn" data-casino-bet="small">📉 صغير (4-9)<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="big">📈 كبير (10-12)<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="seven">🎯 7 بالضبط<br><span style="font-size:0.6rem;">×5</span></button>
+                    <button class="bet-btn" data-casino-bet="even">🔢 زوجي<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="odd">🔢 فردي<br><span style="font-size:0.6rem;">×2</span></button>
+                    <button class="bet-btn" data-casino-bet="double">🔄 زوج متطابق<br><span style="font-size:0.6rem;">×10</span></button>
+                </div>
+                
+                <div class="bet-amount">
+                    <input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10">
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <button class="roll-btn" id="casinoRollBtn" style="flex:2;">🎲 ارمي النرد 🎲</button>
+                    <button class="reset-btn" id="casinoResetBtn" style="flex:1;">🔄 إعادة</button>
+                </div>
+                
+                <div id="casinoResultMessage" class="result-message"></div>
+                
+                <div class="history">
+                    <h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4>
+                    <div id="casinoHistoryList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ------------------- منطقة إضافة أقسام HTML جديدة ------------------- -->
+<!-- ===================== سباق السيارات أونلاين ===================== -->
+<div id="raceOnline-section" class="hidden">
+    <div class="race-container">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <h1>🏁 سباق السيارات أونلاين 🏎️</h1>
+        
+        <div id="raceSetup">
+            <input type="text" id="racePlayerName" placeholder="اسمك...">
+            <button onclick="raceHostGame()">👑 إنشاء غرفة</button>
+            <p style="margin:10px 0; color:#888;">أو</p>
+            <input type="text" id="raceRoomCode" placeholder="كود الغرفة">
+            <button onclick="raceJoinGame()">🚪 دخول الغرفة</button>
+        </div>
+        
+        <div id="raceLobby" class="hidden">
+            <div class="online-status" id="raceRoomDisplay"></div>
+            <div class="enemy-info" id="raceEnemyInfo">⏳ انتظار اتصال الخصم...</div>
+            <div id="raceGameArea" style="display:none;">
+                <div class="balance-card"><div class="balance-amount" id="raceBalance">1000</div><div>💰 رصيدك</div></div>
+                <div class="balance-card"><div class="balance-amount" id="raceEnemyBalance">1000</div><div>💰 رصيد الخصم</div></div>
+                
+                <div class="race-track">
+                    <div class="car-lane car-red"><div class="car-icon">🏎️</div><div class="car-name">🔴 الأحمر</div><div class="track-bar"><div class="car-progress" id="raceProgress0" style="width:0%">0%</div></div><div class="odds-info">×2.5</div></div>
+                    <div class="car-lane car-blue"><div class="car-icon">🏎️</div><div class="car-name">🔵 الأزرق</div><div class="track-bar"><div class="car-progress" id="raceProgress1" style="width:0%">0%</div></div><div class="odds-info">×3.0</div></div>
+                    <div class="car-lane car-green"><div class="car-icon">🏎️</div><div class="car-name">🟢 الأخضر</div><div class="track-bar"><div class="car-progress" id="raceProgress2" style="width:0%">0%</div></div><div class="odds-info">×4.0</div></div>
+                    <div class="car-lane car-yellow"><div class="car-icon">🏎️</div><div class="car-name">🟡 الأصفر</div><div class="track-bar"><div class="car-progress" id="raceProgress3" style="width:0%">0%</div></div><div class="odds-info">×5.0</div></div>
+                </div>
+                
+                <div class="cars-selector">
+                    <div class="car-bet-card" data-car="0"><div class="car-emoji">🏎️</div><div>🔴 الأحمر</div><div class="multiplier">×2.5</div></div>
+                    <div class="car-bet-card" data-car="1"><div class="car-emoji">🏎️</div><div>🔵 الأزرق</div><div class="multiplier">×3.0</div></div>
+                    <div class="car-bet-card" data-car="2"><div class="car-emoji">🏎️</div><div>🟢 الأخضر</div><div class="multiplier">×4.0</div></div>
+                    <div class="car-bet-card" data-car="3"><div class="car-emoji">🏎️</div><div>🟡 الأصفر</div><div class="multiplier">×5.0</div></div>
+                </div>
+                
+                <div class="bet-control">
+                    <input type="number" id="raceBetAmount" value="50" min="10" max="10000" step="10">
+                    <button id="racePlaceBetBtn" style="background:#e67e22; width:auto; padding:10px 20px;">💰 ضع الرهان</button>
+                </div>
+                <button id="raceStartBtn" class="race-btn" disabled>🏁 ابدأ السباق 🏁</button>
+                <div id="raceResultMessage" class="result-message"></div>
+                <div class="history" id="raceHistoryList"><div>✨ راهن على سيارة وابدأ السباق ✨</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+
 <script>
-    // ---------- المتغيرات ----------
-    let peer = null;
-    let conn = null;
-    let myName = "";
-    let myBalance = 1000;
-    let myBet = 0;
-    let myCar = null;
-    let isHost = false;
-    let roomId = "";
-    let players = []; // { name, balance, bet, car, isHost }
-    let raceInProgress = false;
-    let raceInterval = null;
+// ===================== المتغيرات العامة =====================
+let isLocked = false;
+let mPlayers = [];
+let sPlayers = [];
+let players = [];
+let peer = null;
+let myName = "";
+let host = false;
+let votesReceived = [];
+
+const spyPlaces = [ 
+    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
+    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
+    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
+    "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
+    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", 
+    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", 
+    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
+    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
+    "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
+];
+
+// ===================== باقي دوال المافيا والشطرنج والجاسوس والقفز والكازينو =====================
+// (هنا دوال اللعبة الموجودة عندك كاملة...)
+
+// ------------------- منطقة إضافة JavaScript جديدة -------------------
+// ======= ضع هنا أي كود JavaScript جديد لأي لعبة تضيفها =======
+// ===================== سباق السيارات أونلاين =====================
+let racePeer = null, raceConn = null, raceMyName = "", raceMyBalance = 1000, raceEnemyBalance = 1000, raceSelectedCar = null, raceCurrentBet = 0, raceInProgress = false, raceInterval = null, raceRoomHost = false;
+const raceCars = [
+    { name: "الأحمر", multiplier: 2.5, position: 0, speed: 0 },
+    { name: "الأزرق", multiplier: 3.0, position: 0, speed: 0 },
+    { name: "الأخضر", multiplier: 4.0, position: 0, speed: 0 },
+    { name: "الأصفر", multiplier: 5.0, position: 0, speed: 0 }
+];
+
+function raceUpdateUI() { $('#raceBalance').text(raceMyBalance); $('#raceEnemyBalance').text(raceEnemyBalance); }
+function raceAddToHistory(msg, isWin) { const historyDiv = $('#raceHistoryList'); const item = $('<div style="border-bottom:1px solid #333; padding:5px;"></div>'); item.html(msg); if(isWin === true) item.css('color', '#2ecc71'); else if(isWin === false) item.css('color', '#e74c3c'); historyDiv.prepend(item); while(historyDiv.children().length > 15) historyDiv.children().last().remove(); }
+function raceResetPositions() { for(let i=0; i<raceCars.length; i++) { raceCars[i].position = 0; $(`#raceProgress${i}`).css('width', '0%').text('0%'); } }
+
+function raceStartRace() {
+    if(raceInProgress) return;
+    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); setTimeout(() => $('#raceResultMessage').html(''), 1500); return; }
+    if(raceCurrentBet <= 0) { $('#raceResultMessage').html('⚠️ ضع رهاناً أولاً!'); return; }
+    if(raceCurrentBet > raceMyBalance) { $('#raceResultMessage').html('❌ رصيدك غير كافي!'); return; }
     
-    const multipliers = [2.5, 3.0, 4.0, 5.0];
-    const carNames = ["الأحمر", "الأزرق", "الأخضر", "الأصفر"];
+    raceInProgress = true;
+    $('#raceStartBtn').prop('disabled', true);
+    $('#racePlaceBetBtn').prop('disabled', true);
+    $('.car-bet-card').css('pointer-events', 'none');
+    raceMyBalance -= raceCurrentBet;
+    raceUpdateUI();
+    raceAddToHistory(`💰 راهنت بـ ${raceCurrentBet} على ${raceCars[raceSelectedCar].name} (×${raceCars[raceSelectedCar].multiplier})`, null);
+    if(raceConn) raceConn.send({ type: 'bet_placed', bet: raceCurrentBet, car: raceSelectedCar, balance: raceMyBalance });
+    raceResetPositions();
+    for(let i=0; i<raceCars.length; i++) { raceCars[i].speed = Math.random() * 2.5 + 1.2; }
+    if(raceInterval) clearInterval(raceInterval);
+    let raceFinished = false, winner = null;
     
-    // ---------- دوال مساعدة ----------
-    function addHistory(msg, isWin = null) {
-        const div = document.getElementById("historyArea");
-        const item = document.createElement("div");
-        item.innerHTML = msg;
-        if (isWin === true) item.style.color = "#2ecc71";
-        else if (isWin === false) item.style.color = "#e74c3c";
-        else item.style.color = "#ffd966";
-        div.prepend(item);
-        while(div.children.length > 15) div.removeChild(div.lastChild);
-    }
-    
-    function updateUI() {
-        document.getElementById("myBalance").innerHTML = myBalance;
-        // تحديث قائمة اللاعبين
-        const gamePlayersDiv = document.getElementById("gamePlayersList");
-        if (gamePlayersDiv) {
-            gamePlayersDiv.innerHTML = "";
-            for (let p of players) {
-                const badge = document.createElement("div");
-                badge.className = "player-badge" + (p.isHost ? " host" : "");
-                badge.innerHTML = `<strong>${p.name}</strong><br>💰 ${p.balance}<br>${p.bet > 0 ? `🏁 ${carNames[p.car]} ×${multipliers[p.car]}<br>💰 رهان: ${p.bet}` : "⌛ لم يراهن"}`;
-                gamePlayersDiv.appendChild(badge);
+    raceInterval = setInterval(() => {
+        if(raceFinished) return;
+        for(let i=0; i<raceCars.length; i++) {
+            if(raceCars[i].position < 100) {
+                let increment = raceCars[i].speed + (Math.random() * 1.5);
+                raceCars[i].position = Math.min(100, raceCars[i].position + increment);
+                let percent = Math.floor(raceCars[i].position);
+                $(`#raceProgress${i}`).css('width', `${percent}%`).text(`${percent}%`);
             }
         }
-    }
-    
-    function updateLobbyPlayers() {
-        const playersDiv = document.getElementById("playersList");
-        if (playersDiv) {
-            playersDiv.innerHTML = "";
-            for (let p of players) {
-                const badge = document.createElement("div");
-                badge.className = "player-badge" + (p.isHost ? " host" : "");
-                badge.innerHTML = `<strong>${p.name}</strong> ${p.isHost ? "👑" : ""}<br>💰 ${p.balance}`;
-                playersDiv.appendChild(badge);
+        if(!raceFinished) {
+            for(let i=0; i<raceCars.length; i++) {
+                if(raceCars[i].position >= 100 && !raceFinished) { raceFinished = true; winner = i; break; }
             }
         }
-    }
-    
-    function sendToPeer(data) {
-        if (conn && conn.open) conn.send(data);
-    }
-    
-    // ---------- بدء السباق (المضيف فقط) ----------
-    function startRace() {
-        if (!isHost) return;
-        if (raceInProgress) return;
-        
-        // تأكد أن الكل راهن
-        let allBet = true;
-        for (let p of players) {
-            if (!p.bet || p.bet <= 0) allBet = false;
-        }
-        if (!allBet) {
-            addHistory("⚠️ انتظر حتى يراهن جميع اللاعبين!", false);
-            return;
-        }
-        
-        raceInProgress = true;
-        addHistory("🏁 انطلق السباق! 🏁", null);
-        sendToPeer({ type: "race_start" });
-        
-        // إعادة تعيين مواقع السيارات
-        for (let i = 0; i < 4; i++) {
-            document.getElementById(`prog${i}`).style.width = "0%";
-            document.getElementById(`prog${i}`).innerHTML = "0%";
-        }
-        
-        let positions = [0, 0, 0, 0];
-        let speeds = [
-            Math.random() * 2 + 1.5,
-            Math.random() * 2 + 1.5,
-            Math.random() * 2 + 1.5,
-            Math.random() * 2 + 1.5
-        ];
-        let finished = false;
-        let winner = null;
-        
-        if (raceInterval) clearInterval(raceInterval);
-        raceInterval = setInterval(() => {
-            if (finished) return;
-            for (let i = 0; i < 4; i++) {
-                if (positions[i] < 100) {
-                    positions[i] = Math.min(100, positions[i] + speeds[i] + Math.random() * 1.5);
-                    const percent = Math.floor(positions[i]);
-                    document.getElementById(`prog${i}`).style.width = `${percent}%`;
-                    document.getElementById(`prog${i}`).innerHTML = `${percent}%`;
-                }
-            }
-            for (let i = 0; i < 4; i++) {
-                if (positions[i] >= 100 && !finished) {
-                    finished = true;
-                    winner = i;
-                    break;
-                }
-            }
-            if (finished) {
-                clearInterval(raceInterval);
-                raceInProgress = false;
-                
-                const winnerName = carNames[winner];
-                const winnerMulti = multipliers[winner];
-                addHistory(`🏆 الفائز: ${winnerName} (×${winnerMulti}) 🏆`, true);
-                sendToPeer({ type: "race_result", winner: winner });
-                
-                let resultMsg = `🏆 الفائز: ${winnerName} 🏆<br>`;
-                // حساب النتائج لكل لاعب
-                for (let p of players) {
-                    if (p.car === winner && p.bet > 0) {
-                        const winAmount = p.bet * winnerMulti;
-                        p.balance += winAmount;
-                        if (p.name === myName) myBalance = p.balance;
-                        addHistory(`🎉 ${p.name} ربح ${Math.floor(winAmount)}!`, true);
-                        resultMsg += `<br>🎉 ${p.name} ربح ${Math.floor(winAmount)}!`;
-                    } else if (p.bet > 0) {
-                        addHistory(`💔 ${p.name} خسر ${p.bet}`, false);
-                        resultMsg += `<br>💔 ${p.name} خسر ${p.bet}`;
-                    }
-                    p.bet = 0;
-                    p.car = null;
-                }
-                document.getElementById("resultArea").innerHTML = resultMsg;
-                document.getElementById("resultArea").style.color = "gold";
-                myBet = 0;
-                myCar = null;
-                updateUI();
-                
-                // إزالة التحديد من السيارات
-                document.querySelectorAll(".car-card").forEach(c => c.classList.remove("selected"));
-                
-                // تمكين الرهان مرة أخرى
-                document.getElementById("placeBetBtn").disabled = false;
-                document.querySelectorAll(".car-card").forEach(c => c.style.pointerEvents = "auto");
-                
-                setTimeout(() => {
-                    document.getElementById("resultArea").innerHTML = "";
-                }, 5000);
-            }
-        }, 45);
-    }
-    
-    function startRaceFromHost() {
-        if (isHost) startRace();
-    }
-    
-    // ---------- وضع الرهان ----------
-    function placeBet() {
-        if (raceInProgress) {
-            addHistory("⏳ السباق جاري، لا يمكن الرهان الآن", false);
-            return;
-        }
-        if (myCar === null) {
-            addHistory("⚠️ اختر سيارة أولاً!", false);
-            return;
-        }
-        let betVal = parseInt(document.getElementById("betAmount").value);
-        if (isNaN(betVal)) betVal = 50;
-        if (betVal < 10) betVal = 10;
-        if (betVal > 10000) betVal = 10000;
-        if (betVal > myBalance) {
-            addHistory(`❌ رصيدك ${myBalance} فقط!`, false);
-            return;
-        }
-        
-        myBalance -= betVal;
-        myBet = betVal;
-        
-        // تحديث البيانات
-        for (let p of players) {
-            if (p.name === myName) {
-                p.balance = myBalance;
-                p.bet = betVal;
-                p.car = myCar;
-            }
-        }
-        
-        updateUI();
-        addHistory(`💰 راهنت بـ ${betVal} على ${carNames[myCar]} (×${multipliers[myCar]})`, null);
-        sendToPeer({ type: "player_bet", name: myName, bet: betVal, car: myCar, balance: myBalance });
-        
-        // تعطيل الرهان بعد وضعه
-        document.getElementById("placeBetBtn").disabled = true;
-        document.querySelectorAll(".car-card").forEach(c => c.style.pointerEvents = "none");
-        
-        // إعلام المضيف أن الكل راهن
-        if (!isHost) {
-            // لا شيء
-        }
-    }
-    
-    // ---------- اختيار سيارة ----------
-    function selectCar(carIndex) {
-        if (raceInProgress) {
-            addHistory("⏳ السباق جاري، لا يمكن تغيير الرهان", false);
-            return;
-        }
-        if (myBet > 0) {
-            addHistory("⚠️ قمت بالرهان بالفعل! ابدأ السباق أو انتظر المضيف", false);
-            return;
-        }
-        myCar = carIndex;
-        document.querySelectorAll(".car-card").forEach(c => c.classList.remove("selected"));
-        document.querySelector(`.car-card[data-car='${carIndex}']`).classList.add("selected");
-    }
-    
-    // ---------- إنشاء غرفة ----------
-    function createRoom() {
-        myName = document.getElementById("playerName").value.trim();
-        if (!myName) { alert("اكتب اسمك"); return; }
-        isHost = true;
-        players = [{ name: myName, balance: 1000, bet: 0, car: null, isHost: true }];
-        myBalance = 1000;
-        
-        roomId = "RACE_" + Math.floor(1000 + Math.random() * 9000);
-        peer = new Peer(roomId);
-        
-        peer.on("open", () => {
-            document.getElementById("loginScreen").classList.add("hidden");
-            document.getElementById("lobbyScreen").classList.remove("hidden");
-            document.getElementById("roomCodeDisplay").innerHTML = `🔑 كود الغرفة: <strong style="color:gold">${roomId}</strong><br>شاركه مع صديقك`;
-            updateLobbyPlayers();
-        });
-        
-        peer.on("connection", (connection) => {
-            conn = connection;
-            conn.on("data", handleData);
-            document.getElementById("statusBox").className = "status ready";
-            document.getElementById("statusBox").innerHTML = "✅ تم اتصال الخصم! جاري بدء اللعبة...";
-            
-            // إرسال البيانات للمتصل الجديد
-            conn.send({ type: "init", players: players, hostName: myName });
-            
-            setTimeout(() => {
-                document.getElementById("lobbyScreen").classList.add("hidden");
-                document.getElementById("gameScreen").classList.remove("hidden");
-                updateUI();
-            }, 1000);
-        });
-    }
-    
-    // ---------- دخول غرفة ----------
-    function joinRoom() {
-        myName = document.getElementById("playerName").value.trim();
-        const code = document.getElementById("roomCode").value.trim();
-        if (!myName) { alert("اكتب اسمك"); return; }
-        if (!code) { alert("اكتب كود الغرفة"); return; }
-        isHost = false;
-        
-        peer = new Peer();
-        peer.on("open", () => {
-            conn = peer.connect(code);
-            conn.on("open", () => {
-                document.getElementById("loginScreen").classList.add("hidden");
-                document.getElementById("lobbyScreen").classList.remove("hidden");
-                document.getElementById("roomCodeDisplay").innerHTML = `🎲 تم الاتصال بالغرفة: ${code}`;
-                document.getElementById("statusBox").innerHTML = "⏳ جاري الاتصال بالمضيف...";
-                
-                conn.send({ type: "join", name: myName, balance: 1000 });
-            });
-            conn.on("data", handleData);
-        });
-    }
-    
-    // ---------- معالجة البيانات ----------
-    function handleData(data) {
-        if (data.type === "init") {
-            players = data.players;
-            for (let p of players) {
-                if (p.name === myName) myBalance = p.balance;
-            }
-            document.getElementById("lobbyScreen").classList.add("hidden");
-            document.getElementById("gameScreen").classList.remove("hidden");
-            updateUI();
-            addHistory("🎮 دخلت الغرفة! راهن على سيارة", null);
-        }
-        
-        if (data.type === "join") {
-            players.push({ name: data.name, balance: data.balance, bet: 0, car: null, isHost: false });
-            updateLobbyPlayers();
-            if (isHost) {
-                sendToPeer({ type: "update_players", players: players });
-                document.getElementById("statusBox").className = "status ready";
-                document.getElementById("statusBox").innerHTML = "✅ اكتمل اللاعبون! ابدأ اللعبة";
-                document.getElementById("startRaceHostBtn").classList.remove("hidden");
-            }
-        }
-        
-        if (data.type === "update_players") {
-            players = data.players;
-            for (let p of players) {
-                if (p.name === myName) myBalance = p.balance;
-            }
-            updateLobbyPlayers();
-            document.getElementById("lobbyScreen").classList.add("hidden");
-            document.getElementById("gameScreen").classList.remove("hidden");
-            updateUI();
-        }
-        
-        if (data.type === "player_bet") {
-            for (let p of players) {
-                if (p.name === data.name) {
-                    p.bet = data.bet;
-                    p.car = data.car;
-                    p.balance = data.balance;
-                    if (data.name === myName) myBalance = data.balance;
-                }
-            }
-            updateUI();
-            addHistory(`💰 ${data.name} راهن بـ ${data.bet} على ${carNames[data.car]}`, null);
-        }
-        
-        if (data.type === "race_start") {
-            addHistory("🏁 المضيف بدأ السباق! 🏁", null);
-        }
-        
-        if (data.type === "race_result") {
-            const winner = data.winner;
-            const winnerName = carNames[winner];
-            const winnerMulti = multipliers[winner];
-            addHistory(`🏆 الفائز: ${winnerName} (×${winnerMulti}) 🏆`, true);
-            
-            let resultMsg = `🏆 الفائز: ${winnerName} 🏆<br>`;
-            for (let p of players) {
-                if (p.car === winner && p.bet > 0) {
-                    const winAmount = p.bet * winnerMulti;
-                    p.balance += winAmount;
-                    if (p.name === myName) myBalance = p.balance;
-                    addHistory(`🎉 ${p.name} ربح ${Math.floor(winAmount)}!`, true);
-                    resultMsg += `<br>🎉 ${p.name} ربح ${Math.floor(winAmount)}!`;
-                } else if (p.bet > 0) {
-                    addHistory(`💔 ${p.name} خسر ${p.bet}`, false);
-                    resultMsg += `<br>💔 ${p.name} خسر ${p.bet}`;
-                }
-                p.bet = 0;
-                p.car = null;
-            }
-            document.getElementById("resultArea").innerHTML = resultMsg;
-            document.getElementById("resultArea").style.color = "gold";
-            updateUI();
-            myBet = 0;
-            myCar = null;
+        if(raceFinished) {
+            clearInterval(raceInterval);
             raceInProgress = false;
-            document.querySelectorAll(".car-card").forEach(c => c.classList.remove("selected"));
-            document.getElementById("placeBetBtn").disabled = false;
-            document.querySelectorAll(".car-card").forEach(c => c.style.pointerEvents = "auto");
-            
-            setTimeout(() => {
-                document.getElementById("resultArea").innerHTML = "";
-            }, 5000);
+            let winAmount = 0;
+            if(winner === raceSelectedCar) {
+                winAmount = raceCurrentBet * raceCars[winner].multiplier;
+                raceMyBalance += winAmount;
+                raceUpdateUI();
+                raceAddToHistory(`🏆 فزت! ${raceCars[winner].name} فاز! ربحت ${Math.floor(winAmount)}!`, true);
+                $('#raceResultMessage').html(`🏆 فزت! ربحت ${Math.floor(winAmount)}!`).css('color', '#2ecc71');
+                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: winAmount, myBalance: raceMyBalance });
+            } else {
+                raceAddToHistory(`❌ خسرت! ${raceCars[winner].name} فاز. خسرت ${raceCurrentBet}.`, false);
+                $('#raceResultMessage').html(`💔 خسرت! ${raceCars[winner].name} فاز`).css('color', '#e74c3c');
+                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: 0, myBalance: raceMyBalance });
+            }
+            $('#raceStartBtn').prop('disabled', false);
+            $('#racePlaceBetBtn').prop('disabled', false);
+            $('.car-bet-card').css('pointer-events', 'auto');
+            raceCurrentBet = 0; raceSelectedCar = null;
+            $('.car-bet-card').removeClass('selected');
+            setTimeout(() => $('#raceResultMessage').html(''), 3000);
+            if(raceMyBalance <= 0) { $('#raceResultMessage').html('💀 أفلست!'); $('#raceStartBtn').prop('disabled', true); }
         }
-    }
-    
-    // ---------- ربط الأحداث ----------
-    document.querySelectorAll(".car-card").forEach(card => {
-        card.addEventListener("click", () => {
-            const carIdx = parseInt(card.getAttribute("data-car"));
-            selectCar(carIdx);
+    }, 50);
+}
+
+function racePlaceBet() {
+    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
+    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); return; }
+    let betVal = parseInt($('#raceBetAmount').val());
+    if(isNaN(betVal)) betVal = 50;
+    if(betVal < 10) betVal = 10;
+    if(betVal > 10000) betVal = 10000;
+    if(betVal > raceMyBalance) { $('#raceResultMessage').html(`❌ رصيدك ${raceMyBalance} فقط!`); return; }
+    raceCurrentBet = betVal;
+    $('#raceBetAmount').val(betVal);
+    $('#raceStartBtn').prop('disabled', false);
+    $('#raceResultMessage').html(`✅ تم وضع الرهان ${raceCurrentBet} على ${raceCars[raceSelectedCar].name}`);
+    setTimeout(() => $('#raceResultMessage').html(''), 1500);
+}
+
+function raceSelectCar(carIndex) {
+    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
+    raceSelectedCar = carIndex;
+    $('.car-bet-card').removeClass('selected');
+    $(`.car-bet-card[data-car='${carIndex}']`).addClass('selected');
+    if(raceCurrentBet > 0 && raceCurrentBet <= raceMyBalance) $('#raceStartBtn').prop('disabled', false);
+    else $('#raceStartBtn').prop('disabled', true);
+}
+
+function raceHostGame() {
+    raceMyName = $('#racePlayerName').val().trim();
+    if(!raceMyName) { alert("اكتب اسمك"); return; }
+    raceRoomHost = true;
+    let roomId = "RACE_" + Math.floor(1000 + Math.random() * 9000);
+    racePeer = new Peer(roomId);
+    racePeer.on('open', () => {
+        $('#raceSetup').hide();
+        $('#raceLobby').removeClass('hidden');
+        $('#raceRoomDisplay').html(`🔑 كود غرفتك: <strong>${roomId}</strong><br>انتظر الخصم...`);
+        $('#raceEnemyInfo').html('⏳ جاري انتظار الخصم...');
+        $('#raceGameArea').hide();
+    });
+    racePeer.on('connection', conn => {
+        raceConn = conn;
+        $('#raceEnemyInfo').html('✅ تم اتصال الخصم!');
+        $('#raceGameArea').fadeIn();
+        raceSetupReceiver();
+        raceConn.send({ type: 'init', myName: raceMyName, myBalance: raceMyBalance });
+        raceUpdateUI();
+    });
+}
+
+function raceJoinGame() {
+    raceMyName = $('#racePlayerName').val().trim();
+    let roomCode = $('#raceRoomCode').val().trim();
+    if(!raceMyName) { alert("اكتب اسمك"); return; }
+    if(!roomCode) { alert("اكتب كود الغرفة"); return; }
+    raceRoomHost = false;
+    racePeer = new Peer();
+    racePeer.on('open', () => {
+        raceConn = racePeer.connect(roomCode);
+        raceConn.on('open', () => {
+            $('#raceSetup').hide();
+            $('#raceLobby').removeClass('hidden');
+            $('#raceRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${roomCode}`);
+            $('#raceEnemyInfo').html('✅ تم الاتصال!');
+            $('#raceGameArea').fadeIn();
+            raceConn.send({ type: 'join', myName: raceMyName, myBalance: raceMyBalance });
+            raceSetupReceiver();
+            raceUpdateUI();
         });
     });
-    document.getElementById("placeBetBtn").addEventListener("click", placeBet);
+}
+
+function raceSetupReceiver() {
+    raceConn.on('data', data => {
+        if(data.type === 'init') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
+        if(data.type === 'join') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
+        if(data.type === 'bet_placed') { raceEnemyBalance = data.balance; raceUpdateUI(); raceAddToHistory(`👤 الخصم راهن بـ ${data.bet} على ${raceCars[data.car].name}`, null); }
+        if(data.type === 'race_result') { if(data.winAmount > 0) { raceEnemyBalance -= data.winAmount; raceAddToHistory(`👤 الخصم ربح ${data.winAmount}!`, true); } else { raceEnemyBalance -= raceCurrentBet; raceAddToHistory(`👤 الخصم خسر`, false); } raceUpdateUI(); }
+    });
+}
+
+$(document).on('click', '.car-bet-card', function() { const carIdx = parseInt($(this).attr('data-car')); raceSelectCar(carIdx); });
+$(document).on('click', '#racePlaceBetBtn', racePlaceBet);
+$(document).on('click', '#raceStartBtn', raceStartRace);
+$('#raceBetAmount').on('change', function() { let val = parseInt($(this).val()); if(isNaN(val)) $(this).val(50); if(val < 10) $(this).val(10); if(val > 10000) $(this).val(10000); if(val > raceMyBalance && raceMyBalance > 0) $(this).val(raceMyBalance); });
+// ===================== تبديل الألعاب =====================
+function showGame(t) {
+    $('#main-menu').hide();
+    if(t === 'mafia') {
+        $('#mafia-section').removeClass('hidden');
+    } else if(t === 'chess') {
+        $('#chess-section').removeClass('hidden');
+        initChess();
+    } else if(t === 'spy') {
+        $('#spy-section').removeClass('hidden');
+    } else if(t === 'spyOnline') {
+        $('#spy-online-section').removeClass('hidden');
+    } else if(t === 'casinoOnline') {
+        $('#casinoOnline-section').removeClass('hidden');
+    }
+    // ------------------- أضف هنا شروط للألعاب الجديدة -------------------
+  else if(t === 'raceOnline') $('#raceOnline-section').removeClass('hidden');
+}
+
+// ربط أزرار القمار بعد تحميل الصفحة
+$(document).ready(function() {
+    $(document).on('click', '.bet-btn', function() {
+        if(casinoIsRolling) return;
+        if(!casinoIsMyTurn) {
+            $('#casinoResultMessage').html('⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان').css('color', '#f39c12');
+            setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان') $('#casinoResultMessage').html(''); }, 1500);
+            return;
+        }
+        const betType = $(this).attr('data-casino-bet');
+        casinoCurrentBet = betType;
+        $('.bet-btn').removeClass('selected');
+        $(this).addClass('selected');
+        $('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(betType)}`).css('color', '#3498db');
+        setTimeout(() => { if($('#casinoResultMessage').html() === `🎲 تم اختيار الرهان: ${casinoBetName(betType)}`) $('#casinoResultMessage').html(''); }, 1200);
+    });
+    
+    $(document).on('click', '#casinoRollBtn', casinoRollDice);
+    $(document).on('click', '#casinoResetBtn', casinoResetGame);
+    
+    $('#casinoBetAmount').on('change', function() {
+        let val = parseInt($(this).val());
+        if(isNaN(val)) $(this).val(50);
+        if(val < 10) $(this).val(10);
+        if(val > 10000) $(this).val(10000);
+        if(val > casinoMyBalance && casinoMyBalance > 0) $(this).val(casinoMyBalance);
+    });
+});
 </script>
 </body>
 </html>
