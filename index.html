@@ -56,7 +56,7 @@
         .password-box { background: #1a1a1a; border: 3px solid #da291c; border-radius: 20px; padding: 30px; text-align: center; width: 300px; }
         .password-box input { width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; margin: 20px 0; background: #000; color: #0f0; border: 2px solid #da291c; }
         .password-box h3 { color: #da291c; margin-bottom: 10px; }
-        
+
         /* ستايل القمار أونلاين */
         .casino-container { max-width: 500px; width: 100%; background: #1e1e1e; border-radius: 40px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px #da291c; text-align: center; margin: auto; }
         .casino-container h2 { color: #da291c; margin: 0 0 10px 0; }
@@ -78,6 +78,38 @@
         .online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; }
         .waiting-message { color: #f39c12; }
         .enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; }
+
+        /* ستايل سباق السيارات */
+        .race-container-inner { max-width: 800px; width: 100%; background: #1e2a1a; border-radius: 60px; padding: 20px; border: 3px solid #f1c40f; box-shadow: 0 20px 35px rgba(0,0,0,0.5); }
+        .race-container-inner h1 { text-align: center; color: #f1c40f; margin: 0 0 10px 0; }
+        .race-balance-card { background: #0f1f0f; border-radius: 40px; padding: 12px 20px; text-align: center; margin-bottom: 20px; border: 1px solid #f1c40f; color: #ffd966; }
+        .race-balance-amount { font-size: 2.2rem; font-weight: bold; color: #f39c12; }
+        .race-track { background: #2c3e2f; border-radius: 30px; padding: 20px; margin: 20px 0; }
+        .car-lane { background: #1a2a1a; margin-bottom: 12px; border-radius: 30px; padding: 10px 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #5d6e3a; }
+        .car-icon { font-size: 2rem; width: 60px; text-align: center; }
+        .car-name { width: 70px; font-weight: bold; font-size: 0.9rem; color: #ffd966; }
+        .track-bar { flex: 1; background: #3a4a2a; border-radius: 20px; height: 45px; position: relative; overflow: hidden; }
+        .car-progress { width: 0%; height: 100%; border-radius: 20px; transition: width 0.03s linear; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 0.8rem; }
+        .car-red .car-progress { background: radial-gradient(circle at left, #e74c3c, #c0392b); }
+        .car-blue .car-progress { background: radial-gradient(circle at left, #3498db, #2980b9); }
+        .car-green .car-progress { background: radial-gradient(circle at left, #2ecc71, #27ae60); }
+        .car-yellow .car-progress { background: radial-gradient(circle at left, #f1c40f, #f39c12); }
+        .odds-info { font-size: 0.7rem; color: #ffd966; background: #000000aa; padding: 2px 8px; border-radius: 20px; }
+        .cars-selector { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .car-bet-card { background: #1e2a1a; border: 2px solid #f1c40f; border-radius: 30px; padding: 12px 15px; text-align: center; cursor: pointer; min-width: 100px; color: #ffd966; }
+        .car-bet-card.selected { background: #f39c12; color: #1e2a1a; border-color: white; }
+        .car-bet-card .car-emoji { font-size: 2rem; }
+        .car-bet-card .race-multiplier { font-size: 0.8rem; color: #aaa; }
+        .car-bet-card.selected .race-multiplier { color: #1e2a1a; }
+        .bet-control { display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .bet-control input { width: 150px; padding: 10px; border-radius: 30px; border: 2px solid #f1c40f; background: #0a1a0a; color: #f39c12; text-align: center; font-size: 1.1rem; }
+        .race-btn { background: #27ae60; color: white; font-size: 1.3rem; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; width: 100%; }
+        .race-btn:disabled { background: #555; cursor: not-allowed; }
+        .race-result-message { background: #000000aa; border-radius: 30px; padding: 12px; margin-top: 15px; font-weight: bold; text-align: center; color: #ffd966; }
+        .race-history { background: #0f1f0f; border-radius: 20px; padding: 10px; margin-top: 20px; max-height: 150px; overflow-y: auto; font-size: 0.75rem; color: #ffd966; }
+        .race-online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; color: #ffd966; }
+        .race-enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; text-align: center; color: #ffd966; }
+        .race-place-btn { background: #e67e22; width: auto; padding: 10px 20px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -90,6 +122,7 @@
     <button class="menu-btn" style="border-color: #0055ff;" onclick="showGame('spyOnline')">🌐 الجاسوس (أونلاين)</button>
     <button class="menu-btn" style="border-color: #2ecc71;" onclick="showGameWithPassword()">🦘 لعبة القفز - متجر القوى</button>
     <button class="menu-btn" style="border-color: #f39c12;" onclick="showGame('casinoOnline')">🎲 كازينو النرد أونلاين 🎲</button>
+    <button class="menu-btn" style="border-color: #f1c40f;" onclick="showGame('raceOnline')">🏁 سباق السيارات أونلاين 🏎️</button>
 </div>
 
 <!-- ===================== المافيا ===================== -->
@@ -190,7 +223,6 @@
             <input type="text" id="casinoRoomCode" placeholder="كود الغرفة">
             <button onclick="casinoJoinGame()">🚪 دخول الغرفة</button>
         </div>
-        
         <div id="casinoLobby" class="hidden">
             <div class="online-status" id="casinoRoomDisplay"></div>
             <div class="enemy-info" id="casinoEnemyInfo">⏳ انتظار اتصال الخصم...</div>
@@ -203,7 +235,6 @@
                     <div class="balance-label" style="color:#aaa;">💰 رصيد الخصم</div>
                     <div class="balance-amount" id="casinoEnemyBalance">1000</div>
                 </div>
-                
                 <div class="dice-area">
                     <div class="dice">
                         <div class="die" id="casinoDie1">🎲</div>
@@ -211,7 +242,6 @@
                     </div>
                     <div class="dice-total" id="casinoTotalDisplay" style="font-size:1.2rem; color:#da291c;">المجموع: --</div>
                 </div>
-                
                 <div class="bet-options">
                     <button class="bet-btn" data-casino-bet="small">📉 صغير (4-9)<br><span style="font-size:0.6rem;">×2</span></button>
                     <button class="bet-btn" data-casino-bet="big">📈 كبير (10-12)<br><span style="font-size:0.6rem;">×2</span></button>
@@ -220,22 +250,60 @@
                     <button class="bet-btn" data-casino-bet="odd">🔢 فردي<br><span style="font-size:0.6rem;">×2</span></button>
                     <button class="bet-btn" data-casino-bet="double">🔄 زوج متطابق<br><span style="font-size:0.6rem;">×10</span></button>
                 </div>
-                
                 <div class="bet-amount">
                     <input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10">
                 </div>
-                
                 <div style="display: flex; gap: 15px; margin: 15px 0;">
                     <button class="roll-btn" id="casinoRollBtn" style="flex:2;">🎲 ارمي النرد 🎲</button>
                     <button class="reset-btn" id="casinoResetBtn" style="flex:1;">🔄 إعادة</button>
                 </div>
-                
                 <div id="casinoResultMessage" class="result-message"></div>
-                
                 <div class="history">
                     <h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4>
                     <div id="casinoHistoryList"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== سباق السيارات أونلاين ===================== -->
+<div id="raceOnline-section" class="hidden">
+    <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+    <div class="race-container-inner">
+        <h1>🏁 سباق السيارات أونلاين 🏎️</h1>
+        <div id="raceSetup">
+            <input type="text" id="racePlayerName" placeholder="اسمك...">
+            <button onclick="raceHostGame()">👑 إنشاء غرفة (Host)</button>
+            <p style="margin:10px 0; color:#888;">أو</p>
+            <input type="text" id="raceRoomCode" placeholder="كود الغرفة">
+            <button onclick="raceJoinGame()">🚪 دخول الغرفة</button>
+        </div>
+        <div id="raceLobby" class="hidden">
+            <div class="race-online-status" id="raceRoomDisplay"></div>
+            <div class="race-enemy-info" id="raceEnemyInfo">⏳ انتظار اتصال الخصم...</div>
+            <div id="raceGameArea" style="display:none;">
+                <div class="race-balance-card"><div class="race-balance-amount" id="raceBalance">1000</div><div>💰 رصيدك</div></div>
+                <div class="race-balance-card"><div class="race-balance-amount" id="raceEnemyBalance">1000</div><div>💰 رصيد الخصم</div></div>
+                <div class="race-track">
+                    <div class="car-lane car-red"><div class="car-icon">🏎️</div><div class="car-name">🔴 الأحمر</div><div class="track-bar"><div class="car-progress" id="raceProgress0" style="width:0%">0%</div></div><div class="odds-info">×2.5</div></div>
+                    <div class="car-lane car-blue"><div class="car-icon">🏎️</div><div class="car-name">🔵 الأزرق</div><div class="track-bar"><div class="car-progress" id="raceProgress1" style="width:0%">0%</div></div><div class="odds-info">×3.0</div></div>
+                    <div class="car-lane car-green"><div class="car-icon">🏎️</div><div class="car-name">🟢 الأخضر</div><div class="track-bar"><div class="car-progress" id="raceProgress2" style="width:0%">0%</div></div><div class="odds-info">×4.0</div></div>
+                    <div class="car-lane car-yellow"><div class="car-icon">🏎️</div><div class="car-name">🟡 الأصفر</div><div class="track-bar"><div class="car-progress" id="raceProgress3" style="width:0%">0%</div></div><div class="odds-info">×5.0</div></div>
+                </div>
+                <div class="cars-selector">
+                    <div class="car-bet-card" data-car="0"><div class="car-emoji">🏎️</div><div>🔴 الأحمر</div><div class="race-multiplier">×2.5</div></div>
+                    <div class="car-bet-card" data-car="1"><div class="car-emoji">🏎️</div><div>🔵 الأزرق</div><div class="race-multiplier">×3.0</div></div>
+                    <div class="car-bet-card" data-car="2"><div class="car-emoji">🏎️</div><div>🟢 الأخضر</div><div class="race-multiplier">×4.0</div></div>
+                    <div class="car-bet-card" data-car="3"><div class="car-emoji">🏎️</div><div>🟡 الأصفر</div><div class="race-multiplier">×5.0</div></div>
+                </div>
+                <div class="bet-control">
+                    <input type="number" id="raceBetAmount" value="50" min="10" max="10000" step="10">
+                    <button id="racePlaceBetBtn" class="race-place-btn">💰 ضع الرهان</button>
+                </div>
+                <button id="raceStartBtn" class="race-btn" disabled>🏁 ابدأ السباق 🏁</button>
+                <div id="raceResultMessage" class="race-result-message"></div>
+                <div class="race-history" id="raceHistoryList"><div>✨ راهن على سيارة وابدأ السباق ✨</div></div>
             </div>
         </div>
     </div>
@@ -1414,7 +1482,7 @@ let casinoMyBalance = 1000;
 let casinoEnemyBalance = 1000;
 let casinoCurrentBet = null;
 let casinoIsRolling = false;
-let casinoIsMyTurn = true; // المضيف يبدأ أولاً
+let casinoIsMyTurn = true;
 let casinoRoomHost = false;
 
 function casinoBetName(betType) {
@@ -1452,7 +1520,6 @@ function casinoEvaluateBet(dice1, dice2, betType) {
     const total = dice1 + dice2;
     const isEven = (total % 2 === 0);
     const isDouble = (dice1 === dice2);
-    
     switch(betType) {
         case 'small': return (total >= 4 && total <= 9) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
         case 'big': return (total >= 10 && total <= 12) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
@@ -1467,10 +1534,7 @@ function casinoEvaluateBet(dice1, dice2, betType) {
 function casinoPlayDiceSound() {
     $('#casinoDie1').addClass('rolling');
     $('#casinoDie2').addClass('rolling');
-    setTimeout(() => {
-        $('#casinoDie1').removeClass('rolling');
-        $('#casinoDie2').removeClass('rolling');
-    }, 300);
+    setTimeout(() => { $('#casinoDie1').removeClass('rolling'); $('#casinoDie2').removeClass('rolling'); }, 300);
 }
 
 function casinoRollDice() {
@@ -1485,20 +1549,10 @@ function casinoRollDice() {
         setTimeout(() => { if($('#casinoResultMessage').html() === '⚠️ اختر نوع الرهان أولاً!') $('#casinoResultMessage').html(''); }, 1500);
         return;
     }
-    
     let betAmount = parseInt($('#casinoBetAmount').val());
-    if(isNaN(betAmount) || betAmount < 10) {
-        $('#casinoResultMessage').html('⚠️ أقل رهان 10 عملات!').css('color', '#e74c3c');
-        return;
-    }
-    if(betAmount > casinoMyBalance) {
-        $('#casinoResultMessage').html('❌ رصيدك غير كافي!').css('color', '#e74c3c');
-        return;
-    }
-    if(betAmount > 10000) {
-        $('#casinoResultMessage').html('⚠️ الحد الأقصى للرهان 10000').css('color', '#e74c3c');
-        return;
-    }
+    if(isNaN(betAmount) || betAmount < 10) { $('#casinoResultMessage').html('⚠️ أقل رهان 10 عملات!').css('color', '#e74c3c'); return; }
+    if(betAmount > casinoMyBalance) { $('#casinoResultMessage').html('❌ رصيدك غير كافي!').css('color', '#e74c3c'); return; }
+    if(betAmount > 10000) { $('#casinoResultMessage').html('⚠️ الحد الأقصى للرهان 10000').css('color', '#e74c3c'); return; }
     
     casinoIsRolling = true;
     $('#casinoRollBtn').prop('disabled', true);
@@ -1515,26 +1569,20 @@ function casinoRollDice() {
     
     setTimeout(() => {
         clearInterval(rollInterval);
-        
         const dice1 = Math.floor(Math.random() * 6) + 1;
         const dice2 = Math.floor(Math.random() * 6) + 1;
         const total = dice1 + dice2;
-        
         casinoDisplayDice(dice1, dice2);
-        
         const result = casinoEvaluateBet(dice1, dice2, casinoCurrentBet);
         const betAmountVal = betAmount;
-        
         let message = '';
         let winAmount = 0;
-        
         if(result.win) {
             winAmount = betAmountVal * result.multiplier;
             casinoMyBalance += winAmount;
             message = `🎉 ربحت! 🎉 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${dice1}+${dice2}=${total}) | ربحت ${winAmount} عملة!`;
             $('#casinoResultMessage').html(message).css('color', '#2ecc71');
             casinoAddToHistory(`✅ ${message}`, true);
-            // إرسال النتيجة للخصم
             if(casinoConn) casinoConn.send({ type: 'opponent_result', win: true, amount: winAmount, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
         } else {
             casinoMyBalance -= betAmountVal;
@@ -1543,12 +1591,10 @@ function casinoRollDice() {
             casinoAddToHistory(`❌ ${message}`, false);
             if(casinoConn) casinoConn.send({ type: 'opponent_result', win: false, amount: betAmountVal, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
         }
-        
         casinoUpdateUI();
         casinoIsMyTurn = false;
         casinoCurrentBet = null;
         $('.bet-btn').removeClass('selected');
-        
         if(casinoMyBalance <= 0) {
             $('#casinoResultMessage').html(message + '<br>💀 أفلست! لقد خسرت اللعبة 💀');
             $('#casinoRollBtn').prop('disabled', true);
@@ -1558,7 +1604,6 @@ function casinoRollDice() {
             $('#casinoResultMessage').append('<br>⏳ انتظر دور الخصم...');
         }
         casinoIsRolling = false;
-        
         setTimeout(() => {
             if($('#casinoResultMessage').html().includes('انتظر دور الخصم')) {
                 $('#casinoResultMessage').html('⏳ انتظر دور الخصم...');
@@ -1600,7 +1645,6 @@ function casinoJoinGame() {
     if(!casinoMyName) { alert("اكتب اسمك"); return; }
     if(!roomCode) { alert("اكتب كود الغرفة"); return; }
     casinoRoomHost = false;
-    casinoIsMyTurn = false;
     casinoPeer = new Peer();
     casinoPeer.on('open', () => {
         casinoConn = casinoPeer.connect(roomCode);
@@ -1631,16 +1675,12 @@ function casinoSetupReceiver() {
             casinoUpdateUI();
             casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null);
             $('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);
-            if(casinoRoomHost) {
-                casinoConn.send({ type: 'start_turn', turn: true });
-            }
+            if(casinoRoomHost) { casinoConn.send({ type: 'start_turn', turn: true }); }
         }
         if(data.type === 'start_turn') {
             casinoIsMyTurn = true;
             $('#casinoResultMessage').html('🎲 دورك الآن! اختر رهانك وارمِ النرد').css('color', '#2ecc71');
-            setTimeout(() => {
-                if($('#casinoResultMessage').html() === '🎲 دورك الآن! اختر رهانك وارمِ النرد') $('#casinoResultMessage').html('');
-            }, 3000);
+            setTimeout(() => { if($('#casinoResultMessage').html() === '🎲 دورك الآن! اختر رهانك وارمِ النرد') $('#casinoResultMessage').html(''); }, 3000);
         }
         if(data.type === 'opponent_result') {
             if(data.win) {
@@ -1685,9 +1725,176 @@ function casinoResetGame() {
     $('.bet-btn').removeClass('selected');
     $('#casinoRollBtn').prop('disabled', false);
     $('#casinoHistoryList').empty();
-    setTimeout(() => {
-        if($('#casinoResultMessage').html() === '🔄 تمت إعادة اللعبة!') $('#casinoResultMessage').html('');
-    }, 2000);
+    setTimeout(() => { if($('#casinoResultMessage').html() === '🔄 تمت إعادة اللعبة!') $('#casinoResultMessage').html(''); }, 2000);
+}
+
+// ===================== سباق السيارات أونلاين =====================
+let racePeer = null, raceConn = null, raceMyName = "", raceMyBalance = 1000, raceEnemyBalance = 1000, raceSelectedCar = null, raceCurrentBet = 0, raceInProgress = false, raceInterval = null, raceRoomHost = false;
+const raceCars = [
+    { name: "الأحمر", multiplier: 2.5, position: 0, speed: 0 },
+    { name: "الأزرق", multiplier: 3.0, position: 0, speed: 0 },
+    { name: "الأخضر", multiplier: 4.0, position: 0, speed: 0 },
+    { name: "الأصفر", multiplier: 5.0, position: 0, speed: 0 }
+];
+
+function raceUpdateUI() { $('#raceBalance').text(raceMyBalance); $('#raceEnemyBalance').text(raceEnemyBalance); }
+function raceAddToHistory(msg, isWin) {
+    const historyDiv = $('#raceHistoryList');
+    const item = $('<div style="border-bottom:1px solid #333; padding:5px;"></div>');
+    item.html(msg);
+    if(isWin === true) item.css('color', '#2ecc71');
+    else if(isWin === false) item.css('color', '#e74c3c');
+    historyDiv.prepend(item);
+    while(historyDiv.children().length > 15) historyDiv.children().last().remove();
+}
+function raceResetPositions() {
+    for(let i=0; i<raceCars.length; i++) {
+        raceCars[i].position = 0;
+        $(`#raceProgress${i}`).css('width', '0%').text('0%');
+    }
+}
+
+function raceStartRace() {
+    if(raceInProgress) return;
+    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); setTimeout(() => $('#raceResultMessage').html(''), 1500); return; }
+    if(raceCurrentBet <= 0) { $('#raceResultMessage').html('⚠️ ضع رهاناً أولاً!'); return; }
+    if(raceCurrentBet > raceMyBalance) { $('#raceResultMessage').html('❌ رصيدك غير كافي!'); return; }
+    
+    raceInProgress = true;
+    $('#raceStartBtn').prop('disabled', true);
+    $('#racePlaceBetBtn').prop('disabled', true);
+    $('.car-bet-card').css('pointer-events', 'none');
+    raceMyBalance -= raceCurrentBet;
+    raceUpdateUI();
+    raceAddToHistory(`💰 راهنت بـ ${raceCurrentBet} على ${raceCars[raceSelectedCar].name} (×${raceCars[raceSelectedCar].multiplier})`, null);
+    if(raceConn) raceConn.send({ type: 'bet_placed', bet: raceCurrentBet, car: raceSelectedCar, balance: raceMyBalance });
+    raceResetPositions();
+    for(let i=0; i<raceCars.length; i++) { raceCars[i].speed = Math.random() * 2.5 + 1.2; }
+    if(raceInterval) clearInterval(raceInterval);
+    let raceFinished = false, winner = null;
+    
+    raceInterval = setInterval(() => {
+        if(raceFinished) return;
+        for(let i=0; i<raceCars.length; i++) {
+            if(raceCars[i].position < 100) {
+                let increment = raceCars[i].speed + (Math.random() * 1.5);
+                raceCars[i].position = Math.min(100, raceCars[i].position + increment);
+                let percent = Math.floor(raceCars[i].position);
+                $(`#raceProgress${i}`).css('width', `${percent}%`).text(`${percent}%`);
+            }
+        }
+        if(!raceFinished) {
+            for(let i=0; i<raceCars.length; i++) {
+                if(raceCars[i].position >= 100 && !raceFinished) { raceFinished = true; winner = i; break; }
+            }
+        }
+        if(raceFinished) {
+            clearInterval(raceInterval);
+            raceInProgress = false;
+            let winAmount = 0;
+            if(winner === raceSelectedCar) {
+                winAmount = raceCurrentBet * raceCars[winner].multiplier;
+                raceMyBalance += winAmount;
+                raceUpdateUI();
+                raceAddToHistory(`🏆 فزت! ${raceCars[winner].name} فاز! ربحت ${Math.floor(winAmount)}!`, true);
+                $('#raceResultMessage').html(`🏆 فزت! ربحت ${Math.floor(winAmount)}!`).css('color', '#2ecc71');
+                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: winAmount, myBalance: raceMyBalance });
+            } else {
+                raceAddToHistory(`❌ خسرت! ${raceCars[winner].name} فاز. خسرت ${raceCurrentBet}.`, false);
+                $('#raceResultMessage').html(`💔 خسرت! ${raceCars[winner].name} فاز`).css('color', '#e74c3c');
+                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: 0, myBalance: raceMyBalance });
+            }
+            $('#raceStartBtn').prop('disabled', false);
+            $('#racePlaceBetBtn').prop('disabled', false);
+            $('.car-bet-card').css('pointer-events', 'auto');
+            raceCurrentBet = 0; raceSelectedCar = null;
+            $('.car-bet-card').removeClass('selected');
+            setTimeout(() => $('#raceResultMessage').html(''), 3000);
+            if(raceMyBalance <= 0) { $('#raceResultMessage').html('💀 أفلست!'); $('#raceStartBtn').prop('disabled', true); }
+        }
+    }, 50);
+}
+
+function racePlaceBet() {
+    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
+    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); return; }
+    let betVal = parseInt($('#raceBetAmount').val());
+    if(isNaN(betVal)) betVal = 50;
+    if(betVal < 10) betVal = 10;
+    if(betVal > 10000) betVal = 10000;
+    if(betVal > raceMyBalance) { $('#raceResultMessage').html(`❌ رصيدك ${raceMyBalance} فقط!`); return; }
+    raceCurrentBet = betVal;
+    $('#raceBetAmount').val(betVal);
+    $('#raceStartBtn').prop('disabled', false);
+    $('#raceResultMessage').html(`✅ تم وضع الرهان ${raceCurrentBet} على ${raceCars[raceSelectedCar].name}`);
+    setTimeout(() => $('#raceResultMessage').html(''), 1500);
+}
+
+function raceSelectCar(carIndex) {
+    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
+    raceSelectedCar = carIndex;
+    $('.car-bet-card').removeClass('selected');
+    $(`.car-bet-card[data-car='${carIndex}']`).addClass('selected');
+    if(raceCurrentBet > 0 && raceCurrentBet <= raceMyBalance) $('#raceStartBtn').prop('disabled', false);
+    else $('#raceStartBtn').prop('disabled', true);
+}
+
+function raceHostGame() {
+    raceMyName = $('#racePlayerName').val().trim();
+    if(!raceMyName) { alert("اكتب اسمك"); return; }
+    raceRoomHost = true;
+    let roomId = "RACE_" + Math.floor(1000 + Math.random() * 9000);
+    racePeer = new Peer(roomId);
+    racePeer.on('open', () => {
+        $('#raceSetup').hide();
+        $('#raceLobby').removeClass('hidden');
+        $('#raceRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>انتظر الخصم...`);
+        $('#raceEnemyInfo').html('⏳ جاري انتظار الخصم...');
+        $('#raceGameArea').hide();
+    });
+    racePeer.on('connection', conn => {
+        raceConn = conn;
+        $('#raceEnemyInfo').html('✅ تم اتصال الخصم!');
+        $('#raceGameArea').fadeIn();
+        raceSetupReceiver();
+        raceConn.send({ type: 'init', myName: raceMyName, myBalance: raceMyBalance });
+        raceUpdateUI();
+    });
+}
+
+function raceJoinGame() {
+    raceMyName = $('#racePlayerName').val().trim();
+    let roomCode = $('#raceRoomCode').val().trim();
+    if(!raceMyName) { alert("اكتب اسمك"); return; }
+    if(!roomCode) { alert("اكتب كود الغرفة"); return; }
+    raceRoomHost = false;
+    racePeer = new Peer();
+    racePeer.on('open', () => {
+        raceConn = racePeer.connect(roomCode);
+        raceConn.on('open', () => {
+            $('#raceSetup').hide();
+            $('#raceLobby').removeClass('hidden');
+            $('#raceRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${roomCode}`);
+            $('#raceEnemyInfo').html('✅ تم الاتصال!');
+            $('#raceGameArea').fadeIn();
+            raceConn.send({ type: 'join', myName: raceMyName, myBalance: raceMyBalance });
+            raceSetupReceiver();
+            raceUpdateUI();
+        });
+    });
+}
+
+function raceSetupReceiver() {
+    raceConn.on('data', data => {
+        if(data.type === 'init') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
+        if(data.type === 'join') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
+        if(data.type === 'bet_placed') { raceEnemyBalance = data.balance; raceUpdateUI(); raceAddToHistory(`👤 الخصم راهن بـ ${data.bet} على ${raceCars[data.car].name}`, null); }
+        if(data.type === 'race_result') {
+            if(data.winAmount > 0) { raceEnemyBalance = data.myBalance; raceAddToHistory(`👤 الخصم ربح ${data.winAmount}!`, true); }
+            else { raceEnemyBalance = data.myBalance; raceAddToHistory(`👤 الخصم خسر`, false); }
+            raceUpdateUI();
+        }
+    });
 }
 
 // ===================== تبديل الألعاب =====================
@@ -1704,11 +1911,14 @@ function showGame(t) {
         $('#spy-online-section').removeClass('hidden');
     } else if(t === 'casinoOnline') {
         $('#casinoOnline-section').removeClass('hidden');
+    } else if(t === 'raceOnline') {
+        $('#raceOnline-section').removeClass('hidden');
     }
 }
 
-// ربط أزرار القمار بعد تحميل الصفحة
+// ربط أزرار القمار والسباق بعد تحميل الصفحة
 $(document).ready(function() {
+    // أزرار الكازينو
     $(document).on('click', '.bet-btn', function() {
         if(casinoIsRolling) return;
         if(!casinoIsMyTurn) {
@@ -1723,10 +1933,8 @@ $(document).ready(function() {
         $('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(betType)}`).css('color', '#3498db');
         setTimeout(() => { if($('#casinoResultMessage').html() === `🎲 تم اختيار الرهان: ${casinoBetName(betType)}`) $('#casinoResultMessage').html(''); }, 1200);
     });
-    
     $(document).on('click', '#casinoRollBtn', casinoRollDice);
     $(document).on('click', '#casinoResetBtn', casinoResetGame);
-    
     $('#casinoBetAmount').on('change', function() {
         let val = parseInt($(this).val());
         if(isNaN(val)) $(this).val(50);
@@ -1734,7 +1942,22 @@ $(document).ready(function() {
         if(val > 10000) $(this).val(10000);
         if(val > casinoMyBalance && casinoMyBalance > 0) $(this).val(casinoMyBalance);
     });
+
+    // أزرار السباق
+    $(document).on('click', '.car-bet-card', function() {
+        const carIdx = parseInt($(this).attr('data-car'));
+        raceSelectCar(carIdx);
+    });
+    $(document).on('click', '#racePlaceBetBtn', racePlaceBet);
+    $(document).on('click', '#raceStartBtn', raceStartRace);
+    $('#raceBetAmount').on('change', function() {
+        let val = parseInt($(this).val());
+        if(isNaN(val)) $(this).val(50);
+        if(val < 10) $(this).val(10);
+        if(val > 10000) $(this).val(10000);
+        if(val > raceMyBalance && raceMyBalance > 0) $(this).val(raceMyBalance);
+    });
 });
 </script>
 </body>
-</html> هذا اخر كود صح؟
+</html>
