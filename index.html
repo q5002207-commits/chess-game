@@ -1391,7 +1391,7 @@ function startJumpGame(isEasyMode) {
     const hitSound = new Audio('https://files.catbox.moe/cbh2mv.mp3');
     hitSound.load();
 
-   let JUMP_POWER = isEasyMode ? -22 : -18;
+  let JUMP_POWER = isEasyMode ? -20 : -15;
     let OBSTACLE_SPEED = isEasyMode ? 3 : 5;
     let START_HEALTH = isEasyMode ? 5 : 3;
     
@@ -1509,7 +1509,7 @@ const playerImages = [
         let score = 0, highScore = localStorage.getItem('jumpHighScore567') || 0, health = START_HEALTH, gameRunning = true;
         const player = { x: 100, y: GROUND_Y - 40, width: 45, height: 45, velocityY: 0, isJumping: false, originalY: GROUND_Y - 40 };
         let obstacles = [], stars = [], particles = [], obstacleTimer = 0, starTimer = 0;
-      const GRAVITY = 0.5;
+     const GRAVITY = 0.6;
         
         document.getElementById('jump-highScore').innerHTML = highScore;
         document.getElementById('jump-health').innerHTML = health;
