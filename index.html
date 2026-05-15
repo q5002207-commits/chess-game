@@ -7,98 +7,112 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <style>
-        /* ========== ستايل تسجيل الدخول الجديد ========== */
-        .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.5s ease;
-        }
-        .login-card {
-            background: rgba(10,15,25,0.95);
-            backdrop-filter: blur(12px);
-            border-radius: 50px;
-            padding: 40px;
-            text-align: center;
-            border: 1px solid #da291c;
-            width: 90%;
-            max-width: 380px;
-        }
-        .login-card h1 {
-            background: linear-gradient(135deg, #da291c, #ff8c6b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 20px;
-            font-size: 1.6rem;
-        }
-        .google-btn {
-            background: white;
-            border: none;
-            border-radius: 40px;
-            padding: 12px;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            margin: 20px 0;
-        }
+        /* ========== ستايل تسجيل الدخول ========== */
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; transition: all 0.5s ease; }
+        .login-card { background: rgba(10,15,25,0.95); backdrop-filter: blur(12px); border-radius: 50px; padding: 40px; text-align: center; border: 1px solid #da291c; width: 90%; max-width: 380px; }
+        .login-card h1 { background: linear-gradient(135deg, #da291c, #ff8c6b); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px; font-size: 1.6rem; }
+        .google-btn { background: white; border: none; border-radius: 40px; padding: 12px; width: 100%; font-size: 1rem; font-weight: bold; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin: 20px 0; }
         .google-btn img { width: 20px; }
         .error-msg { color: #ff8a6b; margin-top: 10px; font-size: 0.75rem; display: none; }
-        
-        /* شريط المستخدم - صغير بالزاوية اليسرى مع ELO */
-        .user-bar {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            border-radius: 30px;
-            padding: 5px 12px 5px 8px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            z-index: 10001;
-            border: 1px solid #da291c;
-        }
+
+        /* ========== شريط المستخدم ========== */
+        .user-bar { position: fixed; top: 12px; left: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border-radius: 30px; padding: 5px 12px 5px 8px; display: none; align-items: center; gap: 8px; z-index: 10001; border: 1px solid #da291c; flex-wrap: wrap; }
         .user-data { display: flex; align-items: center; gap: 8px; }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #da291c; object-fit: cover; }
         .user-name { color: #0f0; font-size: 0.75rem; font-weight: bold; }
-        .user-elo {
-            background: #000000aa;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            color: #f1c40f;
-            font-weight: bold;
-            direction: ltr;
-            display: inline-block;
-            margin-right: 5px;
-        }
+        .user-elo { background: #000000aa; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; color: #f1c40f; font-weight: bold; direction: ltr; display: inline-block; }
         .logout-btn { background: #da291c; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; font-size: 0.7rem; }
-        
-        /* حاوية اللعبة */
-        #game-container {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-        }
-        
-        /* باقي ستايل اللعبة الأصلي كامل بدون تغيير */
+
+        /* ========== زر الأصدقاء ========== */
+        .friends-btn { background: transparent; border: 1px solid #0f0; color: #0f0; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; position: relative; width: auto; transition: all 0.2s; }
+        .friends-btn:hover { background: rgba(0,255,0,0.1); }
+        .friends-badge { position: absolute; top: -5px; left: -5px; background: #da291c; color: white; font-size: 0.55rem; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-weight: bold; animation: pulseBadge 1.5s infinite; }
+        @keyframes pulseBadge { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+        /* ========== بانل الأصدقاء ========== */
+        .friends-backdrop { position: fixed; inset: 0; z-index: 19999; display: none; }
+        .friends-panel { position: fixed; top: 60px; left: 12px; width: 310px; max-height: 80vh; background: rgba(5,10,18,0.98); border: 1px solid #da291c; border-radius: 20px; z-index: 20000; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 8px 32px rgba(218,41,28,0.3); animation: slideDown 0.2s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .friends-panel-header { background: linear-gradient(135deg, #da291c, #8b0000); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .friends-panel-header h3 { margin: 0; color: white; font-size: 0.9rem; }
+        .friends-panel-close { background: transparent; border: none; color: white; font-size: 1.1rem; cursor: pointer; padding: 0 4px; width: auto; }
+        .friends-tabs { display: flex; background: #0a0f18; flex-shrink: 0; }
+        .friends-tab { flex: 1; padding: 7px 4px; background: transparent; border: none; border-bottom: 2px solid transparent; color: #555; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; width: auto; }
+        .friends-tab.active { color: #da291c; border-bottom-color: #da291c; background: rgba(218,41,28,0.08); }
+        .friends-tab-content { display: none; flex-direction: column; overflow-y: auto; max-height: calc(80vh - 100px); padding: 10px; gap: 7px; }
+        .friends-tab-content.active { display: flex; }
+
+        /* بطاقة صديق */
+        .friend-card { background: #0d1520; border: 1px solid #1a2535; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+        .friend-avatar-sm { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #da291c; object-fit: cover; flex-shrink: 0; }
+        .friend-avatar-placeholder { width: 34px; height: 34px; border-radius: 50%; background: #da291c; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; }
+        .friend-info { flex: 1; min-width: 0; }
+        .friend-name { color: #e0e0e0; font-size: 0.78rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .friend-elo-sm { color: #f1c40f; font-size: 0.62rem; margin-top: 1px; }
+        .friend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .friend-dot.online { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
+        .friend-dot.offline { background: #555; }
+        .f-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .f-btn { background: #1a2535; border: 1px solid #2a3545; color: #ccc; padding: 3px 7px; border-radius: 7px; font-size: 0.62rem; cursor: pointer; width: auto; white-space: nowrap; transition: all 0.15s; }
+        .f-btn:hover { background: #da291c; border-color: #da291c; color: white; }
+        .f-btn.g:hover { background: #27ae60; border-color: #27ae60; }
+        .f-btn.r:hover { background: #c0392b; border-color: #c0392b; }
+
+        /* قسم إضافة صديق */
+        .add-section { display: flex; flex-direction: column; gap: 7px; }
+        .f-input { width: 100%; padding: 8px 10px; background: #0d1520; border: 1px solid #1a2535; border-radius: 9px; color: #e0e0e0; font-size: 0.78rem; text-align: right; box-sizing: border-box; }
+        .f-input:focus { outline: none; border-color: #da291c; }
+        .f-add-btn { padding: 8px; background: #da291c; border: none; border-radius: 9px; color: white; font-size: 0.78rem; font-weight: bold; cursor: pointer; width: 100%; }
+        .f-add-btn:hover { background: #b71c1c; }
+        .f-divider { text-align: center; color: #333; font-size: 0.68rem; margin: 2px 0; }
+        .f-code-box { background: #0d1520; border-radius: 9px; padding: 9px; }
+        .f-code-label { color: #666; font-size: 0.68rem; margin-bottom: 5px; }
+        .f-code-row { display: flex; gap: 5px; }
+        .f-code-val { flex: 1; padding: 6px; background: #000; border: 1px solid #2a3545; border-radius: 7px; color: #f1c40f; font-size: 0.78rem; text-align: center; cursor: pointer; letter-spacing: 1px; }
+        .f-copy-btn { background: #1a2535; border: 1px solid #2a3545; color: #ccc; padding: 6px 9px; border-radius: 7px; cursor: pointer; font-size: 0.7rem; width: auto; }
+
+        /* طلبات صداقة */
+        .req-card { background: #0d1520; border: 1px solid rgba(218,41,28,0.3); border-radius: 10px; padding: 9px; }
+        .req-top { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+        .req-name { flex: 1; color: #e0e0e0; font-size: 0.78rem; font-weight: bold; }
+        .req-email { font-size: 0.62rem; color: #555; margin-bottom: 6px; }
+        .req-btns { display: flex; gap: 6px; }
+
+        /* دعوات غرف */
+        .inv-card { background: linear-gradient(135deg, #0d1f2d, #1a0d2e); border: 1px solid #9b59b6; border-radius: 10px; padding: 10px; }
+        .inv-from { color: #c39bd3; font-size: 0.68rem; margin-bottom: 4px; }
+        .inv-game { color: #e0e0e0; font-size: 0.82rem; font-weight: bold; margin-bottom: 5px; }
+        .inv-code { background: #000; border: 1px solid #9b59b6; border-radius: 7px; padding: 5px; color: #f1c40f; font-size: 0.72rem; text-align: center; margin-bottom: 6px; letter-spacing: 2px; }
+        .inv-btns { display: flex; gap: 6px; }
+        .inv-accept { flex: 1; padding: 6px; background: #27ae60; border: none; border-radius: 7px; color: white; font-size: 0.72rem; cursor: pointer; font-weight: bold; }
+        .inv-decline { flex: 1; padding: 6px; background: #c0392b; border: none; border-radius: 7px; color: white; font-size: 0.72rem; cursor: pointer; font-weight: bold; }
+
+        /* رسائل حالة */
+        .f-msg { text-align: center; padding: 6px; border-radius: 7px; font-size: 0.72rem; font-weight: bold; display: none; }
+        .f-msg.ok { background: rgba(39,174,96,0.15); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+        .f-msg.err { background: rgba(192,57,43,0.15); color: #e74c3c; border: 1px solid rgba(192,57,43,0.3); }
+        .f-msg.inf { background: rgba(41,128,185,0.15); color: #3498db; border: 1px solid rgba(41,128,185,0.3); }
+        .f-empty { text-align: center; padding: 20px; color: #333; font-size: 0.78rem; }
+        .f-empty-icon { font-size: 1.8rem; margin-bottom: 6px; }
+
+        /* نافذة دعوة للعب */
+        .invite-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(5,10,18,0.99); border: 2px solid #da291c; border-radius: 18px; padding: 22px; width: 90%; max-width: 320px; z-index: 30000; display: none; animation: popIn 0.2s ease; }
+        @keyframes popIn { from{opacity:0;transform:translate(-50%,-50%) scale(0.9)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
+        .invite-modal-title { color: #da291c; font-size: 0.95rem; font-weight: bold; text-align: center; margin-bottom: 14px; }
+        .invite-friend-info { display: flex; align-items: center; gap: 9px; background: #0d1520; border-radius: 10px; padding: 9px; margin-bottom: 12px; }
+        .invite-game-select { width: 100%; padding: 9px; background: #0d1520; border: 1px solid #1a2535; border-radius: 9px; color: #e0e0e0; font-size: 0.82rem; margin-bottom: 10px; box-sizing: border-box; }
+        .invite-game-select:focus { outline: none; border-color: #da291c; }
+        .invite-code-box { background: #000; border: 1px dashed #da291c; border-radius: 9px; padding: 9px; margin-bottom: 10px; display: none; }
+        .invite-code-label { color: #666; font-size: 0.68rem; margin-bottom: 5px; }
+        .invite-code-input { width: 100%; padding: 6px; background: #0d1520; border: 1px solid #333; border-radius: 7px; color: #f1c40f; font-size: 0.82rem; text-align: center; letter-spacing: 2px; box-sizing: border-box; }
+        .invite-send-btn { width: 100%; padding: 10px; background: linear-gradient(135deg,#da291c,#8b0000); border: none; border-radius: 10px; color: white; font-size: 0.88rem; font-weight: bold; cursor: pointer; margin-bottom: 7px; }
+        .invite-cancel-btn { width: 100%; padding: 8px; background: #1a2535; border: 1px solid #2a3545; border-radius: 10px; color: #aaa; font-size: 0.78rem; cursor: pointer; }
+
+        /* ========== باقي ستايل اللعبة ========== */
+        #game-container { display: none; width: 100%; min-height: 100vh; }
         * { touch-action: manipulation; user-select: none; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #000; color: #0f0; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         #main-menu { text-align: center; margin-top: 40px; width: 100%; max-width: 400px; }
@@ -132,25 +146,23 @@
         .chat-input-area { display: flex; gap: 5px; }
         .chat-input-area input { flex: 1; padding: 6px; font-size: 0.7em; margin: 0; background: #000; border: 1px solid #0f0; color: #0f0; }
         .chat-input-area button { width: auto; padding: 6px 8px; background: #111; border: 1px solid #0f0; color: #0f0; font-size: 0.7em; }
-        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218, 41, 28, 0.3); position: relative; }
+        #board { width: 380px !important; max-width: 95vw !important; border: 4px solid #333; border-radius: 8px; box-shadow: 0 0 20px rgba(218,41,28,0.3); position: relative; }
         .turn-box { margin-top: 15px; font-size: 1.2em; font-weight: bold; color: #fff; }
         .timer-box { font-size: 1.5em; font-weight: bold; background: #000; padding: 5px 15px; border-radius: 20px; margin-bottom: 10px; color: #ff0; }
         .chess-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .chess-buttons button { width: auto; margin: 0; flex: 1; background: #444; }
-        .highlight-selected { background-color: rgba(255, 255, 0, 0.5) !important; }
-        .highlight-hint { width: 16px; height: 16px; background: rgba(0, 255, 0, 0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .highlight-selected { background-color: rgba(255,255,0,0.5) !important; }
+        .highlight-hint { width: 16px; height: 16px; background: rgba(0,255,0,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
         .board-coords { position: absolute; pointer-events: none; z-index: 50; font-size: 11px; font-weight: bold; color: #ff0; text-shadow: 0 0 3px #000; }
         .file-coord { bottom: 2px; text-align: center; width: 12.5%; position: absolute; }
         .rank-coord { right: 2px; text-align: center; height: 12.5%; display: flex; align-items: center; position: absolute; }
-        .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
+        .secret-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #1a1a1a; border: 3px solid gold; border-radius: 15px; padding: 20px; z-index: 1000; text-align: center; box-shadow: 0 0 50px rgba(0,255,0,0.5); }
         .secret-panel button { margin: 10px; padding: 12px 20px; width: auto; background: #333; border: 1px solid #0f0; }
         .secret-panel button:hover { background: #da291c; }
         .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; justify-content: center; align-items: center; }
         .password-box { background: #1a1a1a; border: 3px solid #da291c; border-radius: 20px; padding: 30px; text-align: center; width: 300px; }
         .password-box input { width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; margin: 20px 0; background: #000; color: #0f0; border: 2px solid #da291c; }
         .password-box h3 { color: #da291c; margin-bottom: 10px; }
-
-        /* ستايل القمار أونلاين */
         .casino-container { max-width: 500px; width: 100%; background: #1e1e1e; border-radius: 40px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 2px #da291c; text-align: center; margin: auto; }
         .casino-container h2 { color: #da291c; margin: 0 0 10px 0; }
         .balance-box { background: #000000aa; border-radius: 60px; padding: 15px; margin: 15px 0; border: 1px solid #da291c; }
@@ -159,8 +171,8 @@
         .dice { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
         .die { width: 80px; height: 80px; background: white; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; box-shadow: 0 5px 0 #999; transition: all 0.1s ease; }
         .die.rolling { animation: shake 0.3s infinite; }
-        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-10deg); } 75% { transform: translateX(5px) rotate(10deg); } 100% { transform: translateX(0); } }
-        .bet-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-5px) rotate(-10deg)} 75%{transform:translateX(5px) rotate(10deg)} 100%{transform:translateX(0)} }
+        .bet-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0; }
         .bet-btn { background: #2c3e50; border: none; padding: 12px 5px; border-radius: 50px; color: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
         .bet-btn.selected { background: #da291c; box-shadow: 0 0 15px #da291c; border: 1px solid gold; }
         .bet-amount input { width: 80%; padding: 12px; border-radius: 50px; border: 2px solid #da291c; background: #000; color: #ffd966; font-size: 1.2rem; text-align: center; }
@@ -171,8 +183,6 @@
         .online-status { background: #2c3e50; padding: 8px; border-radius: 20px; margin-bottom: 10px; font-size: 0.8rem; }
         .waiting-message { color: #f39c12; }
         .enemy-info { background: #1a1a1a; padding: 8px; border-radius: 15px; margin: 10px 0; }
-
-        /* ستايل سباق السيارات */
         .race-container-inner { max-width: 800px; width: 100%; background: #1e2a1a; border-radius: 60px; padding: 20px; border: 3px solid #f1c40f; box-shadow: 0 20px 35px rgba(0,0,0,0.5); }
         .race-container-inner h1 { text-align: center; color: #f1c40f; margin: 0 0 10px 0; }
         .race-balance-card { background: #0f1f0f; border-radius: 40px; padding: 12px 20px; text-align: center; margin-bottom: 20px; border: 1px solid #f1c40f; color: #ffd966; }
@@ -183,10 +193,10 @@
         .car-name { width: 70px; font-weight: bold; font-size: 0.9rem; color: #ffd966; }
         .track-bar { flex: 1; background: #3a4a2a; border-radius: 20px; height: 45px; position: relative; overflow: hidden; }
         .car-progress { width: 0%; height: 100%; border-radius: 20px; transition: width 0.03s linear; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 0.8rem; }
-        .car-red .car-progress { background: radial-gradient(circle at left, #e74c3c, #c0392b); }
-        .car-blue .car-progress { background: radial-gradient(circle at left, #3498db, #2980b9); }
-        .car-green .car-progress { background: radial-gradient(circle at left, #2ecc71, #27ae60); }
-        .car-yellow .car-progress { background: radial-gradient(circle at left, #f1c40f, #f39c12); }
+        .car-red .car-progress { background: radial-gradient(circle at left,#e74c3c,#c0392b); }
+        .car-blue .car-progress { background: radial-gradient(circle at left,#3498db,#2980b9); }
+        .car-green .car-progress { background: radial-gradient(circle at left,#2ecc71,#27ae60); }
+        .car-yellow .car-progress { background: radial-gradient(circle at left,#f1c40f,#f39c12); }
         .odds-info { font-size: 0.7rem; color: #ffd966; background: #000000aa; padding: 2px 8px; border-radius: 20px; }
         .cars-selector { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .car-bet-card { background: #1e2a1a; border: 2px solid #f1c40f; border-radius: 30px; padding: 12px 15px; text-align: center; cursor: pointer; min-width: 100px; color: #ffd966; }
@@ -220,17 +230,105 @@
     </div>
 </div>
 
-<!-- شريط المستخدم - صغير بالزاوية مع ELO -->
+<!-- الباكدروب -->
+<div class="friends-backdrop" id="friendsBackdrop" onclick="closeFriendsPanel()"></div>
+
+<!-- شريط المستخدم -->
 <div id="userBar" class="user-bar">
     <div class="user-data">
         <img id="userAvatar" class="user-avatar">
         <span id="userName" class="user-name"></span>
         <span id="playerElo" class="user-elo">🏆 ELO: 1200</span>
     </div>
+    <!-- زر الأصدقاء الجديد -->
+    <button class="friends-btn" onclick="toggleFriendsPanel()">
+        👥 أصدقاء
+        <span class="friends-badge" id="friendsBadge"></span>
+    </button>
     <button id="logoutBtn" class="logout-btn">🚪 خروج</button>
 </div>
 
-<!-- حاوية اللعبة الأصلية -->
+<!-- ========== بانل الأصدقاء ========== -->
+<div class="friends-panel" id="friendsPanel">
+    <div class="friends-panel-header">
+        <h3>👥 الأصدقاء</h3>
+        <button class="friends-panel-close" onclick="closeFriendsPanel()">✕</button>
+    </div>
+    <div class="friends-tabs">
+        <button class="friends-tab active" onclick="switchTab('list',this)">الأصدقاء</button>
+        <button class="friends-tab" onclick="switchTab('requests',this)">طلبات <span id="reqCount" style="color:#da291c;"></span></button>
+        <button class="friends-tab" onclick="switchTab('invites',this)">دعوات <span id="invCount" style="color:#9b59b6;"></span></button>
+        <button class="friends-tab" onclick="switchTab('add',this)">➕ إضافة</button>
+    </div>
+
+    <!-- تبويب قائمة الأصدقاء -->
+    <div class="friends-tab-content active" id="tab-list">
+        <div class="f-msg" id="listMsg"></div>
+        <div id="friendsList">
+            <div class="f-empty"><div class="f-empty-icon">🤝</div><div>ما عندك أصدقاء بعد</div></div>
+        </div>
+    </div>
+
+    <!-- تبويب الطلبات -->
+    <div class="friends-tab-content" id="tab-requests">
+        <div class="f-msg" id="requestsMsg"></div>
+        <div id="requestsList">
+            <div class="f-empty"><div class="f-empty-icon">📭</div><div>ما في طلبات</div></div>
+        </div>
+    </div>
+
+    <!-- تبويب دعوات الغرف -->
+    <div class="friends-tab-content" id="tab-invites">
+        <div class="f-msg" id="invitesMsg"></div>
+        <div id="invitesList">
+            <div class="f-empty"><div class="f-empty-icon">🎮</div><div>ما في دعوات حالياً</div></div>
+        </div>
+    </div>
+
+    <!-- تبويب إضافة صديق -->
+    <div class="friends-tab-content" id="tab-add">
+        <div class="f-msg" id="addMsg"></div>
+        <div class="add-section">
+            <div style="color:#666;font-size:0.7rem;">🔍 بحث بالإيميل أو الاسم</div>
+            <input class="f-input" id="searchFriendInput" placeholder="example@gmail.com أو الاسم...">
+            <button class="f-add-btn" onclick="searchAndAdd()">🔍 بحث وإضافة</button>
+        </div>
+        <div class="f-divider">── أو ──</div>
+        <div class="add-section">
+            <div style="color:#666;font-size:0.7rem;">🔑 إضافة بكود الصداقة</div>
+            <input class="f-input" id="friendCodeInput" placeholder="مثال: FRAB1234">
+            <button class="f-add-btn" onclick="addByCode()">➕ إضافة بالكود</button>
+        </div>
+        <div class="f-code-box">
+            <div class="f-code-label">📋 كود صداقتك — شاركه مع أصدقائك</div>
+            <div class="f-code-row">
+                <input class="f-code-val" id="myFriendCode" readonly onclick="copyCode()">
+                <button class="f-copy-btn" onclick="copyCode()">📋</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== نافذة دعوة للعب ========== -->
+<div class="invite-modal" id="inviteModal">
+    <div class="invite-modal-title">🎮 دعوة للعب</div>
+    <div class="invite-friend-info" id="inviteModalInfo"></div>
+    <select class="invite-game-select" id="inviteGameSel" onchange="onGameSelChange()">
+        <option value="">-- اختر اللعبة --</option>
+        <option value="chess">♟️ الشطرنج</option>
+        <option value="casino">🎲 كازينو النرد</option>
+        <option value="race">🏎️ سباق السيارات</option>
+        <option value="spy">🕵️ الجاسوس أونلاين</option>
+    </select>
+    <div class="invite-code-box" id="inviteCodeBox">
+        <div class="invite-code-label">أدخل كود الغرفة اللي أنشأتها</div>
+        <input class="invite-code-input" id="inviteRoomCode" placeholder="مثال: 1234">
+    </div>
+    <button class="invite-send-btn" onclick="sendInvite()">📨 إرسال الدعوة</button>
+    <button class="invite-cancel-btn" onclick="closeInviteModal()">إلغاء</button>
+</div>
+
+<!-- حاوية اللعبة -->
 <div id="game-container">
     <div id="main-menu">
         <h1 style="color:#da291c;">🔥 AHMED PRO SYSTEM - المافيا المتكاملة 🔥</h1>
@@ -243,7 +341,7 @@
         <button class="menu-btn" style="border-color: #f1c40f;" onclick="showGame('raceOnline')">🏁 سباق السيارات أونلاين 🏎️</button>
     </div>
 
-    <!-- ===================== المافيا ===================== -->
+    <!-- المافيا -->
     <div id="mafia-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🕵️‍♂️ المافيا - دكتور + ولد + تسكيت</h3></div>
@@ -263,7 +361,7 @@
         </div>
     </div>
 
-    <!-- ===================== الشطرنج ===================== -->
+    <!-- الشطرنج -->
     <div id="chess-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>👑 شطرنج أحمد المحترف 👑</h3></div>
@@ -297,7 +395,7 @@
         </div>
     </div>
 
-    <!-- ===================== الجاسوس ===================== -->
+    <!-- الجاسوس أوفلاين -->
     <div id="spy-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🕵️ لعبة الجاسوس (أوفلاين)</h3></div>
@@ -310,6 +408,7 @@
         <div id="spy-board" class="hidden"><div id="spy-cards-container"></div></div>
     </div>
 
+    <!-- الجاسوس أونلاين -->
     <div id="spy-online-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="header"><h3>🌐 الجاسوس أونلاين</h3></div>
@@ -323,13 +422,13 @@
         <div id="game-play" class="hidden"><div class="spy-card" onclick="$(this).find('.role-display').toggle()"><p>اضغط لإظهار المكان</p><div id="my-role" class="role-display"></div></div><div id="voting-area"><h4 id="vote-title">صوّت للجاسوس:</h4><div id="vote-btns"></div><div id="vote-log-container"></div><div id="final-result"></div></div></div>
     </div>
 
-    <!-- ===================== لعبة القفز ===================== -->
+    <!-- لعبة القفز -->
     <div id="jump-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div id="jumpGameContainer"></div>
     </div>
 
-    <!-- ===================== كازينو النرد أونلاين ===================== -->
+    <!-- كازينو النرد -->
     <div id="casinoOnline-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="casino-container">
@@ -345,19 +444,10 @@
                 <div class="online-status" id="casinoRoomDisplay"></div>
                 <div class="enemy-info" id="casinoEnemyInfo">⏳ انتظار اتصال الخصم...</div>
                 <div id="casinoGameArea" style="display:none;">
-                    <div class="balance-box">
-                        <div class="balance-label" style="color:#aaa;">💰 رصيدك</div>
-                        <div class="balance-amount" id="casinoBalance">1000</div>
-                    </div>
-                    <div class="balance-box" style="background:#1a1a1a;">
-                        <div class="balance-label" style="color:#aaa;">💰 رصيد الخصم</div>
-                        <div class="balance-amount" id="casinoEnemyBalance">1000</div>
-                    </div>
+                    <div class="balance-box"><div class="balance-label" style="color:#aaa;">💰 رصيدك</div><div class="balance-amount" id="casinoBalance">1000</div></div>
+                    <div class="balance-box" style="background:#1a1a1a;"><div class="balance-label" style="color:#aaa;">💰 رصيد الخصم</div><div class="balance-amount" id="casinoEnemyBalance">1000</div></div>
                     <div class="dice-area">
-                        <div class="dice">
-                            <div class="die" id="casinoDie1">🎲</div>
-                            <div class="die" id="casinoDie2">🎲</div>
-                        </div>
+                        <div class="dice"><div class="die" id="casinoDie1">🎲</div><div class="die" id="casinoDie2">🎲</div></div>
                         <div class="dice-total" id="casinoTotalDisplay" style="font-size:1.2rem; color:#da291c;">المجموع: --</div>
                     </div>
                     <div class="bet-options">
@@ -368,24 +458,19 @@
                         <button class="bet-btn" data-casino-bet="odd">🔢 فردي<br><span style="font-size:0.6rem;">×2</span></button>
                         <button class="bet-btn" data-casino-bet="double">🔄 زوج متطابق<br><span style="font-size:0.6rem;">×10</span></button>
                     </div>
-                    <div class="bet-amount">
-                        <input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10">
-                    </div>
-                    <div style="display: flex; gap: 15px; margin: 15px 0;">
+                    <div class="bet-amount"><input type="number" id="casinoBetAmount" value="50" min="10" max="10000" step="10"></div>
+                    <div style="display:flex; gap:15px; margin:15px 0;">
                         <button class="roll-btn" id="casinoRollBtn" style="flex:2;">🎲 ارمي النرد 🎲</button>
                         <button class="reset-btn" id="casinoResetBtn" style="flex:1;">🔄 إعادة</button>
                     </div>
                     <div id="casinoResultMessage" class="result-message"></div>
-                    <div class="history">
-                        <h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4>
-                        <div id="casinoHistoryList"></div>
-                    </div>
+                    <div class="history"><h4 style="margin:0 0 8px 0; color:#da291c;">📜 سجل اللعب</h4><div id="casinoHistoryList"></div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===================== سباق السيارات أونلاين ===================== -->
+    <!-- سباق السيارات -->
     <div id="raceOnline-section" class="hidden">
         <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
         <div class="race-container-inner">
@@ -434,66 +519,7 @@
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 
 <script>
-// ===================== نظام ELO =====================
-function getEloKey(email) {
-    return `elo_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-}
-
-function getPlayerElo(email) {
-    const key = getEloKey(email);
-    const saved = localStorage.getItem(key);
-    if (saved !== null && !isNaN(saved)) {
-        return parseInt(saved);
-    }
-    return 1200;
-}
-
-function savePlayerElo(email, elo) {
-    const key = getEloKey(email);
-    localStorage.setItem(key, elo);
-}
-
-function updateEloDisplay() {
-    const user = auth.currentUser;
-    if (user && user.email) {
-        const elo = getPlayerElo(user.email);
-        const eloSpan = document.getElementById('playerElo');
-        if (eloSpan) {
-            eloSpan.textContent = `🏆 ELO: ${elo}`;
-        }
-    }
-}
-
-function calculateNewElo(myElo, opponentElo, myWin) {
-    const K = 32;
-    const expected = 1 / (1 + Math.pow(10, (opponentElo - myElo) / 400));
-    const change = Math.round(K * ((myWin ? 1 : 0) - expected));
-    return myElo + change;
-}
-
-function updateEloAfterGame(myWin, opponentEmail = null, opponentElo = 1200) {
-    const user = auth.currentUser;
-    if (!user || !user.email) return;
-    
-    let myElo = getPlayerElo(user.email);
-    let oppElo = opponentElo;
-    
-    if (opponentEmail) {
-        oppElo = getPlayerElo(opponentEmail);
-    }
-    
-    const newMyElo = calculateNewElo(myElo, oppElo, myWin);
-    savePlayerElo(user.email, newMyElo);
-    
-    if (opponentEmail) {
-        const newOppElo = calculateNewElo(oppElo, myElo, !myWin);
-        savePlayerElo(opponentEmail, newOppElo);
-    }
-    
-    updateEloDisplay();
-}
-
-// ===================== نظام تسجيل الدخول بجوجل =====================
+// ===================== Firebase Init =====================
 const firebaseConfig = {
     apiKey: "AIzaSyAlq7wGqzoU414Q3ZQFmqQvyY7UpUHYWjY",
     authDomain: "ahmad-e442a.firebaseapp.com",
@@ -504,28 +530,47 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db   = firebase.firestore();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-const loginOverlay = document.getElementById('loginOverlay');
-const userBar = document.getElementById('userBar');
-const gameContainer = document.getElementById('game-container');
-const errorMsg = document.getElementById('errorMsg');
-const loadingMsg = document.getElementById('loadingMsg');
+// ===================== ELO =====================
+function getEloKey(email) { return `elo_${email.replace(/[^a-zA-Z0-9]/g,'_')}`; }
+function getPlayerElo(email) { const v = localStorage.getItem(getEloKey(email)); return (v !== null && !isNaN(v)) ? parseInt(v) : 1200; }
+function savePlayerElo(email, elo) { localStorage.setItem(getEloKey(email), elo); }
+function updateEloDisplay() {
+    const user = auth.currentUser;
+    if (user && user.email) document.getElementById('playerElo').textContent = `🏆 ELO: ${getPlayerElo(user.email)}`;
+}
+function calculateNewElo(myElo, oppElo, win) {
+    const K = 32, exp = 1 / (1 + Math.pow(10, (oppElo - myElo) / 400));
+    return myElo + Math.round(K * ((win ? 1 : 0) - exp));
+}
+function updateEloAfterGame(myWin, opponentEmail = null, opponentElo = 1200) {
+    const user = auth.currentUser;
+    if (!user || !user.email) return;
+    let myElo = getPlayerElo(user.email);
+    let oppElo = opponentEmail ? getPlayerElo(opponentEmail) : opponentElo;
+    savePlayerElo(user.email, calculateNewElo(myElo, oppElo, myWin));
+    if (opponentEmail) savePlayerElo(opponentEmail, calculateNewElo(oppElo, myElo, !myWin));
+    updateEloDisplay();
+}
 
-function showError(text) { errorMsg.innerText = text; errorMsg.style.display = 'block'; setTimeout(() => errorMsg.style.display = 'none', 4000); }
-function showLoading(show) { loadingMsg.style.display = show ? 'block' : 'none'; }
+// ===================== Auth =====================
+const loginOverlay  = document.getElementById('loginOverlay');
+const userBar       = document.getElementById('userBar');
+const gameContainer = document.getElementById('game-container');
+const errorMsg      = document.getElementById('errorMsg');
+const loadingMsg    = document.getElementById('loadingMsg');
+
+function showError(t) { errorMsg.innerText = t; errorMsg.style.display = 'block'; setTimeout(() => errorMsg.style.display = 'none', 4000); }
+function showLoading(s) { loadingMsg.style.display = s ? 'block' : 'none'; }
 
 async function signIn() {
     showLoading(true);
     try {
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
-        loginOverlay.style.display = 'none';
-        userBar.style.display = 'flex';
-        gameContainer.style.display = 'block';
-        document.getElementById('userName').innerText = user.displayName || user.email;
-        document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?background=da291c&color=fff&name=' + (user.displayName ? user.displayName.charAt(0) : 'A');
-        updateEloDisplay();
+        onUserLoggedIn(user);
     } catch (err) {
         if (err.code === 'auth/popup-blocked') showError('⚠️ السماح بالنوافذ المنبثقة');
         else if (err.code === 'auth/unauthorized-domain') showError('⚠️ أضف النطاق في Firebase Console');
@@ -534,1674 +579,462 @@ async function signIn() {
 }
 
 async function signOut() {
+    if (auth.currentUser) setUserOffline(auth.currentUser.uid);
+    friendsListeners.forEach(u => u());
+    friendsListeners = [];
     await auth.signOut();
     loginOverlay.style.display = 'flex';
     userBar.style.display = 'none';
     gameContainer.style.display = 'none';
 }
 
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        loginOverlay.style.display = 'none';
-        userBar.style.display = 'flex';
-        gameContainer.style.display = 'block';
-        document.getElementById('userName').innerText = user.displayName || user.email;
-        document.getElementById('userAvatar').src = user.photoURL || 'https://ui-avatars.com/api/?background=da291c&color=fff&name=' + (user.displayName ? user.displayName.charAt(0) : 'A');
-        updateEloDisplay();
-    } else {
-        loginOverlay.style.display = 'flex';
-        userBar.style.display = 'none';
-        gameContainer.style.display = 'none';
-    }
+function onUserLoggedIn(user) {
+    loginOverlay.style.display = 'none';
+    userBar.style.display = 'flex';
+    gameContainer.style.display = 'block';
+    document.getElementById('userName').innerText = user.displayName || user.email;
+    document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?background=da291c&color=fff&name=${(user.displayName||'A').charAt(0)}`;
+    updateEloDisplay();
+    initFriends(user);
+}
+
+auth.onAuthStateChanged(user => {
+    if (user) onUserLoggedIn(user);
+    else { loginOverlay.style.display = 'flex'; userBar.style.display = 'none'; gameContainer.style.display = 'none'; }
 });
 
 document.getElementById('googleLoginBtn').onclick = signIn;
 document.getElementById('logoutBtn').onclick = signOut;
 
-// ===================== باقي كود اللعبة الأصلي (كامل بدون أي حذف أو اختصار) =====================
-let isLocked = false;
-let mPlayers = [];
-let sPlayers = [];
-let players = [];
-let peer = null;
-let myName = "";
-let host = false;
-let votesReceived = [];
+// ===================== نظام الأصدقاء =====================
+let currentUser = null;
+let friendsList = [];
+let pendingRequests = [];
+let gameInvites = [];
+let friendsListeners = [];
+let inviteTarget = null;
 
-const spyPlaces = [ 
-    "مستشفى", "مدرسة", "غابة", "طائرة", "مطعم", "فندق", "مطار", "سفينة", "مخيم", "قلعة", "مسجد", 
-    "الأردن", "فلسطين", "شاورما", "منسف", "تلفزيون", "هاتف", "غرفة نوم", "سيارة", "المول", 
-    "السوبر ماركت", "الحلاق", "السينما", "المسرح", "البنك", "كازية", "مخبز", "خياط", "صيدلية", 
-    "عيادة أسنان", "مختبر", "الجامعة", "مدرسة سواقة", "حديقة حيوان", "السيرك", "المتحف", "معرض فنون", 
-    "صالة أفراح", "ملعب كرة قدم", "نادي رياضي", "مسبح", "شاطئ", "ميناء", "محطة قطار", "موقف باصات", 
-    "المترو", "جسر", "نفق", "مطبعة", "ورشة نجارة", "كراج تصليح", "صحراء", "واحة", "كهف", "بركان", 
-    "شلال", "جزيرة", "قطب متجمد", "قمة جبل", "وادي", "غابة استوائية", "سفينة فضاء", "محطة مير", 
-    "الغواصة", "منطاد", "هليكوبتر", "سفينة حربية", "ناقلة نفط", "كاسحة ثلوج", "أهرامات", "البتراء", 
-    "جرش", "قلعة عجلون", "قصر أموي", "معبد قديم", "بيت مهجور", "سفينة قراصنة", "مدينة مفقودة"
-];
+function genFriendCode(email) {
+    if (!email) return '';
+    let h = 0;
+    for (let i = 0; i < email.length; i++) { h = ((h << 5) - h) + email.charCodeAt(i); h |= 0; }
+    return 'FR' + Math.abs(h).toString(36).toUpperCase().slice(0,6);
+}
 
-// ===================== المافيا =====================
-function addMafiaPlayer() {
-    let n = $('#mafiaPlayerName').val().trim();
-    if(n) {
-        mPlayers.push(n);
-        $('#mafia-preview').html("👥 اللاعبين: " + mPlayers.join(" - "));
-        $('#mafiaPlayerName').val("").focus();
+async function syncProfile(user) {
+    try {
+        await db.collection('users').doc(user.uid).set({
+            uid: user.uid,
+            displayName: user.displayName || user.email.split('@')[0],
+            email: user.email,
+            photoURL: user.photoURL || '',
+            friendCode: genFriendCode(user.email),
+            online: true,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    } catch(e) { console.warn(e); }
+}
+
+async function setUserOffline(uid) {
+    try { await db.collection('users').doc(uid).update({ online: false, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e) {}
+}
+
+function initFriends(user) {
+    currentUser = user;
+    syncProfile(user);
+    document.getElementById('myFriendCode').value = genFriendCode(user.email);
+    setupFriendsListeners();
+    window.addEventListener('beforeunload', () => setUserOffline(user.uid));
+}
+
+function setupFriendsListeners() {
+    friendsListeners.forEach(u => u());
+    friendsListeners = [];
+    const uid = currentUser.uid;
+
+    // أصدقاء
+    friendsListeners.push(
+        db.collection('friends').where('users','array-contains',uid).where('status','==','accepted')
+        .onSnapshot(snap => { friendsList = snap.docs.map(d => ({id:d.id,...d.data()})); renderFriends(); })
+    );
+    // طلبات واردة
+    friendsListeners.push(
+        db.collection('friend_requests').where('toUid','==',uid).where('status','==','pending')
+        .onSnapshot(snap => { pendingRequests = snap.docs.map(d => ({id:d.id,...d.data()})); renderRequests(); updateBadge(); })
+    );
+    // دعوات غرف
+    friendsListeners.push(
+        db.collection('game_invites').where('toUid','==',uid).where('status','==','pending')
+        .onSnapshot(snap => { gameInvites = snap.docs.map(d => ({id:d.id,...d.data()})); renderInvites(); updateBadge(); })
+    );
+}
+
+// ── UI ──
+function toggleFriendsPanel() {
+    const p = document.getElementById('friendsPanel');
+    const b = document.getElementById('friendsBackdrop');
+    if (p.style.display === 'flex') { p.style.display = 'none'; b.style.display = 'none'; }
+    else { p.style.display = 'flex'; b.style.display = 'block'; }
+}
+function closeFriendsPanel() {
+    document.getElementById('friendsPanel').style.display = 'none';
+    document.getElementById('friendsBackdrop').style.display = 'none';
+}
+function switchTab(name, btn) {
+    document.querySelectorAll('.friends-tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.friends-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+function updateBadge() {
+    const total = pendingRequests.length + gameInvites.length;
+    const badge = document.getElementById('friendsBadge');
+    const rCount = document.getElementById('reqCount');
+    const iCount = document.getElementById('invCount');
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+    if (rCount) rCount.textContent = pendingRequests.length > 0 ? `(${pendingRequests.length})` : '';
+    if (iCount) iCount.textContent = gameInvites.length > 0 ? `(${gameInvites.length})` : '';
+}
+
+// ── رندر قائمة الأصدقاء ──
+async function renderFriends() {
+    const c = document.getElementById('friendsList');
+    if (!c) return;
+    if (friendsList.length === 0) { c.innerHTML = '<div class="f-empty"><div class="f-empty-icon">🤝</div><div>ما عندك أصدقاء بعد</div></div>'; return; }
+    c.innerHTML = '';
+    for (const fr of friendsList) {
+        const fUid = fr.users.find(u => u !== currentUser.uid);
+        if (!fUid) continue;
+        try {
+            const doc = await db.collection('users').doc(fUid).get();
+            if (!doc.exists) continue;
+            const f = doc.data();
+            const card = document.createElement('div');
+            card.className = 'friend-card';
+            card.innerHTML = `
+                ${f.photoURL ? `<img class="friend-avatar-sm" src="${f.photoURL}" onerror="this.style.display='none'">` : `<div class="friend-avatar-placeholder">${(f.displayName||'?')[0].toUpperCase()}</div>`}
+                <div class="friend-info">
+                    <div class="friend-name">${f.displayName || f.email}</div>
+                    <div class="friend-elo-sm">🏆 ${getPlayerElo(f.email)}</div>
+                </div>
+                <div class="friend-dot ${f.online ? 'online' : 'offline'}"></div>
+                <div class="f-actions">
+                    <button class="f-btn g" onclick="openInviteModal('${fUid}','${(f.displayName||f.email).replace(/'/g,"\\'")}','${f.photoURL||''}')">🎮 العب</button>
+                    <button class="f-btn r" onclick="removeFriend('${fr.id}','${(f.displayName||f.email).replace(/'/g,"\\'")}')">🗑️</button>
+                </div>`;
+            c.appendChild(card);
+        } catch(e) {}
     }
 }
 
-function getRolesDistribution(playersList) {
-    let count = playersList.length;
-    let roles = [];
-    let doctorsCount = 1;
-    let hasSilentMafia = (count >= 9);
-    let hasChild = (count >= 9);
-    let citizensCount = count - doctorsCount - 1;
-    if(hasSilentMafia) citizensCount--;
-    if(hasChild) citizensCount--;
-    if(citizensCount < 0) citizensCount = 0;
-    
-    roles.push({type:'mafia', name:'مافيا 🔪 (قاتل)', class:'mafia-role'});
-    if(hasSilentMafia) roles.push({type:'silent_mafia', name:'مافيا تسكيت 🤐', class:'silent-role'});
-    for(let i=0; i<doctorsCount; i++) roles.push({type:'doctor', name:'دكتور 💉', class:'doctor-role'});
-    if(hasChild) roles.push({type:'child', name:'ولد 👶 (يضرب إذا اجتمع مع مافيا)', class:'child-role'});
-    for(let i=0; i<citizensCount; i++) roles.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
-    
-    for(let i=roles.length-1; i>0; i--) {
-        let j = Math.floor(Math.random()*(i+1));
-        [roles[i], roles[j]] = [roles[j], roles[i]];
-    }
+// ── رندر الطلبات ──
+function renderRequests() {
+    const c = document.getElementById('requestsList');
+    if (!c) return;
+    if (pendingRequests.length === 0) { c.innerHTML = '<div class="f-empty"><div class="f-empty-icon">📭</div><div>ما في طلبات</div></div>'; return; }
+    c.innerHTML = '';
+    pendingRequests.forEach(req => {
+        const card = document.createElement('div');
+        card.className = 'req-card';
+        card.innerHTML = `
+            <div class="req-top">
+                ${req.fromPhoto ? `<img class="friend-avatar-sm" src="${req.fromPhoto}">` : `<div class="friend-avatar-placeholder">${(req.fromName||'?')[0]}</div>`}
+                <div class="req-name">${req.fromName || req.fromEmail}</div>
+            </div>
+            <div class="req-email">${req.fromEmail}</div>
+            <div class="req-btns">
+                <button class="f-btn g" style="flex:1;text-align:center;" onclick="acceptReq('${req.id}','${req.fromUid}')">✅ قبول</button>
+                <button class="f-btn r" style="flex:1;text-align:center;" onclick="declineReq('${req.id}')">❌ رفض</button>
+            </div>`;
+        c.appendChild(card);
+    });
+}
+
+// ── رندر الدعوات ──
+function renderInvites() {
+    const c = document.getElementById('invitesList');
+    if (!c) return;
+    if (gameInvites.length === 0) { c.innerHTML = '<div class="f-empty"><div class="f-empty-icon">🎮</div><div>ما في دعوات حالياً</div></div>'; return; }
+    const names = { chess:'♟️ شطرنج', casino:'🎲 كازينو', race:'🏎️ سباق', spy:'🕵️ جاسوس' };
+    c.innerHTML = '';
+    gameInvites.forEach(inv => {
+        const card = document.createElement('div');
+        card.className = 'inv-card';
+        card.innerHTML = `
+            <div class="inv-from">📩 من: ${inv.fromName}</div>
+            <div class="inv-game">${names[inv.game] || inv.game}</div>
+            <div class="inv-code">🔑 ${inv.roomCode}</div>
+            <div class="inv-btns">
+                <button class="inv-accept" onclick="acceptInvite('${inv.id}','${inv.game}','${inv.roomCode}')">✅ انضم</button>
+                <button class="inv-decline" onclick="declineInvite('${inv.id}')">❌ رفض</button>
+            </div>`;
+        c.appendChild(card);
+    });
+}
+
+// ── إضافة أصدقاء ──
+async function searchAndAdd() {
+    const q = document.getElementById('searchFriendInput').value.trim();
+    if (!q) { showFMsg('addMsg','اكتب إيميل أو اسم','err'); return; }
+    showFMsg('addMsg','⏳ جاري البحث...','inf');
+    try {
+        let snap = await db.collection('users').where('email','==',q.toLowerCase()).limit(1).get();
+        if (snap.empty) snap = await db.collection('users').where('displayName','==',q).limit(1).get();
+        if (snap.empty) { showFMsg('addMsg','❌ ما وجدنا أي مستخدم','err'); return; }
+        await doSendRequest(snap.docs[0].data());
+    } catch(e) { showFMsg('addMsg','⚠️ خطأ: '+e.message,'err'); }
+}
+async function addByCode() {
+    const code = document.getElementById('friendCodeInput').value.trim().toUpperCase();
+    if (!code) { showFMsg('addMsg','أدخل الكود','err'); return; }
+    showFMsg('addMsg','⏳ جاري البحث...','inf');
+    try {
+        const snap = await db.collection('users').where('friendCode','==',code).limit(1).get();
+        if (snap.empty) { showFMsg('addMsg','❌ الكود غير صحيح','err'); return; }
+        await doSendRequest(snap.docs[0].data());
+    } catch(e) { showFMsg('addMsg','⚠️ خطأ: '+e.message,'err'); }
+}
+async function doSendRequest(target) {
+    if (target.uid === currentUser.uid) { showFMsg('addMsg','😅 ما تقدر تضيف نفسك!','err'); return; }
+    if (friendsList.some(f => f.users.includes(target.uid))) { showFMsg('addMsg','✅ هذا الشخص صديقك بالفعل!','inf'); return; }
+    const ex = await db.collection('friend_requests').where('fromUid','==',currentUser.uid).where('toUid','==',target.uid).limit(1).get();
+    if (!ex.empty) { showFMsg('addMsg','⚠️ أرسلت له طلب قبل','inf'); return; }
+    await db.collection('friend_requests').add({
+        fromUid: currentUser.uid, fromName: currentUser.displayName || currentUser.email,
+        fromEmail: currentUser.email, fromPhoto: currentUser.photoURL || '',
+        toUid: target.uid, toName: target.displayName || target.email,
+        status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showFMsg('addMsg',`✅ تم إرسال طلب لـ ${target.displayName || target.email}!`,'ok');
+    document.getElementById('searchFriendInput').value = '';
+    document.getElementById('friendCodeInput').value = '';
+}
+async function acceptReq(id, fromUid) {
+    try {
+        await db.collection('friends').add({ users: [currentUser.uid, fromUid], status: 'accepted', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await db.collection('friend_requests').doc(id).delete();
+        showFMsg('requestsMsg','✅ تم قبول طلب الصداقة!','ok');
+    } catch(e) { showFMsg('requestsMsg','⚠️ خطأ','err'); }
+}
+async function declineReq(id) {
+    try { await db.collection('friend_requests').doc(id).delete(); showFMsg('requestsMsg','تم رفض الطلب','inf'); } catch(e) {}
+}
+async function removeFriend(frId, name) {
+    if (!confirm(`إزالة ${name} من أصدقائك؟`)) return;
+    try { await db.collection('friends').doc(frId).delete(); showFMsg('listMsg',`تمت إزالة ${name}`,'inf'); } catch(e) {}
+}
+function copyCode() {
+    const v = document.getElementById('myFriendCode').value;
+    navigator.clipboard.writeText(v).then(() => showFMsg('addMsg','📋 تم نسخ الكود!','ok')).catch(() => { document.getElementById('myFriendCode').select(); document.execCommand('copy'); showFMsg('addMsg','📋 تم النسخ!','ok'); });
+}
+
+// ── دعوة للعب ──
+function openInviteModal(uid, name, photo) {
+    inviteTarget = { uid, name, photo };
+    const info = document.getElementById('inviteModalInfo');
+    info.innerHTML = `${photo ? `<img class="friend-avatar-sm" src="${photo}">` : `<div class="friend-avatar-placeholder">${name[0]}</div>`}<div><div style="color:#e0e0e0;font-size:0.82rem;font-weight:bold;">${name}</div><div style="color:#666;font-size:0.68rem;">اختر لعبة وكود الغرفة</div></div>`;
+    document.getElementById('inviteGameSel').value = '';
+    document.getElementById('inviteCodeBox').style.display = 'none';
+    document.getElementById('inviteRoomCode').value = '';
+    document.getElementById('inviteModal').style.display = 'block';
+    closeFriendsPanel();
+}
+function onGameSelChange() {
+    document.getElementById('inviteCodeBox').style.display = document.getElementById('inviteGameSel').value ? 'block' : 'none';
+}
+function closeInviteModal() { document.getElementById('inviteModal').style.display = 'none'; inviteTarget = null; }
+async function sendInvite() {
+    if (!inviteTarget) return;
+    const game = document.getElementById('inviteGameSel').value;
+    const code = document.getElementById('inviteRoomCode').value.trim();
+    if (!game) { alert('اختر اللعبة'); return; }
+    if (!code) { alert('أدخل كود الغرفة'); return; }
+    try {
+        await db.collection('game_invites').add({
+            fromUid: currentUser.uid, fromName: currentUser.displayName || currentUser.email,
+            fromPhoto: currentUser.photoURL || '', toUid: inviteTarget.uid,
+            game, roomCode: code, status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeInviteModal();
+        alert(`✅ تم إرسال الدعوة لـ ${inviteTarget.name}!\nسيظهر له الكود في تبويب "دعوات"`);
+    } catch(e) { alert('⚠️ خطأ: ' + e.message); }
+}
+
+// ── قبول دعوة الغرفة ──
+async function acceptInvite(id, game, code) {
+    try {
+        await db.collection('game_invites').doc(id).delete();
+        const gNames = { chess:'الشطرنج', casino:'كازينو النرد', race:'سباق السيارات', spy:'الجاسوس' };
+        if (confirm(`✅ انضمام لـ ${gNames[game]||game}\nكود الغرفة: ${code}\n\nانتقل للعبة الآن؟`)) {
+            if (game === 'chess') { showGame('chess'); setTimeout(() => { const el = document.getElementById('joinCode'); if(el) el.value = code; alert(`أدخل الكود ${code} في خانة "دخول Join"`); }, 500); }
+            else if (game === 'casino') { showGame('casinoOnline'); setTimeout(() => { const el = document.getElementById('casinoRoomCode'); if(el) el.value = code; alert(`الكود ${code} جاهز - اضغط دخول الغرفة`); }, 500); }
+            else if (game === 'race') { showGame('raceOnline'); setTimeout(() => { const el = document.getElementById('raceRoomCode'); if(el) el.value = code; alert(`الكود ${code} جاهز - اضغط دخول الغرفة`); }, 500); }
+            else if (game === 'spy') { showGame('spyOnline'); setTimeout(() => { const el = document.getElementById('roomCode'); if(el) el.value = code; alert(`الكود ${code} جاهز - اضغط دخول`); }, 500); }
+            closeFriendsPanel();
+        }
+    } catch(e) {}
+}
+async function declineInvite(id) {
+    try { await db.collection('game_invites').doc(id).delete(); showFMsg('invitesMsg','تم رفض الدعوة','inf'); } catch(e) {}
+}
+
+function showFMsg(id, txt, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = txt; el.className = 'f-msg ' + type; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3500);
+}
+
+// ===================== باقي كود اللعبة (بدون تغيير) =====================
+let isLocked = false, mPlayers = [], sPlayers = [], players = [], peer = null, myName = "", host = false, votesReceived = [];
+
+const spyPlaces = ["مستشفى","مدرسة","غابة","طائرة","مطعم","فندق","مطار","سفينة","مخيم","قلعة","مسجد","الأردن","فلسطين","شاورما","منسف","تلفزيون","هاتف","غرفة نوم","سيارة","المول","السوبر ماركت","الحلاق","السينما","المسرح","البنك","كازية","مخبز","خياط","صيدلية","عيادة أسنان","مختبر","الجامعة","مدرسة سواقة","حديقة حيوان","السيرك","المتحف","معرض فنون","صالة أفراح","ملعب كرة قدم","نادي رياضي","مسبح","شاطئ","ميناء","محطة قطار","موقف باصات","المترو","جسر","نفق","مطبعة","ورشة نجارة","كراج تصليح","صحراء","واحة","كهف","بركان","شلال","جزيرة","قطب متجمد","قمة جبل","وادي","غابة استوائية","سفينة فضاء","محطة مير","الغواصة","منطاد","هليكوبتر","سفينة حربية","ناقلة نفط","كاسحة ثلوج","أهرامات","البتراء","جرش","قلعة عجلون","قصر أموي","معبد قديم","بيت مهجور","سفينة قراصنة","مدينة مفقودة"];
+
+function addMafiaPlayer() { let n=$('#mafiaPlayerName').val().trim(); if(n){mPlayers.push(n);$('#mafia-preview').html("👥 اللاعبين: "+mPlayers.join(" - "));$('#mafiaPlayerName').val("").focus();} }
+function getRolesDistribution(pl) {
+    let count=pl.length,roles=[],hasSilent=(count>=9),hasChild=(count>=9),cit=count-1-1-(hasSilent?1:0)-(hasChild?1:0);
+    if(cit<0)cit=0;
+    roles.push({type:'mafia',name:'مافيا 🔪 (قاتل)',class:'mafia-role'});
+    if(hasSilent)roles.push({type:'silent_mafia',name:'مافيا تسكيت 🤐',class:'silent-role'});
+    roles.push({type:'doctor',name:'دكتور 💉',class:'doctor-role'});
+    if(hasChild)roles.push({type:'child',name:'ولد 👶 (يضرب إذا اجتمع مع مافيا)',class:'child-role'});
+    for(let i=0;i<cit;i++)roles.push({type:'citizen',name:'مواطن 🧑‍🌾',class:'citizen-role'});
+    for(let i=roles.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[roles[i],roles[j]]=[roles[j],roles[i]];}
     return roles;
 }
-
 function startMafiaDist() {
-    if(mPlayers.length < 4) {
-        alert("⚠️ لازم 4 لاعبين على الأقل!");
-        return;
-    }
-    
-    let narratorIdx = Math.floor(Math.random() * mPlayers.length);
-    let narratorName = mPlayers[narratorIdx];
-    let playersList = mPlayers.filter((_, i) => i !== narratorIdx);
-    let rolesList = getRolesDistribution(playersList);
-    
-    while(rolesList.length < playersList.length) rolesList.push({type:'citizen', name:'مواطن 🧑‍🌾', class:'citizen-role'});
-    while(rolesList.length > playersList.length) rolesList.pop();
-    
-    $('#mafia-setup').hide();
-    $('#mafia-board').removeClass('hidden');
-    $('#narrator-name').html(`<div class="narrator-box">🎭 الراوي: ${narratorName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
-    
-    let container = $('#mafia-cards-container').empty();
-    
-    playersList.forEach((player, idx) => {
-        let role = rolesList[idx];
-        let card = $(`
-            <div class="mafia-card" data-player="${player}" data-role-type="${role.type}">
-                <strong style="font-size:1.1rem;">${player}</strong>
-                <div class="role-display" style="margin-top:10px;">
-                    <span class="role-badge ${role.class}">${role.name}</span>
-                    ${role.type === 'child' ? '<div style="font-size:0.7rem; margin-top:5px;">⚔️ إذا التوزيع جمعه مع مافيا يقدر يضرب</div>' : ''}
-                    ${role.type === 'silent_mafia' ? '<div style="font-size:0.7rem;">🤫 يمتلك قدرة إسكات أحد اللاعبين ليلة واحدة</div>' : ''}
-                    ${role.type === 'doctor' ? '<div style="font-size:0.7rem;">💊 يستطيع حماية شخص واحد كل ليلة من المافيا</div>' : ''}
-                </div>
-            </div>
-        `);
-        
-        card.click(function() {
-            if(isLocked) return;
-            isLocked = true;
-            $('.mafia-card').addClass('locked');
-            $(this).removeClass('locked');
-            $(this).find('strong').hide();
-            $(this).find('.role-display').fadeIn();
-            setTimeout(() => {
-                $(this).addClass('fade-out');
-                setTimeout(() => {
-                    $(this).css('visibility', 'hidden');
-                    isLocked = false;
-                    $('.mafia-card').removeClass('locked');
-                }, 500);
-            }, 3500);
-        });
+    if(mPlayers.length<4){alert("⚠️ لازم 4 لاعبين على الأقل!");return;}
+    let nIdx=Math.floor(Math.random()*mPlayers.length),nName=mPlayers[nIdx],pl=mPlayers.filter((_,i)=>i!==nIdx),rl=getRolesDistribution(pl);
+    while(rl.length<pl.length)rl.push({type:'citizen',name:'مواطن 🧑‍🌾',class:'citizen-role'});
+    while(rl.length>pl.length)rl.pop();
+    $('#mafia-setup').hide();$('#mafia-board').removeClass('hidden');
+    $('#narrator-name').html(`<div class="narrator-box">🎭 الراوي: ${nName}<br><span style="font-size:0.7rem;">(يدير اللعبة ويعلن النتائج)</span></div>`);
+    let container=$('#mafia-cards-container').empty();
+    pl.forEach((player,idx)=>{
+        let role=rl[idx];
+        let card=$(`<div class="mafia-card" data-player="${player}" data-role-type="${role.type}"><strong style="font-size:1.1rem;">${player}</strong><div class="role-display" style="margin-top:10px;"><span class="role-badge ${role.class}">${role.name}</span>${role.type==='child'?'<div style="font-size:0.7rem; margin-top:5px;">⚔️ إذا التوزيع جمعه مع مافيا يقدر يضرب</div>':''}${role.type==='silent_mafia'?'<div style="font-size:0.7rem;">🤫 يمتلك قدرة إسكات أحد اللاعبين ليلة واحدة</div>':''}${role.type==='doctor'?'<div style="font-size:0.7rem;">💊 يستطيع حماية شخص واحد كل ليلة من المافيا</div>':''}</div></div>`);
+        card.click(function(){if(isLocked)return;isLocked=true;$('.mafia-card').addClass('locked');$(this).removeClass('locked');$(this).find('strong').hide();$(this).find('.role-display').fadeIn();setTimeout(()=>{$(this).addClass('fade-out');setTimeout(()=>{$(this).css('visibility','hidden');isLocked=false;$('.mafia-card').removeClass('locked');},500);},3500);});
         container.append(card);
     });
 }
 
-// ===================== الجاسوس أوفلاين =====================
-function addSpyPlayer() {
-    let n = $('#spyPlayerName').val().trim();
-    if(n){
-        sPlayers.push(n);
-        $('#spy-preview').text("👥 اللاعبين: " + sPlayers.join(" - "));
-        $('#spyPlayerName').val("").focus();
-    }
-}
-
-function startSpyDist() {
-    if(sPlayers.length < 3) {
-        alert("⚠️ لازم 3 لاعبين على الأقل!");
-        return;
-    }
-    let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-    let spyIdx = Math.floor(Math.random() * sPlayers.length);
-    let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`);
-    
-    $('#spy-setup').hide();
-    $('#spy-board').removeClass('hidden');
-    let container = $('#spy-cards-container').empty();
-    
-    sPlayers.forEach((player, i) => {
-        let card = $(`
-            <div class="spy-card">
-                <strong>${player}</strong>
-                <div class="role-display" style="color: #0f0; font-size:1rem;">${roles[i]}</div>
-            </div>
-        `);
-        card.click(function() {
-            if(isLocked) return;
-            isLocked = true;
-            $('.spy-card').addClass('locked');
-            $(this).removeClass('locked');
-            $(this).find('strong').hide();
-            $(this).find('.role-display').fadeIn();
-            setTimeout(() => {
-                $(this).addClass('fade-out');
-                setTimeout(() => {
-                    $(this).css('visibility', 'hidden');
-                    isLocked = false;
-                    $('.spy-card').removeClass('locked');
-                }, 500);
-            }, 3000);
-        });
+function addSpyPlayer(){let n=$('#spyPlayerName').val().trim();if(n){sPlayers.push(n);$('#spy-preview').text("👥 اللاعبين: "+sPlayers.join(" - "));$('#spyPlayerName').val("").focus();}}
+function startSpyDist(){
+    if(sPlayers.length<3){alert("⚠️ لازم 3 لاعبين على الأقل!");return;}
+    let place=spyPlaces[Math.floor(Math.random()*spyPlaces.length)],spyIdx=Math.floor(Math.random()*sPlayers.length),roles=sPlayers.map((_,i)=>i===spyIdx?"🕵️ أنت الجاسوس! المكان مختلف":`📍 المكان: ${place}`);
+    $('#spy-setup').hide();$('#spy-board').removeClass('hidden');
+    let container=$('#spy-cards-container').empty();
+    sPlayers.forEach((player,i)=>{
+        let card=$(`<div class="spy-card"><strong>${player}</strong><div class="role-display" style="color:#0f0;font-size:1rem;">${roles[i]}</div></div>`);
+        card.click(function(){if(isLocked)return;isLocked=true;$('.spy-card').addClass('locked');$(this).removeClass('locked');$(this).find('strong').hide();$(this).find('.role-display').fadeIn();setTimeout(()=>{$(this).addClass('fade-out');setTimeout(()=>{$(this).css('visibility','hidden');isLocked=false;$('.spy-card').removeClass('locked');},500);},3000);});
         container.append(card);
     });
 }
 
-// ===================== الجاسوس أونلاين =====================
-function hostRoom() {
-    myName = $('#spyNick').val().trim();
-    if(!myName) { alert("اكتب اسمك"); return; }
-    host = true;
-    let id = "ROOM_" + Math.floor(100 + Math.random() * 899);
-    peer = new Peer(id);
-    peer.on('open', (i) => {
-        $('#spy-online-setup').hide();
-        $('#lobby').removeClass('hidden');
-        $('#display-room-id').text("🔑 كود الغرفة: " + i);
-        players.push({name: myName, id: i});
-        updateLobby();
-        $('#start-btn').show();
-    });
-    peer.on('connection', c => {
-        c.on('data', d => {
-            if(d.type === 'join') {
-                players.push({name: d.name, id: c.peer});
-                broadcast({type: 'list', list: players});
-                updateLobby();
-            }
-            if(d.type === 'vote') handleOnlineVote(d.voter, d.target);
-        });
-    });
-}
+function hostRoom(){myName=$('#spyNick').val().trim();if(!myName){alert("اكتب اسمك");return;}host=true;let id="ROOM_"+Math.floor(100+Math.random()*899);peer=new Peer(id);peer.on('open',(i)=>{$('#spy-online-setup').hide();$('#lobby').removeClass('hidden');$('#display-room-id').text("🔑 كود الغرفة: "+i);players.push({name:myName,id:i});updateLobby();$('#start-btn').show();});peer.on('connection',c=>{c.on('data',d=>{if(d.type==='join'){players.push({name:d.name,id:c.peer});broadcast({type:'list',list:players});updateLobby();}if(d.type==='vote')handleOnlineVote(d.voter,d.target);});});}
+function joinRoom(){myName=$('#spyNick').val().trim();let code=$('#roomCode').val().trim();if(!myName||!code){alert("اكتب اسمك والكود");return;}peer=new Peer();peer.on('open',id=>{let conn=peer.connect(code);conn.on('open',()=>{conn.send({type:'join',name:myName});$('#spy-online-setup').hide();$('#lobby').removeClass('hidden');});conn.on('data',d=>{if(d.type==='list'){players=d.list;updateLobby();}if(d.type==='start')startOnlineGameView(d.role,d.names);if(d.type==='res')showOnlineFinalResults(d.spy,d.logs);});});}
+function updateLobby(){$('#online-players-list').text("👥 المتصلين: "+players.map(p=>p.name).join(" - "));}
+function broadcast(d){if(peer&&peer.connections){Object.values(peer.connections).forEach(c=>{if(c[0])c[0].send(d);});}}
+function startOnlineGame(){let place=spyPlaces[Math.floor(Math.random()*spyPlaces.length)],spyIdx=Math.floor(Math.random()*players.length);peer.actualSpy=players[spyIdx].name;votesReceived=[];players.forEach((p,i)=>{let role=(i===spyIdx)?"🕵️ أنت الجاسوس! المكان مختلف":`📍 المكان: ${place}`;if(p.name===myName){startOnlineGameView(role,players.map(pl=>pl.name));}else{let conn=Object.values(peer.connections).find(c=>c[0]&&c[0].peer===p.id);if(conn&&conn[0])conn[0].send({type:'start',role:role,names:players.map(pl=>pl.name)});}});}
+function startOnlineGameView(role,names){$('#lobby').hide();$('#game-play').removeClass('hidden');$('#my-role').text(role).hide();$('#vote-log-container').empty();$('#final-result').empty();$('#vote-title').show();let btns=$('#vote-btns').empty().show();names.forEach(n=>{if(n!==myName)btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`);});}
+function sendOnlineVote(target){$('.vote-btn').addClass('locked');if(host){handleOnlineVote(myName,target);}else{let conn=Object.values(peer.connections)[0];if(conn&&conn[0])conn[0].send({type:'vote',voter:myName,target:target});}}
+function handleOnlineVote(voter,target){votesReceived.push(`${voter} صوت لـ ${target}`);if(votesReceived.length>=players.length){let result={type:'res',spy:peer.actualSpy,logs:votesReceived};broadcast(result);showOnlineFinalResults(peer.actualSpy,votesReceived);}}
+function showOnlineFinalResults(spyName,logs){$('#vote-btns').hide();$('#vote-title').hide();let html="<strong>📊 نتائج التصويت:</strong><br>";logs.forEach(l=>html+=`<div class="vote-log-item">${l}</div>`);$('#vote-log-container').html(html);$('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);}
 
-function joinRoom() {
-    myName = $('#spyNick').val().trim();
-    let code = $('#roomCode').val().trim();
-    if(!myName || !code) { alert("اكتب اسمك والكود"); return; }
-    peer = new Peer();
-    peer.on('open', id => {
-        let conn = peer.connect(code);
-        conn.on('open', () => {
-            conn.send({type: 'join', name: myName});
-            $('#spy-online-setup').hide();
-            $('#lobby').removeClass('hidden');
-        });
-        conn.on('data', d => {
-            if(d.type === 'list') { players = d.list; updateLobby(); }
-            if(d.type === 'start') startOnlineGameView(d.role, d.names);
-            if(d.type === 'res') showOnlineFinalResults(d.spy, d.logs);
-        });
-    });
-}
+// شطرنج
+let chessBoard=null,chessGame=new Chess(),chessConn=null,myChessColor='w',selectedChessSq=null,timerInterval=null,timeLeft=25,gameActive=true,moveHistory=[],suggestionEnabled=false,suggestionInterval=null,isAIPlaying=false,aiInterval=null;
+function getAIMove(){let moves=chessGame.moves({verbose:true});if(moves.length===0)return null;let bestMove=moves[0],bestScore=-Infinity;for(let move of moves){let score=0,target=chessGame.get(move.to);if(target){let pv={'p':1,'n':3.2,'b':3.3,'r':5,'q':9,'k':100};score+=pv[target.type]||0;}let tg=new Chess(chessGame.fen()),ex=tg.move({from:move.from,to:move.to,promotion:'q'});if(ex){if(tg.in_checkmate())score+=1000;if(tg.in_check())score+=5;let piece=chessGame.get(move.from);if(piece&&(piece.type==='n'||piece.type==='b')){if(['b1','g1','b8','g8'].includes(move.from))score+=1.5;}let om=tg.moves({verbose:true});for(let om2 of om){let cap=tg.get(om2.to);if(cap&&cap.color===tg.turn()&&om2.to===move.to){score-=({'p':1,'n':3,'b':3,'r':5,'q':9}[cap.type]||0)*0.6;break;}}}if(score>bestScore){bestScore=score;bestMove=move;}}return bestMove;}
+function aiMakeMove(){if(!gameActive||!isAIPlaying)return;if(chessGame.game_over()){isAIPlaying=false;if(aiInterval)clearInterval(aiInterval);return;}if(chessGame.turn()!==myChessColor)return;let move=getAIMove();if(move){chessGame.move({from:move.from,to:move.to,promotion:'q'});addMoveToHistory(move);chessBoard.position(chessGame.fen());if(chessConn)chessConn.send({f:move.from,t:move.to});updateChessStatus();stopTimer();if(!chessGame.game_over()){if(chessGame.turn()===myChessColor)startTimer();else $('#timer-display').text('⏱️ انتظر دور الخصم');}else endGame('🤖 الـ AI حقق الفوز! كش ملك 👑');}}
+function startAIPlaying(){if(!gameActive){addFakeMessage("❌ المباراة انتهت",true);return;}if(chessGame.turn()!==myChessColor){addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI (77)",true);return;}if(isAIPlaying){addFakeMessage("⚠️ الـ AI يعمل بالفعل",true);return;}isAIPlaying=true;addFakeMessage("🤖 تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز 🏆",true);if(aiInterval)clearInterval(aiInterval);aiMakeMove();aiInterval=setInterval(()=>{if(isAIPlaying&&gameActive&&chessGame.turn()===myChessColor&&!chessGame.game_over())aiMakeMove();},500);}
+function stopAIPlaying(){if(!isAIPlaying){addFakeMessage("⚠️ الـ AI ليس مفعل",true);return;}isAIPlaying=false;if(aiInterval)clearInterval(aiInterval);addFakeMessage("🛑 تم إيقاف الـ AI من اللوحة السرية، ارجعت تلعب بنفسك",true);}
+function sendSuggestion(){if(!suggestionEnabled||chessGame.game_over()||chessGame.turn()!==myChessColor)return;let best=getAIMove();if(best){let piece=chessGame.get(best.from),pn=piece?({'p':'بيدق','n':'حصان','b':'فيل','r':'قلعة','q':'ملكة','k':'ملك'}[piece.type]||'قطعة'):'قطعة',tp=chessGame.get(best.to),et=tp?` ويأكل ${({'p':'بيدق','n':'حصان','b':'فيل','r':'قلعة','q':'ملكة'}[tp.type]||'قطعة')}`:'';addFakeMessage(`💡 الـ AI يقترح: حرك ${pn} من ${best.from} إلى ${best.to}${et}`,true);}}
+function toggleSuggestion(){suggestionEnabled=!suggestionEnabled;if(suggestionEnabled){addFakeMessage("💡 الاقتراحات مفعلة",true);sendSuggestion();if(suggestionInterval)clearInterval(suggestionInterval);suggestionInterval=setInterval(()=>{if(suggestionEnabled&&!chessGame.game_over()&&chessGame.turn()===myChessColor)sendSuggestion();},12000);}else{if(suggestionInterval)clearInterval(suggestionInterval);addFakeMessage("🔇 الاقتراحات معطلة",true);}}
+function showSecretPanel(){$('.secret-panel').remove();let panel=$(`<div class="secret-panel"><h3 style="color:gold;">🎮 التحكم السري 🎮</h3><button id="secret-ai-start">🤖 تشغيل الـ AI (يلعب عني)</button><button id="secret-ai-stop">🛑 إيقاف الـ AI</button><button id="secret-suggestions-on">💡 تفعيل الاقتراحات</button><button id="secret-suggestions-off">🔇 إيقاف الاقتراحات</button><button id="secret-close" style="background:#da291c;">❌ إغلاق</button></div>`);$('body').append(panel);$('#secret-ai-start').on('click',()=>{startAIPlaying();$('.secret-panel').remove();});$('#secret-ai-stop').on('click',()=>{stopAIPlaying();$('.secret-panel').remove();});$('#secret-suggestions-on').on('click',()=>{if(!suggestionEnabled)toggleSuggestion();$('.secret-panel').remove();});$('#secret-suggestions-off').on('click',()=>{if(suggestionEnabled)toggleSuggestion();$('.secret-panel').remove();});$('#secret-close').on('click',()=>{$('.secret-panel').remove();});}
+function addBoardCoordinates(){setTimeout(()=>{let boardEl=$('#board .chessboard-js');if(!boardEl.length)boardEl=$('#board');boardEl.css('position','relative');$('.board-coords').remove();let files=['a','b','c','d','e','f','g','h'],ranks=['8','7','6','5','4','3','2','1'],sq=boardEl.width()/8;for(let i=0;i<8;i++){boardEl.append($(`<div class="board-coords file-coord" style="left:${i*sq+sq/2-8}px;bottom:2px;">${files[i]}</div>`));boardEl.append($(`<div class="board-coords rank-coord" style="top:${i*sq+sq/2-8}px;right:2px;">${ranks[i]}</div>`));}},100);}
+function addFakeMessage(msg,isSystem=false){let d=$('<p></p>').text(msg);if(isSystem)d.css('color','#ffaa00').css('font-style','italic');else d.css('color','#0f0');$('#chat-messages').append(d);$('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);}
+function hackWin(){if(!gameActive)return;gameActive=false;stopTimer();stopAIPlaying();let wt=myChessColor==='w'?'الأبيض':'الأسود';$('#turn-display').html('🔥 اختراق ناجح! '+wt+' فاز بواسطة الكود السري 🔥');if(chessConn)chessConn.send({type:'hack_lose'});alert('🔥 اختراق ناجح! 🔥\n'+wt+' فاز بواسطة الكود السري');}
+function setupFakeChat(){$('#send-chat-btn').off('click').on('click',function(){let msg=$('#chat-input').val().trim();if(msg==="")return;if(msg==="77"){showSecretPanel();$('#chat-input').val("");return;}if(msg==="079866"){setTimeout(()=>{hackWin();},50);$('#chat-input').val("");return;}addFakeMessage("أنت: "+msg);$('#chat-input').val("");setTimeout(()=>{addFakeMessage("الخصم: "+["هاها 😄","يلا نلعب","بس شوي","قوي يالحب","شطرنج مو سهلة","🤔🤔","وين كنت؟","تمام","ماشي","تصدق؟","ع السلامة"][Math.floor(Math.random()*11)],false);},1000+Math.random()*2000);});$('#chat-input').off('keypress').on('keypress',function(e){if(e.which===13)$('#send-chat-btn').click();});}
+const whiteKingPhoto='https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
+const blackKingPhoto='https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
+function updateMoveHistory(){let html='';moveHistory.forEach((m,i)=>{html+=`<p>${i+1}. ${m}</p>`;});$('#history-list').html(html);$('#move-history').scrollTop($('#move-history')[0].scrollHeight);}
+function addMoveToHistory(move){let t=`${move.from} → ${move.to}`;if(move.promotion)t+=` (ترقية لـ ${move.promotion})`;moveHistory.push(t);updateMoveHistory();}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function startTimer(){if(!gameActive||chessGame.game_over())return;if(chessGame.turn()!==myChessColor){$('#timer-display').text('⏱️ انتظر دور الخصم');return;}timeLeft=25;updateTimerDisplay();if(timerInterval)stopTimer();timerInterval=setInterval(()=>{if(!gameActive)return;if(chessGame.turn()!==myChessColor){stopTimer();$('#timer-display').text('⏱️ انتظر دور الخصم');return;}if(chessGame.game_over()){stopTimer();return;}timeLeft--;updateTimerDisplay();if(timeLeft<=0){stopTimer();gameActive=false;stopAIPlaying();let loser=myChessColor==='w'?'الأبيض':'الأسود';alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);$('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);if(chessConn)chessConn.send({type:'timeout',loser:myChessColor});$('#timer-display').text('💀 وقت منتهي');}},1000);}
+function updateTimerDisplay(){let d=`⏱️ ${timeLeft.toString().padStart(2,'0')} ث`;$('#timer-display').text(d);$('#timer-display').css('color',timeLeft<=5?'#ff0000':'#ff0');}
+function endGame(msg){gameActive=false;stopTimer();stopAIPlaying();if(suggestionInterval)clearInterval(suggestionInterval);alert(msg);$('#turn-display').text(msg);}
+function updateChessStatus(){let s=chessGame.turn()==='w'?"دور الأبيض":"دور الأسود";if(chessGame.in_checkmate())s="كش ملك! انتهت اللعبة.";else if(chessGame.in_stalemate())s="تعادل";else if(chessGame.in_threefold_repetition())s="تعادل (تكرار)";$('#turn-display').text(s);}
+function initChess(){$('#setup-area').show();$('#turn-display').text('انتظار اللاعب الآخر...');gameActive=true;suggestionEnabled=false;isAIPlaying=false;if(suggestionInterval)clearInterval(suggestionInterval);if(aiInterval)clearInterval(aiInterval);moveHistory=[];updateMoveHistory();$('#chat-messages').empty();setupFakeChat();chessGame=new Chess();selectedChessSq=null;timeLeft=25;chessBoard=Chessboard('board',{draggable:false,orientation:myChessColor==='w'?'white':'black',position:'start',pieceTheme:(p)=>{if(p==='wK')return whiteKingPhoto;if(p==='bK')return blackKingPhoto;return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}',p);}});addBoardCoordinates();$('#board').off('click').on('click','.square-55d63',function(){if(!gameActive)return;if(isAIPlaying){addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص",true);return;}if(chessGame.turn()!==myChessColor)return;let sq=$(this).data('square'),piece=chessGame.get(sq);if(piece&&piece.color===myChessColor){$('.square-55d63').removeClass('highlight-selected');$('.highlight-hint').remove();selectedChessSq=sq;$(this).addClass('highlight-selected');chessGame.moves({square:sq,verbose:true}).forEach(m=>{$('.square-'+m.to).append('<div class="highlight-hint"></div>');});}else if(selectedChessSq){let move=chessGame.move({from:selectedChessSq,to:sq,promotion:'q'});if(move){addMoveToHistory(move);chessBoard.position(chessGame.fen());if(chessConn)chessConn.send({f:selectedChessSq,t:sq});updateChessStatus();stopTimer();if(!chessGame.game_over()){if(chessGame.turn()===myChessColor)startTimer();else $('#timer-display').text('⏱️ انتظر دور الخصم');}else endGame(chessGame.in_checkmate()?'كش ملك! انتهت اللعبة.':'انتهت اللعبة.');}$('.square-55d63').removeClass('highlight-selected');$('.highlight-hint').remove();selectedChessSq=null;}});$('#resign-btn').off('click').on('click',function(){if(!gameActive)return;if(confirm('هل أنت متأكد من الانسحاب؟')){endGame(`${myChessColor==='w'?'الأبيض':'الأسود'} انسحب. الفوز للخصم.`);if(chessConn)chessConn.send({type:'resign',color:myChessColor});}});$('#draw-btn').off('click').on('click',function(){if(!gameActive)return;if(confirm('طلب تعادل. انتظر رد الخصم...')){alert('تم إرسال طلب التعادل إلى الخصم');if(chessConn)chessConn.send({type:'draw_request'});}});}
+function hostGame(){let id=Math.floor(1000+Math.random()*9000).toString(),peerChess=new Peer("AHMED_CHESS_"+id);peerChess.on('open',()=>alert("🔑 كودك للخصم: "+id));peerChess.on('connection',c=>{chessConn=c;myChessColor='w';initChess();setupChessReceiver();if(chessGame.turn()===myChessColor&&gameActive)startTimer();});}
+function joinGame(){let code=$('#joinCode').val(),peerChess=new Peer();peerChess.on('open',()=>{chessConn=peerChess.connect("AHMED_CHESS_"+code);chessConn.on('open',()=>{myChessColor='b';initChess();setupChessReceiver();if(chessGame.turn()===myChessColor&&gameActive)startTimer();});});}
+function setupChessReceiver(){chessConn.on('data',data=>{if(data.f&&data.t){chessGame.move({from:data.f,to:data.t,promotion:'q'});addMoveToHistory({from:data.f,to:data.t,promotion:'q'});chessBoard.position(chessGame.fen());updateChessStatus();stopTimer();if(!chessGame.game_over()){if(chessGame.turn()===myChessColor)startTimer();else $('#timer-display').text('⏱️ انتظر دور الخصم');}else endGame(chessGame.in_checkmate()?'كش ملك! انتهت اللعبة.':'انتهت اللعبة.');}else if(data.type==='timeout'){endGame(`⏰ الخصم خسر لأن وقته انتهى!`);}else if(data.type==='resign'){endGame(`🏆 الخصم انسحب. فزت! 🏆`);}else if(data.type==='draw_request'){if(confirm('🤝 الخصم يطلب التعادل. هل توافق؟')){endGame('تعادل! انتهت المباراة بالتعادل.');chessConn.send({type:'draw_accept'});}else{chessConn.send({type:'draw_reject'});}}else if(data.type==='draw_accept'){endGame('تم قبول طلب التعادل! انتهت المباراة.');}else if(data.type==='hack_lose'){gameActive=false;stopTimer();stopAIPlaying();alert('🔥 الخصم قام بعملية اختراق! لقد خسرت المباراة.');$('#turn-display').html('🔥 الخصم اخترق اللعبة! لقد خسرت 🔥');}});}
 
-function updateLobby() {
-    $('#online-players-list').text("👥 المتصلين: " + players.map(p => p.name).join(" - "));
-}
+// لعبة القفز
+let jumpGameStarted=false;
+function showGameWithPassword(){$('#main-menu').hide();const overlay=document.createElement('div');overlay.className='password-overlay';overlay.innerHTML=`<div class="password-box"><h3>🔐 كلمة السر للقفز</h3><p> = الوضع العادي | = الوضع السهل</p><input type="password" id="jumpPasswordInput" placeholder="أدخل كلمة السر" maxlength="10" autocomplete="off"><button id="submitJumpPassword">دخول</button></div>`;document.body.appendChild(overlay);document.getElementById('submitJumpPassword').onclick=()=>{const pwd=document.getElementById('jumpPasswordInput').value;if(pwd==="567"||pwd==="345"){overlay.remove();$('#jump-section').removeClass('hidden');startJumpGame(pwd==="345");}else{document.getElementById('jumpPasswordInput').value="";alert("⚠️ كلمة سر خاطئة!");}};document.getElementById('jumpPasswordInput').onkeypress=(e)=>{if(e.key==='Enter')document.getElementById('submitJumpPassword').click();};}
+function startJumpGame(isEasyMode){if(jumpGameStarted)return;jumpGameStarted=true;const container=document.getElementById('jumpGameContainer');container.innerHTML=`<style>.jump-game-wrapper *{user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}.jump-game-wrapper{background:linear-gradient(145deg,#0a2f1f,#051a0e);display:flex;justify-content:center;align-items:center;min-height:80vh;font-family:'Segoe UI',system-ui,sans-serif;margin:0;padding:10px;}.jump-game-container{background:#2c4a2e;border-radius:40px;padding:15px;box-shadow:0 20px 35px rgba(0,0,0,0.5);border:2px solid #d4af37;text-align:center;max-width:1000px;width:100%;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;}.jump-game-main{flex:2;min-width:280px;}.jump-shop-sidebar{background:#1f2a1bdd;backdrop-filter:blur(10px);border-radius:30px;padding:15px;width:220px;border:1px solid gold;align-self:start;}.jump-score-board{display:flex;justify-content:space-between;margin-bottom:15px;gap:10px;flex-wrap:wrap;}.jump-score-card{background:#000000aa;padding:5px 12px;border-radius:40px;font-weight:bold;color:#ffd966;font-size:1rem;}.jump-controls{margin-top:15px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap;}.jump-btn{background:#dba53f;border:none;font-weight:bold;padding:12px 25px;border-radius:50px;cursor:pointer;font-size:1.1rem;transition:transform 0.05s;}.jump-btn:active{transform:scale(0.95);}.jump-reset-btn{background:#e74c3c;color:white;}.jump-jump-btn{background:#2ecc71;color:white;font-size:1.3rem;padding:12px 30px;}.jump-info{margin-top:15px;padding:8px;border-radius:30px;background:#000000aa;color:#ffd966;font-weight:bold;font-size:0.8rem;}.jump-shop-title{text-align:center;color:#ffd966;font-size:1.3rem;margin-bottom:15px;cursor:pointer;}.jump-shop-items{display:flex;flex-direction:column;gap:12px;}.jump-shop-item{background:#2c3e2f;border-radius:30px;padding:8px;text-align:center;cursor:pointer;border:1px solid #f1c40f;transition:0.05s;}.jump-shop-item:active{transform:scale(0.96);}.jump-shop-item.disabled{opacity:0.5;pointer-events:none;filter:grayscale(0.3);}.jump-shop-item h4{margin:0;color:#f9e79f;font-size:0.9rem;}.jump-shop-item p{margin:4px 0;font-size:0.7rem;color:#ccc;}.jump-stars-badge{background:#000000aa;padding:5px;border-radius:30px;text-align:center;margin-bottom:15px;font-weight:bold;color:gold;}@media(max-width:750px){.jump-shop-sidebar{width:100%;order:2;}.jump-game-main{order:1;}}</style><div class="jump-game-wrapper"><div class="jump-game-container"><div class="jump-game-main"><div class="jump-score-board"><div class="jump-score-card">⭐ النقاط: <span id="jump-score">0</span></div><div class="jump-score-card">🏆 أعلى نتيجة: <span id="jump-highScore">0</span></div><div class="jump-score-card">❤️ الصحة: <span id="jump-health">${isEasyMode?5:3}</span></div></div><canvas id="jumpGameCanvas" width="800" height="400" style="width:100%;height:auto;max-width:800px;aspect-ratio:800/400"></canvas><div class="jump-controls"><button class="jump-btn jump-jump-btn" id="jumpButtonMobileJump">🦘 قفز</button><button class="jump-btn jump-reset-btn" id="jumpResetBtn">🔄 إعادة</button></div><div class="jump-info" id="jump-info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div></div><div class="jump-shop-sidebar"><div class="jump-shop-title">🛒 المتجر 🛒</div><div class="jump-stars-badge">⭐ نقاط الشراء: <span id="jump-starPoints">0</span></div><div class="jump-shop-items" id="jumpShopContainer"></div><div style="font-size:0.6rem;text-align:center;margin-top:10px;color:#aaa;">اضغط على العنصر لشرائه</div></div></div></div>`;
+const canvas=document.getElementById('jumpGameCanvas'),ctx=canvas.getContext('2d');canvas.width=800;canvas.height=400;
+const hitSound=new Audio('https://files.catbox.moe/cbh2mv.mp3');hitSound.load();
+let JUMP_POWER=isEasyMode?-28:-12,OBSTACLE_SPEED=isEasyMode?3:5,START_HEALTH=isEasyMode?5:3,starPoints=0,hasShield=false,doublePoints=false,slowMotion=false,slowTimer=null;
+const playerImages=[{name:"🥋 البطل 1",url:'https://i.ibb.co/GfM5hw66/IMG-1082.jpg'},{name:"🦸‍♂️ البطل 2",url:'https://i.ibb.co/w9vXM5P/IMG-1086.jpg'},{name:"🧙‍♂️ البطل 3",url:'https://i.ibb.co/jvcths60/IMG-1085.jpg'},{name:"😎 البطل 4",url:"https://i.ibb.co/W4vfZfRG/590286458-796398966772460-2509327364039348328-n.jpg"},{name:"🌟 البطل 5",url:"https://i.ibb.co/p94NQCX/688578316-1013730631218105-9200723146244921732-n.jpg"}];
+let selectedPlayerIndex=0;
+function showCharacterSelection(){return new Promise((resolve)=>{const sd=document.createElement('div');sd.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:2000;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;';const title=document.createElement('h2');title.textContent='🎮 اختر بطلك 🎮';title.style.color='#ffd966';title.style.fontSize='1.8rem';sd.appendChild(title);const cc=document.createElement('div');cc.style.cssText='display:flex;gap:30px;flex-wrap:wrap;justify-content:center;';playerImages.forEach((img,index)=>{const card=document.createElement('div');card.style.cssText=`background:#2c4a2e;border:${index===selectedPlayerIndex?'3px solid #f1c40f':'2px solid #d4af37'};border-radius:20px;padding:20px;cursor:pointer;text-align:center;width:150px;`;const imgEl=document.createElement('img');imgEl.src=img.url;imgEl.style.cssText='width:80px;height:80px;object-fit:cover;border-radius:50%;margin-bottom:10px;';const nameEl=document.createElement('div');nameEl.textContent=img.name;nameEl.style.cssText='color:white;font-weight:bold;';card.appendChild(imgEl);card.appendChild(nameEl);card.onclick=()=>{selectedPlayerIndex=index;document.querySelectorAll('.jump-char-card').forEach(c=>{c.style.border='2px solid #d4af37';});card.style.border='3px solid #f1c40f';};card.className='jump-char-card';cc.appendChild(card);});sd.appendChild(cc);const btn=document.createElement('button');btn.textContent='🚀 ابدأ اللعبة 🚀';btn.style.cssText='background:#2ecc71;color:white;font-size:1.3rem;padding:12px 30px;border:none;border-radius:50px;cursor:pointer;margin-top:20px;';btn.onclick=()=>{sd.remove();resolve();};sd.appendChild(btn);document.body.appendChild(sd);});}
+showCharacterSelection().then(()=>{const selImg=new Image();selImg.src=playerImages[selectedPlayerIndex].url;const GROUND_Y=340;let score=0,highScore=localStorage.getItem('jumpHighScore567')||0,health=START_HEALTH,gameRunning=true;const player={x:100,y:GROUND_Y-40,width:45,height:45,velocityY:0,isJumping:false,originalY:GROUND_Y-40};let obstacles=[],stars=[],particles=[],obstacleTimer=0,starTimer=0;const GRAVITY=0.8;document.getElementById('jump-highScore').innerHTML=highScore;document.getElementById('jump-health').innerHTML=health;const obstacleImg=new Image();obstacleImg.src='https://i.imgur.com/Prv0riC.jpeg';let obstacleImgFailed=false;obstacleImg.onerror=()=>{obstacleImgFailed=true;};
+function updateShopUI(){document.getElementById('jump-starPoints').innerText=starPoints;const c=document.getElementById('jumpShopContainer');c.innerHTML=`<div class="jump-shop-item ${starPoints>=150&&!hasShield?'':'disabled'}" onclick="window.buyJumpItem('shield')"><h4>🛡️ درع واقي</h4><p>يمتص ضربة واحدة</p><p>⭐ 150 نقطة</p></div><div class="jump-shop-item ${starPoints>=250&&!doublePoints?'':'disabled'}" onclick="window.buyJumpItem('doublePoints')"><h4>⭐ مضاعف نقاط</h4><p>كل نجمة تعطي ضعف</p><p>⭐ 250 نقطة</p></div><div class="jump-shop-item ${starPoints>=180&&!slowMotion?'':'disabled'}" onclick="window.buyJumpItem('slowTime')"><h4>🐢 تباطؤ الوقت</h4><p>عقبات أبطأ 10 ثواني</p><p>⭐ 180 نقطة</p></div><div class="jump-shop-item ${starPoints>=100&&health<(START_HEALTH+2)?'':'disabled'}" onclick="window.buyJumpItem('extraHeart')"><h4>💚 قلب إضافي</h4><p>يزيد الصحة 1 قلب</p><p>⭐ 100 نقطة</p></div>`;}
+window.buyJumpItem=(item)=>{if(!gameRunning){document.getElementById('jump-info').innerHTML='⚠️ اللعبة منتهية، اضغط إعادة';return;}if(item==='shield'&&starPoints>=150&&!hasShield){starPoints-=150;hasShield=true;document.getElementById('jump-info').innerHTML='🛡️ تم شراء الدرع الواقي!';}else if(item==='doublePoints'&&starPoints>=250&&!doublePoints){starPoints-=250;doublePoints=true;document.getElementById('jump-info').innerHTML='⭐ مضاعف النقاط مفعل للأبد!';}else if(item==='slowTime'&&starPoints>=180&&!slowMotion){starPoints-=180;slowMotion=true;if(slowTimer)clearTimeout(slowTimer);slowTimer=setTimeout(()=>{slowMotion=false;document.getElementById('jump-info').innerHTML='⚡ انتهى تأثير التباطؤ';},10000);document.getElementById('jump-info').innerHTML='🐢 تباطؤ العقبات لمدة 10 ثواني!';}else if(item==='extraHeart'&&starPoints>=100&&health<(START_HEALTH+2)){starPoints-=100;health=Math.min(START_HEALTH+2,health+1);document.getElementById('jump-health').innerHTML=health;document.getElementById('jump-info').innerHTML='💚 تم إضافة قلب إضافي!';}else{document.getElementById('jump-info').innerHTML='⚠️ نقاط غير كافية أو تم شراؤه مسبقاً';return;}updateShopUI();};
+function performJump(){if(!gameRunning||player.isJumping)return false;player.velocityY=JUMP_POWER;player.isJumping=true;for(let i=0;i<8;i++)particles.push({x:player.x+22,y:player.y+45,vx:(Math.random()-0.5)*4,vy:Math.random()*4,life:15});return true;}
+function addObstacle(){if(gameRunning)obstacles.push({x:canvas.width,y:GROUND_Y-40,width:45,height:45});}
+function addStar(){if(gameRunning)stars.push({x:canvas.width,y:GROUND_Y-60-Math.random()*40,width:28,height:28,collected:false});}
+function updatePlayer(){if(!gameRunning)return;player.velocityY+=GRAVITY;player.y+=player.velocityY;if(player.y>=player.originalY){player.y=player.originalY;player.isJumping=false;player.velocityY=0;}if(player.y>canvas.height)takeDamage();if(player.y<0){player.y=0;player.velocityY=0;}}
+function takeDamage(){if(!gameRunning)return;if(hasShield){hasShield=false;document.getElementById('jump-info').innerHTML='🛡️ الدرع امتص الضربة!';updateShopUI();return;}health--;document.getElementById('jump-health').innerHTML=health;hitSound.currentTime=0;hitSound.play().catch(e=>console.log);canvas.style.transform='translateX(5px)';setTimeout(()=>canvas.style.transform='',100);if(health<=0){gameRunning=false;document.getElementById('jump-info').innerHTML='💀 انتهت اللعبة! اضغط إعادة 💀';}}
+function addPoints(points){if(!gameRunning)return;let fp=doublePoints?points*2:points;score+=fp;starPoints+=fp;document.getElementById('jump-score').innerHTML=score;updateShopUI();if(score>highScore){highScore=score;localStorage.setItem('jumpHighScore567',highScore);document.getElementById('jump-highScore').innerHTML=highScore;}}
+function updateObjects(){if(!gameRunning)return;let speed=slowMotion?3:OBSTACLE_SPEED;for(let i=0;i<obstacles.length;i++){obstacles[i].x-=speed;if(obstacles[i].x<player.x+45&&obstacles[i].x+45>player.x&&obstacles[i].y<player.y+45&&obstacles[i].y+45>player.y){takeDamage();obstacles.splice(i,1);i--;}}obstacles=obstacles.filter(o=>o.x+45>0);for(let i=0;i<stars.length;i++){stars[i].x-=speed;if(!stars[i].collected&&stars[i].x<player.x+45&&stars[i].x+28>player.x&&stars[i].y<player.y+45&&stars[i].y+28>player.y){stars[i].collected=true;addPoints(isEasyMode?20:10);for(let j=0;j<8;j++)particles.push({x:stars[i].x+14,y:stars[i].y+14,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:15});}}stars=stars.filter(s=>!s.collected&&s.x+28>0);}
+function updateParticles(){for(let i=0;i<particles.length;i++){particles[i].x+=particles[i].vx;particles[i].y+=particles[i].vy;particles[i].life--;}particles=particles.filter(p=>p.life>0);}
+function generateObjects(){if(!gameRunning)return;let or=isEasyMode?70:60,sr=isEasyMode?50:40;obstacleTimer++;if(obstacleTimer>or){obstacleTimer=0;if(Math.random()<0.6)addObstacle();}starTimer++;if(starTimer>sr){starTimer=0;if(Math.random()<0.5)addStar();}}
+function draw(){const gr=ctx.createLinearGradient(0,0,0,GROUND_Y);gr.addColorStop(0,'#1a252f');gr.addColorStop(1,'#2c3e50');ctx.fillStyle=gr;ctx.fillRect(0,0,canvas.width,GROUND_Y);ctx.fillStyle='#5d4e30';ctx.fillRect(0,GROUND_Y,canvas.width,canvas.height-GROUND_Y);ctx.fillStyle='#4caf50';for(let i=0;i<canvas.width;i+=20)ctx.fillRect(i,GROUND_Y-5,10,8);for(let o of obstacles){if(obstacleImg.complete&&obstacleImg.naturalWidth>0&&!obstacleImgFailed)ctx.drawImage(obstacleImg,o.x,o.y,45,45);else{ctx.fillStyle='#e74c3c';ctx.fillRect(o.x,o.y,45,45);}}for(let s of stars){ctx.fillStyle='#f1c40f';ctx.beginPath();let cx=s.x+14,cy=s.y+14;for(let i=0;i<5;i++){let a=(i*72-90)*Math.PI/180,x1=cx+Math.cos(a)*12,y1=cy+Math.sin(a)*12,a2=(i*72+36-90)*Math.PI/180,x2=cx+Math.cos(a2)*5,y2=cy+Math.sin(a2)*5;if(i===0)ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x1,y1);}ctx.fill();}if(selImg.complete)ctx.drawImage(selImg,player.x,player.y,45,45);else{ctx.fillStyle='#3498db';ctx.fillRect(player.x,player.y,45,45);}for(let p of particles){ctx.fillStyle=`rgba(255,215,0,${p.life/15})`;ctx.fillRect(p.x,p.y,4,4);}if(!gameRunning){ctx.fillStyle='#000000aa';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#f1c40f';ctx.font='bold 30px Arial';ctx.textAlign='center';ctx.fillText('GAME OVER',canvas.width/2,canvas.height/2);ctx.textAlign='left';}}
+function gameLoop(){if(gameRunning){updatePlayer();updateObjects();updateParticles();generateObjects();}draw();requestAnimationFrame(gameLoop);}
+function resetGame(){gameRunning=true;score=0;health=START_HEALTH;obstacles=[];stars=[];particles=[];obstacleTimer=0;starTimer=0;player.y=player.originalY;player.velocityY=0;player.isJumping=false;document.getElementById('jump-score').innerHTML='0';document.getElementById('jump-health').innerHTML=START_HEALTH;document.getElementById('jump-info').innerHTML='🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾';}
+document.getElementById('jumpButtonMobileJump').addEventListener('click',(e)=>{e.preventDefault();performJump();});document.getElementById('jumpButtonMobileJump').addEventListener('touchstart',(e)=>{e.preventDefault();performJump();});canvas.addEventListener('click',(e)=>{e.preventDefault();performJump();});canvas.addEventListener('touchstart',(e)=>{e.preventDefault();performJump();});document.addEventListener('keydown',(e)=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();performJump();}});document.getElementById('jumpResetBtn').addEventListener('click',resetGame);resetGame();updateShopUI();gameLoop();});}
 
-function broadcast(d) {
-    if(peer && peer.connections) {
-        Object.values(peer.connections).forEach(c => {
-            if(c[0]) c[0].send(d);
-        });
-    }
-}
+// كازينو
+let casinoPeer=null,casinoConn=null,casinoMyName="",casinoMyBalance=1000,casinoEnemyBalance=1000,casinoCurrentBet=null,casinoIsRolling=false,casinoIsMyTurn=true,casinoRoomHost=false;
+function casinoBetName(t){return{small:'صغير (4-9)',big:'كبير (10-12)',seven:'رقم 7',even:'زوجي',odd:'فردي',double:'زوج متطابق'}[t]||t;}
+function casinoDisplayDice(v1,v2){const ds=['⚀','⚁','⚂','⚃','⚄','⚅'];$('#casinoDie1').text(ds[v1-1]);$('#casinoDie2').text(ds[v2-1]);$('#casinoTotalDisplay').text(`المجموع: ${v1+v2}`);}
+function casinoUpdateUI(){$('#casinoBalance').text(casinoMyBalance);$('#casinoEnemyBalance').text(casinoEnemyBalance);$('#casinoBalance').css('color',casinoMyBalance<=0?'#e74c3c':'#f1c40f');$('#casinoEnemyBalance').css('color',casinoEnemyBalance<=0?'#e74c3c':'#f1c40f');}
+function casinoAddToHistory(msg,isWin){const h=$('#casinoHistoryList'),item=$('<div style="border-bottom:1px solid #333;padding:5px;"></div>');item.html(msg);if(isWin===true)item.css('color','#2ecc71');else if(isWin===false)item.css('color','#e74c3c');h.prepend(item);while(h.children().length>20)h.children().last().remove();}
+function casinoEvaluateBet(d1,d2,t){const tot=d1+d2,isEven=(tot%2===0),isDbl=(d1===d2);switch(t){case'small':return(tot>=4&&tot<=9)?{win:true,multiplier:2}:{win:false,multiplier:0};case'big':return(tot>=10&&tot<=12)?{win:true,multiplier:2}:{win:false,multiplier:0};case'seven':return(tot===7)?{win:true,multiplier:5}:{win:false,multiplier:0};case'even':return(isEven&&tot!==0)?{win:true,multiplier:2}:{win:false,multiplier:0};case'odd':return(!isEven&&tot!==0)?{win:true,multiplier:2}:{win:false,multiplier:0};case'double':return isDbl?{win:true,multiplier:10}:{win:false,multiplier:0};default:return{win:false,multiplier:0};}}
+function casinoRollDice(){if(casinoIsRolling)return;if(!casinoIsMyTurn){$('#casinoResultMessage').html('⏳ دور الخصم حالياً، انتظر دورك').css('color','#f39c12');setTimeout(()=>{if($('#casinoResultMessage').html()==='⏳ دور الخصم حالياً، انتظر دورك')$('#casinoResultMessage').html('');},1500);return;}if(!casinoCurrentBet){$('#casinoResultMessage').html('⚠️ اختر نوع الرهان أولاً!').css('color','#f39c12');setTimeout(()=>{if($('#casinoResultMessage').html()==='⚠️ اختر نوع الرهان أولاً!')$('#casinoResultMessage').html('');},1500);return;}let ba=parseInt($('#casinoBetAmount').val());if(isNaN(ba)||ba<10){$('#casinoResultMessage').html('⚠️ أقل رهان 10 عملات!').css('color','#e74c3c');return;}if(ba>casinoMyBalance){$('#casinoResultMessage').html('❌ رصيدك غير كافي!').css('color','#e74c3c');return;}if(ba>10000){$('#casinoResultMessage').html('⚠️ الحد الأقصى للرهان 10000').css('color','#e74c3c');return;}casinoIsRolling=true;$('#casinoRollBtn').prop('disabled',true);$('#casinoDie1').addClass('rolling');$('#casinoDie2').addClass('rolling');setTimeout(()=>{$('#casinoDie1').removeClass('rolling');$('#casinoDie2').removeClass('rolling');},300);let ri=setInterval(()=>{const f1=Math.floor(Math.random()*6)+1,f2=Math.floor(Math.random()*6)+1,ds=['⚀','⚁','⚂','⚃','⚄','⚅'];$('#casinoDie1').text(ds[f1-1]);$('#casinoDie2').text(ds[f2-1]);$('#casinoTotalDisplay').text(`المجموع: ${f1+f2}`);},50);setTimeout(()=>{clearInterval(ri);const d1=Math.floor(Math.random()*6)+1,d2=Math.floor(Math.random()*6)+1,tot=d1+d2;casinoDisplayDice(d1,d2);const res=casinoEvaluateBet(d1,d2,casinoCurrentBet);let msg='',wa=0;if(res.win){wa=ba*res.multiplier;casinoMyBalance+=wa;msg=`🎉 ربحت! 🎉 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${d1}+${d2}=${tot}) | ربحت ${wa} عملة!`;$('#casinoResultMessage').html(msg).css('color','#2ecc71');casinoAddToHistory(`✅ ${msg}`,true);if(casinoConn)casinoConn.send({type:'opponent_result',win:true,amount:wa,bet:casinoCurrentBet,dice1:d1,dice2:d2});}else{casinoMyBalance-=ba;msg=`💔 خسرت! 💔 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${d1}+${d2}=${tot}) | خسرت ${ba} عملة.`;$('#casinoResultMessage').html(msg).css('color','#e74c3c');casinoAddToHistory(`❌ ${msg}`,false);if(casinoConn)casinoConn.send({type:'opponent_result',win:false,amount:ba,bet:casinoCurrentBet,dice1:d1,dice2:d2});}casinoUpdateUI();casinoIsMyTurn=false;casinoCurrentBet=null;$('.bet-btn').removeClass('selected');if(casinoMyBalance<=0){$('#casinoResultMessage').html(msg+'<br>💀 أفلست! لقد خسرت اللعبة 💀');$('#casinoRollBtn').prop('disabled',true);if(casinoConn)casinoConn.send({type:'game_over',loser:casinoMyName});}else{$('#casinoRollBtn').prop('disabled',false);$('#casinoResultMessage').append('<br>⏳ انتظر دور الخصم...');}casinoIsRolling=false;setTimeout(()=>{if($('#casinoResultMessage').html().includes('انتظر دور الخصم'))$('#casinoResultMessage').html('⏳ انتظر دور الخصم...');},3000);},500);}
+function casinoHostGame(){casinoMyName=$('#casinoPlayerName').val().trim();if(!casinoMyName){alert("اكتب اسمك");return;}casinoRoomHost=true;casinoIsMyTurn=true;let roomId="CASINO_"+Math.floor(1000+Math.random()*9000);casinoPeer=new Peer(roomId);casinoPeer.on('open',()=>{$('#casinoOnlineSetup').hide();$('#casinoLobby').removeClass('hidden');$('#casinoRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>🎲 انتظر اتصال الخصم...`);$('#casinoEnemyInfo').html('⏳ جاري انتظار الخصم...');$('#casinoGameArea').hide();});casinoPeer.on('connection',conn=>{casinoConn=conn;$('#casinoEnemyInfo').html('✅ تم اتصال الخصم! اللعبة تبدأ الآن.');$('#casinoGameArea').fadeIn();casinoSetupReceiver();casinoConn.send({type:'init',myName:casinoMyName,myBalance:casinoMyBalance});casinoUpdateUI();casinoDisplayDice(1,1);});}
+function casinoJoinGame(){casinoMyName=$('#casinoPlayerName').val().trim();let rc=$('#casinoRoomCode').val().trim();if(!casinoMyName){alert("اكتب اسمك");return;}if(!rc){alert("اكتب كود الغرفة");return;}casinoRoomHost=false;casinoPeer=new Peer();casinoPeer.on('open',()=>{casinoConn=casinoPeer.connect(rc);casinoConn.on('open',()=>{$('#casinoOnlineSetup').hide();$('#casinoLobby').removeClass('hidden');$('#casinoRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${rc}`);$('#casinoEnemyInfo').html('✅ تم الاتصال! جاري بدء اللعبة...');$('#casinoGameArea').fadeIn();casinoConn.send({type:'join',myName:casinoMyName,myBalance:casinoMyBalance});casinoSetupReceiver();casinoUpdateUI();casinoDisplayDice(1,1);});});}
+function casinoSetupReceiver(){casinoConn.on('data',data=>{if(data.type==='init'){casinoEnemyBalance=data.myBalance;casinoUpdateUI();casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`,null);$('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);}if(data.type==='join'){casinoEnemyBalance=data.myBalance;casinoUpdateUI();casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`,null);$('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);if(casinoRoomHost){casinoConn.send({type:'start_turn',turn:true});}}if(data.type==='start_turn'){casinoIsMyTurn=true;$('#casinoResultMessage').html('🎲 دورك الآن! اختر رهانك وارمِ النرد').css('color','#2ecc71');setTimeout(()=>{if($('#casinoResultMessage').html()==='🎲 دورك الآن! اختر رهانك وارمِ النرد')$('#casinoResultMessage').html('');},3000);}if(data.type==='opponent_result'){if(data.win){casinoEnemyBalance+=data.amount;casinoAddToHistory(`👤 الخصم ربح ${data.amount} عملة`,true);$('#casinoResultMessage').html(`💥 الخصم ربح ${data.amount} عملة! دورك الآن`).css('color','#f39c12');}else{casinoEnemyBalance-=data.amount;casinoAddToHistory(`👤 الخصم خسر ${data.amount} عملة`,false);$('#casinoResultMessage').html(`✅ الخصم خسر ${data.amount} عملة! دورك الآن`).css('color','#2ecc71');}casinoUpdateUI();casinoIsMyTurn=true;casinoCurrentBet=null;$('.bet-btn').removeClass('selected');$('#casinoRollBtn').prop('disabled',false);setTimeout(()=>{$('#casinoResultMessage').html('🎲 دورك الآن');setTimeout(()=>$('#casinoResultMessage').html(''),2000);},3000);}if(data.type==='game_over'){$('#casinoResultMessage').html(`🏆 فزت! الخصم أفلست 🏆`).css('color','#2ecc71');$('#casinoRollBtn').prop('disabled',true);casinoAddToHistory(`🏆 فوز! الخصم خسر اللعبة`,true);}});}
+function casinoResetGame(){if(casinoConn)casinoConn.send({type:'reset_request'});casinoMyBalance=1000;casinoEnemyBalance=1000;casinoCurrentBet=null;casinoIsMyTurn=casinoRoomHost;casinoUpdateUI();casinoDisplayDice(1,1);$('#casinoResultMessage').html('🔄 تمت إعادة اللعبة!').css('color','#ffd966');$('.bet-btn').removeClass('selected');$('#casinoRollBtn').prop('disabled',false);$('#casinoHistoryList').empty();setTimeout(()=>{if($('#casinoResultMessage').html()==='🔄 تمت إعادة اللعبة!')$('#casinoResultMessage').html('');},2000);}
 
-function startOnlineGame() {
-    let place = spyPlaces[Math.floor(Math.random() * spyPlaces.length)];
-    let spyIdx = Math.floor(Math.random() * players.length);
-    peer.actualSpy = players[spyIdx].name;
-    votesReceived = [];
-    
-    players.forEach((p, i) => {
-        let role = (i === spyIdx) ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 المكان: ${place}`;
-        if(p.name === myName) {
-            startOnlineGameView(role, players.map(pl => pl.name));
-        } else {
-            let conn = Object.values(peer.connections).find(c => c[0] && c[0].peer === p.id);
-            if(conn && conn[0]) conn[0].send({type: 'start', role: role, names: players.map(pl => pl.name)});
-        }
-    });
-}
+// سباق السيارات
+let racePeer=null,raceConn=null,raceMyName="",raceMyBalance=1000,raceEnemyBalance=1000,raceSelectedCar=null,raceCurrentBet=0,raceInProgress=false,raceInterval=null,raceRoomHost=false;
+const raceCars=[{name:"الأحمر",multiplier:2.5,position:0,speed:0},{name:"الأزرق",multiplier:3.0,position:0,speed:0},{name:"الأخضر",multiplier:4.0,position:0,speed:0},{name:"الأصفر",multiplier:5.0,position:0,speed:0}];
+function raceUpdateUI(){$('#raceBalance').text(raceMyBalance);$('#raceEnemyBalance').text(raceEnemyBalance);}
+function raceAddToHistory(msg,isWin){const h=$('#raceHistoryList'),item=$('<div style="border-bottom:1px solid #333;padding:5px;"></div>');item.html(msg);if(isWin===true)item.css('color','#2ecc71');else if(isWin===false)item.css('color','#e74c3c');h.prepend(item);while(h.children().length>15)h.children().last().remove();}
+function raceResetPositions(){for(let i=0;i<raceCars.length;i++){raceCars[i].position=0;$(`#raceProgress${i}`).css('width','0%').text('0%');}}
+function raceStartRace(){if(raceInProgress)return;if(raceSelectedCar===null){$('#raceResultMessage').html('⚠️ اختر سيارة أولاً!');setTimeout(()=>$('#raceResultMessage').html(''),1500);return;}if(raceCurrentBet<=0){$('#raceResultMessage').html('⚠️ ضع رهاناً أولاً!');return;}if(raceCurrentBet>raceMyBalance){$('#raceResultMessage').html('❌ رصيدك غير كافي!');return;}raceInProgress=true;$('#raceStartBtn').prop('disabled',true);$('#racePlaceBetBtn').prop('disabled',true);$('.car-bet-card').css('pointer-events','none');raceMyBalance-=raceCurrentBet;raceUpdateUI();raceAddToHistory(`💰 راهنت بـ ${raceCurrentBet} على ${raceCars[raceSelectedCar].name} (×${raceCars[raceSelectedCar].multiplier})`,null);if(raceConn)raceConn.send({type:'bet_placed',bet:raceCurrentBet,car:raceSelectedCar,balance:raceMyBalance});raceResetPositions();for(let i=0;i<raceCars.length;i++){raceCars[i].speed=Math.random()*2.5+1.2;}if(raceInterval)clearInterval(raceInterval);let raceFinished=false,winner=null;raceInterval=setInterval(()=>{if(raceFinished)return;for(let i=0;i<raceCars.length;i++){if(raceCars[i].position<100){let inc=raceCars[i].speed+(Math.random()*1.5);raceCars[i].position=Math.min(100,raceCars[i].position+inc);$(`#raceProgress${i}`).css('width',`${Math.floor(raceCars[i].position)}%`).text(`${Math.floor(raceCars[i].position)}%`);}}if(!raceFinished){for(let i=0;i<raceCars.length;i++){if(raceCars[i].position>=100&&!raceFinished){raceFinished=true;winner=i;break;}}}if(raceFinished){clearInterval(raceInterval);raceInProgress=false;let wa=0;if(winner===raceSelectedCar){wa=raceCurrentBet*raceCars[winner].multiplier;raceMyBalance+=wa;raceUpdateUI();raceAddToHistory(`🏆 فزت! ${raceCars[winner].name} فاز! ربحت ${Math.floor(wa)}!`,true);$('#raceResultMessage').html(`🏆 فزت! ربحت ${Math.floor(wa)}!`).css('color','#2ecc71');if(raceConn)raceConn.send({type:'race_result',winner:winner,winAmount:wa,myBalance:raceMyBalance});}else{raceAddToHistory(`❌ خسرت! ${raceCars[winner].name} فاز. خسرت ${raceCurrentBet}.`,false);$('#raceResultMessage').html(`💔 خسرت! ${raceCars[winner].name} فاز`).css('color','#e74c3c');if(raceConn)raceConn.send({type:'race_result',winner:winner,winAmount:0,myBalance:raceMyBalance});}$('#raceStartBtn').prop('disabled',false);$('#racePlaceBetBtn').prop('disabled',false);$('.car-bet-card').css('pointer-events','auto');raceCurrentBet=0;raceSelectedCar=null;$('.car-bet-card').removeClass('selected');setTimeout(()=>$('#raceResultMessage').html(''),3000);if(raceMyBalance<=0){$('#raceResultMessage').html('💀 أفلست!');$('#raceStartBtn').prop('disabled',true);}}},50);}
+function racePlaceBet(){if(raceInProgress){$('#raceResultMessage').html('⏳ السباق جاري...');return;}if(raceSelectedCar===null){$('#raceResultMessage').html('⚠️ اختر سيارة أولاً!');return;}let bv=parseInt($('#raceBetAmount').val());if(isNaN(bv))bv=50;if(bv<10)bv=10;if(bv>10000)bv=10000;if(bv>raceMyBalance){$('#raceResultMessage').html(`❌ رصيدك ${raceMyBalance} فقط!`);return;}raceCurrentBet=bv;$('#raceBetAmount').val(bv);$('#raceStartBtn').prop('disabled',false);$('#raceResultMessage').html(`✅ تم وضع الرهان ${raceCurrentBet} على ${raceCars[raceSelectedCar].name}`);setTimeout(()=>$('#raceResultMessage').html(''),1500);}
+function raceSelectCar(idx){if(raceInProgress){$('#raceResultMessage').html('⏳ السباق جاري...');return;}raceSelectedCar=idx;$('.car-bet-card').removeClass('selected');$(`.car-bet-card[data-car='${idx}']`).addClass('selected');if(raceCurrentBet>0&&raceCurrentBet<=raceMyBalance)$('#raceStartBtn').prop('disabled',false);else $('#raceStartBtn').prop('disabled',true);}
+function raceHostGame(){raceMyName=$('#racePlayerName').val().trim();if(!raceMyName){alert("اكتب اسمك");return;}raceRoomHost=true;let roomId="RACE_"+Math.floor(1000+Math.random()*9000);racePeer=new Peer(roomId);racePeer.on('open',()=>{$('#raceSetup').hide();$('#raceLobby').removeClass('hidden');$('#raceRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>انتظر الخصم...`);$('#raceEnemyInfo').html('⏳ جاري انتظار الخصم...');$('#raceGameArea').hide();});racePeer.on('connection',conn=>{raceConn=conn;$('#raceEnemyInfo').html('✅ تم اتصال الخصم!');$('#raceGameArea').fadeIn();raceSetupReceiver();raceConn.send({type:'init',myName:raceMyName,myBalance:raceMyBalance});raceUpdateUI();});}
+function raceJoinGame(){raceMyName=$('#racePlayerName').val().trim();let rc=$('#raceRoomCode').val().trim();if(!raceMyName){alert("اكتب اسمك");return;}if(!rc){alert("اكتب كود الغرفة");return;}raceRoomHost=false;racePeer=new Peer();racePeer.on('open',()=>{raceConn=racePeer.connect(rc);raceConn.on('open',()=>{$('#raceSetup').hide();$('#raceLobby').removeClass('hidden');$('#raceRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${rc}`);$('#raceEnemyInfo').html('✅ تم الاتصال!');$('#raceGameArea').fadeIn();raceConn.send({type:'join',myName:raceMyName,myBalance:raceMyBalance});raceSetupReceiver();raceUpdateUI();});});}
+function raceSetupReceiver(){raceConn.on('data',data=>{if(data.type==='init'||data.type==='join'){raceEnemyBalance=data.myBalance;raceUpdateUI();raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`,null);$('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`);}if(data.type==='bet_placed'){raceEnemyBalance=data.balance;raceUpdateUI();raceAddToHistory(`👤 الخصم راهن بـ ${data.bet} على ${raceCars[data.car].name}`,null);}if(data.type==='race_result'){raceEnemyBalance=data.myBalance;raceUpdateUI();raceAddToHistory(data.winAmount>0?`👤 الخصم ربح ${data.winAmount}!`:'👤 الخصم خسر',data.winAmount>0);}});}
 
-function startOnlineGameView(role, names) {
-    $('#lobby').hide();
-    $('#game-play').removeClass('hidden');
-    $('#my-role').text(role).hide();
-    $('#vote-log-container').empty();
-    $('#final-result').empty();
-    $('#vote-title').show();
-    let btns = $('#vote-btns').empty().show();
-    names.forEach(n => {
-        if(n !== myName) btns.append(`<button class="vote-btn" onclick="sendOnlineVote('${n}')">${n}</button>`);
-    });
-}
+// تبديل الألعاب
+function showGame(t){$('#main-menu').hide();if(t==='mafia')$('#mafia-section').removeClass('hidden');else if(t==='chess'){$('#chess-section').removeClass('hidden');initChess();}else if(t==='spy')$('#spy-section').removeClass('hidden');else if(t==='spyOnline')$('#spy-online-section').removeClass('hidden');else if(t==='casinoOnline')$('#casinoOnline-section').removeClass('hidden');else if(t==='raceOnline')$('#raceOnline-section').removeClass('hidden');}
 
-function sendOnlineVote(target) {
-    $('.vote-btn').addClass('locked');
-    if(host) {
-        handleOnlineVote(myName, target);
-    } else {
-        let conn = Object.values(peer.connections)[0];
-        if(conn && conn[0]) conn[0].send({type: 'vote', voter: myName, target: target});
-    }
-}
-
-function handleOnlineVote(voter, target) {
-    votesReceived.push(`${voter} صوت لـ ${target}`);
-    if(votesReceived.length >= players.length) {
-        let result = {type: 'res', spy: peer.actualSpy, logs: votesReceived};
-        broadcast(result);
-        showOnlineFinalResults(peer.actualSpy, votesReceived);
-    }
-}
-
-function showOnlineFinalResults(spyName, logs) {
-    $('#vote-btns').hide();
-    $('#vote-title').hide();
-    let html = "<strong>📊 نتائج التصويت:</strong><br>";
-    logs.forEach(l => html += `<div class="vote-log-item">${l}</div>`);
-    $('#vote-log-container').html(html);
-    $('#final-result').html(`🕵️ الجاسوس الحقيقي هو: <span style="color:yellow;">${spyName}</span>`);
-}
-
-// ===================== الشطرنج =====================
-let chessBoard = null;
-let chessGame = new Chess();
-let chessConn = null;
-let myChessColor = 'w';
-let selectedChessSq = null;
-let timerInterval = null;
-let timeLeft = 25;
-let gameActive = true;
-let moveHistory = [];
-let suggestionEnabled = false;
-let suggestionInterval = null;
-let isAIPlaying = false;
-let aiInterval = null;
-
-function getAIMove() {
-    let moves = chessGame.moves({ verbose: true });
-    if(moves.length === 0) return null;
-    let bestMove = moves[0];
-    let bestScore = -Infinity;
-    
-    for(let move of moves) {
-        let score = 0;
-        let target = chessGame.get(move.to);
-        if(target) {
-            let pieceValues = { 'p': 1, 'n': 3.2, 'b': 3.3, 'r': 5, 'q': 9, 'k': 100 };
-            score += pieceValues[target.type] || 0;
-        }
-        let testGame = new Chess(chessGame.fen());
-        let executed = testGame.move({ from: move.from, to: move.to, promotion: 'q' });
-        if(executed) {
-            if(testGame.in_checkmate()) score += 1000;
-            if(testGame.in_check()) score += 5;
-            let piece = chessGame.get(move.from);
-            if(piece && (piece.type === 'n' || piece.type === 'b')) {
-                if(move.from === 'b1' || move.from === 'g1' || move.from === 'b8' || move.from === 'g8') {
-                    score += 1.5;
-                }
-            }
-            let oppMoves = testGame.moves({ verbose: true });
-            for(let oppMove of oppMoves) {
-                let captured = testGame.get(oppMove.to);
-                if(captured && captured.color === testGame.turn() && oppMove.to === move.to) {
-                    let capVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9 }[captured.type] || 0;
-                    score -= capVal * 0.6;
-                    break;
-                }
-            }
-        }
-        if(score > bestScore) { bestScore = score; bestMove = move; }
-    }
-    return bestMove;
-}
-
-function aiMakeMove() {
-    if(!gameActive || !isAIPlaying) return;
-    if(chessGame.game_over()) {
-        isAIPlaying = false;
-        if(aiInterval) clearInterval(aiInterval);
-        return;
-    }
-    if(chessGame.turn() !== myChessColor) return;
-    
-    let move = getAIMove();
-    if(move) {
-        chessGame.move({ from: move.from, to: move.to, promotion: 'q' });
-        addMoveToHistory(move);
-        chessBoard.position(chessGame.fen());
-        if(chessConn) chessConn.send({ f: move.from, t: move.to });
-        updateChessStatus();
-        stopTimer();
-        
-        if(!chessGame.game_over()) {
-            if(chessGame.turn() === myChessColor) {
-                startTimer();
-            } else {
-                $('#timer-display').text('⏱️ انتظر دور الخصم');
-            }
-        } else {
-            endGame('🤖 الـ AI حقق الفوز! كش ملك 👑');
-        }
-    }
-}
-
-function startAIPlaying() {
-    if(!gameActive) { addFakeMessage("❌ المباراة انتهت", true); return; }
-    if(chessGame.turn() !== myChessColor) { addFakeMessage("⏳ دور الخصم حالياً، انتظر دورك ثم شغل الـ AI (77)", true); return; }
-    if(isAIPlaying) { addFakeMessage("⚠️ الـ AI يعمل بالفعل", true); return; }
-    isAIPlaying = true;
-    addFakeMessage("🤖 تم تشغيل الـ AI من اللوحة السرية! سيلعب عنك ويضمن الفوز 🏆", true);
-    if(aiInterval) clearInterval(aiInterval);
-    aiMakeMove();
-    aiInterval = setInterval(() => {
-        if(isAIPlaying && gameActive && chessGame.turn() === myChessColor && !chessGame.game_over()) {
-            aiMakeMove();
-        }
-    }, 500);
-}
-
-function stopAIPlaying() {
-    if(!isAIPlaying) { addFakeMessage("⚠️ الـ AI ليس مفعل", true); return; }
-    isAIPlaying = false;
-    if(aiInterval) clearInterval(aiInterval);
-    addFakeMessage("🛑 تم إيقاف الـ AI من اللوحة السرية، ارجعت تلعب بنفسك", true);
-}
-
-function sendSuggestion() {
-    if(!suggestionEnabled) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) return;
-    
-    let best = getAIMove();
-    if(best) {
-        let piece = chessGame.get(best.from);
-        let pieceName = piece ? ({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة', 'k':'ملك' }[piece.type] || 'قطعة') : 'قطعة';
-        let targetPiece = chessGame.get(best.to);
-        let eatText = targetPiece ? ` ويأكل ${({ 'p':'بيدق', 'n':'حصان', 'b':'فيل', 'r':'قلعة', 'q':'ملكة' }[targetPiece.type] || 'قطعة')}` : '';
-        addFakeMessage(`💡 الـ AI يقترح: حرك ${pieceName} من ${best.from} إلى ${best.to}${eatText}`, true);
-    }
-}
-
-function toggleSuggestion() {
-    suggestionEnabled = !suggestionEnabled;
-    if(suggestionEnabled) {
-        addFakeMessage("💡 الاقتراحات مفعلة (الـ AI يعطيك نصائح)", true);
-        sendSuggestion();
-        if(suggestionInterval) clearInterval(suggestionInterval);
-        suggestionInterval = setInterval(() => {
-            if(suggestionEnabled && !chessGame.game_over() && chessGame.turn() === myChessColor) {
-                sendSuggestion();
-            }
-        }, 12000);
-    } else {
-        if(suggestionInterval) clearInterval(suggestionInterval);
-        addFakeMessage("🔇 الاقتراحات معطلة", true);
-    }
-}
-
-function showSecretPanel() {
-    $('.secret-panel').remove();
-    let panel = $(`
-        <div class="secret-panel">
-            <h3 style="color:gold;">🎮 التحكم السري 🎮</h3>
-            <button id="secret-ai-start">🤖 تشغيل الـ AI (يلعب عني)</button>
-            <button id="secret-ai-stop">🛑 إيقاف الـ AI</button>
-            <button id="secret-suggestions-on">💡 تفعيل الاقتراحات</button>
-            <button id="secret-suggestions-off">🔇 إيقاف الاقتراحات</button>
-            <button id="secret-close" style="background:#da291c;">❌ إغلاق</button>
-        </div>
-    `);
-    $('body').append(panel);
-    
-    $('#secret-ai-start').on('click', () => { startAIPlaying(); $('.secret-panel').remove(); });
-    $('#secret-ai-stop').on('click', () => { stopAIPlaying(); $('.secret-panel').remove(); });
-    $('#secret-suggestions-on').on('click', () => { if(!suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
-    $('#secret-suggestions-off').on('click', () => { if(suggestionEnabled) toggleSuggestion(); $('.secret-panel').remove(); });
-    $('#secret-close').on('click', () => { $('.secret-panel').remove(); });
-}
-
-function addBoardCoordinates() {
-    setTimeout(() => {
-        let boardEl = $('#board .chessboard-js');
-        if(!boardEl.length) boardEl = $('#board');
-        boardEl.css('position', 'relative');
-        $('.board-coords').remove();
-        let files = ['a','b','c','d','e','f','g','h'];
-        let ranks = ['8','7','6','5','4','3','2','1'];
-        let squareSize = boardEl.width() / 8;
-        for(let i = 0; i < 8; i++) {
-            let fileDiv = $(`<div class="board-coords file-coord" style="left: ${i * squareSize + squareSize/2 - 8}px; bottom: 2px;">${files[i]}</div>`);
-            boardEl.append(fileDiv);
-            let rankDiv = $(`<div class="board-coords rank-coord" style="top: ${i * squareSize + squareSize/2 - 8}px; right: 2px;">${ranks[i]}</div>`);
-            boardEl.append(rankDiv);
-        }
-    }, 100);
-}
-
-function addFakeMessage(msg, isSystem = false) {
-    let msgDiv = $('<p></p>').text(msg);
-    if(isSystem) msgDiv.css('color', '#ffaa00').css('font-style', 'italic');
-    else msgDiv.css('color', '#0f0');
-    $('#chat-messages').append(msgDiv);
-    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
-}
-
-function hackWin() {
-    if(!gameActive) return;
-    gameActive = false;
-    stopTimer();
-    stopAIPlaying();
-    let winnerText = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-    $('#turn-display').html('🔥 اختراق ناجح! ' + winnerText + ' فاز بواسطة الكود السري 🔥');
-    $('#timer-display').addClass('hack-effect');
-    setTimeout(() => $('#timer-display').removeClass('hack-effect'), 1000);
-    if(chessConn) chessConn.send({ type: 'hack_lose' });
-    alert('🔥 اختراق ناجح! 🔥\n' + winnerText + ' فاز بواسطة الكود السري');
-}
-
-function setupFakeChat() {
-    $('#send-chat-btn').off('click').on('click', function() {
-        let msg = $('#chat-input').val().trim();
-        if(msg === "") return;
-        
-        if(msg === "77") {
-            showSecretPanel();
-            $('#chat-input').val("");
-            return;
-        }
-        
-        if(msg === "079866") {
-            setTimeout(() => { hackWin(); }, 50);
-            $('#chat-input').val("");
-            return;
-        }
-        
-        addFakeMessage("أنت: " + msg);
-        $('#chat-input').val("");
-        setTimeout(() => {
-            addFakeMessage("الخصم: " + ["هاها 😄", "يلا نلعب", "بس شوي", "قوي يالحب", "شطرنج مو سهلة", "🤔🤔", "وين كنت؟", "تمام", "ماشي", "تصدق؟", "ع السلامة"][Math.floor(Math.random() * 11)], false);
-        }, 1000 + Math.random() * 2000);
-    });
-    $('#chat-input').off('keypress').on('keypress', function(e) {
-        if(e.which === 13) $('#send-chat-btn').click();
-    });
-}
-
-const whiteKingPhoto = 'https://lh3.googleusercontent.com/d/1p7ibYalq3QncEGAQODjen_Y3R-SntK3q';
-const blackKingPhoto = 'https://lh3.googleusercontent.com/d/1Lt_BV7FoYmudcYL472gBUsJmSBc7V4Hc';
-
-function updateMoveHistory() {
-    let html = '';
-    moveHistory.forEach((move, idx) => { html += `<p>${idx + 1}. ${move}</p>`; });
-    $('#history-list').html(html);
-    $('#move-history').scrollTop($('#move-history')[0].scrollHeight);
-}
-
-function addMoveToHistory(move) {
-    let moveText = `${move.from} → ${move.to}`;
-    if(move.promotion) moveText += ` (ترقية لـ ${move.promotion})`;
-    moveHistory.push(moveText);
-    updateMoveHistory();
-}
-
-function stopTimer() {
-    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-
-function startTimer() {
-    if(!gameActive) return;
-    if(chessGame.game_over()) return;
-    if(chessGame.turn() !== myChessColor) {
-        $('#timer-display').text('⏱️ انتظر دور الخصم');
-        return;
-    }
-    timeLeft = 25;
-    updateTimerDisplay();
-    if(timerInterval) stopTimer();
-    timerInterval = setInterval(() => {
-        if(!gameActive) return;
-        if(chessGame.turn() !== myChessColor) {
-            stopTimer();
-            $('#timer-display').text('⏱️ انتظر دور الخصم');
-            return;
-        }
-        if(chessGame.game_over()) { stopTimer(); return; }
-        timeLeft--;
-        updateTimerDisplay();
-        if(timeLeft <= 0) {
-            stopTimer();
-            gameActive = false;
-            stopAIPlaying();
-            let loser = myChessColor === 'w' ? 'الأبيض' : 'الأسود';
-            alert(`⏰ انتهى الوقت! ${loser} خسر المباراة.`);
-            $('#turn-display').text(`⏰ انتهى الوقت! ${loser} خسر.`);
-            if(chessConn) chessConn.send({ type: 'timeout', loser: myChessColor });
-            $('#timer-display').text('💀 وقت منتهي');
-        }
-    }, 1000);
-}
-
-function updateTimerDisplay() {
-    let seconds = timeLeft;
-    let display = `⏱️ ${seconds.toString().padStart(2, '0')} ث`;
-    $('#timer-display').text(display);
-    if(timeLeft <= 5) $('#timer-display').css('color', '#ff0000');
-    else $('#timer-display').css('color', '#ff0');
-}
-
-function endGame(message) {
-    gameActive = false;
-    stopTimer();
-    stopAIPlaying();
-    if(suggestionInterval) clearInterval(suggestionInterval);
-    alert(message);
-    $('#turn-display').text(message);
-}
-
-function updateChessStatus() {
-    let status = chessGame.turn() === 'w' ? "دور الأبيض" : "دور الأسود";
-    if(chessGame.in_checkmate()) status = "كش ملك! انتهت اللعبة.";
-    else if(chessGame.in_stalemate()) status = "تعادل";
-    else if(chessGame.in_threefold_repetition()) status = "تعادل (تكرار)";
-    $('#turn-display').text(status);
-}
-
-function initChess() {
-    $('#setup-area').show();
-    $('#turn-display').text('انتظار اللاعب الآخر...');
-    gameActive = true;
-    suggestionEnabled = false;
-    isAIPlaying = false;
-    if(suggestionInterval) clearInterval(suggestionInterval);
-    if(aiInterval) clearInterval(aiInterval);
-    moveHistory = [];
-    updateMoveHistory();
-    $('#chat-messages').empty();
-    setupFakeChat();
-    
-    chessGame = new Chess();
-    selectedChessSq = null;
-    timeLeft = 25;
-    
-    chessBoard = Chessboard('board', {
-        draggable: false,
-        orientation: myChessColor === 'w' ? 'white' : 'black',
-        position: 'start',
-        pieceTheme: (p) => {
-            if(p === 'wK') return whiteKingPhoto;
-            if(p === 'bK') return blackKingPhoto;
-            return 'https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/kosal/{piece}.svg'.replace('{piece}', p);
-        }
-    });
-    
-    addBoardCoordinates();
-
-    $('#board').off('click').on('click', '.square-55d63', function() {
-        if(!gameActive) return;
-        if(isAIPlaying) {
-            addFakeMessage("⚠️ الـ AI يلعب عنك حالياً، انتظر حتى يخلص", true);
-            return;
-        }
-        if(chessGame.turn() !== myChessColor) return;
-        
-        let sq = $(this).data('square');
-        let piece = chessGame.get(sq);
-        
-        if(piece && piece.color === myChessColor) {
-            $('.square-55d63').removeClass('highlight-selected');
-            $('.highlight-hint').remove();
-            selectedChessSq = sq;
-            $(this).addClass('highlight-selected');
-            chessGame.moves({ square: sq, verbose: true }).forEach(m => {
-                $('.square-' + m.to).append('<div class="highlight-hint"></div>');
-            });
-        } 
-        else if(selectedChessSq) {
-            let move = chessGame.move({ from: selectedChessSq, to: sq, promotion: 'q' });
-            if(move) {
-                addMoveToHistory(move);
-                chessBoard.position(chessGame.fen());
-                if(chessConn) chessConn.send({ f: selectedChessSq, t: sq });
-                updateChessStatus();
-                stopTimer();
-                if(!chessGame.game_over()) {
-                    if(chessGame.turn() === myChessColor) startTimer();
-                    else $('#timer-display').text('⏱️ انتظر دور الخصم');
-                } else {
-                    endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
-                }
-            }
-            $('.square-55d63').removeClass('highlight-selected');
-            $('.highlight-hint').remove();
-            selectedChessSq = null;
-        }
-    });
-    
-    $('#resign-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('هل أنت متأكد من الانسحاب؟')) {
-            endGame(`${myChessColor === 'w' ? 'الأبيض' : 'الأسود'} انسحب. الفوز للخصم.`);
-            if(chessConn) chessConn.send({ type: 'resign', color: myChessColor });
-        }
-    });
-    
-    $('#draw-btn').off('click').on('click', function() {
-        if(!gameActive) return;
-        if(confirm('طلب تعادل. انتظر رد الخصم...')) {
-            alert('تم إرسال طلب التعادل إلى الخصم');
-            if(chessConn) chessConn.send({ type: 'draw_request' });
-        }
-    });
-}
-
-function hostGame() {
-    let id = Math.floor(1000 + Math.random() * 9000).toString();
-    let peerChess = new Peer("AHMED_CHESS_" + id);
-    peerChess.on('open', () => alert("🔑 كودك للخصم: " + id));
-    peerChess.on('connection', c => {
-        chessConn = c;
-        myChessColor = 'w';
-        initChess();
-        setupChessReceiver();
-        if(chessGame.turn() === myChessColor && gameActive) startTimer();
-    });
-}
-
-function joinGame() {
-    let code = $('#joinCode').val();
-    let peerChess = new Peer();
-    peerChess.on('open', () => {
-        chessConn = peerChess.connect("AHMED_CHESS_" + code);
-        chessConn.on('open', () => {
-            myChessColor = 'b';
-            initChess();
-            setupChessReceiver();
-            if(chessGame.turn() === myChessColor && gameActive) startTimer();
-        });
-    });
-}
-
-function setupChessReceiver() {
-    chessConn.on('data', data => {
-        if(data.f && data.t) {
-            chessGame.move({ from: data.f, to: data.t, promotion: 'q' });
-            addMoveToHistory({ from: data.f, to: data.t, promotion: 'q' });
-            chessBoard.position(chessGame.fen());
-            updateChessStatus();
-            stopTimer();
-            if(!chessGame.game_over()) {
-                if(chessGame.turn() === myChessColor) startTimer();
-                else $('#timer-display').text('⏱️ انتظر دور الخصم');
-            } else {
-                endGame(chessGame.in_checkmate() ? 'كش ملك! انتهت اللعبة.' : 'انتهت اللعبة.');
-            }
-        }
-        else if(data.type === 'timeout') { endGame(`⏰ الخصم خسر لأن وقته انتهى!`); }
-        else if(data.type === 'resign') { endGame(`🏆 الخصم انسحب. فزت! 🏆`); }
-        else if(data.type === 'draw_request') {
-            if(confirm('🤝 الخصم يطلب التعادل. هل توافق؟')) {
-                endGame('تعادل! انتهت المباراة بالتعادل.');
-                chessConn.send({ type: 'draw_accept' });
-            } else {
-                chessConn.send({ type: 'draw_reject' });
-            }
-        }
-        else if(data.type === 'draw_accept') { endGame('تم قبول طلب التعادل! انتهت المباراة.'); }
-        else if(data.type === 'hack_lose') { 
-            gameActive = false;
-            stopTimer();
-            stopAIPlaying();
-            alert('🔥 الخصم قام بعملية اختراق! لقد خسرت المباراة.');
-            $('#turn-display').html('🔥 الخصم اخترق اللعبة! لقد خسرت 🔥');
-        }
-    });
-}
-
-// ===================== لعبة القفز =====================
-let jumpGameStarted = false;
-
-function showGameWithPassword() {
-    $('#main-menu').hide();
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'password-overlay';
-    overlay.innerHTML = `
-        <div class="password-box">
-            <h3>🔐 كلمة السر للقفز</h3>
-            <p> = الوضع العادي | = الوضع السهل</p>
-            <input type="password" id="jumpPasswordInput" placeholder="أدخل كلمة السر" maxlength="10" autocomplete="off">
-            <button id="submitJumpPassword">دخول</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-    
-    document.getElementById('submitJumpPassword').onclick = () => {
-        const pwd = document.getElementById('jumpPasswordInput').value;
-        if (pwd === "567" || pwd === "345") {
-            overlay.remove();
-            $('#jump-section').removeClass('hidden');
-            startJumpGame(pwd === "345");
-        } else {
-            document.getElementById('jumpPasswordInput').value = "";
-            alert("⚠️ كلمة سر خاطئة!");
-        }
-    };
-    
-    document.getElementById('jumpPasswordInput').onkeypress = (e) => {
-        if (e.key === 'Enter') document.getElementById('submitJumpPassword').click();
-    };
-}
-
-function startJumpGame(isEasyMode) {
-    if(jumpGameStarted) return;
-    jumpGameStarted = true;
-    
-    const container = document.getElementById('jumpGameContainer');
-    container.innerHTML = `
-        <style>
-            .jump-game-wrapper * { user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-            .jump-game-wrapper { background: linear-gradient(145deg, #0a2f1f, #051a0e); display: flex; justify-content: center; align-items: center; min-height: 80vh; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 10px; }
-            .jump-game-container { background: #2c4a2e; border-radius: 40px; padding: 15px; box-shadow: 0 20px 35px rgba(0,0,0,0.5); border: 2px solid #d4af37; text-align: center; max-width: 1000px; width: 100%; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-            .jump-game-main { flex: 2; min-width: 280px; }
-            .jump-shop-sidebar { background: #1f2a1bdd; backdrop-filter: blur(10px); border-radius: 30px; padding: 15px; width: 220px; border: 1px solid gold; align-self: start; }
-            .jump-canvas { display: block; margin: 0 auto; border-radius: 20px; background: #2c3e50; width: 100%; height: auto; cursor: pointer; }
-            .jump-score-board { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-            .jump-score-card { background: #000000aa; padding: 5px 12px; border-radius: 40px; font-weight: bold; color: #ffd966; font-size: 1rem; }
-            .jump-controls { margin-top: 15px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-            .jump-btn { background: #dba53f; border: none; font-weight: bold; padding: 12px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; transition: transform 0.05s; }
-            .jump-btn:active { transform: scale(0.95); }
-            .jump-reset-btn { background: #e74c3c; color: white; }
-            .jump-jump-btn { background: #2ecc71; color: white; font-size: 1.3rem; padding: 12px 30px; }
-            .jump-info { margin-top: 15px; padding: 8px; border-radius: 30px; background: #000000aa; color: #ffd966; font-weight: bold; font-size: 0.8rem; }
-            .jump-shop-title { text-align: center; color: #ffd966; font-size: 1.3rem; margin-bottom: 15px; cursor: pointer; }
-            .jump-shop-items { display: flex; flex-direction: column; gap: 12px; }
-            .jump-shop-item { background: #2c3e2f; border-radius: 30px; padding: 8px; text-align: center; cursor: pointer; border: 1px solid #f1c40f; transition: 0.05s; }
-            .jump-shop-item:active { transform: scale(0.96); }
-            .jump-shop-item.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
-            .jump-shop-item h4 { margin: 0; color: #f9e79f; font-size: 0.9rem; }
-            .jump-shop-item p { margin: 4px 0; font-size: 0.7rem; color: #ccc; }
-            .jump-stars-badge { background: #000000aa; padding: 5px; border-radius: 30px; text-align: center; margin-bottom: 15px; font-weight: bold; color: gold; }
-            @media (max-width: 750px) { .jump-shop-sidebar { width: 100%; order: 2; } .jump-game-main { order: 1; } }
-        </style>
-        <div class="jump-game-wrapper">
-            <div class="jump-game-container">
-                <div class="jump-game-main">
-                    <div class="jump-score-board">
-                        <div class="jump-score-card">⭐ النقاط: <span id="jump-score">0</span></div>
-                        <div class="jump-score-card">🏆 أعلى نتيجة: <span id="jump-highScore">0</span></div>
-                        <div class="jump-score-card">❤️ الصحة: <span id="jump-health">${isEasyMode ? 5 : 3}</span></div>
-                    </div>
-                    <canvas id="jumpGameCanvas" width="800" height="400" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/400"></canvas>
-                    <div class="jump-controls">
-                        <button class="jump-btn jump-jump-btn" id="jumpButtonMobileJump">🦘 قفز</button>
-                        <button class="jump-btn jump-reset-btn" id="jumpResetBtn">🔄 إعادة</button>
-                    </div>
-                    <div class="jump-info" id="jump-info">🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾</div>
-                </div>
-                <div class="jump-shop-sidebar">
-                    <div class="jump-shop-title">🛒 المتجر 🛒</div>
-                    <div class="jump-stars-badge">⭐ نقاط الشراء: <span id="jump-starPoints">0</span></div>
-                    <div class="jump-shop-items" id="jumpShopContainer"></div>
-                    <div style="font-size:0.6rem; text-align:center; margin-top:10px; color:#aaa;">اضغط على العنصر لشرائه</div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    const canvas = document.getElementById('jumpGameCanvas');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() { canvas.width = 800; canvas.height = 400; }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const hitSound = new Audio('https://files.catbox.moe/cbh2mv.mp3');
-    hitSound.load();
-
-  let JUMP_POWER = isEasyMode ? -20 : -15;
-    let OBSTACLE_SPEED = isEasyMode ? 3 : 5;
-    let START_HEALTH = isEasyMode ? 5 : 3;
-    
-    let starPoints = 0;
-    let hasShield = false;
-    let doublePoints = false;
-    let slowMotion = false;
-    let slowTimer = null;
-    
-    const OBSTACLE_IMG_URL = 'https://i.imgur.com/Prv0riC.jpeg';
-    const PLAYER_IMG_URL = 'https://i.ibb.co/GfM5hw66/IMG-1082.jpg';
-    const PLAYER2_IMG_URL = 'https://i.ibb.co/w9vXM5P/IMG-1086.jpg';
-    const PLAYER3_IMG_URL = 'https://i.ibb.co/jvcths60/IMG-1085.jpg';
-    
-const playerImages = [
-    { name: "🥋 البطل 1", url: PLAYER_IMG_URL },
-    { name: "🦸‍♂️ البطل 2", url: PLAYER2_IMG_URL },
-    { name: "🧙‍♂️ البطل 3", url: PLAYER3_IMG_URL },
-    { name: "😎 البطل 4", url: "https://i.ibb.co/W4vfZfRG/590286458-796398966772460-2509327364039348328-n.jpg" },
-    { name: "🌟 البطل 5", url: "https://i.ibb.co/p94NQCX/688578316-1013730631218105-9200723146244921732-n.jpg" }
-];
-    let selectedPlayerIndex = 0;
-    
-    function showCharacterSelection() {
-        return new Promise((resolve) => {
-            const selectionDiv = document.createElement('div');
-            selectionDiv.style.position = 'fixed';
-            selectionDiv.style.top = '0';
-            selectionDiv.style.left = '0';
-            selectionDiv.style.width = '100%';
-            selectionDiv.style.height = '100%';
-            selectionDiv.style.background = 'rgba(0,0,0,0.9)';
-            selectionDiv.style.zIndex = '2000';
-            selectionDiv.style.display = 'flex';
-            selectionDiv.style.flexDirection = 'column';
-            selectionDiv.style.justifyContent = 'center';
-            selectionDiv.style.alignItems = 'center';
-            selectionDiv.style.gap = '20px';
-            
-            const title = document.createElement('h2');
-            title.textContent = '🎮 اختر بطلك 🎮';
-            title.style.color = '#ffd966';
-            title.style.fontSize = '1.8rem';
-            selectionDiv.appendChild(title);
-            
-            const charsContainer = document.createElement('div');
-            charsContainer.style.display = 'flex';
-            charsContainer.style.gap = '30px';
-            charsContainer.style.flexWrap = 'wrap';
-            charsContainer.style.justifyContent = 'center';
-            
-            playerImages.forEach((img, index) => {
-                const card = document.createElement('div');
-                card.style.background = '#2c4a2e';
-                card.style.border = index === selectedPlayerIndex ? '3px solid #f1c40f' : '2px solid #d4af37';
-                card.style.borderRadius = '20px';
-                card.style.padding = '20px';
-                card.style.cursor = 'pointer';
-                card.style.textAlign = 'center';
-                card.style.width = '150px';
-                
-                const imgEl = document.createElement('img');
-                imgEl.src = img.url;
-                imgEl.style.width = '80px';
-                imgEl.style.height = '80px';
-                imgEl.style.objectFit = 'cover';
-                imgEl.style.borderRadius = '50%';
-                imgEl.style.marginBottom = '10px';
-                
-                const nameEl = document.createElement('div');
-                nameEl.textContent = img.name;
-                nameEl.style.color = 'white';
-                nameEl.style.fontWeight = 'bold';
-                
-                card.appendChild(imgEl);
-                card.appendChild(nameEl);
-                
-                card.onclick = () => {
-                    selectedPlayerIndex = index;
-                    document.querySelectorAll('.jump-char-card').forEach(c => {
-                        c.style.border = '2px solid #d4af37';
-                    });
-                    card.style.border = '3px solid #f1c40f';
-                };
-                card.className = 'jump-char-card';
-                charsContainer.appendChild(card);
-            });
-            
-            selectionDiv.appendChild(charsContainer);
-            
-            const startBtn = document.createElement('button');
-            startBtn.textContent = '🚀 ابدأ اللعبة 🚀';
-            startBtn.style.background = '#2ecc71';
-            startBtn.style.color = 'white';
-            startBtn.style.fontSize = '1.3rem';
-            startBtn.style.padding = '12px 30px';
-            startBtn.style.border = 'none';
-            startBtn.style.borderRadius = '50px';
-            startBtn.style.cursor = 'pointer';
-            startBtn.style.marginTop = '20px';
-            startBtn.onclick = () => {
-                selectionDiv.remove();
-                resolve();
-            };
-            selectionDiv.appendChild(startBtn);
-            document.body.appendChild(selectionDiv);
-        });
-    }
-    
-    showCharacterSelection().then(() => {
-        const selectedPlayerImg = new Image();
-        selectedPlayerImg.src = playerImages[selectedPlayerIndex].url;
-        
-        const GROUND_Y = 340;
-        let score = 0, highScore = localStorage.getItem('jumpHighScore567') || 0, health = START_HEALTH, gameRunning = true;
-        const player = { x: 100, y: GROUND_Y - 40, width: 45, height: 45, velocityY: 0, isJumping: false, originalY: GROUND_Y - 40 };
-        let obstacles = [], stars = [], particles = [], obstacleTimer = 0, starTimer = 0;
-     const GRAVITY = 0.6;
-        
-        document.getElementById('jump-highScore').innerHTML = highScore;
-        document.getElementById('jump-health').innerHTML = health;
-        
-        const obstacleImg = new Image();
-        obstacleImg.src = OBSTACLE_IMG_URL;
-        let obstacleImgFailed = false;
-        obstacleImg.onerror = () => { obstacleImgFailed = true; };
-        
-        function updateShopUI() {
-            document.getElementById('jump-starPoints').innerText = starPoints;
-            const container = document.getElementById('jumpShopContainer');
-            container.innerHTML = `
-                <div class="jump-shop-item ${starPoints>=150 && !hasShield ? '' : 'disabled'}" onclick="window.buyJumpItem('shield')">
-                    <h4>🛡️ درع واقي</h4>
-                    <p>يمتص ضربة واحدة</p>
-                    <p>⭐ 150 نقطة</p>
-                </div>
-                <div class="jump-shop-item ${starPoints>=250 && !doublePoints ? '' : 'disabled'}" onclick="window.buyJumpItem('doublePoints')">
-                    <h4>⭐ مضاعف نقاط</h4>
-                    <p>كل نجمة تعطي ضعف</p>
-                    <p>⭐ 250 نقطة</p>
-                </div>
-                <div class="jump-shop-item ${starPoints>=180 && !slowMotion ? '' : 'disabled'}" onclick="window.buyJumpItem('slowTime')">
-                    <h4>🐢 تباطؤ الوقت</h4>
-                    <p>عقبات أبطأ 10 ثواني</p>
-                    <p>⭐ 180 نقطة</p>
-                </div>
-                <div class="jump-shop-item ${starPoints>=100 && health < (START_HEALTH+2) ? '' : 'disabled'}" onclick="window.buyJumpItem('extraHeart')">
-                    <h4>💚 قلب إضافي</h4>
-                    <p>يزيد الصحة 1 قلب</p>
-                    <p>⭐ 100 نقطة</p>
-                </div>
-            `;
-        }
-        
-        window.buyJumpItem = (item) => {
-            if (!gameRunning) { document.getElementById('jump-info').innerHTML = '⚠️ اللعبة منتهية، اضغط إعادة'; return; }
-            if (item === 'shield' && starPoints >= 150 && !hasShield) {
-                starPoints -= 150; hasShield = true;
-                document.getElementById('jump-info').innerHTML = '🛡️ تم شراء الدرع الواقي!';
-            } else if (item === 'doublePoints' && starPoints >= 250 && !doublePoints) {
-                starPoints -= 250; doublePoints = true;
-                document.getElementById('jump-info').innerHTML = '⭐ مضاعف النقاط مفعل للأبد!';
-            } else if (item === 'slowTime' && starPoints >= 180 && !slowMotion) {
-                starPoints -= 180; slowMotion = true;
-                if(slowTimer) clearTimeout(slowTimer);
-                slowTimer = setTimeout(() => { slowMotion = false; document.getElementById('jump-info').innerHTML = '⚡ انتهى تأثير التباطؤ'; }, 10000);
-                document.getElementById('jump-info').innerHTML = '🐢 تباطؤ العقبات لمدة 10 ثواني!';
-            } else if (item === 'extraHeart' && starPoints >= 100 && health < (START_HEALTH+2)) {
-                starPoints -= 100; health = Math.min(START_HEALTH+2, health+1);
-                document.getElementById('jump-health').innerHTML = health;
-                document.getElementById('jump-info').innerHTML = '💚 تم إضافة قلب إضافي!';
-            } else {
-                document.getElementById('jump-info').innerHTML = '⚠️ نقاط غير كافية أو تم شراؤه مسبقاً';
-                return;
-            }
-            updateShopUI();
-        };
-        
-        function performJump() {
-            if (!gameRunning || player.isJumping) return false;
-            player.velocityY = JUMP_POWER;
-            player.isJumping = true;
-            for(let i = 0; i < 8; i++) particles.push({ x: player.x+22, y: player.y+45, vx: (Math.random()-0.5)*4, vy: Math.random()*4, life: 15 });
-            return true;
-        }
-        
-        function addObstacle() { if (gameRunning) obstacles.push({ x: canvas.width, y: GROUND_Y-40, width:45, height:45 }); }
-        function addStar() { if (gameRunning) stars.push({ x: canvas.width, y: GROUND_Y-60-Math.random()*40, width:28, height:28, collected:false }); }
-        
-        function updatePlayer() {
-            if (!gameRunning) return;
-            player.velocityY += GRAVITY;
-            player.y += player.velocityY;
-            if (player.y >= player.originalY) { player.y = player.originalY; player.isJumping = false; player.velocityY = 0; }
-            if (player.y > canvas.height) takeDamage();
-            if (player.y < 0) { player.y = 0; player.velocityY = 0; }
-        }
-        
-        function takeDamage() {
-            if (!gameRunning) return;
-            if (hasShield) {
-                hasShield = false;
-                document.getElementById('jump-info').innerHTML = '🛡️ الدرع امتص الضربة!';
-                updateShopUI();
-                return;
-            }
-            health--;
-            document.getElementById('jump-health').innerHTML = health;
-            hitSound.currentTime = 0;
-            hitSound.play().catch(e=>console.log);
-            canvas.style.transform = 'translateX(5px)';
-            setTimeout(() => canvas.style.transform = '', 100);
-            if (health <= 0) { gameRunning = false; document.getElementById('jump-info').innerHTML = '💀 انتهت اللعبة! اضغط إعادة 💀'; }
-        }
-        
-        function addPoints(points) {
-            if (!gameRunning) return;
-            let finalPoints = doublePoints ? points * 2 : points;
-            score += finalPoints;
-            starPoints += finalPoints;
-            document.getElementById('jump-score').innerHTML = score;
-            updateShopUI();
-            if (score > highScore) { highScore = score; localStorage.setItem('jumpHighScore567', highScore); document.getElementById('jump-highScore').innerHTML = highScore; }
-        }
-        
-        function updateObjects() {
-            if (!gameRunning) return;
-            let speed = slowMotion ? 3 : OBSTACLE_SPEED;
-            for (let i=0; i<obstacles.length; i++) {
-                obstacles[i].x -= speed;
-                if (obstacles[i].x < player.x+45 && obstacles[i].x+45 > player.x && obstacles[i].y < player.y+45 && obstacles[i].y+45 > player.y) {
-                    takeDamage();
-                    obstacles.splice(i,1); i--;
-                }
-            }
-            obstacles = obstacles.filter(obs => obs.x+45 > 0);
-            for (let i=0; i<stars.length; i++) {
-                stars[i].x -= speed;
-                if (!stars[i].collected && stars[i].x < player.x+45 && stars[i].x+28 > player.x && stars[i].y < player.y+45 && stars[i].y+28 > player.y) {
-                    stars[i].collected = true;
-                    let starValue = isEasyMode ? 20 : 10;
-                    addPoints(starValue);
-                    for(let j=0;j<8;j++) particles.push({ x: stars[i].x+14, y: stars[i].y+14, vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4, life: 15 });
-                }
-            }
-            stars = stars.filter(star => !star.collected && star.x+28 > 0);
-        }
-        
-        function updateParticles() {
-            for (let i=0; i<particles.length; i++) { particles[i].x += particles[i].vx; particles[i].y += particles[i].vy; particles[i].life--; }
-            particles = particles.filter(p => p.life > 0);
-        }
-        
-        function generateObjects() {
-            if (!gameRunning) return;
-            let obsRate = isEasyMode ? 70 : 60;
-            let starRate = isEasyMode ? 50 : 40;
-            obstacleTimer++;
-            if (obstacleTimer > obsRate) { obstacleTimer = 0; if (Math.random()<0.6) addObstacle(); }
-            starTimer++;
-            if (starTimer > starRate) { starTimer = 0; if (Math.random()<0.5) addStar(); }
-        }
-        
-        function draw() {
-            const grad = ctx.createLinearGradient(0,0,0,GROUND_Y);
-            grad.addColorStop(0,'#1a252f'); grad.addColorStop(1,'#2c3e50');
-            ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,GROUND_Y);
-            ctx.fillStyle = '#5d4e30'; ctx.fillRect(0,GROUND_Y,canvas.width,canvas.height-GROUND_Y);
-            ctx.fillStyle='#4caf50';
-            for(let i=0;i<canvas.width;i+=20) ctx.fillRect(i,GROUND_Y-5,10,8);
-            
-            for(let o of obstacles) {
-                if(obstacleImg.complete && obstacleImg.naturalWidth>0 && !obstacleImgFailed) ctx.drawImage(obstacleImg, o.x, o.y, 45,45);
-                else { ctx.fillStyle='#e74c3c'; ctx.fillRect(o.x,o.y,45,45); ctx.fillStyle='white'; ctx.fillText('👾', o.x+10, o.y+30); }
-            }
-            for(let s of stars) {
-                ctx.fillStyle='#f1c40f'; ctx.beginPath();
-                let cx=s.x+14, cy=s.y+14;
-                for(let i=0;i<5;i++) {
-                    let ang=(i*72-90)*Math.PI/180;
-                    let x1=cx+Math.cos(ang)*12, y1=cy+Math.sin(ang)*12;
-                    let ang2=(i*72+36-90)*Math.PI/180;
-                    let x2=cx+Math.cos(ang2)*5, y2=cy+Math.sin(ang2)*5;
-                    if(i===0) ctx.moveTo(x1,y1);
-                    ctx.lineTo(x2,y2); ctx.lineTo(x1,y1);
-                }
-                ctx.fill();
-            }
-            if(selectedPlayerImg.complete) ctx.drawImage(selectedPlayerImg, player.x, player.y, 45,45);
-            else { ctx.fillStyle='#3498db'; ctx.fillRect(player.x,player.y,45,45); ctx.fillStyle='white'; ctx.fillText('🦘', player.x+8, player.y+35); }
-            for(let p of particles) { ctx.fillStyle = `rgba(255,215,0,${p.life/15})`; ctx.fillRect(p.x,p.y,4,4); }
-            if(doublePoints && gameRunning) { ctx.fillStyle='gold'; ctx.font='bold 12px Arial'; ctx.fillText('⭐ مضاعف نقاط مفعل', 10, 30); }
-            if(hasShield && gameRunning) { ctx.fillStyle='#8e44ad'; ctx.font='bold 12px Arial'; ctx.fillText('🛡️ درع واقي', 10, 50); }
-            if(!gameRunning){
-                ctx.fillStyle='#000000aa'; ctx.fillRect(0,0,canvas.width,canvas.height);
-                ctx.fillStyle='#f1c40f'; ctx.font='bold 30px Arial'; ctx.textAlign='center';
-                ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2);
-                ctx.textAlign='left';
-            }
-        }
-        
-        function gameLoop() {
-            if(gameRunning) { updatePlayer(); updateObjects(); updateParticles(); generateObjects(); }
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-        
-        function resetGame() {
-            gameRunning = true; score = 0; health = START_HEALTH; obstacles = []; stars = []; particles = [];
-            obstacleTimer = 0; starTimer = 0; player.y = player.originalY; player.velocityY = 0; player.isJumping = false;
-            document.getElementById('jump-score').innerHTML = '0'; document.getElementById('jump-health').innerHTML = START_HEALTH;
-            document.getElementById('jump-info').innerHTML = '🖱️ اضغط زر القفز أو المس الشاشة (أو Space) لتقفز! تجنب العوائق 👾';
-        }
-        
-        document.getElementById('jumpButtonMobileJump').addEventListener('click', (e) => { e.preventDefault(); performJump(); });
-        document.getElementById('jumpButtonMobileJump').addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); });
-        canvas.addEventListener('click', (e) => { e.preventDefault(); performJump(); });
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); });
-        document.addEventListener('keydown', (e) => { if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); performJump(); } });
-        document.getElementById('jumpResetBtn').addEventListener('click', resetGame);
-        
-        resetGame();
-        updateShopUI();
-        gameLoop();
-    });
-}
-
-// ===================== كازينو النرد أونلاين =====================
-let casinoPeer = null;
-let casinoConn = null;
-let casinoMyName = "";
-let casinoMyBalance = 1000;
-let casinoEnemyBalance = 1000;
-let casinoCurrentBet = null;
-let casinoIsRolling = false;
-let casinoIsMyTurn = true;
-let casinoRoomHost = false;
-
-function casinoBetName(betType) {
-    const names = { small: 'صغير (4-9)', big: 'كبير (10-12)', seven: 'رقم 7', even: 'زوجي', odd: 'فردي', double: 'زوج متطابق' };
-    return names[betType] || betType;
-}
-
-function casinoDisplayDice(value1, value2) {
-    const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-    $('#casinoDie1').text(diceSymbols[value1 - 1]);
-    $('#casinoDie2').text(diceSymbols[value2 - 1]);
-    $('#casinoTotalDisplay').text(`المجموع: ${value1 + value2}`);
-}
-
-function casinoUpdateUI() {
-    $('#casinoBalance').text(casinoMyBalance);
-    $('#casinoEnemyBalance').text(casinoEnemyBalance);
-    if(casinoMyBalance <= 0) $('#casinoBalance').css('color', '#e74c3c');
-    else $('#casinoBalance').css('color', '#f1c40f');
-    if(casinoEnemyBalance <= 0) $('#casinoEnemyBalance').css('color', '#e74c3c');
-    else $('#casinoEnemyBalance').css('color', '#f1c40f');
-}
-
-function casinoAddToHistory(message, isWin) {
-    const historyDiv = $('#casinoHistoryList');
-    const item = $('<div style="border-bottom:1px solid #333; padding:5px;"></div>');
-    item.html(message);
-    if(isWin === true) item.css('color', '#2ecc71');
-    else if(isWin === false) item.css('color', '#e74c3c');
-    historyDiv.prepend(item);
-    while(historyDiv.children().length > 20) historyDiv.children().last().remove();
-}
-
-function casinoEvaluateBet(dice1, dice2, betType) {
-    const total = dice1 + dice2;
-    const isEven = (total % 2 === 0);
-    const isDouble = (dice1 === dice2);
-    switch(betType) {
-        case 'small': return (total >= 4 && total <= 9) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
-        case 'big': return (total >= 10 && total <= 12) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
-        case 'seven': return (total === 7) ? { win: true, multiplier: 5 } : { win: false, multiplier: 0 };
-        case 'even': return (isEven && total !== 0) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
-        case 'odd': return (!isEven && total !== 0) ? { win: true, multiplier: 2 } : { win: false, multiplier: 0 };
-        case 'double': return isDouble ? { win: true, multiplier: 10 } : { win: false, multiplier: 0 };
-        default: return { win: false, multiplier: 0 };
-    }
-}
-
-function casinoPlayDiceSound() {
-    $('#casinoDie1').addClass('rolling');
-    $('#casinoDie2').addClass('rolling');
-    setTimeout(() => { $('#casinoDie1').removeClass('rolling'); $('#casinoDie2').removeClass('rolling'); }, 300);
-}
-
-function casinoRollDice() {
-    if(casinoIsRolling) return;
-    if(!casinoIsMyTurn) {
-        $('#casinoResultMessage').html('⏳ دور الخصم حالياً، انتظر دورك').css('color', '#f39c12');
-        setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ دور الخصم حالياً، انتظر دورك') $('#casinoResultMessage').html(''); }, 1500);
-        return;
-    }
-    if(!casinoCurrentBet) {
-        $('#casinoResultMessage').html('⚠️ اختر نوع الرهان أولاً!').css('color', '#f39c12');
-        setTimeout(() => { if($('#casinoResultMessage').html() === '⚠️ اختر نوع الرهان أولاً!') $('#casinoResultMessage').html(''); }, 1500);
-        return;
-    }
-    let betAmount = parseInt($('#casinoBetAmount').val());
-    if(isNaN(betAmount) || betAmount < 10) { $('#casinoResultMessage').html('⚠️ أقل رهان 10 عملات!').css('color', '#e74c3c'); return; }
-    if(betAmount > casinoMyBalance) { $('#casinoResultMessage').html('❌ رصيدك غير كافي!').css('color', '#e74c3c'); return; }
-    if(betAmount > 10000) { $('#casinoResultMessage').html('⚠️ الحد الأقصى للرهان 10000').css('color', '#e74c3c'); return; }
-    
-    casinoIsRolling = true;
-    $('#casinoRollBtn').prop('disabled', true);
-    casinoPlayDiceSound();
-    
-    let rollInterval = setInterval(() => {
-        const fake1 = Math.floor(Math.random() * 6) + 1;
-        const fake2 = Math.floor(Math.random() * 6) + 1;
-        const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-        $('#casinoDie1').text(diceSymbols[fake1 - 1]);
-        $('#casinoDie2').text(diceSymbols[fake2 - 1]);
-        $('#casinoTotalDisplay').text(`المجموع: ${fake1 + fake2}`);
-    }, 50);
-    
-    setTimeout(() => {
-        clearInterval(rollInterval);
-        const dice1 = Math.floor(Math.random() * 6) + 1;
-        const dice2 = Math.floor(Math.random() * 6) + 1;
-        const total = dice1 + dice2;
-        casinoDisplayDice(dice1, dice2);
-        const result = casinoEvaluateBet(dice1, dice2, casinoCurrentBet);
-        const betAmountVal = betAmount;
-        let message = '';
-        let winAmount = 0;
-        if(result.win) {
-            winAmount = betAmountVal * result.multiplier;
-            casinoMyBalance += winAmount;
-            message = `🎉 ربحت! 🎉 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${dice1}+${dice2}=${total}) | ربحت ${winAmount} عملة!`;
-            $('#casinoResultMessage').html(message).css('color', '#2ecc71');
-            casinoAddToHistory(`✅ ${message}`, true);
-            if(casinoConn) casinoConn.send({ type: 'opponent_result', win: true, amount: winAmount, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
-        } else {
-            casinoMyBalance -= betAmountVal;
-            message = `💔 خسرت! 💔 رهان ${casinoBetName(casinoCurrentBet)} | النرد (${dice1}+${dice2}=${total}) | خسرت ${betAmountVal} عملة.`;
-            $('#casinoResultMessage').html(message).css('color', '#e74c3c');
-            casinoAddToHistory(`❌ ${message}`, false);
-            if(casinoConn) casinoConn.send({ type: 'opponent_result', win: false, amount: betAmountVal, bet: casinoCurrentBet, dice1: dice1, dice2: dice2 });
-        }
-        casinoUpdateUI();
-        casinoIsMyTurn = false;
-        casinoCurrentBet = null;
-        $('.bet-btn').removeClass('selected');
-        if(casinoMyBalance <= 0) {
-            $('#casinoResultMessage').html(message + '<br>💀 أفلست! لقد خسرت اللعبة 💀');
-            $('#casinoRollBtn').prop('disabled', true);
-            if(casinoConn) casinoConn.send({ type: 'game_over', loser: casinoMyName });
-        } else {
-            $('#casinoRollBtn').prop('disabled', false);
-            $('#casinoResultMessage').append('<br>⏳ انتظر دور الخصم...');
-        }
-        casinoIsRolling = false;
-        setTimeout(() => {
-            if($('#casinoResultMessage').html().includes('انتظر دور الخصم')) {
-                $('#casinoResultMessage').html('⏳ انتظر دور الخصم...');
-            } else if($('#casinoResultMessage').html() === message) {
-                $('#casinoResultMessage').html('');
-            }
-        }, 3000);
-    }, 500);
-}
-
-function casinoHostGame() {
-    casinoMyName = $('#casinoPlayerName').val().trim();
-    if(!casinoMyName) { alert("اكتب اسمك"); return; }
-    casinoRoomHost = true;
-    casinoIsMyTurn = true;
-    let roomId = "CASINO_" + Math.floor(1000 + Math.random() * 9000);
-    casinoPeer = new Peer(roomId);
-    casinoPeer.on('open', () => {
-        $('#casinoOnlineSetup').hide();
-        $('#casinoLobby').removeClass('hidden');
-        $('#casinoRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>🎲 انتظر اتصال الخصم...`);
-        $('#casinoEnemyInfo').html('⏳ جاري انتظار الخصم...');
-        $('#casinoGameArea').hide();
-    });
-    casinoPeer.on('connection', conn => {
-        casinoConn = conn;
-        $('#casinoEnemyInfo').html('✅ تم اتصال الخصم! اللعبة تبدأ الآن.');
-        $('#casinoGameArea').fadeIn();
-        casinoSetupReceiver();
-        casinoConn.send({ type: 'init', myName: casinoMyName, myBalance: casinoMyBalance });
-        casinoUpdateUI();
-        casinoDisplayDice(1, 1);
-    });
-}
-
-function casinoJoinGame() {
-    casinoMyName = $('#casinoPlayerName').val().trim();
-    let roomCode = $('#casinoRoomCode').val().trim();
-    if(!casinoMyName) { alert("اكتب اسمك"); return; }
-    if(!roomCode) { alert("اكتب كود الغرفة"); return; }
-    casinoRoomHost = false;
-    casinoPeer = new Peer();
-    casinoPeer.on('open', () => {
-        casinoConn = casinoPeer.connect(roomCode);
-        casinoConn.on('open', () => {
-            $('#casinoOnlineSetup').hide();
-            $('#casinoLobby').removeClass('hidden');
-            $('#casinoRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${roomCode}`);
-            $('#casinoEnemyInfo').html('✅ تم الاتصال! جاري بدء اللعبة...');
-            $('#casinoGameArea').fadeIn();
-            casinoConn.send({ type: 'join', myName: casinoMyName, myBalance: casinoMyBalance });
-            casinoSetupReceiver();
-            casinoUpdateUI();
-            casinoDisplayDice(1, 1);
-        });
-    });
-}
-
-function casinoSetupReceiver() {
-    casinoConn.on('data', data => {
-        if(data.type === 'init') {
-            casinoEnemyBalance = data.myBalance;
-            casinoUpdateUI();
-            casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null);
-            $('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);
-        }
-        if(data.type === 'join') {
-            casinoEnemyBalance = data.myBalance;
-            casinoUpdateUI();
-            casinoAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null);
-            $('#casinoEnemyInfo').html(`👤 الخصم: ${data.myName}`);
-            if(casinoRoomHost) { casinoConn.send({ type: 'start_turn', turn: true }); }
-        }
-        if(data.type === 'start_turn') {
-            casinoIsMyTurn = true;
-            $('#casinoResultMessage').html('🎲 دورك الآن! اختر رهانك وارمِ النرد').css('color', '#2ecc71');
-            setTimeout(() => { if($('#casinoResultMessage').html() === '🎲 دورك الآن! اختر رهانك وارمِ النرد') $('#casinoResultMessage').html(''); }, 3000);
-        }
-        if(data.type === 'opponent_result') {
-            if(data.win) {
-                casinoEnemyBalance += data.amount;
-                casinoAddToHistory(`👤 الخصم ربح ${data.amount} عملة (رهان ${casinoBetName(data.bet)} | نرد ${data.dice1}+${data.dice2})`, true);
-                $('#casinoResultMessage').html(`💥 الخصم ربح ${data.amount} عملة! دورك الآن`).css('color', '#f39c12');
-            } else {
-                casinoEnemyBalance -= data.amount;
-                casinoAddToHistory(`👤 الخصم خسر ${data.amount} عملة (رهان ${casinoBetName(data.bet)} | نرد ${data.dice1}+${data.dice2})`, false);
-                $('#casinoResultMessage').html(`✅ الخصم خسر ${data.amount} عملة! دورك الآن`).css('color', '#2ecc71');
-            }
-            casinoUpdateUI();
-            casinoIsMyTurn = true;
-            casinoCurrentBet = null;
-            $('.bet-btn').removeClass('selected');
-            $('#casinoRollBtn').prop('disabled', false);
-            setTimeout(() => {
-                if($('#casinoResultMessage').html() === `💥 الخصم ربح ${data.amount} عملة! دورك الآن` || 
-                   $('#casinoResultMessage').html() === `✅ الخصم خسر ${data.amount} عملة! دورك الآن`) {
-                    $('#casinoResultMessage').html('🎲 دورك الآن');
-                    setTimeout(() => $('#casinoResultMessage').html(''), 2000);
-                }
-            }, 3000);
-        }
-        if(data.type === 'game_over') {
-            $('#casinoResultMessage').html(`🏆 فزت! الخصم أفلست 🏆`).css('color', '#2ecc71');
-            $('#casinoRollBtn').prop('disabled', true);
-            casinoAddToHistory(`🏆 فوز! الخصم خسر اللعبة`, true);
-        }
-    });
-}
-
-function casinoResetGame() {
-    if(casinoConn) casinoConn.send({ type: 'reset_request' });
-    casinoMyBalance = 1000;
-    casinoEnemyBalance = 1000;
-    casinoCurrentBet = null;
-    casinoIsMyTurn = casinoRoomHost;
-    casinoUpdateUI();
-    casinoDisplayDice(1, 1);
-    $('#casinoResultMessage').html('🔄 تمت إعادة اللعبة!').css('color', '#ffd966');
-    $('.bet-btn').removeClass('selected');
-    $('#casinoRollBtn').prop('disabled', false);
-    $('#casinoHistoryList').empty();
-    setTimeout(() => { if($('#casinoResultMessage').html() === '🔄 تمت إعادة اللعبة!') $('#casinoResultMessage').html(''); }, 2000);
-}
-
-// ===================== سباق السيارات أونلاين =====================
-let racePeer = null, raceConn = null, raceMyName = "", raceMyBalance = 1000, raceEnemyBalance = 1000, raceSelectedCar = null, raceCurrentBet = 0, raceInProgress = false, raceInterval = null, raceRoomHost = false;
-const raceCars = [
-    { name: "الأحمر", multiplier: 2.5, position: 0, speed: 0 },
-    { name: "الأزرق", multiplier: 3.0, position: 0, speed: 0 },
-    { name: "الأخضر", multiplier: 4.0, position: 0, speed: 0 },
-    { name: "الأصفر", multiplier: 5.0, position: 0, speed: 0 }
-];
-
-function raceUpdateUI() { $('#raceBalance').text(raceMyBalance); $('#raceEnemyBalance').text(raceEnemyBalance); }
-function raceAddToHistory(msg, isWin) {
-    const historyDiv = $('#raceHistoryList');
-    const item = $('<div style="border-bottom:1px solid #333; padding:5px;"></div>');
-    item.html(msg);
-    if(isWin === true) item.css('color', '#2ecc71');
-    else if(isWin === false) item.css('color', '#e74c3c');
-    historyDiv.prepend(item);
-    while(historyDiv.children().length > 15) historyDiv.children().last().remove();
-}
-function raceResetPositions() {
-    for(let i=0; i<raceCars.length; i++) {
-        raceCars[i].position = 0;
-        $(`#raceProgress${i}`).css('width', '0%').text('0%');
-    }
-}
-
-function raceStartRace() {
-    if(raceInProgress) return;
-    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); setTimeout(() => $('#raceResultMessage').html(''), 1500); return; }
-    if(raceCurrentBet <= 0) { $('#raceResultMessage').html('⚠️ ضع رهاناً أولاً!'); return; }
-    if(raceCurrentBet > raceMyBalance) { $('#raceResultMessage').html('❌ رصيدك غير كافي!'); return; }
-    
-    raceInProgress = true;
-    $('#raceStartBtn').prop('disabled', true);
-    $('#racePlaceBetBtn').prop('disabled', true);
-    $('.car-bet-card').css('pointer-events', 'none');
-    raceMyBalance -= raceCurrentBet;
-    raceUpdateUI();
-    raceAddToHistory(`💰 راهنت بـ ${raceCurrentBet} على ${raceCars[raceSelectedCar].name} (×${raceCars[raceSelectedCar].multiplier})`, null);
-    if(raceConn) raceConn.send({ type: 'bet_placed', bet: raceCurrentBet, car: raceSelectedCar, balance: raceMyBalance });
-    raceResetPositions();
-    for(let i=0; i<raceCars.length; i++) { raceCars[i].speed = Math.random() * 2.5 + 1.2; }
-    if(raceInterval) clearInterval(raceInterval);
-    let raceFinished = false, winner = null;
-    
-    raceInterval = setInterval(() => {
-        if(raceFinished) return;
-        for(let i=0; i<raceCars.length; i++) {
-            if(raceCars[i].position < 100) {
-                let increment = raceCars[i].speed + (Math.random() * 1.5);
-                raceCars[i].position = Math.min(100, raceCars[i].position + increment);
-                let percent = Math.floor(raceCars[i].position);
-                $(`#raceProgress${i}`).css('width', `${percent}%`).text(`${percent}%`);
-            }
-        }
-        if(!raceFinished) {
-            for(let i=0; i<raceCars.length; i++) {
-                if(raceCars[i].position >= 100 && !raceFinished) { raceFinished = true; winner = i; break; }
-            }
-        }
-        if(raceFinished) {
-            clearInterval(raceInterval);
-            raceInProgress = false;
-            let winAmount = 0;
-            if(winner === raceSelectedCar) {
-                winAmount = raceCurrentBet * raceCars[winner].multiplier;
-                raceMyBalance += winAmount;
-                raceUpdateUI();
-                raceAddToHistory(`🏆 فزت! ${raceCars[winner].name} فاز! ربحت ${Math.floor(winAmount)}!`, true);
-                $('#raceResultMessage').html(`🏆 فزت! ربحت ${Math.floor(winAmount)}!`).css('color', '#2ecc71');
-                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: winAmount, myBalance: raceMyBalance });
-            } else {
-                raceAddToHistory(`❌ خسرت! ${raceCars[winner].name} فاز. خسرت ${raceCurrentBet}.`, false);
-                $('#raceResultMessage').html(`💔 خسرت! ${raceCars[winner].name} فاز`).css('color', '#e74c3c');
-                if(raceConn) raceConn.send({ type: 'race_result', winner: winner, winAmount: 0, myBalance: raceMyBalance });
-            }
-            $('#raceStartBtn').prop('disabled', false);
-            $('#racePlaceBetBtn').prop('disabled', false);
-            $('.car-bet-card').css('pointer-events', 'auto');
-            raceCurrentBet = 0; raceSelectedCar = null;
-            $('.car-bet-card').removeClass('selected');
-            setTimeout(() => $('#raceResultMessage').html(''), 3000);
-            if(raceMyBalance <= 0) { $('#raceResultMessage').html('💀 أفلست!'); $('#raceStartBtn').prop('disabled', true); }
-        }
-    }, 50);
-}
-
-function racePlaceBet() {
-    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
-    if(raceSelectedCar === null) { $('#raceResultMessage').html('⚠️ اختر سيارة أولاً!'); return; }
-    let betVal = parseInt($('#raceBetAmount').val());
-    if(isNaN(betVal)) betVal = 50;
-    if(betVal < 10) betVal = 10;
-    if(betVal > 10000) betVal = 10000;
-    if(betVal > raceMyBalance) { $('#raceResultMessage').html(`❌ رصيدك ${raceMyBalance} فقط!`); return; }
-    raceCurrentBet = betVal;
-    $('#raceBetAmount').val(betVal);
-    $('#raceStartBtn').prop('disabled', false);
-    $('#raceResultMessage').html(`✅ تم وضع الرهان ${raceCurrentBet} على ${raceCars[raceSelectedCar].name}`);
-    setTimeout(() => $('#raceResultMessage').html(''), 1500);
-}
-
-function raceSelectCar(carIndex) {
-    if(raceInProgress) { $('#raceResultMessage').html('⏳ السباق جاري...'); return; }
-    raceSelectedCar = carIndex;
-    $('.car-bet-card').removeClass('selected');
-    $(`.car-bet-card[data-car='${carIndex}']`).addClass('selected');
-    if(raceCurrentBet > 0 && raceCurrentBet <= raceMyBalance) $('#raceStartBtn').prop('disabled', false);
-    else $('#raceStartBtn').prop('disabled', true);
-}
-
-function raceHostGame() {
-    raceMyName = $('#racePlayerName').val().trim();
-    if(!raceMyName) { alert("اكتب اسمك"); return; }
-    raceRoomHost = true;
-    let roomId = "RACE_" + Math.floor(1000 + Math.random() * 9000);
-    racePeer = new Peer(roomId);
-    racePeer.on('open', () => {
-        $('#raceSetup').hide();
-        $('#raceLobby').removeClass('hidden');
-        $('#raceRoomDisplay').html(`🔑 كود غرفتك: <strong style="color:#f1c40f;">${roomId}</strong><br>انتظر الخصم...`);
-        $('#raceEnemyInfo').html('⏳ جاري انتظار الخصم...');
-        $('#raceGameArea').hide();
-    });
-    racePeer.on('connection', conn => {
-        raceConn = conn;
-        $('#raceEnemyInfo').html('✅ تم اتصال الخصم!');
-        $('#raceGameArea').fadeIn();
-        raceSetupReceiver();
-        raceConn.send({ type: 'init', myName: raceMyName, myBalance: raceMyBalance });
-        raceUpdateUI();
-    });
-}
-
-function raceJoinGame() {
-    raceMyName = $('#racePlayerName').val().trim();
-    let roomCode = $('#raceRoomCode').val().trim();
-    if(!raceMyName) { alert("اكتب اسمك"); return; }
-    if(!roomCode) { alert("اكتب كود الغرفة"); return; }
-    raceRoomHost = false;
-    racePeer = new Peer();
-    racePeer.on('open', () => {
-        raceConn = racePeer.connect(roomCode);
-        raceConn.on('open', () => {
-            $('#raceSetup').hide();
-            $('#raceLobby').removeClass('hidden');
-            $('#raceRoomDisplay').html(`🎲 تم الاتصال بالغرفة: ${roomCode}`);
-            $('#raceEnemyInfo').html('✅ تم الاتصال!');
-            $('#raceGameArea').fadeIn();
-            raceConn.send({ type: 'join', myName: raceMyName, myBalance: raceMyBalance });
-            raceSetupReceiver();
-            raceUpdateUI();
-        });
-    });
-}
-
-function raceSetupReceiver() {
-    raceConn.on('data', data => {
-        if(data.type === 'init') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
-        if(data.type === 'join') { raceEnemyBalance = data.myBalance; raceUpdateUI(); raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`, null); $('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`); }
-        if(data.type === 'bet_placed') { raceEnemyBalance = data.balance; raceUpdateUI(); raceAddToHistory(`👤 الخصم راهن بـ ${data.bet} على ${raceCars[data.car].name}`, null); }
-        if(data.type === 'race_result') {
-            if(data.winAmount > 0) { raceEnemyBalance = data.myBalance; raceAddToHistory(`👤 الخصم ربح ${data.winAmount}!`, true); }
-            else { raceEnemyBalance = data.myBalance; raceAddToHistory(`👤 الخصم خسر`, false); }
-            raceUpdateUI();
-        }
-    });
-}
-
-// ===================== تبديل الألعاب =====================
-function showGame(t) {
-    $('#main-menu').hide();
-    if(t === 'mafia') {
-        $('#mafia-section').removeClass('hidden');
-    } else if(t === 'chess') {
-        $('#chess-section').removeClass('hidden');
-        initChess();
-    } else if(t === 'spy') {
-        $('#spy-section').removeClass('hidden');
-    } else if(t === 'spyOnline') {
-        $('#spy-online-section').removeClass('hidden');
-    } else if(t === 'casinoOnline') {
-        $('#casinoOnline-section').removeClass('hidden');
-    } else if(t === 'raceOnline') {
-        $('#raceOnline-section').removeClass('hidden');
-    }
-}
-
-// ربط أزرار القمار والسباق بعد تحميل الصفحة
-$(document).ready(function() {
-    // أزرار الكازينو
-    $(document).on('click', '.bet-btn', function() {
-        if(casinoIsRolling) return;
-        if(!casinoIsMyTurn) {
-            $('#casinoResultMessage').html('⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان').css('color', '#f39c12');
-            setTimeout(() => { if($('#casinoResultMessage').html() === '⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان') $('#casinoResultMessage').html(''); }, 1500);
-            return;
-        }
-        const betType = $(this).attr('data-casino-bet');
-        casinoCurrentBet = betType;
-        $('.bet-btn').removeClass('selected');
-        $(this).addClass('selected');
-        $('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(betType)}`).css('color', '#3498db');
-        setTimeout(() => { if($('#casinoResultMessage').html() === `🎲 تم اختيار الرهان: ${casinoBetName(betType)}`) $('#casinoResultMessage').html(''); }, 1200);
-    });
-    $(document).on('click', '#casinoRollBtn', casinoRollDice);
-    $(document).on('click', '#casinoResetBtn', casinoResetGame);
-    $('#casinoBetAmount').on('change', function() {
-        let val = parseInt($(this).val());
-        if(isNaN(val)) $(this).val(50);
-        if(val < 10) $(this).val(10);
-        if(val > 10000) $(this).val(10000);
-        if(val > casinoMyBalance && casinoMyBalance > 0) $(this).val(casinoMyBalance);
-    });
-
-    // أزرار السباق
-    $(document).on('click', '.car-bet-card', function() {
-        const carIdx = parseInt($(this).attr('data-car'));
-        raceSelectCar(carIdx);
-    });
-    $(document).on('click', '#racePlaceBetBtn', racePlaceBet);
-    $(document).on('click', '#raceStartBtn', raceStartRace);
-    $('#raceBetAmount').on('change', function() {
-        let val = parseInt($(this).val());
-        if(isNaN(val)) $(this).val(50);
-        if(val < 10) $(this).val(10);
-        if(val > 10000) $(this).val(10000);
-        if(val > raceMyBalance && raceMyBalance > 0) $(this).val(raceMyBalance);
-    });
+$(document).ready(function(){
+    $(document).on('click','.bet-btn',function(){if(casinoIsRolling)return;if(!casinoIsMyTurn){$('#casinoResultMessage').html('⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان').css('color','#f39c12');setTimeout(()=>{if($('#casinoResultMessage').html()==='⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان')$('#casinoResultMessage').html('');},1500);return;}const bt=$(this).attr('data-casino-bet');casinoCurrentBet=bt;$('.bet-btn').removeClass('selected');$(this).addClass('selected');$('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(bt)}`).css('color','#3498db');setTimeout(()=>{if($('#casinoResultMessage').html()===`🎲 تم اختيار الرهان: ${casinoBetName(bt)}`)$('#casinoResultMessage').html('');},1200);});
+    $(document).on('click','#casinoRollBtn',casinoRollDice);
+    $(document).on('click','#casinoResetBtn',casinoResetGame);
+    $('#casinoBetAmount').on('change',function(){let v=parseInt($(this).val());if(isNaN(v))$(this).val(50);if(v<10)$(this).val(10);if(v>10000)$(this).val(10000);if(v>casinoMyBalance&&casinoMyBalance>0)$(this).val(casinoMyBalance);});
+    $(document).on('click','.car-bet-card',function(){raceSelectCar(parseInt($(this).attr('data-car')));});
+    $(document).on('click','#racePlaceBetBtn',racePlaceBet);
+    $(document).on('click','#raceStartBtn',raceStartRace);
+    $('#raceBetAmount').on('change',function(){let v=parseInt($(this).val());if(isNaN(v))$(this).val(50);if(v<10)$(this).val(10);if(v>10000)$(this).val(10000);if(v>raceMyBalance&&raceMyBalance>0)$(this).val(raceMyBalance);});
 });
 </script>
 </body>
