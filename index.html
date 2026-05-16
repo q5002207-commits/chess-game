@@ -339,6 +339,13 @@
         <button class="menu-btn" style="border-color: #2ecc71;" onclick="showGameWithPassword()">🦘 لعبة القفز - متجر القوى</button>
         <button class="menu-btn" style="border-color: #f39c12;" onclick="showGame('casinoOnline')">🎲 كازينو النرد أونلاين 🎲</button>
         <button class="menu-btn" style="border-color: #f1c40f;" onclick="showGame('raceOnline')">🏁 سباق السيارات أونلاين 🏎️</button>
+        <button class="menu-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showGame('drone')">🚁 FPV War - Kamikaze Drone 💥</button>
+    </div>
+
+    <!-- ===================== لعبة الدرون ===================== -->
+    <div id="drone-section" class="hidden">
+        <button class="back-home" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+        <div id="droneGameContainer"></div>
     </div>
 
     <!-- المافيا -->
@@ -652,20 +659,29 @@ function setupFriendsListeners() {
     friendsListeners = [];
     const uid = currentUser.uid;
 
-    // أصدقاء
+    // أصدقاء - query بدون compound index (filter client-side)
     friendsListeners.push(
-        db.collection('friends').where('users','array-contains',uid).where('status','==','accepted')
-        .onSnapshot(snap => { friendsList = snap.docs.map(d => ({id:d.id,...d.data()})); renderFriends(); })
+        db.collection('friends').where('users','array-contains',uid)
+        .onSnapshot(snap => {
+            friendsList = snap.docs.map(d => ({id:d.id,...d.data()})).filter(d => d.status === 'accepted');
+            renderFriends();
+        }, err => console.warn('friends listener:', err))
     );
-    // طلبات واردة
+    // طلبات واردة - query بدون compound index
     friendsListeners.push(
-        db.collection('friend_requests').where('toUid','==',uid).where('status','==','pending')
-        .onSnapshot(snap => { pendingRequests = snap.docs.map(d => ({id:d.id,...d.data()})); renderRequests(); updateBadge(); })
+        db.collection('friend_requests').where('toUid','==',uid)
+        .onSnapshot(snap => {
+            pendingRequests = snap.docs.map(d => ({id:d.id,...d.data()})).filter(d => d.status === 'pending');
+            renderRequests(); updateBadge();
+        }, err => console.warn('requests listener:', err))
     );
-    // دعوات غرف
+    // دعوات غرف - query بدون compound index
     friendsListeners.push(
-        db.collection('game_invites').where('toUid','==',uid).where('status','==','pending')
-        .onSnapshot(snap => { gameInvites = snap.docs.map(d => ({id:d.id,...d.data()})); renderInvites(); updateBadge(); })
+        db.collection('game_invites').where('toUid','==',uid)
+        .onSnapshot(snap => {
+            gameInvites = snap.docs.map(d => ({id:d.id,...d.data()})).filter(d => d.status === 'pending');
+            renderInvites(); updateBadge();
+        }, err => console.warn('invites listener:', err))
     );
 }
 
@@ -797,18 +813,24 @@ async function addByCode() {
 }
 async function doSendRequest(target) {
     if (target.uid === currentUser.uid) { showFMsg('addMsg','😅 ما تقدر تضيف نفسك!','err'); return; }
-    if (friendsList.some(f => f.users.includes(target.uid))) { showFMsg('addMsg','✅ هذا الشخص صديقك بالفعل!','inf'); return; }
-    const ex = await db.collection('friend_requests').where('fromUid','==',currentUser.uid).where('toUid','==',target.uid).limit(1).get();
-    if (!ex.empty) { showFMsg('addMsg','⚠️ أرسلت له طلب قبل','inf'); return; }
-    await db.collection('friend_requests').add({
-        fromUid: currentUser.uid, fromName: currentUser.displayName || currentUser.email,
-        fromEmail: currentUser.email, fromPhoto: currentUser.photoURL || '',
-        toUid: target.uid, toName: target.displayName || target.email,
-        status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    showFMsg('addMsg',`✅ تم إرسال طلب لـ ${target.displayName || target.email}!`,'ok');
-    document.getElementById('searchFriendInput').value = '';
-    document.getElementById('friendCodeInput').value = '';
+    if (friendsList.some(f => f.users && f.users.includes(target.uid))) { showFMsg('addMsg','✅ هذا الشخص صديقك بالفعل!','inf'); return; }
+    // تحقق من الطلبات السابقة - بدون compound index
+    try {
+        const ex = await db.collection('friend_requests').where('fromUid','==',currentUser.uid).get();
+        const alreadySent = ex.docs.some(d => d.data().toUid === target.uid && d.data().status === 'pending');
+        if (alreadySent) { showFMsg('addMsg','⚠️ أرسلت له طلب قبل، انتظر رده','inf'); return; }
+    } catch(e) {}
+    try {
+        await db.collection('friend_requests').add({
+            fromUid: currentUser.uid, fromName: currentUser.displayName || currentUser.email,
+            fromEmail: currentUser.email, fromPhoto: currentUser.photoURL || '',
+            toUid: target.uid, toName: target.displayName || target.email,
+            status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showFMsg('addMsg',`✅ تم إرسال طلب لـ ${target.displayName || target.email}!`,'ok');
+        document.getElementById('searchFriendInput').value = '';
+        document.getElementById('friendCodeInput').value = '';
+    } catch(e) { showFMsg('addMsg','⚠️ خطأ في الإرسال: '+e.message,'err'); }
 }
 async function acceptReq(id, fromUid) {
     try {
@@ -1024,7 +1046,7 @@ function raceJoinGame(){raceMyName=$('#racePlayerName').val().trim();let rc=$('#
 function raceSetupReceiver(){raceConn.on('data',data=>{if(data.type==='init'||data.type==='join'){raceEnemyBalance=data.myBalance;raceUpdateUI();raceAddToHistory(`🎮 ${data.myName} دخل اللعبة`,null);$('#raceEnemyInfo').html(`👤 الخصم: ${data.myName}`);}if(data.type==='bet_placed'){raceEnemyBalance=data.balance;raceUpdateUI();raceAddToHistory(`👤 الخصم راهن بـ ${data.bet} على ${raceCars[data.car].name}`,null);}if(data.type==='race_result'){raceEnemyBalance=data.myBalance;raceUpdateUI();raceAddToHistory(data.winAmount>0?`👤 الخصم ربح ${data.winAmount}!`:'👤 الخصم خسر',data.winAmount>0);}});}
 
 // تبديل الألعاب
-function showGame(t){$('#main-menu').hide();if(t==='mafia')$('#mafia-section').removeClass('hidden');else if(t==='chess'){$('#chess-section').removeClass('hidden');initChess();}else if(t==='spy')$('#spy-section').removeClass('hidden');else if(t==='spyOnline')$('#spy-online-section').removeClass('hidden');else if(t==='casinoOnline')$('#casinoOnline-section').removeClass('hidden');else if(t==='raceOnline')$('#raceOnline-section').removeClass('hidden');}
+function showGame(t){$('#main-menu').hide();if(t==='mafia')$('#mafia-section').removeClass('hidden');else if(t==='chess'){$('#chess-section').removeClass('hidden');initChess();}else if(t==='spy')$('#spy-section').removeClass('hidden');else if(t==='spyOnline')$('#spy-online-section').removeClass('hidden');else if(t==='casinoOnline')$('#casinoOnline-section').removeClass('hidden');else if(t==='raceOnline')$('#raceOnline-section').removeClass('hidden');else if(t==='drone'){$('#drone-section').removeClass('hidden');startDroneGame();}}
 
 $(document).ready(function(){
     $(document).on('click','.bet-btn',function(){if(casinoIsRolling)return;if(!casinoIsMyTurn){$('#casinoResultMessage').html('⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان').css('color','#f39c12');setTimeout(()=>{if($('#casinoResultMessage').html()==='⏳ دور الخصم حالياً، لا يمكنك تغيير الرهان')$('#casinoResultMessage').html('');},1500);return;}const bt=$(this).attr('data-casino-bet');casinoCurrentBet=bt;$('.bet-btn').removeClass('selected');$(this).addClass('selected');$('#casinoResultMessage').html(`🎲 تم اختيار الرهان: ${casinoBetName(bt)}`).css('color','#3498db');setTimeout(()=>{if($('#casinoResultMessage').html()===`🎲 تم اختيار الرهان: ${casinoBetName(bt)}`)$('#casinoResultMessage').html('');},1200);});
@@ -1036,6 +1058,452 @@ $(document).ready(function(){
     $(document).on('click','#raceStartBtn',raceStartRace);
     $('#raceBetAmount').on('change',function(){let v=parseInt($(this).val());if(isNaN(v))$(this).val(50);if(v<10)$(this).val(10);if(v>10000)$(this).val(10000);if(v>raceMyBalance&&raceMyBalance>0)$(this).val(raceMyBalance);});
 });
+// ===================== FPV War - Kamikaze Drone =====================
+let droneStarted = false;
+function startDroneGame() {
+    if (droneStarted) return;
+    droneStarted = true;
+    const container = document.getElementById('droneGameContainer');
+    container.innerHTML = `
+    <style>
+        #droneCanvas { display:block; margin:0 auto; background:#1a1a2e; border-radius:12px; cursor:crosshair; touch-action:none; }
+        .drone-ui { max-width:700px; margin:0 auto; padding:10px; font-family:'Segoe UI',sans-serif; }
+        .drone-hud { display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.7); border:1px solid #00ffff; border-radius:10px; padding:8px 14px; margin-bottom:10px; flex-wrap:wrap; gap:6px; }
+        .drone-stat { color:#00ffff; font-size:0.8rem; font-weight:bold; }
+        .drone-stat span { color:#fff; }
+        .drone-hp-bar { width:120px; height:10px; background:#333; border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; }
+        .drone-hp-fill { height:100%; background:linear-gradient(90deg,#e74c3c,#e74c3c); border-radius:5px; transition:width 0.2s; }
+        .drone-ammo { color:#f1c40f; font-size:0.8rem; }
+        .drone-btns { display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+        .drone-btn { background:#111; border:2px solid #00ffff; color:#00ffff; padding:8px 18px; border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; width:auto; transition:0.2s; }
+        .drone-btn:active, .drone-btn:hover { background:#00ffff22; }
+        .drone-btn.red { border-color:#e74c3c; color:#e74c3c; }
+        .drone-btn.red:hover { background:#e74c3c22; }
+        .drone-wave { text-align:center; color:#00ffff; font-size:1rem; font-weight:bold; margin-bottom:6px; }
+        .drone-touch-area { display:flex; gap:8px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+        .drone-touch-btn { background:#0a0a1a; border:2px solid #00ffff44; color:#00ffff; padding:12px 20px; border-radius:10px; cursor:pointer; font-size:1.1rem; width:auto; user-select:none; -webkit-tap-highlight-color:transparent; }
+        @media(max-width:500px){ #droneCanvas{width:100% !important; height:auto !important;} }
+    </style>
+    <div class="drone-ui">
+        <div class="drone-wave" id="droneWave">🚁 FPV War - Wave 1</div>
+        <div class="drone-hud">
+            <div class="drone-stat">❤️ HP: <div class="drone-hp-bar"><div class="drone-hp-fill" id="droneHpFill" style="width:100%"></div></div></div>
+            <div class="drone-stat">💥 Score: <span id="droneScore">0</span></div>
+            <div class="drone-stat">🌊 Wave: <span id="droneWaveNum">1</span></div>
+            <div class="drone-stat">🔋 Fuel: <span id="droneFuel">100</span>%</div>
+            <div class="drone-ammo">🎯 Missiles: <span id="droneMissiles">5</span></div>
+        </div>
+        <canvas id="droneCanvas" width="680" height="420"></canvas>
+        <div class="drone-touch-area">
+            <button class="drone-touch-btn" id="dBtnLeft">◀</button>
+            <button class="drone-touch-btn" id="dBtnUp">▲</button>
+            <button class="drone-touch-btn" id="dBtnFire">💥 FIRE</button>
+            <button class="drone-touch-btn" id="dBtnDown">▼</button>
+            <button class="drone-touch-btn" id="dBtnRight">▶</button>
+        </div>
+        <div class="drone-btns">
+            <button class="drone-btn" id="dronePauseBtn">⏸ إيقاف</button>
+            <button class="drone-btn red" id="droneRestartBtn">🔄 إعادة</button>
+        </div>
+        <div style="text-align:center;color:#555;font-size:0.7rem;margin-top:8px;">WASD / أسهم للتحريك | Space / F للإطلاق | كاميكازي: اصطدم بالأعداء!</div>
+    </div>`;
+
+    const canvas = document.getElementById('droneCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    // ── State ──
+    let score=0, wave=1, gameOver=false, paused=false;
+    let fuel=100, missiles=5, hp=100;
+    let frameCount=0;
+
+    // ── Drone ──
+    const drone = { x:W/2, y:H-80, w:38, h:22, vx:0, vy:0, speed:4.5, trail:[] };
+
+    // ── Bullets ──
+    let bullets = [];       // player bullets
+    let eBullets = [];      // enemy bullets
+
+    // ── Enemies ──
+    let enemies = [];
+    let explosions = [];
+    let stars = [];
+
+    // ── Keys ──
+    const keys = {};
+    document.addEventListener('keydown', e => {
+        keys[e.code] = true;
+        if ((e.code==='Space'||e.code==='KeyF') && !gameOver && !paused) { e.preventDefault(); fireMissile(); }
+    });
+    document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+    // ── Touch buttons ──
+    const touchMap = {
+        dBtnLeft:  () => { keys['ArrowLeft']=true; },
+        dBtnRight: () => { keys['ArrowRight']=true; },
+        dBtnUp:    () => { keys['ArrowUp']=true; },
+        dBtnDown:  () => { keys['ArrowDown']=true; },
+        dBtnFire:  () => { fireMissile(); }
+    };
+    Object.entries(touchMap).forEach(([id, fn]) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, e => { e.preventDefault(); fn(); }, {passive:false}));
+        if (id !== 'dBtnFire') {
+            ['touchend','mouseup','touchcancel'].forEach(ev => btn.addEventListener(ev, e => {
+                e.preventDefault();
+                keys['ArrowLeft']=keys['ArrowRight']=keys['ArrowUp']=keys['ArrowDown']=false;
+            }, {passive:false}));
+        }
+    });
+
+    // ── Canvas click = kamikaze or fire ──
+    canvas.addEventListener('click', e => {
+        if (gameOver || paused) return;
+        const r = canvas.getBoundingClientRect();
+        const mx = (e.clientX - r.left) * (W / r.width);
+        const my = (e.clientY - r.top)  * (H / r.height);
+        // fire toward click direction
+        const ang = Math.atan2(my - drone.y, mx - drone.x);
+        bullets.push({ x:drone.x, y:drone.y, vx:Math.cos(ang)*10, vy:Math.sin(ang)*10, r:5, kamikaze:false });
+    });
+
+    // ── Stars ──
+    for (let i=0; i<60; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.3, s:Math.random()*0.5+0.2 });
+
+    function spawnWave(w) {
+        enemies = [];
+        const count = 4 + w * 2;
+        const types = ['jet','tank','heli','boss'];
+        for (let i=0; i<count; i++) {
+            const t = w >= 3 && i === 0 ? 'boss' : types[Math.floor(Math.random()*3)];
+            enemies.push({
+                x: Math.random()*(W-60)+30,
+                y: Math.random()*(H*0.45)+20,
+                w: t==='boss'?60:36, h: t==='boss'?36:22,
+                hp: t==='boss'?8:t==='tank'?3:1,
+                maxHp: t==='boss'?8:t==='tank'?3:1,
+                vx: (Math.random()-0.5)*(2+w*0.3),
+                vy: (Math.random()-0.5)*0.6,
+                type: t,
+                shootTimer: Math.random()*90+30,
+                color: t==='boss'?'#e74c3c':t==='tank'?'#8e44ad':t==='heli'?'#f39c12':'#3498db'
+            });
+        }
+        missiles = Math.min(missiles + 3 + w, 12);
+        document.getElementById('droneMissiles').textContent = missiles;
+        document.getElementById('droneWave').textContent = `🚁 FPV War - Wave ${w}`;
+        document.getElementById('droneWaveNum').textContent = w;
+    }
+
+    function fireMissile() {
+        if (missiles <= 0) return;
+        missiles--;
+        document.getElementById('droneMissiles').textContent = missiles;
+        bullets.push({ x:drone.x, y:drone.y-drone.h/2, vx:0, vy:-12, r:6, kamikaze:false });
+    }
+
+    function kamikazeRush() {
+        // Fly toward nearest enemy at high speed
+        if (enemies.length === 0) return;
+        let nearest = enemies.reduce((a,b) => {
+            const da = Math.hypot(a.x-drone.x, a.y-drone.y);
+            const db = Math.hypot(b.x-drone.x, b.y-drone.y);
+            return da < db ? a : b;
+        });
+        const ang = Math.atan2(nearest.y - drone.y, nearest.x - drone.x);
+        drone.vx = Math.cos(ang) * 18;
+        drone.vy = Math.sin(ang) * 18;
+    }
+
+    function spawnExplosion(x, y, big) {
+        const count = big ? 20 : 10;
+        for (let i=0; i<count; i++) {
+            const ang = Math.random()*Math.PI*2;
+            const spd = Math.random()*(big?5:3)+1;
+            explosions.push({ x, y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, r:Math.random()*(big?8:5)+2, life:big?40:25, maxLife:big?40:25, color:['#f1c40f','#e74c3c','#ff8c00','#fff'][Math.floor(Math.random()*4)] });
+        }
+    }
+
+    function updateDrone() {
+        const spd = drone.speed;
+        if (keys['ArrowLeft']||keys['KeyA'])  drone.vx -= 0.7;
+        if (keys['ArrowRight']||keys['KeyD']) drone.vx += 0.7;
+        if (keys['ArrowUp']||keys['KeyW'])    drone.vy -= 0.7;
+        if (keys['ArrowDown']||keys['KeyS'])  drone.vy += 0.7;
+        drone.vx *= 0.82; drone.vy *= 0.82;
+        drone.vx = Math.max(-spd, Math.min(spd, drone.vx));
+        drone.vy = Math.max(-spd, Math.min(spd, drone.vy));
+        drone.x += drone.vx; drone.y += drone.vy;
+        drone.x = Math.max(drone.w/2, Math.min(W-drone.w/2, drone.x));
+        drone.y = Math.max(drone.h/2, Math.min(H-drone.h/2, drone.y));
+        drone.trail.push({x:drone.x, y:drone.y});
+        if (drone.trail.length > 14) drone.trail.shift();
+        // fuel
+        if (keys['ArrowLeft']||keys['ArrowRight']||keys['ArrowUp']||keys['ArrowDown']||keys['KeyA']||keys['KeyD']||keys['KeyW']||keys['KeyS']) {
+            fuel -= 0.04;
+            if (fuel < 0) fuel = 0;
+        } else { fuel = Math.min(100, fuel + 0.02); }
+        document.getElementById('droneFuel').textContent = Math.floor(fuel);
+    }
+
+    function updateBullets() {
+        bullets = bullets.filter(b => b.x>-10 && b.x<W+10 && b.y>-10 && b.y<H+10);
+        bullets.forEach(b => { b.x += b.vx; b.y += b.vy; });
+        // check hits
+        bullets.forEach((b,bi) => {
+            enemies.forEach((e,ei) => {
+                if (Math.abs(b.x-e.x)<e.w/2+b.r && Math.abs(b.y-e.y)<e.h/2+b.r) {
+                    e.hp--;
+                    spawnExplosion(b.x, b.y, false);
+                    bullets.splice(bi, 1);
+                    if (e.hp <= 0) {
+                        spawnExplosion(e.x, e.y, true);
+                        score += e.type==='boss'?500:e.type==='tank'?150:80;
+                        document.getElementById('droneScore').textContent = score;
+                        enemies.splice(ei, 1);
+                    }
+                }
+            });
+        });
+    }
+
+    function updateEnemies() {
+        enemies.forEach(e => {
+            e.x += e.vx; e.y += e.vy;
+            if (e.x < e.w/2 || e.x > W-e.w/2) e.vx *= -1;
+            if (e.y < e.h/2 || e.y > H*0.55) e.vy *= -1;
+            // shoot
+            e.shootTimer--;
+            if (e.shootTimer <= 0) {
+                e.shootTimer = 50 + Math.random()*60;
+                const ang = Math.atan2(drone.y-e.y, drone.x-e.x);
+                const spd = e.type==='boss'?5:3;
+                eBullets.push({ x:e.x, y:e.y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, r:4 });
+            }
+            // drone collision = kamikaze dmg
+            if (Math.abs(drone.x-e.x)<(e.w+drone.w)/2-4 && Math.abs(drone.y-e.y)<(e.h+drone.h)/2-4) {
+                const dmg = e.type==='boss'?30:20;
+                hp -= dmg; if (hp<0) hp=0;
+                spawnExplosion((drone.x+e.x)/2,(drone.y+e.y)/2,true);
+                score += Math.floor(e.type==='boss'?300:100);
+                document.getElementById('droneScore').textContent = score;
+                e.hp = 0; // destroy enemy too (kamikaze!)
+            }
+        });
+        enemies = enemies.filter(e => e.hp > 0);
+
+        // enemy bullets hit drone
+        eBullets = eBullets.filter(b => b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
+        eBullets.forEach((b,bi) => {
+            b.x+=b.vx; b.y+=b.vy;
+            if (Math.abs(b.x-drone.x)<drone.w/2+b.r && Math.abs(b.y-drone.y)<drone.h/2+b.r) {
+                hp -= 8; if(hp<0) hp=0;
+                spawnExplosion(b.x, b.y, false);
+                eBullets.splice(bi,1);
+            }
+        });
+
+        document.getElementById('droneHpFill').style.width = hp+'%';
+        document.getElementById('droneHpFill').style.background = hp>50?'#2ecc71':hp>25?'#f39c12':'#e74c3c';
+    }
+
+    function updateExplosions() {
+        explosions.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.life--; p.r*=0.96; });
+        explosions = explosions.filter(p => p.life>0 && p.r>0.5);
+    }
+
+    function drawStars() {
+        stars.forEach(s => { s.y+=s.s; if(s.y>H) s.y=0; ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
+    }
+
+    function drawDrone() {
+        // trail
+        drone.trail.forEach((p,i) => {
+            const a = i/drone.trail.length * 0.4;
+            ctx.fillStyle = `rgba(0,255,255,${a})`;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3*(i/drone.trail.length), 0, Math.PI*2); ctx.fill();
+        });
+        // body
+        ctx.save(); ctx.translate(drone.x, drone.y);
+        // glow
+        ctx.shadowColor='#00ffff'; ctx.shadowBlur=18;
+        // fuselage
+        ctx.fillStyle='#00ffff';
+        ctx.beginPath(); ctx.ellipse(0,0,drone.w/2,drone.h/2,0,0,Math.PI*2); ctx.fill();
+        // cockpit
+        ctx.fillStyle='#003344';
+        ctx.beginPath(); ctx.ellipse(0,0,drone.w/4,drone.h/3,0,0,Math.PI*2); ctx.fill();
+        // rotors
+        ctx.strokeStyle='#00ffff88'; ctx.lineWidth=2;
+        [[-drone.w/2-8,-drone.h/2],[drone.w/2+8,-drone.h/2],[-drone.w/2-8,drone.h/2],[drone.w/2+8,drone.h/2]].forEach(([rx,ry])=>{
+            const spin = frameCount*0.3;
+            ctx.save(); ctx.translate(rx,ry);
+            ctx.rotate(spin);
+            ctx.beginPath(); ctx.moveTo(-8,0); ctx.lineTo(8,0); ctx.stroke();
+            ctx.rotate(Math.PI/2);
+            ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.stroke();
+            ctx.restore();
+        });
+        ctx.shadowBlur=0;
+        ctx.restore();
+    }
+
+    function drawEnemies() {
+        enemies.forEach(e => {
+            ctx.save(); ctx.translate(e.x, e.y);
+            ctx.shadowColor=e.color; ctx.shadowBlur=12;
+            if (e.type==='boss') {
+                // big boss triangle
+                ctx.fillStyle=e.color;
+                ctx.beginPath(); ctx.moveTo(0,-e.h); ctx.lineTo(e.w/2,e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.closePath(); ctx.fill();
+                ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+                // hp bar
+                ctx.fillStyle='#333'; ctx.fillRect(-e.w/2,-e.h-8,e.w,5);
+                ctx.fillStyle='#e74c3c'; ctx.fillRect(-e.w/2,-e.h-8,e.w*(e.hp/e.maxHp),5);
+            } else if (e.type==='tank') {
+                ctx.fillStyle=e.color;
+                ctx.fillRect(-e.w/2,-e.h/2,e.w,e.h);
+                ctx.fillStyle='#7f8c8d'; ctx.fillRect(-4,-e.h/2-10,8,12);
+                ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.strokeRect(-e.w/2,-e.h/2,e.w,e.h);
+            } else if (e.type==='heli') {
+                ctx.fillStyle=e.color;
+                ctx.beginPath(); ctx.ellipse(0,0,e.w/2,e.h/2,0,0,Math.PI*2); ctx.fill();
+                // rotor
+                ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+                const r2 = frameCount*0.4;
+                ctx.save(); ctx.rotate(r2);
+                ctx.beginPath(); ctx.moveTo(-e.w/2,0); ctx.lineTo(e.w/2,0); ctx.stroke();
+                ctx.restore();
+            } else {
+                // jet
+                ctx.fillStyle=e.color;
+                ctx.beginPath(); ctx.moveTo(0,-e.h); ctx.lineTo(e.w/3,e.h/2); ctx.lineTo(0,e.h/4); ctx.lineTo(-e.w/3,e.h/2); ctx.closePath(); ctx.fill();
+            }
+            ctx.shadowBlur=0; ctx.restore();
+        });
+    }
+
+    function drawBullets() {
+        bullets.forEach(b => {
+            ctx.save();
+            ctx.shadowColor='#00ffff'; ctx.shadowBlur=10;
+            ctx.fillStyle='#00ffff';
+            ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
+            ctx.restore();
+        });
+        eBullets.forEach(b => {
+            ctx.save();
+            ctx.shadowColor='#ff4444'; ctx.shadowBlur=8;
+            ctx.fillStyle='#ff4444';
+            ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
+            ctx.restore();
+        });
+    }
+
+    function drawExplosions() {
+        explosions.forEach(p => {
+            const a = p.life/p.maxLife;
+            ctx.globalAlpha = a;
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1;
+        });
+    }
+
+    function drawHUD() {
+        // scanlines effect
+        ctx.fillStyle='rgba(0,255,255,0.015)';
+        for (let y=0; y<H; y+=4) { ctx.fillRect(0,y,W,2); }
+        // border
+        ctx.strokeStyle='rgba(0,255,255,0.3)'; ctx.lineWidth=2;
+        ctx.strokeRect(2,2,W-4,H-4);
+    }
+
+    function drawGameOver() {
+        ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#e74c3c'; ctx.font='bold 42px Arial'; ctx.textAlign='center';
+        ctx.fillText('💥 DRONE DOWN 💥', W/2, H/2-30);
+        ctx.fillStyle='#00ffff'; ctx.font='bold 22px Arial';
+        ctx.fillText(`Score: ${score}  |  Wave: ${wave}`, W/2, H/2+15);
+        ctx.fillStyle='#aaa'; ctx.font='16px Arial';
+        ctx.fillText('اضغط إعادة للمتابعة', W/2, H/2+50);
+        ctx.textAlign='left';
+    }
+
+    function drawWaveClear() {
+        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#2ecc71'; ctx.font='bold 36px Arial'; ctx.textAlign='center';
+        ctx.fillText(`✅ Wave ${wave} Clear!`, W/2, H/2);
+        ctx.textAlign='left';
+    }
+
+    let waveClearTimer = 0;
+
+    function loop() {
+        frameCount++;
+        ctx.clearRect(0,0,W,H);
+        // bg gradient
+        const bg = ctx.createLinearGradient(0,0,0,H);
+        bg.addColorStop(0,'#0a0a1e'); bg.addColorStop(1,'#1a1a2e');
+        ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+        drawStars();
+
+        if (!gameOver && !paused) {
+            if (waveClearTimer > 0) {
+                waveClearTimer--;
+                drawWaveClear();
+                updateExplosions(); drawExplosions();
+                if (waveClearTimer === 0) { wave++; spawnWave(wave); }
+                requestAnimationFrame(loop); return;
+            }
+            updateDrone();
+            updateBullets();
+            updateEnemies();
+            updateExplosions();
+            if (hp <= 0) { gameOver = true; spawnExplosion(drone.x,drone.y,true); }
+            if (enemies.length === 0 && waveClearTimer === 0) { waveClearTimer = 90; spawnExplosion(W/2,H/2,true); }
+        }
+
+        drawEnemies();
+        drawBullets();
+        drawExplosions();
+        if (!gameOver) drawDrone();
+        drawHUD();
+        if (gameOver) drawGameOver();
+        if (paused && !gameOver) {
+            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,W,H);
+            ctx.fillStyle='#f1c40f'; ctx.font='bold 32px Arial'; ctx.textAlign='center';
+            ctx.fillText('⏸ PAUSED', W/2, H/2); ctx.textAlign='left';
+        }
+        requestAnimationFrame(loop);
+    }
+
+    // ── Pause / Restart ──
+    document.getElementById('dronePauseBtn').onclick = () => {
+        if (gameOver) return;
+        paused = !paused;
+        document.getElementById('dronePauseBtn').textContent = paused ? '▶ متابعة' : '⏸ إيقاف';
+    };
+    document.getElementById('droneRestartBtn').onclick = () => {
+        score=0; wave=1; hp=100; fuel=100; missiles=5;
+        gameOver=false; paused=false; waveClearTimer=0;
+        bullets=[]; eBullets=[]; explosions=[];
+        drone.x=W/2; drone.y=H-80; drone.vx=0; drone.vy=0; drone.trail=[];
+        document.getElementById('droneScore').textContent='0';
+        document.getElementById('droneWaveNum').textContent='1';
+        document.getElementById('droneFuel').textContent='100';
+        document.getElementById('droneMissiles').textContent='5';
+        document.getElementById('droneHpFill').style.width='100%';
+        document.getElementById('dronePauseBtn').textContent='⏸ إيقاف';
+        spawnWave(1);
+    };
+
+    spawnWave(1);
+    loop();
+}
+
 </script>
 </body>
 </html>
