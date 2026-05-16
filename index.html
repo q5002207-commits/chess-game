@@ -1058,452 +1058,587 @@ $(document).ready(function(){
     $(document).on('click','#raceStartBtn',raceStartRace);
     $('#raceBetAmount').on('change',function(){let v=parseInt($(this).val());if(isNaN(v))$(this).val(50);if(v<10)$(this).val(10);if(v>10000)$(this).val(10000);if(v>raceMyBalance&&raceMyBalance>0)$(this).val(raceMyBalance);});
 });
-// ===================== FPV War - Kamikaze Drone =====================
+// ===================== FPV Kamikaze Drone - منظور الدرون الأول =====================
 let droneStarted = false;
+
 function startDroneGame() {
     if (droneStarted) return;
     droneStarted = true;
+
     const container = document.getElementById('droneGameContainer');
     container.innerHTML = `
     <style>
-        #droneCanvas { display:block; margin:0 auto; background:#1a1a2e; border-radius:12px; cursor:crosshair; touch-action:none; }
-        .drone-ui { max-width:700px; margin:0 auto; padding:10px; font-family:'Segoe UI',sans-serif; }
-        .drone-hud { display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.7); border:1px solid #00ffff; border-radius:10px; padding:8px 14px; margin-bottom:10px; flex-wrap:wrap; gap:6px; }
-        .drone-stat { color:#00ffff; font-size:0.8rem; font-weight:bold; }
-        .drone-stat span { color:#fff; }
-        .drone-hp-bar { width:120px; height:10px; background:#333; border-radius:5px; overflow:hidden; display:inline-block; vertical-align:middle; }
-        .drone-hp-fill { height:100%; background:linear-gradient(90deg,#e74c3c,#e74c3c); border-radius:5px; transition:width 0.2s; }
-        .drone-ammo { color:#f1c40f; font-size:0.8rem; }
-        .drone-btns { display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
-        .drone-btn { background:#111; border:2px solid #00ffff; color:#00ffff; padding:8px 18px; border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; width:auto; transition:0.2s; }
-        .drone-btn:active, .drone-btn:hover { background:#00ffff22; }
-        .drone-btn.red { border-color:#e74c3c; color:#e74c3c; }
-        .drone-btn.red:hover { background:#e74c3c22; }
-        .drone-wave { text-align:center; color:#00ffff; font-size:1rem; font-weight:bold; margin-bottom:6px; }
-        .drone-touch-area { display:flex; gap:8px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
-        .drone-touch-btn { background:#0a0a1a; border:2px solid #00ffff44; color:#00ffff; padding:12px 20px; border-radius:10px; cursor:pointer; font-size:1.1rem; width:auto; user-select:none; -webkit-tap-highlight-color:transparent; }
-        @media(max-width:500px){ #droneCanvas{width:100% !important; height:auto !important;} }
+        .fpv-wrap { max-width:700px; margin:0 auto; padding:8px; background:#000; font-family:'Segoe UI',sans-serif; }
+        #fpvCanvas { display:block; width:100%; border-radius:10px; cursor:crosshair; touch-action:none; }
+        .fpv-hud-row { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:#0a0a0a; border:1px solid #2a2a2a; border-radius:8px; margin-bottom:6px; flex-wrap:wrap; gap:5px; }
+        .fpv-stat { color:#00ff88; font-size:0.75rem; font-weight:bold; font-family:monospace; }
+        .fpv-stat.warn { color:#f1c40f; }
+        .fpv-stat.danger { color:#e74c3c; }
+        .fpv-controls { display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+        .fpv-btn { background:#111; border:1px solid #333; color:#ccc; padding:10px 16px; border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; width:auto; transition:0.15s; }
+        .fpv-btn:hover { background:#222; border-color:#555; }
+        .fpv-pad { display:grid; grid-template-columns:repeat(3,52px); grid-template-rows:repeat(2,52px); gap:5px; margin-top:8px; }
+        .fpv-pad-btn { background:#111; border:1px solid #333; color:#aaa; border-radius:8px; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+        .fpv-pad-btn:active { background:#1a1a1a; border-color:#555; }
+        .fpv-fire-btn { background:linear-gradient(135deg,#8b0000,#c0392b); border:2px solid #e74c3c; color:white; padding:14px 28px; border-radius:10px; cursor:pointer; font-size:1rem; font-weight:bold; width:auto; margin-top:8px; letter-spacing:1px; }
+        .fpv-fire-btn:active { background:#c0392b; }
+        @media(max-width:500px){ .fpv-pad-btn{width:46px;height:46px;} }
     </style>
-    <div class="drone-ui">
-        <div class="drone-wave" id="droneWave">🚁 FPV War - Wave 1</div>
-        <div class="drone-hud">
-            <div class="drone-stat">❤️ HP: <div class="drone-hp-bar"><div class="drone-hp-fill" id="droneHpFill" style="width:100%"></div></div></div>
-            <div class="drone-stat">💥 Score: <span id="droneScore">0</span></div>
-            <div class="drone-stat">🌊 Wave: <span id="droneWaveNum">1</span></div>
-            <div class="drone-stat">🔋 Fuel: <span id="droneFuel">100</span>%</div>
-            <div class="drone-ammo">🎯 Missiles: <span id="droneMissiles">5</span></div>
+    <div class="fpv-wrap">
+        <div class="fpv-hud-row">
+            <div class="fpv-stat" id="fpvAlt">ALT: 120m</div>
+            <div class="fpv-stat" id="fpvSpd">SPD: 0 km/h</div>
+            <div class="fpv-stat warn" id="fpvDist">DIST: ---m</div>
+            <div class="fpv-stat" id="fpvScore">SCORE: 0</div>
+            <div class="fpv-stat" id="fpvAmmo">🎯 AMMO: 3</div>
+            <div class="fpv-stat danger" id="fpvMission">HUNT THE TANK</div>
         </div>
-        <canvas id="droneCanvas" width="680" height="420"></canvas>
-        <div class="drone-touch-area">
-            <button class="drone-touch-btn" id="dBtnLeft">◀</button>
-            <button class="drone-touch-btn" id="dBtnUp">▲</button>
-            <button class="drone-touch-btn" id="dBtnFire">💥 FIRE</button>
-            <button class="drone-touch-btn" id="dBtnDown">▼</button>
-            <button class="drone-touch-btn" id="dBtnRight">▶</button>
+
+        <canvas id="fpvCanvas" width="680" height="420"></canvas>
+
+        <div style="display:flex; gap:10px; justify-content:center; align-items:flex-end; margin-top:8px; flex-wrap:wrap;">
+            <!-- D-pad -->
+            <div class="fpv-pad">
+                <div></div>
+                <div class="fpv-pad-btn" id="fpvUp">▲</div>
+                <div></div>
+                <div class="fpv-pad-btn" id="fpvLeft">◀</div>
+                <div class="fpv-pad-btn" id="fpvDown">▼</div>
+                <div class="fpv-pad-btn" id="fpvRight">▶</div>
+            </div>
+            <!-- fire -->
+            <button class="fpv-fire-btn" id="fpvFireBtn">💥 DIVE &amp; STRIKE</button>
         </div>
-        <div class="drone-btns">
-            <button class="drone-btn" id="dronePauseBtn">⏸ إيقاف</button>
-            <button class="drone-btn red" id="droneRestartBtn">🔄 إعادة</button>
+
+        <div class="fpv-controls">
+            <button class="fpv-btn" id="fpvRestartBtn">🔄 مهمة جديدة</button>
+            <button class="fpv-btn" id="fpvPauseBtn">⏸ إيقاف</button>
         </div>
-        <div style="text-align:center;color:#555;font-size:0.7rem;margin-top:8px;">WASD / أسهم للتحريك | Space / F للإطلاق | كاميكازي: اصطدم بالأعداء!</div>
+        <div style="text-align:center;color:#333;font-size:0.68rem;margin-top:6px;">
+            W/A/S/D أو الأسهم = توجيه الكاميرا | SPACE = انقض على الهدف
+        </div>
     </div>`;
 
-    const canvas = document.getElementById('droneCanvas');
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
+    // ── Canvas setup ──
+    const canvas = document.getElementById('fpvCanvas');
+    const ctx    = canvas.getContext('2d');
+    const CW = 680, CH = 420;
+    canvas.width = CW; canvas.height = CH;
 
-    // ── State ──
-    let score=0, wave=1, gameOver=false, paused=false;
-    let fuel=100, missiles=5, hp=100;
-    let frameCount=0;
+    // ── World config ──
+    const WORLD_SIZE = 2000;
+    const GROUND_Y   = CH * 0.68; // horizon line when level
+    const FOV        = 70 * Math.PI / 180;
 
-    // ── Drone ──
-    const drone = { x:W/2, y:H-80, w:38, h:22, vx:0, vy:0, speed:4.5, trail:[] };
-
-    // ── Bullets ──
-    let bullets = [];       // player bullets
-    let eBullets = [];      // enemy bullets
-
-    // ── Enemies ──
-    let enemies = [];
-    let explosions = [];
-    let stars = [];
-
-    // ── Keys ──
-    const keys = {};
-    document.addEventListener('keydown', e => {
-        keys[e.code] = true;
-        if ((e.code==='Space'||e.code==='KeyF') && !gameOver && !paused) { e.preventDefault(); fireMissile(); }
-    });
-    document.addEventListener('keyup', e => { keys[e.code] = false; });
-
-    // ── Touch buttons ──
-    const touchMap = {
-        dBtnLeft:  () => { keys['ArrowLeft']=true; },
-        dBtnRight: () => { keys['ArrowRight']=true; },
-        dBtnUp:    () => { keys['ArrowUp']=true; },
-        dBtnDown:  () => { keys['ArrowDown']=true; },
-        dBtnFire:  () => { fireMissile(); }
+    // ── Drone state ──
+    const drone = {
+        x: WORLD_SIZE/2, z: WORLD_SIZE/2 - 400, // world pos (xz plane)
+        y: 130,          // altitude
+        yaw: 0,          // heading (radians, 0 = north = -z)
+        pitch: 0,        // nose up/down
+        speed: 0,        // forward speed m/s
+        maxSpeed: 90,
+        diving: false,
+        divePitch: 0,
+        diveTarget: null,
+        dead: false,
+        exploded: false,
+        explodeTimer: 0
     };
-    Object.entries(touchMap).forEach(([id, fn]) => {
-        const btn = document.getElementById(id);
-        if (!btn) return;
-        ['touchstart','mousedown'].forEach(ev => btn.addEventListener(ev, e => { e.preventDefault(); fn(); }, {passive:false}));
-        if (id !== 'dBtnFire') {
-            ['touchend','mouseup','touchcancel'].forEach(ev => btn.addEventListener(ev, e => {
-                e.preventDefault();
-                keys['ArrowLeft']=keys['ArrowRight']=keys['ArrowUp']=keys['ArrowDown']=false;
-            }, {passive:false}));
-        }
-    });
 
-    // ── Canvas click = kamikaze or fire ──
-    canvas.addEventListener('click', e => {
-        if (gameOver || paused) return;
-        const r = canvas.getBoundingClientRect();
-        const mx = (e.clientX - r.left) * (W / r.width);
-        const my = (e.clientY - r.top)  * (H / r.height);
-        // fire toward click direction
-        const ang = Math.atan2(my - drone.y, mx - drone.x);
-        bullets.push({ x:drone.x, y:drone.y, vx:Math.cos(ang)*10, vy:Math.sin(ang)*10, r:5, kamikaze:false });
-    });
+    // ── Targets (tanks) ──
+    const TANK_CONFIGS = [
+        { x: WORLD_SIZE/2 + 80,  z: WORLD_SIZE/2 + 200, angle: 1.2 },
+        { x: WORLD_SIZE/2 - 120, z: WORLD_SIZE/2 + 350, angle: 2.5 },
+        { x: WORLD_SIZE/2 + 200, z: WORLD_SIZE/2 + 50,  angle: 0.4 }
+    ];
+    let tanks = TANK_CONFIGS.map((t,i) => ({
+        ...t, alive: true, w: 28, h: 18, id: i,
+        moveAngle: Math.random()*Math.PI*2,
+        moveSpeed: 0.4 + Math.random()*0.3,
+        shootTimer: 60 + i*40
+    }));
 
-    // ── Stars ──
-    for (let i=0; i<60; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.3, s:Math.random()*0.5+0.2 });
+    // ── Particles & FX ──
+    let particles = [];
+    let smoke     = [];
+    let score     = 0;
+    let ammo      = 3;
+    let missionDone = false;
+    let paused    = false;
+    let frame     = 0;
 
-    function spawnWave(w) {
-        enemies = [];
-        const count = 4 + w * 2;
-        const types = ['jet','tank','heli','boss'];
+    // ── Input ──
+    const keys = {};
+    const keyDown = e => { keys[e.code] = true; if(e.code==='Space'){e.preventDefault();triggerDive();} };
+    const keyUp   = e => { keys[e.code] = false; };
+    document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup',   keyUp);
+
+    // touch d-pad
+    function bindPad(id, code) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('touchstart', e=>{e.preventDefault();keys[code]=true;},{passive:false});
+        el.addEventListener('touchend',   e=>{e.preventDefault();keys[code]=false;},{passive:false});
+        el.addEventListener('mousedown',  e=>{keys[code]=true;});
+        el.addEventListener('mouseup',    e=>{keys[code]=false;});
+    }
+    bindPad('fpvUp','KeyW'); bindPad('fpvDown','KeyS');
+    bindPad('fpvLeft','KeyA'); bindPad('fpvRight','KeyD');
+
+    document.getElementById('fpvFireBtn').addEventListener('click', triggerDive);
+    document.getElementById('fpvFireBtn').addEventListener('touchstart', e=>{e.preventDefault();triggerDive();},{passive:false});
+    document.getElementById('fpvPauseBtn').onclick = ()=>{ paused=!paused; document.getElementById('fpvPauseBtn').textContent = paused?'▶ متابعة':'⏸ إيقاف'; };
+    document.getElementById('fpvRestartBtn').onclick = restartGame;
+
+    // ── Dive / Strike ──
+    function triggerDive() {
+        if (drone.dead || drone.diving || missionDone || paused) return;
+        if (ammo <= 0) { showHudMsg('NO AMMO!'); return; }
+        // find nearest alive tank
+        let nearest = null, nearDist = Infinity;
+        tanks.forEach(t => {
+            if (!t.alive) return;
+            const dx = t.x - drone.x, dz = t.z - drone.z;
+            const d = Math.sqrt(dx*dx + dz*dz);
+            if (d < nearDist) { nearDist = d; nearest = t; }
+        });
+        if (!nearest) return;
+        drone.diving    = true;
+        drone.diveTarget = nearest;
+        ammo--;
+        document.getElementById('fpvAmmo').textContent = '🎯 AMMO: ' + ammo;
+        // auto-aim yaw toward target
+        const dx = nearest.x - drone.x, dz = nearest.z - drone.z;
+        drone.yaw = Math.atan2(dx, -dz);
+    }
+
+    // ── Spawn explosion particles ──
+    function boom(wx, wz, big) {
+        const count = big ? 60 : 25;
         for (let i=0; i<count; i++) {
-            const t = w >= 3 && i === 0 ? 'boss' : types[Math.floor(Math.random()*3)];
-            enemies.push({
-                x: Math.random()*(W-60)+30,
-                y: Math.random()*(H*0.45)+20,
-                w: t==='boss'?60:36, h: t==='boss'?36:22,
-                hp: t==='boss'?8:t==='tank'?3:1,
-                maxHp: t==='boss'?8:t==='tank'?3:1,
-                vx: (Math.random()-0.5)*(2+w*0.3),
-                vy: (Math.random()-0.5)*0.6,
-                type: t,
-                shootTimer: Math.random()*90+30,
-                color: t==='boss'?'#e74c3c':t==='tank'?'#8e44ad':t==='heli'?'#f39c12':'#3498db'
+            particles.push({
+                wx, wy: 0, wz,
+                vx: (Math.random()-0.5)*18,
+                vy: Math.random()*14+2,
+                vz: (Math.random()-0.5)*18,
+                life: big ? 90 : 50,
+                maxLife: big ? 90 : 50,
+                r: Math.random()*(big?12:6)+2,
+                color: ['#f1c40f','#e74c3c','#ff8c00','#fff','#aaa'][Math.floor(Math.random()*5)]
             });
         }
-        missiles = Math.min(missiles + 3 + w, 12);
-        document.getElementById('droneMissiles').textContent = missiles;
-        document.getElementById('droneWave').textContent = `🚁 FPV War - Wave ${w}`;
-        document.getElementById('droneWaveNum').textContent = w;
-    }
-
-    function fireMissile() {
-        if (missiles <= 0) return;
-        missiles--;
-        document.getElementById('droneMissiles').textContent = missiles;
-        bullets.push({ x:drone.x, y:drone.y-drone.h/2, vx:0, vy:-12, r:6, kamikaze:false });
-    }
-
-    function kamikazeRush() {
-        // Fly toward nearest enemy at high speed
-        if (enemies.length === 0) return;
-        let nearest = enemies.reduce((a,b) => {
-            const da = Math.hypot(a.x-drone.x, a.y-drone.y);
-            const db = Math.hypot(b.x-drone.x, b.y-drone.y);
-            return da < db ? a : b;
-        });
-        const ang = Math.atan2(nearest.y - drone.y, nearest.x - drone.x);
-        drone.vx = Math.cos(ang) * 18;
-        drone.vy = Math.sin(ang) * 18;
-    }
-
-    function spawnExplosion(x, y, big) {
-        const count = big ? 20 : 10;
-        for (let i=0; i<count; i++) {
-            const ang = Math.random()*Math.PI*2;
-            const spd = Math.random()*(big?5:3)+1;
-            explosions.push({ x, y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, r:Math.random()*(big?8:5)+2, life:big?40:25, maxLife:big?40:25, color:['#f1c40f','#e74c3c','#ff8c00','#fff'][Math.floor(Math.random()*4)] });
+        for (let i=0; i<(big?20:8); i++) {
+            smoke.push({ wx, wy: 0, wz, vy: Math.random()*3+1, life: big?180:80, maxLife: big?180:80, r: Math.random()*(big?30:15)+5 });
         }
     }
 
-    function updateDrone() {
-        const spd = drone.speed;
-        if (keys['ArrowLeft']||keys['KeyA'])  drone.vx -= 0.7;
-        if (keys['ArrowRight']||keys['KeyD']) drone.vx += 0.7;
-        if (keys['ArrowUp']||keys['KeyW'])    drone.vy -= 0.7;
-        if (keys['ArrowDown']||keys['KeyS'])  drone.vy += 0.7;
-        drone.vx *= 0.82; drone.vy *= 0.82;
-        drone.vx = Math.max(-spd, Math.min(spd, drone.vx));
-        drone.vy = Math.max(-spd, Math.min(spd, drone.vy));
-        drone.x += drone.vx; drone.y += drone.vy;
-        drone.x = Math.max(drone.w/2, Math.min(W-drone.w/2, drone.x));
-        drone.y = Math.max(drone.h/2, Math.min(H-drone.h/2, drone.y));
-        drone.trail.push({x:drone.x, y:drone.y});
-        if (drone.trail.length > 14) drone.trail.shift();
-        // fuel
-        if (keys['ArrowLeft']||keys['ArrowRight']||keys['ArrowUp']||keys['ArrowDown']||keys['KeyA']||keys['KeyD']||keys['KeyW']||keys['KeyS']) {
-            fuel -= 0.04;
-            if (fuel < 0) fuel = 0;
-        } else { fuel = Math.min(100, fuel + 0.02); }
-        document.getElementById('droneFuel').textContent = Math.floor(fuel);
+    // ── 3D → Screen projection ──
+    // Returns {sx, sy, scale, behind} for a world point (wx,wy,wz)
+    // wy = height above ground (positive up)
+    function project(wx, wy, wz) {
+        // vector from drone to point in world space
+        const dx = wx - drone.x;
+        const dy = wy - drone.y;   // height diff (wy=0 is ground)
+        const dz = wz - drone.z;
+
+        // rotate by -yaw (camera transform)
+        const cosY = Math.cos(-drone.yaw), sinY = Math.sin(-drone.yaw);
+        const rx =  cosY*dx + sinY*dz;
+        const rz = -sinY*dx + cosY*dz;
+
+        // rotate by -pitch
+        const cosP = Math.cos(-drone.pitch), sinP = Math.sin(-drone.pitch);
+        const ry =  cosP*dy - sinP*rz;
+        const rz2 = sinP*dy + cosP*rz;
+
+        if (rz2 >= 0) return { behind: true, sx:0, sy:0, scale:0, dist: rz2 };
+
+        const focalLen = (CW/2) / Math.tan(FOV/2);
+        const scale = focalLen / (-rz2);
+        const sx = CW/2 + rx * scale;
+        const sy = CH/2 - ry * scale;
+        return { sx, sy, scale, behind: false, dist: -rz2 };
     }
 
-    function updateBullets() {
-        bullets = bullets.filter(b => b.x>-10 && b.x<W+10 && b.y>-10 && b.y<H+10);
-        bullets.forEach(b => { b.x += b.vx; b.y += b.vy; });
-        // check hits
-        bullets.forEach((b,bi) => {
-            enemies.forEach((e,ei) => {
-                if (Math.abs(b.x-e.x)<e.w/2+b.r && Math.abs(b.y-e.y)<e.h/2+b.r) {
-                    e.hp--;
-                    spawnExplosion(b.x, b.y, false);
-                    bullets.splice(bi, 1);
-                    if (e.hp <= 0) {
-                        spawnExplosion(e.x, e.y, true);
-                        score += e.type==='boss'?500:e.type==='tank'?150:80;
-                        document.getElementById('droneScore').textContent = score;
-                        enemies.splice(ei, 1);
-                    }
-                }
+    // ── Draw ground grid ──
+    function drawGround() {
+        // sky gradient
+        const sky = ctx.createLinearGradient(0,0,0,CH);
+        sky.addColorStop(0,'#0a1628'); sky.addColorStop(0.5,'#1a3a1a'); sky.addColorStop(1,'#0d1f0d');
+        ctx.fillStyle = sky; ctx.fillRect(0,0,CW,CH);
+
+        // ground grid
+        const gridStep = 50;
+        const gridRange = 800;
+        const gridStart = Math.floor((drone.x - gridRange) / gridStep) * gridStep;
+        const gridStartZ = Math.floor((drone.z - gridRange) / gridStep) * gridStep;
+
+        ctx.strokeStyle = 'rgba(0,180,50,0.18)';
+        ctx.lineWidth = 1;
+
+        // X lines
+        for (let gx = gridStart; gx <= drone.x+gridRange; gx += gridStep) {
+            const A = project(gx, -drone.y, drone.z - gridRange);
+            const B = project(gx, -drone.y, drone.z + gridRange);
+            if (A.behind && B.behind) continue;
+            ctx.beginPath();
+            if (!A.behind) ctx.moveTo(A.sx, A.sy); else ctx.moveTo(B.sx, B.sy);
+            if (!B.behind) ctx.lineTo(B.sx, B.sy); else ctx.lineTo(A.sx, A.sy);
+            ctx.stroke();
+        }
+        // Z lines
+        for (let gz = gridStartZ; gz <= drone.z+gridRange; gz += gridStep) {
+            const A = project(drone.x - gridRange, -drone.y, gz);
+            const B = project(drone.x + gridRange, -drone.y, gz);
+            if (A.behind && B.behind) continue;
+            ctx.beginPath();
+            if (!A.behind) ctx.moveTo(A.sx, A.sy); else ctx.moveTo(B.sx, B.sy);
+            if (!B.behind) ctx.lineTo(B.sx, B.sy); else ctx.lineTo(A.sx, A.sy);
+            ctx.stroke();
+        }
+    }
+
+    // ── Draw a tank in 3D ──
+    function drawTank(tank) {
+        if (!tank.alive) return;
+        const bodyH = 8; // tank height above ground
+        const center = project(tank.x, -drone.y + bodyH, tank.z);
+        if (center.behind) return;
+        const dist = center.dist;
+
+        const s = Math.max(4, Math.min(80, 1200 / dist));
+
+        // shadow on ground
+        const shadow = project(tank.x, -drone.y + 1, tank.z);
+        if (!shadow.behind) {
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.beginPath(); ctx.ellipse(shadow.sx, shadow.sy, s*1.4, s*0.5, 0, 0, Math.PI*2); ctx.fill();
+        }
+
+        // tank body
+        ctx.save();
+        ctx.translate(center.sx, center.sy);
+
+        // body box (green military)
+        ctx.fillStyle = '#2d5a27';
+        ctx.fillRect(-s*1.1, -s*0.55, s*2.2, s*1.1);
+        ctx.strokeStyle = '#1a3a17'; ctx.lineWidth = 1;
+        ctx.strokeRect(-s*1.1, -s*0.55, s*2.2, s*1.1);
+
+        // turret
+        ctx.fillStyle = '#3a6b35';
+        ctx.beginPath(); ctx.ellipse(0, -s*0.3, s*0.6, s*0.4, 0, 0, Math.PI*2); ctx.fill();
+
+        // barrel
+        const barrelAng = tank.angle - drone.yaw;
+        ctx.strokeStyle = '#1a2a18'; ctx.lineWidth = Math.max(2, s*0.15);
+        ctx.beginPath();
+        ctx.moveTo(0, -s*0.3);
+        ctx.lineTo(Math.cos(barrelAng)*s*1.2, -s*0.3 + Math.sin(barrelAng)*s*0.4);
+        ctx.stroke();
+
+        // tracks
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-s*1.2, s*0.4, s*2.4, s*0.3);
+
+        // target reticle if it's the dive target
+        if (drone.diveTarget === tank && drone.diving) {
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth   = 2;
+            const rs = s*1.8;
+            ctx.strokeRect(-rs, -rs, rs*2, rs*2);
+            // corner marks
+            const cm = rs*0.35;
+            ['tl','tr','bl','br'].forEach(c => {
+                const cx2 = c.includes('l') ? -rs : rs;
+                const cy2 = c.includes('t') ? -rs : rs;
+                ctx.beginPath();
+                ctx.moveTo(cx2, cy2);
+                ctx.lineTo(cx2 + (c.includes('l')?cm:-cm), cy2);
+                ctx.moveTo(cx2, cy2);
+                ctx.lineTo(cx2, cy2 + (c.includes('t')?cm:-cm));
+                ctx.stroke();
             });
-        });
-    }
+        }
 
-    function updateEnemies() {
-        enemies.forEach(e => {
-            e.x += e.vx; e.y += e.vy;
-            if (e.x < e.w/2 || e.x > W-e.w/2) e.vx *= -1;
-            if (e.y < e.h/2 || e.y > H*0.55) e.vy *= -1;
-            // shoot
-            e.shootTimer--;
-            if (e.shootTimer <= 0) {
-                e.shootTimer = 50 + Math.random()*60;
-                const ang = Math.atan2(drone.y-e.y, drone.x-e.x);
-                const spd = e.type==='boss'?5:3;
-                eBullets.push({ x:e.x, y:e.y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, r:4 });
-            }
-            // drone collision = kamikaze dmg
-            if (Math.abs(drone.x-e.x)<(e.w+drone.w)/2-4 && Math.abs(drone.y-e.y)<(e.h+drone.h)/2-4) {
-                const dmg = e.type==='boss'?30:20;
-                hp -= dmg; if (hp<0) hp=0;
-                spawnExplosion((drone.x+e.x)/2,(drone.y+e.y)/2,true);
-                score += Math.floor(e.type==='boss'?300:100);
-                document.getElementById('droneScore').textContent = score;
-                e.hp = 0; // destroy enemy too (kamikaze!)
-            }
-        });
-        enemies = enemies.filter(e => e.hp > 0);
+        // distance label
+        if (dist < 400) {
+            ctx.fillStyle = '#00ff88';
+            ctx.font = `bold ${Math.max(9, s*0.6)}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.floor(dist)+'m', 0, -s*1.2);
+        }
 
-        // enemy bullets hit drone
-        eBullets = eBullets.filter(b => b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
-        eBullets.forEach((b,bi) => {
-            b.x+=b.vx; b.y+=b.vy;
-            if (Math.abs(b.x-drone.x)<drone.w/2+b.r && Math.abs(b.y-drone.y)<drone.h/2+b.r) {
-                hp -= 8; if(hp<0) hp=0;
-                spawnExplosion(b.x, b.y, false);
-                eBullets.splice(bi,1);
-            }
-        });
-
-        document.getElementById('droneHpFill').style.width = hp+'%';
-        document.getElementById('droneHpFill').style.background = hp>50?'#2ecc71':hp>25?'#f39c12':'#e74c3c';
-    }
-
-    function updateExplosions() {
-        explosions.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.life--; p.r*=0.96; });
-        explosions = explosions.filter(p => p.life>0 && p.r>0.5);
-    }
-
-    function drawStars() {
-        stars.forEach(s => { s.y+=s.s; if(s.y>H) s.y=0; ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
-    }
-
-    function drawDrone() {
-        // trail
-        drone.trail.forEach((p,i) => {
-            const a = i/drone.trail.length * 0.4;
-            ctx.fillStyle = `rgba(0,255,255,${a})`;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 3*(i/drone.trail.length), 0, Math.PI*2); ctx.fill();
-        });
-        // body
-        ctx.save(); ctx.translate(drone.x, drone.y);
-        // glow
-        ctx.shadowColor='#00ffff'; ctx.shadowBlur=18;
-        // fuselage
-        ctx.fillStyle='#00ffff';
-        ctx.beginPath(); ctx.ellipse(0,0,drone.w/2,drone.h/2,0,0,Math.PI*2); ctx.fill();
-        // cockpit
-        ctx.fillStyle='#003344';
-        ctx.beginPath(); ctx.ellipse(0,0,drone.w/4,drone.h/3,0,0,Math.PI*2); ctx.fill();
-        // rotors
-        ctx.strokeStyle='#00ffff88'; ctx.lineWidth=2;
-        [[-drone.w/2-8,-drone.h/2],[drone.w/2+8,-drone.h/2],[-drone.w/2-8,drone.h/2],[drone.w/2+8,drone.h/2]].forEach(([rx,ry])=>{
-            const spin = frameCount*0.3;
-            ctx.save(); ctx.translate(rx,ry);
-            ctx.rotate(spin);
-            ctx.beginPath(); ctx.moveTo(-8,0); ctx.lineTo(8,0); ctx.stroke();
-            ctx.rotate(Math.PI/2);
-            ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.stroke();
-            ctx.restore();
-        });
-        ctx.shadowBlur=0;
         ctx.restore();
     }
 
-    function drawEnemies() {
-        enemies.forEach(e => {
-            ctx.save(); ctx.translate(e.x, e.y);
-            ctx.shadowColor=e.color; ctx.shadowBlur=12;
-            if (e.type==='boss') {
-                // big boss triangle
-                ctx.fillStyle=e.color;
-                ctx.beginPath(); ctx.moveTo(0,-e.h); ctx.lineTo(e.w/2,e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.closePath(); ctx.fill();
-                ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-                // hp bar
-                ctx.fillStyle='#333'; ctx.fillRect(-e.w/2,-e.h-8,e.w,5);
-                ctx.fillStyle='#e74c3c'; ctx.fillRect(-e.w/2,-e.h-8,e.w*(e.hp/e.maxHp),5);
-            } else if (e.type==='tank') {
-                ctx.fillStyle=e.color;
-                ctx.fillRect(-e.w/2,-e.h/2,e.w,e.h);
-                ctx.fillStyle='#7f8c8d'; ctx.fillRect(-4,-e.h/2-10,8,12);
-                ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.strokeRect(-e.w/2,-e.h/2,e.w,e.h);
-            } else if (e.type==='heli') {
-                ctx.fillStyle=e.color;
-                ctx.beginPath(); ctx.ellipse(0,0,e.w/2,e.h/2,0,0,Math.PI*2); ctx.fill();
-                // rotor
-                ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
-                const r2 = frameCount*0.4;
-                ctx.save(); ctx.rotate(r2);
-                ctx.beginPath(); ctx.moveTo(-e.w/2,0); ctx.lineTo(e.w/2,0); ctx.stroke();
-                ctx.restore();
-            } else {
-                // jet
-                ctx.fillStyle=e.color;
-                ctx.beginPath(); ctx.moveTo(0,-e.h); ctx.lineTo(e.w/3,e.h/2); ctx.lineTo(0,e.h/4); ctx.lineTo(-e.w/3,e.h/2); ctx.closePath(); ctx.fill();
-            }
-            ctx.shadowBlur=0; ctx.restore();
-        });
-    }
-
-    function drawBullets() {
-        bullets.forEach(b => {
-            ctx.save();
-            ctx.shadowColor='#00ffff'; ctx.shadowBlur=10;
-            ctx.fillStyle='#00ffff';
-            ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
-            ctx.restore();
-        });
-        eBullets.forEach(b => {
-            ctx.save();
-            ctx.shadowColor='#ff4444'; ctx.shadowBlur=8;
-            ctx.fillStyle='#ff4444';
-            ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
-            ctx.restore();
-        });
-    }
-
-    function drawExplosions() {
-        explosions.forEach(p => {
-            const a = p.life/p.maxLife;
+    // ── Draw particles ──
+    function drawParticles() {
+        particles.forEach(p => {
+            const proj = project(p.wx, -drone.y + p.wy, p.wz);
+            if (proj.behind) return;
+            const a = p.life / p.maxLife;
             ctx.globalAlpha = a;
-            ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-            ctx.globalAlpha = 1;
+            ctx.fillStyle   = p.color;
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, Math.max(1, p.r * proj.scale * 0.08), 0, Math.PI*2);
+            ctx.fill();
         });
+        smoke.forEach(s2 => {
+            const proj = project(s2.wx, -drone.y + s2.wy, s2.wz);
+            if (proj.behind) return;
+            const a = (s2.life / s2.maxLife) * 0.4;
+            ctx.globalAlpha = a;
+            ctx.fillStyle = '#666';
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, Math.max(2, s2.r * proj.scale * 0.05), 0, Math.PI*2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
     }
 
-    function drawHUD() {
-        // scanlines effect
-        ctx.fillStyle='rgba(0,255,255,0.015)';
-        for (let y=0; y<H; y+=4) { ctx.fillRect(0,y,W,2); }
-        // border
-        ctx.strokeStyle='rgba(0,255,255,0.3)'; ctx.lineWidth=2;
-        ctx.strokeRect(2,2,W-4,H-4);
+    // ── FPV Overlay (HUD glass) ──
+    function drawFPVOverlay() {
+        // vignette
+        const vig = ctx.createRadialGradient(CW/2,CH/2,CH*0.3,CW/2,CH/2,CH*0.8);
+        vig.addColorStop(0,'rgba(0,0,0,0)');
+        vig.addColorStop(1,'rgba(0,0,0,0.65)');
+        ctx.fillStyle = vig; ctx.fillRect(0,0,CW,CH);
+
+        // crosshair
+        const cx = CW/2, cy = CH/2;
+        ctx.strokeStyle = drone.diving ? '#ff0000' : '#00ff88';
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.9;
+        // center dot
+        ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.stroke();
+        // lines
+        [[cx-30,cy,cx-8,cy],[cx+8,cy,cx+30,cy],[cx,cy-30,cx,cy-8],[cx,cy+8,cx,cy+30]].forEach(([x1,y1,x2,y2])=>{
+            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+        });
+        ctx.globalAlpha = 1;
+
+        // attitude indicator (pitch/roll lines)
+        ctx.strokeStyle='rgba(0,255,136,0.35)'; ctx.lineWidth=1;
+        const horizY = CH/2 - (drone.pitch / (Math.PI/2)) * CH * 0.5;
+        ctx.beginPath(); ctx.moveTo(CW*0.25, horizY); ctx.lineTo(CW*0.75, horizY); ctx.stroke();
+
+        // speed tape (left)
+        const spd = Math.floor(drone.speed * 3.6);
+        ctx.fillStyle='rgba(0,255,136,0.15)'; ctx.fillRect(12,CH/2-40,55,80);
+        ctx.strokeStyle='rgba(0,255,136,0.4)'; ctx.lineWidth=1; ctx.strokeRect(12,CH/2-40,55,80);
+        ctx.fillStyle='#00ff88'; ctx.font='bold 16px monospace'; ctx.textAlign='center';
+        ctx.fillText(spd, 39, CH/2+6);
+        ctx.font='9px monospace'; ctx.fillText('KM/H', 39, CH/2+20);
+
+        // alt tape (right)
+        ctx.fillStyle='rgba(0,255,136,0.15)'; ctx.fillRect(CW-67,CH/2-40,55,80);
+        ctx.strokeStyle='rgba(0,255,136,0.4)'; ctx.lineWidth=1; ctx.strokeRect(CW-67,CH/2-40,55,80);
+        ctx.fillStyle='#00ff88'; ctx.font='bold 16px monospace';
+        ctx.fillText(Math.floor(drone.y), CW-40, CH/2+6);
+        ctx.font='9px monospace'; ctx.fillText('ALT m', CW-40, CH/2+20);
+
+        // compass strip top center
+        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(CW/2-90,8,180,22);
+        ctx.strokeStyle='rgba(0,255,136,0.5)'; ctx.strokeRect(CW/2-90,8,180,22);
+        const headingDeg = Math.floor((drone.yaw * 180/Math.PI + 360) % 360);
+        const compass = ['N','NE','E','SE','S','SW','W','NW'];
+        ctx.fillStyle='#00ff88'; ctx.font='bold 11px monospace'; ctx.textAlign='center';
+        ctx.fillText(headingDeg + '°  ' + compass[Math.floor((headingDeg+22.5)/45)%8], CW/2, 24);
+        ctx.textAlign='left';
+
+        // DIVING indicator
+        if (drone.diving) {
+            ctx.fillStyle='rgba(200,0,0,0.2)';
+            ctx.fillRect(0,0,CW,CH);
+            ctx.fillStyle='#ff0000'; ctx.font='bold 18px monospace'; ctx.textAlign='center';
+            ctx.fillText('⚡ DIVING - IMPACT IMMINENT', CW/2, CH-30);
+            ctx.textAlign='left';
+        }
+
+        // Paused
+        if (paused) {
+            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,CW,CH);
+            ctx.fillStyle='#f1c40f'; ctx.font='bold 30px monospace'; ctx.textAlign='center';
+            ctx.fillText('[ PAUSED ]', CW/2, CH/2);
+            ctx.textAlign='left';
+        }
     }
 
-    function drawGameOver() {
-        ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.fillRect(0,0,W,H);
-        ctx.fillStyle='#e74c3c'; ctx.font='bold 42px Arial'; ctx.textAlign='center';
-        ctx.fillText('💥 DRONE DOWN 💥', W/2, H/2-30);
-        ctx.fillStyle='#00ffff'; ctx.font='bold 22px Arial';
-        ctx.fillText(`Score: ${score}  |  Wave: ${wave}`, W/2, H/2+15);
-        ctx.fillStyle='#aaa'; ctx.font='16px Arial';
-        ctx.fillText('اضغط إعادة للمتابعة', W/2, H/2+50);
+    // ── Mission complete / Game Over screens ──
+    function drawMissionScreen() {
+        ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.fillRect(0,0,CW,CH);
+        if (missionDone && !drone.dead) {
+            ctx.fillStyle='#00ff88'; ctx.font='bold 34px monospace'; ctx.textAlign='center';
+            ctx.fillText('✅ MISSION COMPLETE', CW/2, CH/2-25);
+            ctx.fillStyle='#f1c40f'; ctx.font='bold 20px monospace';
+            ctx.fillText('SCORE: ' + score, CW/2, CH/2+15);
+        } else if (drone.dead) {
+            ctx.fillStyle='#e74c3c'; ctx.font='bold 34px monospace'; ctx.textAlign='center';
+            ctx.fillText('💥 DRONE LOST', CW/2, CH/2-25);
+            ctx.fillStyle='#aaa'; ctx.font='16px monospace';
+            ctx.fillText('SCORE: ' + score, CW/2, CH/2+15);
+        }
+        ctx.fillStyle='#666'; ctx.font='14px monospace';
+        ctx.fillText('اضغط "مهمة جديدة" للمتابعة', CW/2, CH/2+50);
         ctx.textAlign='left';
     }
 
-    function drawWaveClear() {
-        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,W,H);
-        ctx.fillStyle='#2ecc71'; ctx.font='bold 36px Arial'; ctx.textAlign='center';
-        ctx.fillText(`✅ Wave ${wave} Clear!`, W/2, H/2);
-        ctx.textAlign='left';
-    }
+    // ── Update logic ──
+    function update() {
+        if (paused || missionDone) return;
+        frame++;
 
-    let waveClearTimer = 0;
+        // ── Drone controls (when not diving) ──
+        if (!drone.diving && !drone.dead) {
+            const turnSpeed = 0.035;
+            const pitchSpeed = 0.025;
+            if (keys['KeyA']||keys['ArrowLeft'])  drone.yaw   -= turnSpeed;
+            if (keys['KeyD']||keys['ArrowRight']) drone.yaw   += turnSpeed;
+            if (keys['KeyW']||keys['ArrowUp'])    drone.pitch -= pitchSpeed;
+            if (keys['KeyS']||keys['ArrowDown'])  drone.pitch += pitchSpeed;
+            drone.pitch = Math.max(-0.6, Math.min(0.6, drone.pitch));
 
-    function loop() {
-        frameCount++;
-        ctx.clearRect(0,0,W,H);
-        // bg gradient
-        const bg = ctx.createLinearGradient(0,0,0,H);
-        bg.addColorStop(0,'#0a0a1e'); bg.addColorStop(1,'#1a1a2e');
-        ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+            // speed auto
+            drone.speed = Math.min(drone.maxSpeed, drone.speed + 0.4);
 
-        drawStars();
+            // move forward in yaw direction
+            const fwd = drone.speed / 60;
+            drone.x += Math.sin(drone.yaw)  * fwd;
+            drone.z -= Math.cos(drone.yaw)  * fwd;
 
-        if (!gameOver && !paused) {
-            if (waveClearTimer > 0) {
-                waveClearTimer--;
-                drawWaveClear();
-                updateExplosions(); drawExplosions();
-                if (waveClearTimer === 0) { wave++; spawnWave(wave); }
-                requestAnimationFrame(loop); return;
+            // altitude from pitch
+            drone.y -= Math.sin(drone.pitch) * fwd * 40;
+            drone.y  = Math.max(30, Math.min(400, drone.y));
+        }
+
+        // ── Dive mode ──
+        if (drone.diving && !drone.dead) {
+            const t = drone.diveTarget;
+            if (t && t.alive) {
+                // steer toward target
+                const dx = t.x - drone.x, dz = t.z - drone.z;
+                const targetYaw = Math.atan2(dx, -dz);
+                // smooth yaw
+                let dyaw = targetYaw - drone.yaw;
+                while (dyaw >  Math.PI) dyaw -= Math.PI*2;
+                while (dyaw < -Math.PI) dyaw += Math.PI*2;
+                drone.yaw += dyaw * 0.12;
+
+                // nose down
+                drone.pitch = Math.min(drone.pitch + 0.04, 0.9);
+
+                // accelerate
+                drone.speed = Math.min(200, drone.speed + 3);
+                const fwd = drone.speed / 60;
+                drone.x += Math.sin(drone.yaw) * fwd;
+                drone.z -= Math.cos(drone.yaw) * fwd;
+                drone.y -= Math.sin(drone.pitch) * fwd * 50;
+
+                // check impact
+                const dist = Math.sqrt(dx*dx + dz*dz);
+                if (dist < 35 || drone.y < 5) {
+                    // BOOM
+                    boom(t.x, t.z, true);
+                    t.alive = false;
+                    score += 1000;
+                    document.getElementById('fpvScore').textContent = 'SCORE: ' + score;
+                    drone.dead = true;
+                    drone.exploded = true;
+                    boom(drone.x, drone.z, true);
+                    setTimeout(() => {
+                        const alive = tanks.filter(tt=>tt.alive).length;
+                        if (alive === 0) {
+                            missionDone = true;
+                            document.getElementById('fpvMission').textContent = '✅ ALL TANKS DESTROYED';
+                        }
+                    }, 1200);
+                }
             }
-            updateDrone();
-            updateBullets();
-            updateEnemies();
-            updateExplosions();
-            if (hp <= 0) { gameOver = true; spawnExplosion(drone.x,drone.y,true); }
-            if (enemies.length === 0 && waveClearTimer === 0) { waveClearTimer = 90; spawnExplosion(W/2,H/2,true); }
         }
 
-        drawEnemies();
-        drawBullets();
-        drawExplosions();
-        if (!gameOver) drawDrone();
-        drawHUD();
-        if (gameOver) drawGameOver();
-        if (paused && !gameOver) {
-            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(0,0,W,H);
-            ctx.fillStyle='#f1c40f'; ctx.font='bold 32px Arial'; ctx.textAlign='center';
-            ctx.fillText('⏸ PAUSED', W/2, H/2); ctx.textAlign='left';
-        }
+        // ── Tanks move ──
+        tanks.forEach(t => {
+            if (!t.alive) return;
+            t.x += Math.cos(t.moveAngle) * t.moveSpeed;
+            t.z += Math.sin(t.moveAngle) * t.moveSpeed;
+            t.x = Math.max(100, Math.min(WORLD_SIZE-100, t.x));
+            t.z = Math.max(100, Math.min(WORLD_SIZE-100, t.z));
+            if (Math.random() < 0.005) t.moveAngle += (Math.random()-0.5)*0.8;
+        });
+
+        // ── Particles ──
+        particles.forEach(p => {
+            p.wx += p.vx * 0.05; p.wz += p.vz * 0.05;
+            p.wy += p.vy * 0.05; p.vy -= 0.2;
+            p.life--;
+        });
+        smoke.forEach(s2 => { s2.wy += s2.vy * 0.05; s2.life--; });
+        particles = particles.filter(p => p.life > 0);
+        smoke     = smoke.filter(s2 => s2.life > 0);
+
+        // update HUD
+        const nearest = tanks.filter(t=>t.alive).reduce((a,b)=>{
+            if (!a) return b;
+            const da = Math.hypot(a.x-drone.x,a.z-drone.z);
+            const db = Math.hypot(b.x-drone.x,b.z-drone.z);
+            return da<db?a:b;
+        }, null);
+        const dist2 = nearest ? Math.floor(Math.hypot(nearest.x-drone.x, nearest.z-drone.z)) : 0;
+        document.getElementById('fpvAlt').textContent  = 'ALT: ' + Math.floor(drone.y) + 'm';
+        document.getElementById('fpvSpd').textContent  = 'SPD: ' + Math.floor(drone.speed * 3.6) + ' km/h';
+        document.getElementById('fpvDist').textContent = nearest ? 'DIST: ' + dist2 + 'm' : 'TARGET: NONE';
+        const alive = tanks.filter(t=>t.alive).length;
+        if (alive > 0) document.getElementById('fpvMission').textContent = '🎯 TANKS: ' + alive;
+    }
+
+    // ── Render ──
+    function render() {
+        ctx.clearRect(0,0,CW,CH);
+        drawGround();
+        // draw tanks (sorted by distance, far first)
+        const sorted = [...tanks].sort((a,b)=>{
+            const da = Math.hypot(a.x-drone.x,a.z-drone.z);
+            const db = Math.hypot(b.x-drone.x,b.z-drone.z);
+            return db-da;
+        });
+        sorted.forEach(t => drawTank(t));
+        drawParticles();
+        drawFPVOverlay();
+        if ((missionDone || drone.dead) && !drone.exploding) drawMissionScreen();
+    }
+
+    // ── Main loop ──
+    function loop() {
+        update();
+        render();
         requestAnimationFrame(loop);
     }
 
-    // ── Pause / Restart ──
-    document.getElementById('dronePauseBtn').onclick = () => {
-        if (gameOver) return;
-        paused = !paused;
-        document.getElementById('dronePauseBtn').textContent = paused ? '▶ متابعة' : '⏸ إيقاف';
-    };
-    document.getElementById('droneRestartBtn').onclick = () => {
-        score=0; wave=1; hp=100; fuel=100; missiles=5;
-        gameOver=false; paused=false; waveClearTimer=0;
-        bullets=[]; eBullets=[]; explosions=[];
-        drone.x=W/2; drone.y=H-80; drone.vx=0; drone.vy=0; drone.trail=[];
-        document.getElementById('droneScore').textContent='0';
-        document.getElementById('droneWaveNum').textContent='1';
-        document.getElementById('droneFuel').textContent='100';
-        document.getElementById('droneMissiles').textContent='5';
-        document.getElementById('droneHpFill').style.width='100%';
-        document.getElementById('dronePauseBtn').textContent='⏸ إيقاف';
-        spawnWave(1);
-    };
+    // ── Restart ──
+    function restartGame() {
+        drone.x = WORLD_SIZE/2; drone.z = WORLD_SIZE/2-400;
+        drone.y = 130; drone.yaw = 0; drone.pitch = 0;
+        drone.speed = 0; drone.diving = false; drone.diveTarget = null;
+        drone.dead = false; drone.exploded = false;
+        tanks = TANK_CONFIGS.map((t,i) => ({
+            ...t, alive:true, w:28, h:18, id:i,
+            moveAngle:Math.random()*Math.PI*2,
+            moveSpeed:0.4+Math.random()*0.3,
+            shootTimer:60+i*40
+        }));
+        particles=[]; smoke=[]; score=0; ammo=3; missionDone=false; paused=false; frame=0;
+        document.getElementById('fpvScore').textContent='SCORE: 0';
+        document.getElementById('fpvAmmo').textContent='🎯 AMMO: 3';
+        document.getElementById('fpvMission').textContent='HUNT THE TANK';
+        document.getElementById('fpvPauseBtn').textContent='⏸ إيقاف';
+    }
 
-    spawnWave(1);
+    window.restartGame = restartGame;
     loop();
 }
 
 </script>
 </body>
-</html>
