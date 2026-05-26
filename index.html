@@ -1,10 +1,10 @@
-\cat > /mnt/user-data/outputs/prayer_app.html << 'HTMLEOF'
+cat > /mnt/user-data/outputs/prayer_app.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>مذكرتي ايبيلإسلامية</title>
+<title>مذكرتي الإسلامية</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -90,6 +90,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f4f0;min-height:100v
 .s-row-lbl{font-size:14px;color:#111;flex:1}
 .s-row-lbl small{display:block;font-size:11px;color:#9ca3af;margin-top:1px}
 .t-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:14px;direction:ltr;width:96px;text-align:center}
+/* إخفاء أسهم الزيادة والتنقيص من حقول الوقت */
+.t-inp[inputmode="numeric"] {
+  -moz-appearance: textfield;
+}
+.t-inp[inputmode="numeric"]::-webkit-inner-spin-button,
+.t-inp[inputmode="numeric"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .n-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:14px;width:68px;text-align:center}
 .txt-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:13px;direction:rtl;flex:1}
 .toggle{width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
@@ -511,7 +520,7 @@ function renderSettingsInputs() {
   document.getElementById('timeInputs').innerHTML = PRAYERS.map(p => `
     <div class="s-row">
       <div class="s-row-lbl"><i class="ti ${p.icon}" style="font-size:16px;margin-left:5px;color:#1a6b3c"></i>${p.name}</div>
-      <input class="t-inp" type="time" id="pi_${p.name}" value="${pTimes[p.name]}">
+      <input class="t-inp" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}" id="pi_${p.name}" value="${pTimes[p.name]}" placeholder="00:00" maxlength="5">
     </div>`).join('');
   document.getElementById('durInp').value = blockDur;
   document.getElementById('oathInp').value = oathPhrase;
