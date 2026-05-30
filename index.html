@@ -1,174 +1,194 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أحمد الإمبراطور 👑</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0f;font-family:'Segoe UI',Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
-.container{width:100%;max-width:900px;background:#13131a;border-radius:28px;overflow:hidden;border:1px solid #2a2a3a}
-.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px;display:flex;align-items:center;gap:12px;border-bottom:2px solid #d4af37}
-.avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#d4af37);display:flex;align-items:center;justify-content:center;font-size:24px}
-.header-info{flex:1}
-.header-name{color:#d4af37;font-size:18px;font-weight:bold}
-.header-status{color:#888;font-size:12px;display:flex;align-items:center;gap:5px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.chat-area{height:400px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.msg{display:flex;gap:10px;max-width:80%;animation:slideIn 0.3s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{flex-direction:row-reverse;align-self:flex-end}
-.msg.ai{align-self:flex-start}
-.msg-avatar{width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.msg.ai .msg-avatar{background:linear-gradient(135deg,#7c3aed,#d4af37)}
-.msg.user .msg-avatar{background:#1e1e4a;border:1px solid #2a2a5a}
-.msg-bubble{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.6}
-.msg.ai .msg-bubble{background:#1a1a24;border:1px solid #2a2a3a;border-bottom-left-radius:4px}
-.msg.user .msg-bubble{background:#1e1e4a;border:1px solid #2a2a5a;border-bottom-right-radius:4px;color:#c8c8ff}
-.msg-time{font-size:10px;color:#666;margin-top:4px}
-.input-area{padding:20px;background:#13131a;border-top:1px solid #2a2a3a}
-.input-row{display:flex;gap:10px;background:#1a1a24;border:1px solid #2a2a3a;border-radius:16px;padding:8px 12px}
-.input-row:focus-within{border-color:#d4af37}
-#msgInput{flex:1;background:none;border:none;outline:none;color:#eee;font-size:14px;resize:none;direction:rtl;font-family:inherit}
-#msgInput::placeholder{color:#666}
-.send-btn{background:linear-gradient(135deg,#7c3aed,#d4af37);border:none;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:18px}
-.send-btn:disabled{opacity:0.5}
-.typing{display:flex;gap:4px;padding:10px 14px;background:#1a1a24;border-radius:18px;width:fit-content}
-.typing span{width:8px;height:8px;border-radius:50%;background:#d4af37;animation:typing 1.4s infinite}
-.typing span:nth-child(2){animation-delay:0.2s}
-.typing span:nth-child(3){animation-delay:0.4s}
-@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-10px)}}
-.suggestions{padding:0 20px 20px;display:flex;gap:8px;flex-wrap:wrap}
-.sug-btn{background:#1a1a24;border:1px solid #2a2a3a;border-radius:20px;padding:6px 12px;font-size:11px;color:#aaa;cursor:pointer}
-.sug-btn:hover{border-color:#d4af37;color:#d4af37}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع الذكاء الاصطناعي الخاص بي</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #131314;
+            color: #e3e3e3;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            background-color: #1e1f20;
+            border-bottom: 1px solid #2f3032;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: #a8c7fa;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 1rem;
+            word-wrap: break-word;
+            white-space: pre-line; /* عشان يحافظ على أسطر الإجابة المنظمة */
+        }
+
+        .user-message {
+            background-color: #2b2a2a;
+            color: #fff;
+            align-self: flex-start;
+        }
+
+        .ai-message {
+            background-color: #1e1f20;
+            color: #e3e3e3;
+            align-self: flex-end;
+            border: 1px solid #2f3032;
+        }
+
+        .input-area {
+            padding: 20px;
+            background-color: #131314;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            display: flex;
+            background-color: #1e1f20;
+            border-radius: 30px;
+            padding: 10px 20px;
+            border: 1px solid #3c4043;
+            align-items: center;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #a8c7fa;
+        }
+
+        input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #a8c7fa;
+            color: #042b5c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #c2e7ff;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<div class="avatar">👑</div>
-<div class="header-info">
-<div class="header-name">أحمد الإمبراطور</div>
-<div class="header-status"><span class="status-dot"></span>متصل</div>
-</div>
-</div>
-<div class="chat-area" id="chatArea">
-<div id="welcomeMsg" style="text-align:center;padding:40px 20px">
-<div style="font-size:50px;margin-bottom:10px">👑</div>
-<div style="font-size:20px;font-weight:bold;color:#d4af37;margin-bottom:8px">أحمد الإمبراطور</div>
-<div style="font-size:13px;color:#888;margin-bottom:20px">ذكاء اصطناعي خاص - اسألني أي شيء</div>
-<div class="suggestions" style="justify-content:center">
-<button class="sug-btn" onclick="sendQuick('ما هي فضائل قيام الليل؟')">🌙 قيام الليل</button>
-<button class="sug-btn" onclick="sendQuick('كيف أذاكر بفعالية؟')">📚 خطة دراسة</button>
-<button class="sug-btn" onclick="sendQuick('احكي لي نكتة أردنية')">😂 نكتة</button>
-</div>
-</div>
-</div>
-<div class="input-area">
-<div class="input-row">
-<textarea id="msgInput" placeholder="اكتب رسالتك..." rows="1"></textarea>
-<button class="send-btn" onclick="sendMessage()">➤</button>
-</div>
-</div>
-</div>
 
-<script>
-const knowledge = {
-    default: [
-        "أنا ذكاء اصطناعي بسيط حالياً. اسألني عن: قيام الليل، الدراسة، النكت، أو أي شيء ثاني! 👑",
-        "سؤال جميل! بس محتاج تفاصيل أكثر عشان أعطيك جواب دقيق. جرب تسأل بشكل ثاني.",
-        "أحمد الإمبراطور في خدمتك! 🌟 وضح سؤالك أكثر وأنا أساعدك."
-    ],
-    'قيام الليل': 'قيام الليل من أعظم العبادات! فضائله: ✨ سبب لدخول الجنة، ✨ ينزل الرب إلى السماء الدنيا، ✨ يكفر الذنوب، ✨ يورث السكينة والطمأنينة.',
-    'نكتة': 'واحد أردني سأل صاحبه: ليش الحمامة تسكر عينها لما تشرب موية؟ قاله: لو شافت من وين عم تشرب ما بتشرب! 😂',
-    'دراسة': 'خطة دراسة ممتازة: 🎯 حدد أهدافك يومياً ⏰ رتب المواد حسب الأهمية ☕ خذ راحة كل 45 دقيقة 📖 راجع قبل النوم 🎉 كافئ نفسك بعد الإنجاز',
-    'مذاكرة': 'السر في المذاكرة: فهم قبل الحفظ، مراجعة مستمرة، وأخذ فترات راحة. بالتوفيق! 📚',
-    'الاردن': '🇯🇴 الأردن بلد العز والشهامة! الله يحميها ويحمي شبابها.',
-    'ذكاء': 'الذكاء قدرة على التعلم والتكيف، والحكمة استخدام المعرفة بشكل صحيح. تبي شرح أعمق؟',
-    'كيفك': 'أنا بخير الحمدلله! شكراً على سؤالك. كيف أحوالك أنت؟',
-    'السلام': 'وعليكم السلام ورحمة الله وبركاته! أهلاً وسهلاً بك 🌸'
-};
+    <header>
+        <h1>مساعد الذكاء الاصطناعي الرهيب 🤖</h1>
+    </header>
 
-function getResponse(question) {
-    let q = question.toLowerCase();
-    for (let key in knowledge) {
-        if (q.includes(key)) return knowledge[key];
-    }
-    if (q.includes('الوقت') || q.includes('الساعة')) {
-        let d = new Date();
-        return `الساعة الآن ${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')}`;
-    }
-    return knowledge.default[Math.floor(Math.random() * knowledge.default.length)];
-}
+    <div class="chat-container" id="chatContainer">
+        <div class="message ai-message">أهلاً بك! أنا مدعوم بنموذج Gemini الحقيقي الآن. اسألني أي شيء وسأجيبك فوراً! 👇</div>
+    </div>
 
-let isLoading = false;
-
-function addMessage(text, isUser) {
-    const welcome = document.getElementById('welcomeMsg');
-    if (welcome) welcome.remove();
-    const area = document.getElementById('chatArea');
-    const div = document.createElement('div');
-    div.className = `msg ${isUser ? 'user' : 'ai'}`;
-    const time = new Date().toLocaleTimeString('ar', {hour:'2-digit',minute:'2-digit'});
-    div.innerHTML = `
-        <div class="msg-avatar">${isUser ? '👤' : '👑'}</div>
-        <div>
-            <div class="msg-bubble">${text}</div>
-            <div class="msg-time">${time}</div>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="اكتب سؤالك هنا..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">إرسال</button>
         </div>
-    `;
-    area.appendChild(div);
-    area.scrollTop = area.scrollHeight;
-}
+    </div>
 
-function showTyping() {
-    const area = document.getElementById('chatArea');
-    const div = document.createElement('div');
-    div.className = 'msg ai';
-    div.id = 'typingIndicator';
-    div.innerHTML = `<div class="msg-avatar">👑</div><div class="typing"><span></span><span></span><span></span></div>`;
-    area.appendChild(div);
-    area.scrollTop = area.scrollHeight;
-}
+    <script type="module">
+        import { GoogleGenAI } from "https://esm.sh/@google/genai";
 
-function hideTyping() {
-    const t = document.getElementById('typingIndicator');
-    if (t) t.remove();
-}
+        // الـ API Key الخاص بك اللي زودتني فيه
+        const apiKey = "AQ.Ab8RN6IBfemV7N1SkB7tlqgYyxY_iEyqeJ9qs1bEe4JxFk6Lcw";
+        
+        // تجهيز مكتبة الذكاء الاصطناعي
+        const ai = new GoogleGenAI({ apiKey: apiKey });
 
-function sendQuick(text) {
-    document.getElementById('msgInput').value = text;
-    sendMessage();
-}
+        // تعريف الوظائف على الـ window عشان تشتغل مع أزرار الـ HTML
+        window.sendMessage = async function() {
+            const userInput = document.getElementById('userInput');
+            const text = userInput.value.trim();
+            if (text === '') return;
 
-async function sendMessage() {
-    const input = document.getElementById('msgInput');
-    const text = input.value.trim();
-    if (!text || isLoading) return;
-    input.value = '';
-    isLoading = true;
-    document.querySelector('.send-btn').disabled = true;
-    
-    addMessage(text, true);
-    showTyping();
-    
-    setTimeout(() => {
-        const reply = getResponse(text);
-        hideTyping();
-        addMessage(reply, false);
-        isLoading = false;
-        document.querySelector('.send-btn').disabled = false;
-        input.focus();
-    }, 800);
-}
+            // 1. عرض رسالة المستخدم
+            appendMessage(text, 'user-message');
+            userInput.value = '';
 
-document.getElementById('msgInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-    }
-});
-</script>
+            // 2. إظهار رسالة مؤقتة "جاري التفكير..." للذكاء الاصطناعي
+            const loadingId = appendMessage('جاري التفكير والتحليل... 🧠', 'ai-message');
+
+            try {
+                // 3. إرسال الطلب لـ Gemini (استخدمنا نموذج gemini-2.5-flash الأحدث والأسرع)
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: text,
+                });
+
+                // 4. استبدال نص التفكير بالإجابة الحقيقية القادمة من السيرفر
+                const aiResponseText = response.text;
+                document.getElementById(loadingId).innerText = aiResponseText;
+
+            } catch (error) {
+                console.error("حدث خطأ:", error);
+                document.getElementById(loadingId).innerText = "عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. تأكد من اتصال الإنترنت أو صلاحية المفتاح.";
+            }
+        };
+
+        window.handleKeyPress = function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        };
+
+        function appendMessage(text, className) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            const id = 'msg-' + Date.now();
+            messageDiv.id = id;
+            messageDiv.className = `message ${className}`;
+            messageDiv.innerText = text;
+            chatContainer.appendChild(messageDiv);
+            
+            // سكرول تلقائي لأسفل المحادثة
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return id;
+        }
+    </script>
 </body>
 </html>
