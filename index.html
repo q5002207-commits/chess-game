@@ -3,103 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>أحمد الإمبراطور 👑</title>
+<title>أحمد الإمبراطور </title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1a1a24;--border:#2a2a3a;--gold:#d4af37;--gold2:#f0d060;--text:#e8e8f0;--text2:#9090a8;--user-bubble:#1e1e4a;--ai-bubble:#13131a;--accent:#7c3aed}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative}
-.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#d4af37);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 0 12px rgba(212,175,55,.3)}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#d4af37);display:flex;align-items:center;justify-content:center;font-size:22px}
 .header-info{flex:1}
-.header-name{font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.5px}
+.header-name{font-size:16px;font-weight:600;color:var(--gold)}
 .header-status{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:2px}
 .status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .header-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;font-size:20px}
-.header-menu:hover{background:var(--surface2);color:var(--text)}
-.chat-area{flex:1;overflow-y:auto;padding:16px;scroll-behavior:smooth;display:flex;flex-direction:column;gap:12px}
+.chat-area{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
 .chat-area::-webkit-scrollbar{width:4px}
-.chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .welcome{text-align:center;padding:30px 20px;margin:auto;max-width:380px}
-.welcome-crown{font-size:56px;margin-bottom:12px;display:block;filter:drop-shadow(0 0 20px rgba(212,175,55,.5))}
-.welcome-title{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
+.welcome-crown{font-size:56px;margin-bottom:12px;display:block}
+.welcome-title{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .welcome-sub{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px}
 .suggestions{display:flex;flex-direction:column;gap:8px}
-.sug-btn{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:13px;cursor:pointer;text-align:right;transition:all .15s;line-height:1.5}
-.sug-btn:hover{border-color:var(--gold);color:var(--gold);background:#1a1a2e}
+.sug-btn{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:13px;cursor:pointer;text-align:right}
+.sug-btn:hover{border-color:var(--gold);color:var(--gold)}
 .msg{display:flex;gap:10px;max-width:85%;animation:msgIn .2s ease}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .msg.user{align-self:flex-start;flex-direction:row-reverse}
 .msg.ai{align-self:flex-end}
-.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;align-self:flex-end}
+.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;align-self:flex-end}
 .msg.ai .msg-avatar{background:linear-gradient(135deg,#7c3aed,#d4af37)}
 .msg.user .msg-avatar{background:#1e1e4a;border:1px solid var(--border)}
 .msg-bubble{padding:11px 14px;border-radius:18px;font-size:14px;line-height:1.7;max-width:100%}
-.msg.ai .msg-bubble{background:var(--ai-bubble);border:1px solid var(--border);border-bottom-right-radius:4px;color:var(--text)}
+.msg.ai .msg-bubble{background:var(--ai-bubble);border:1px solid var(--border);border-bottom-right-radius:4px}
 .msg.user .msg-bubble{background:var(--user-bubble);border:1px solid #2a2a5a;border-bottom-left-radius:4px;color:#c8c8ff}
-.msg-time{font-size:10px;color:var(--text2);margin-top:4px;padding:0 4px}
-.msg.user .msg-time{text-align:right}
-.typing-bubble{background:var(--ai-bubble);border:1px solid var(--border);border-radius:18px;border-bottom-right-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center}
+.msg-time{font-size:10px;color:var(--text2);margin-top:4px}
+.typing-bubble{background:var(--ai-bubble);border:1px solid var(--border);border-radius:18px;border-bottom-right-radius:4px;padding:12px 16px;display:flex;gap:5px;width:fit-content}
 .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:.4;animation:tdot 1.2s infinite}
 .typing-dot:nth-child(2){animation-delay:.2s}
 .typing-dot:nth-child(3){animation-delay:.4s}
-@keyframes tdot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
-.input-area{background:var(--surface);border-top:1px solid var(--border);padding:12px 14px;flex-shrink:0}
-.input-row{display:flex;gap:8px;align-items:flex-end;background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:8px 8px 8px 12px;transition:border-color .15s}
+@keyframes tdot{0%,100%{opacity:.4}50%{opacity:1;transform:scale(1.3)}}
+.input-area{background:var(--surface);border-top:1px solid var(--border);padding:12px 14px}
+.input-row{display:flex;gap:8px;align-items:flex-end;background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:8px 8px 8px 12px}
 .input-row:focus-within{border-color:var(--gold)}
-#msgInput{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;resize:none;max-height:120px;min-height:24px;line-height:1.5;direction:rtl;font-family:inherit}
+#msgInput{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;resize:none;max-height:120px;min-height:24px;direction:rtl;font-family:inherit}
 #msgInput::placeholder{color:var(--text2)}
-.send-btn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s;font-size:18px}
-.send-btn:hover{opacity:.85}
-.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#d4af37);border:none;cursor:pointer;font-size:18px}
+.send-btn:disabled{opacity:.4}
 .input-hint{font-size:11px;color:var(--text2);text-align:center;margin-top:7px}
-.sidebar{position:fixed;top:0;right:0;width:260px;height:100%;background:var(--surface);border-left:1px solid var(--border);z-index:200;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:16px}
-.sidebar.open{transform:translateX(0)}
-.sidebar-title{font-size:15px;font-weight:600;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.close-sidebar{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px}
-.new-chat-btn{background:linear-gradient(135deg,var(--accent),#5b21b6);border:none;border-radius:10px;padding:10px;color:white;font-size:13px;cursor:pointer;width:100%;margin-bottom:14px;font-weight:500}
-.history-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
-.history-item{padding:9px 11px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.history-item:hover{border-color:var(--gold);color:var(--text)}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:none}
-.overlay.show{display:block}
-.msg-bubble strong{color:var(--gold2);font-weight:600}
-.msg-bubble em{color:#a0a0d0;font-style:italic}
-.msg-bubble code{background:#0a0a20;border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:12px;font-family:monospace;color:#86efac}
-.msg-bubble pre{background:#0a0a20;border:1px solid var(--border);border-radius:8px;padding:10px;overflow-x:auto;margin:6px 0}
-.msg-bubble pre code{background:none;border:none;padding:0}
-.msg-bubble ul,.msg-bubble ol{padding-right:18px;margin:6px 0}
-.msg-bubble li{margin:3px 0}
-.msg-bubble h3{color:var(--gold);margin:8px 0 4px;font-size:15px}
 </style>
 </head>
 <body>
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-title">المحادثات<button class="close-sidebar" onclick="closeSidebar()">✕</button></div>
-  <button class="new-chat-btn" onclick="newChat()">+ محادثة جديدة</button>
-  <div class="history-list" id="historyList"></div>
-</div>
 <div class="header">
   <div class="avatar">👑</div>
   <div class="header-info">
     <div class="header-name">أحمد الإمبراطور</div>
     <div class="header-status"><span class="status-dot"></span>متصل الآن</div>
   </div>
-  <button class="header-menu" onclick="openSidebar()">☰</button>
 </div>
 <div class="chat-area" id="chatArea">
-  <div class="welcome" id="welcomeMsg">
+  <div class="welcome">
     <span class="welcome-crown">👑</span>
     <div class="welcome-title">أحمد الإمبراطور</div>
-    <div class="welcome-sub">ذكاء اصطناعي خاص — اسألني عن أي شيء، أنا هنا لمساعدتك</div>
+    <div class="welcome-sub">ذكاء اصطناعي خاص — اسألني عن أي شيء</div>
     <div class="suggestions">
       <button class="sug-btn" onclick="sendSuggestion(this)">🌙 ما هي فضائل قيام الليل؟</button>
       <button class="sug-btn" onclick="sendSuggestion(this)">💡 ساعدني في كتابة خطة دراسية</button>
       <button class="sug-btn" onclick="sendSuggestion(this)">🤔 ما الفرق بين الذكاء والحكمة؟</button>
-      <button class="sug-btn" onclick="sendSuggestion(this)">😄 احكِ لي نكتة باللهجة الأردنية</button>
+      <button class="sug-btn" onclick="sendSuggestion(this)">😄 احكِ لي نكتة أردنية</button>
     </div>
   </div>
 </div>
@@ -115,83 +85,30 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
 // 🔑 مفتاح OpenRouter API
 const OPENROUTER_API_KEY = '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';
 
-// SYSTEM_PROMPT مبسط وواضح
-const SYSTEM_PROMPT = `انت احمد الامبراطور، ذكاء اصطناعي شخصي وخاص.
-شخصيتك:
-- اسمك احمد الامبراطور، تتكلم بثقة وذكاء
-- تتحدث باللغة العربية او اللهجة الاردنية
-- شخصيتك دافئة وذكية وعملية
-- ممكن تمزح بشكل لطيف
-- اجاباتك منظمة وواضحة، استخدم النقاط عند الحاجة
-- انت خبير بكل المجالات: دين، دراسة، تقنية، رياضة، ثقافة عامة`;
+const SYSTEM_PROMPT = `انت احمد الامبراطور، ذكاء اصطناعي شخصي وخاص. تتحدث العربية او اللهجة الاردنية، شخصيتك دافئة وذكية.`;
 
 let messages = [];
-let chatHistory = JSON.parse(localStorage.getItem('ah_history') || '[]');
-let currentChatId = Date.now().toString();
 let isLoading = false;
 
-function getTime(){return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit',hour12:true})}
-
-function renderHistory(){
-  const list=document.getElementById('historyList');
-  if(!chatHistory.length){list.innerHTML='<div style="color:var(--text2);font-size:12px;text-align:center;padding:20px">لا توجد محادثات سابقة</div>';return}
-  list.innerHTML=chatHistory.slice().reverse().map(ch=>`<div class="history-item" onclick="loadChat('${ch.id}')" title="${ch.title}">💬 ${ch.title}</div>`).join('');
-}
-
-function openSidebar(){renderHistory();document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
-
-function loadChat(id){
-  const ch=chatHistory.find(c=>c.id===id);if(!ch)return;
-  currentChatId=id;messages=[...ch.messages];
-  const area=document.getElementById('chatArea');area.innerHTML='';
-  messages.forEach(m=>{if(m.role==='user')appendMsg('user',m.content);else appendMsg('ai',m.content)});
-  closeSidebar();
-}
-
-function newChat(){saveCurrentChat();location.reload()}
-
-function saveCurrentChat(){
-  if(!messages.length)return;
-  const firstMsg=messages.find(m=>m.role==='user');
-  const title=firstMsg?firstMsg.content.substring(0,40):'محادثة';
-  const existing=chatHistory.findIndex(c=>c.id===currentChatId);
-  const chatObj={id:currentChatId,title,messages:[...messages],date:new Date().toISOString()};
-  if(existing>=0)chatHistory[existing]=chatObj;else chatHistory.push(chatObj);
-  if(chatHistory.length>30)chatHistory=chatHistory.slice(-30);
-  localStorage.setItem('ah_history',JSON.stringify(chatHistory));
-}
+function getTime(){return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})}
 
 function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-function formatMd(text){
-  let t=escHtml(text);
-  t=t.replace(/```([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
-  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
-  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>');
-  t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>');
-  t=t.replace(/^- (.+)$/gm,'<li>$1</li>');
-  t=t.replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>');
-  t=t.replace(/\n{2,}/g,'</p><p>');
-  t=t.replace(/\n/g,'<br>');
-  return '<p>'+t+'</p>';
-}
-
 function appendMsg(role,text){
-  const welcome=document.getElementById('welcomeMsg');if(welcome)welcome.remove();
+  const welcome=document.querySelector('.welcome');
+  if(welcome && (role==='user' || role==='ai'))welcome.remove();
   const area=document.getElementById('chatArea');
   const div=document.createElement('div');
   div.className='msg '+role;
   const avatarIcon=role==='ai'?'👑':'👤';
-  const bubbleContent=role==='ai'?formatMd(text):'<p>'+escHtml(text)+'</p>';
-  div.innerHTML=`<div class="msg-avatar">${avatarIcon}</div><div><div class="msg-bubble">${bubbleContent}</div><div class="msg-time">${getTime()}</div></div>`;
+  div.innerHTML=`<div class="msg-avatar">${avatarIcon}</div><div><div class="msg-bubble"><p>${escHtml(text)}</p></div><div class="msg-time">${getTime()}</div></div>`;
   area.appendChild(div);
   area.scrollTop=area.scrollHeight;
 }
 
 function showTyping(){
-  const welcome=document.getElementById('welcomeMsg');if(welcome)welcome.remove();
+  const welcome=document.querySelector('.welcome');
+  if(welcome)welcome.remove();
   const area=document.getElementById('chatArea');
   const div=document.createElement('div');
   div.className='msg ai';div.id='typingIndicator';
@@ -200,19 +117,19 @@ function showTyping(){
 }
 function removeTyping(){const t=document.getElementById('typingIndicator');if(t)t.remove()}
 
-// ✅ النموذج الصحيح الشغال
+// ✅ الحل الأساسي - أضفنا HTTP-Referer و X-Title
 async function callAPI(userMsg){
-  messages.push({role:'user',content:userMsg});
-  
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://ahmed-ai.com',      // 👈 عنوان موقعك
+        'X-Title': 'Ahmed AI'                        // 👈 اسم تطبيقك
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-v4-flash',
+        model: 'deepseek/deepseek-chat',
         messages: [
           {role: 'system', content: SYSTEM_PROMPT},
           {role: 'user', content: userMsg}
@@ -226,9 +143,7 @@ async function callAPI(userMsg){
     }
 
     const data = await response.json();
-    const reply = data.choices[0].message.content;
-    messages.push({role: 'assistant', content: reply});
-    return reply;
+    return data.choices[0].message.content;
     
   } catch(error) {
     console.error('خطأ:', error);
@@ -240,15 +155,19 @@ async function sendMessage(){
   const inp=document.getElementById('msgInput');
   const text=inp.value.trim();
   if(!text||isLoading)return;
-  inp.value='';inp.style.height='auto';
+  inp.value='';
   isLoading=true;document.getElementById('sendBtn').disabled=true;
-  appendMsg('user',text);showTyping();
+  appendMsg('user',text);
+  messages.push({role:'user',content:text});
+  showTyping();
   try{
     const reply=await callAPI(text);
-    removeTyping();appendMsg('ai',reply);saveCurrentChat();
+    removeTyping();
+    appendMsg('ai',reply);
+    messages.push({role:'assistant',content:reply});
   }catch(e){
     removeTyping();
-    appendMsg('ai','عذراً، حدث خطأ في الاتصال. تأكد من اتصالك بالإنترنت.');
+    appendMsg('ai','عذراً، حدث خطأ.');
   }
   isLoading=false;document.getElementById('sendBtn').disabled=false;inp.focus();
 }
@@ -260,9 +179,6 @@ function sendSuggestion(btn){
   sendMessage();
 }
 
-document.getElementById('msgInput').addEventListener('input',function(){
-  this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';
-});
 document.getElementById('msgInput').addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
 });
