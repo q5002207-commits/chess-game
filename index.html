@@ -234,7 +234,7 @@ async function sendMessage(){
     removeTyping();appendMsg('ai',reply);saveCurrentChat();
   }catch(e){
     removeTyping();
-    appendMsg('ai','⚠️ خطأ: '+e.message+'\n\nتحقق الإنترنت وحاول مجدداً.');
+    appendMsg('ai','⚠️ خطأ: '+e.message+'\n\nتحقق من المفتاح أو الإنترنت وحاول مجدداً.');
   }
   isLoading=false;document.getElementById('sendBtn').disabled=false;inp.focus();
 }
