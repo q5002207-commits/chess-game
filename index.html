@@ -1,558 +1,498 @@
-cat > /mnt/user-data/outputs/prayer_app.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>مذكرتي الإسلامية</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<title>أحمد الإمبراطور 👑</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f4f0;min-height:100vh;overflow-x:hidden}
-#root{direction:rtl;min-height:100vh;background:#f0f4f0}
-
-/* NAV */
-.nav{display:flex;background:white;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.nav-btn{flex:1;padding:11px 4px 9px;border:none;background:none;cursor:pointer;font-size:11px;color:#9ca3af;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;transition:color .15s}
-.nav-btn i{font-size:22px}
-.nav-btn.active{color:#1a6b3c;border-bottom-color:#1a6b3c;font-weight:500}
-
-.page{display:none;padding:14px;animation:fi .18s ease}
-.page.active{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-
-/* HERO */
-.hero{background:#1a6b3c;border-radius:18px;padding:18px 16px;margin-bottom:12px;color:white;text-align:center}
-.hero-time{font-size:46px;font-weight:200;letter-spacing:3px;font-variant-numeric:tabular-nums;line-height:1}
-.hero-date{font-size:12px;opacity:.7;margin-top:5px}
-.hero-hijri{font-size:12px;opacity:.6;margin-top:2px}
-.hero-div{height:1px;background:rgba(255,255,255,.18);margin:13px 0}
-.hero-next-lbl{font-size:11px;opacity:.65;margin-bottom:3px}
-.hero-next-name{font-size:17px;font-weight:500;letter-spacing:.5px}
-.hero-cd{font-size:30px;font-weight:200;letter-spacing:2px;font-variant-numeric:tabular-nums;margin-top:2px}
-
-/* PRAYER CARDS */
-.prayer-row{background:white;border-radius:14px;border:1px solid #e5e7eb;padding:13px 15px;margin-bottom:8px;display:flex;align-items:center;gap:11px;transition:border .2s}
-.prayer-row.is-cur{border:2px solid #1a6b3c;background:#f6fdf8}
-.prayer-row.is-nxt{border:2px solid #d97706;background:#fffbf0}
-.p-dot{width:9px;height:9px;border-radius:50%;background:#e5e7eb;flex-shrink:0}
-.p-dot.cur{background:#1a6b3c}.p-dot.nxt{background:#d97706}
-.p-name{font-size:15px;font-weight:500;color:#111827;flex:1}
-.p-icon{font-size:17px;margin-left:5px}
-.p-badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:500;margin-right:6px}
-.p-badge.cur{background:#dcfce7;color:#166534}.p-badge.nxt{background:#fef3c7;color:#92400e}
-.p-time{font-size:14px;font-variant-numeric:tabular-nums;color:#374151;font-weight:500}
-
-/* QURAN */
-.q-search-row{display:flex;gap:8px;margin-bottom:12px}
-.q-search-row select{flex:1;padding:10px 12px;border-radius:12px;border:1px solid #d1d5db;background:white;color:#111;font-size:14px;direction:rtl}
-.q-search-row input{flex:1;padding:10px 12px;border-radius:12px;border:1px solid #d1d5db;background:white;color:#111;font-size:14px;direction:rtl}
-.surah-meta{background:#1a6b3c;border-radius:14px 14px 0 0;color:white;padding:14px 18px;text-align:center}
-.surah-meta h2{font-size:20px;font-weight:500}
-.surah-meta p{font-size:12px;opacity:.75;margin-top:3px}
-.surah-body{background:white;border-radius:0 0 14px 14px;border:1px solid #e5e7eb;border-top:none;margin-bottom:12px}
-.bismillah{text-align:center;padding:14px;font-size:20px;color:#1a6b3c;font-weight:500;border-bottom:1px solid #f3f4f6}
-.ayah-row{padding:11px 18px;border-bottom:1px solid #f3f4f6;display:flex;gap:11px;align-items:baseline}
-.ayah-row:last-child{border-bottom:none}
-.ayah-num{width:26px;height:26px;border-radius:50%;background:#f0fdf4;color:#166534;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #bbf7d0}
-.ayah-text{font-size:20px;line-height:2.1;color:#111;text-align:right;flex:1}
-.loading-box{text-align:center;padding:40px 20px;color:#6b7280;font-size:14px}
-.loading-box i{font-size:30px;margin-bottom:10px;display:block;animation:spin 1s linear infinite}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.err-box{text-align:center;padding:30px;color:#dc2626;font-size:13px;background:white;border-radius:14px;border:1px solid #fecaca}
-.surah-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px}
-.surah-list-item{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
-.surah-list-item:hover{background:#f6fdf8;border-color:#1a6b3c}
-.surah-list-num{width:28px;height:28px;border-radius:50%;background:#f0fdf4;color:#1a6b3c;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;border:1px solid #bbf7d0;flex-shrink:0}
-.surah-list-name{font-size:14px;color:#111;font-weight:500}
-.surah-list-ayahs{font-size:11px;color:#6b7280}
-.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid #e5e7eb;background:white;color:#374151;font-size:13px;cursor:pointer;margin-bottom:12px}
-.back-btn:hover{background:#f9fafb}
-
-/* ADHKAR */
-.adhkar-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.adhkar-tab{padding:7px 14px;border-radius:20px;border:1px solid #e5e7eb;background:white;color:#6b7280;font-size:13px;cursor:pointer;transition:all .15s}
-.adhkar-tab.active{background:#1a6b3c;color:white;border-color:#1a6b3c}
-.dhikr-card{background:white;border-radius:14px;border:1px solid #e5e7eb;margin-bottom:10px;overflow:hidden}
-.dhikr-head{background:#f6fdf8;padding:10px 14px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
-.dhikr-title{font-size:13px;font-weight:500;color:#166534}
-.dhikr-count{font-size:11px;color:#6b7280;background:#e5e7eb;padding:2px 8px;border-radius:20px}
-.dhikr-arabic{font-size:18px;line-height:2;color:#111;padding:14px 16px;text-align:right;border-bottom:1px solid #f3f4f6}
-.dhikr-meaning{font-size:13px;color:#6b7280;padding:10px 16px;line-height:1.7}
-.dhikr-source{font-size:11px;color:#9ca3af;padding:6px 16px 10px;font-style:italic}
-
-/* SETTINGS */
-.s-section{margin-bottom:14px}
-.s-label{font-size:12px;font-weight:500;color:#6b7280;margin-bottom:7px;padding-right:2px}
-.s-card{background:white;border-radius:14px;border:1px solid #e5e7eb;overflow:hidden}
-.s-row{padding:12px 15px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px}
-.s-row:last-child{border-bottom:none}
-.s-row-lbl{font-size:14px;color:#111;flex:1}
-.s-row-lbl small{display:block;font-size:11px;color:#9ca3af;margin-top:1px}
-.t-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:14px;direction:ltr;width:96px;text-align:center}
-/* إخفاء أسهم الزيادة والتنقيص من حقول الوقت */
-.t-inp[inputmode="numeric"] {
-  -moz-appearance: textfield;
+:root{
+  --bg:#0a0a0f;
+  --surface:#13131a;
+  --surface2:#1a1a24;
+  --border:#2a2a3a;
+  --gold:#d4af37;
+  --gold2:#f0d060;
+  --text:#e8e8f0;
+  --text2:#9090a8;
+  --user-bubble:#1e1e4a;
+  --ai-bubble:#13131a;
+  --accent:#7c3aed;
 }
-.t-inp[inputmode="numeric"]::-webkit-inner-spin-button,
-.t-inp[inputmode="numeric"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.n-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:14px;width:68px;text-align:center}
-.txt-inp{padding:7px 10px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;color:#111;font-size:13px;direction:rtl;flex:1}
-.toggle{width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
-.toggle.on{background:#1a6b3c}
-.toggle::after{content:'';position:absolute;width:20px;height:20px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle.on::after{left:23px}
-.save-btn{width:100%;padding:13px;background:#1a6b3c;color:white;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;margin-top:6px}
-.save-btn:hover{background:#155c32}
-.test-btn{width:100%;padding:11px;background:white;color:#374151;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;cursor:pointer;margin-top:6px}
-.test-btn:hover{background:#f9fafb}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh}
 
-/* BLOCK */
-.block-modal{display:none;position:fixed;inset:0;background:#0a2e15;z-index:9999;align-items:center;justify-content:center;padding:20px}
-.block-modal.show{display:flex}
-.block-inner{background:#0f3d1e;border-radius:22px;padding:30px 24px;text-align:center;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.1)}
-.b-icon{font-size:54px;margin-bottom:12px;display:block}
-.b-prayer-lbl{font-size:12px;color:rgba(255,255,255,.55);margin-bottom:3px}
-.b-prayer-name{font-size:24px;font-weight:500;color:white;margin-bottom:18px}
-.b-cd-lbl{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px}
-.b-cd{font-size:54px;font-weight:200;color:#86efac;letter-spacing:3px;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:22px}
-.b-desc{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:14px;line-height:1.6}
-.b-oath-lbl{font-size:12px;color:rgba(255,255,255,.8);margin-bottom:8px;font-weight:500}
-.b-oath-phrase{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 14px;color:#86efac;font-size:14px;margin-bottom:14px;direction:rtl}
-.b-inp{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:white;font-size:15px;text-align:center;direction:rtl;margin-bottom:8px}
-.b-inp::placeholder{color:rgba(255,255,255,.3)}
-.b-err{font-size:12px;color:#fca5a5;min-height:16px;margin-bottom:10px}
-.b-btn{width:100%;padding:13px;background:#16a34a;color:white;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer}
-.b-btn:hover{background:#15803d}
-.b-hint{font-size:11px;color:rgba(255,255,255,.25);margin-top:12px}
+/* HEADER */
+.header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink:0;
+  position:relative;
+}
+.header::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.avatar{
+  width:44px;height:44px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#d4af37);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(212,175,55,.3);
+}
+.header-info{flex:1}
+.header-name{font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.5px}
+.header-status{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:2px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.header-menu{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;font-size:20px}
+.header-menu:hover{background:var(--surface2);color:var(--text)}
+
+/* CHAT AREA */
+.chat-area{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  scroll-behavior:smooth;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* WELCOME */
+.welcome{
+  text-align:center;
+  padding:30px 20px;
+  margin:auto;
+  max-width:380px;
+}
+.welcome-crown{font-size:56px;margin-bottom:12px;display:block;filter:drop-shadow(0 0 20px rgba(212,175,55,.5))}
+.welcome-title{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
+.welcome-sub{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px}
+.suggestions{display:flex;flex-direction:column;gap:8px}
+.sug-btn{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 14px;
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  text-align:right;
+  transition:all .15s;
+  line-height:1.5;
+}
+.sug-btn:hover{border-color:var(--gold);color:var(--gold);background:#1a1a2e}
+
+/* MESSAGES */
+.msg{display:flex;gap:10px;max-width:85%;animation:msgIn .2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.user{align-self:flex-start;flex-direction:row-reverse}
+.msg.ai{align-self:flex-end}
+.msg-avatar{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;align-self:flex-end;
+}
+.msg.ai .msg-avatar{background:linear-gradient(135deg,#7c3aed,#d4af37)}
+.msg.user .msg-avatar{background:#1e1e4a;border:1px solid var(--border)}
+.msg-bubble{
+  padding:11px 14px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.7;
+  max-width:100%;
+}
+.msg.ai .msg-bubble{
+  background:var(--ai-bubble);
+  border:1px solid var(--border);
+  border-bottom-right-radius:4px;
+  color:var(--text);
+}
+.msg.user .msg-bubble{
+  background:var(--user-bubble);
+  border:1px solid #2a2a5a;
+  border-bottom-left-radius:4px;
+  color:#c8c8ff;
+}
+.msg-time{font-size:10px;color:var(--text2);margin-top:4px;text-align:left;padding:0 4px}
+.msg.user .msg-time{text-align:right}
+
+/* TYPING */
+.typing-bubble{
+  background:var(--ai-bubble);
+  border:1px solid var(--border);
+  border-radius:18px;
+  border-bottom-right-radius:4px;
+  padding:12px 16px;
+  display:flex;gap:5px;align-items:center;
+}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:.4;animation:tdot 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+
+/* INPUT AREA */
+.input-area{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:12px 14px;
+  flex-shrink:0;
+}
+.input-row{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:8px 8px 8px 12px;
+  transition:border-color .15s;
+}
+.input-row:focus-within{border-color:var(--gold)}
+#msgInput{
+  flex:1;
+  background:none;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-size:14px;
+  resize:none;
+  max-height:120px;
+  min-height:24px;
+  line-height:1.5;
+  direction:rtl;
+  font-family:inherit;
+}
+#msgInput::placeholder{color:var(--text2)}
+.send-btn{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:opacity .15s;
+  font-size:18px;
+}
+.send-btn:hover{opacity:.85}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.input-hint{font-size:11px;color:var(--text2);text-align:center;margin-top:7px}
+
+/* SIDEBAR / HISTORY */
+.sidebar{
+  position:fixed;top:0;right:0;
+  width:260px;height:100%;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  z-index:200;
+  transform:translateX(100%);
+  transition:transform .25s ease;
+  display:flex;flex-direction:column;
+  padding:16px;
+}
+.sidebar.open{transform:translateX(0)}
+.sidebar-title{font-size:15px;font-weight:600;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.close-sidebar{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px}
+.new-chat-btn{
+  background:linear-gradient(135deg,var(--accent),#5b21b6);
+  border:none;border-radius:10px;
+  padding:10px;color:white;font-size:13px;
+  cursor:pointer;width:100%;margin-bottom:14px;
+  font-weight:500;
+}
+.history-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.history-item{
+  padding:9px 11px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:13px;color:var(--text2);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.history-item:hover{border-color:var(--gold);color:var(--text)}
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:150;display:none;
+}
+.overlay.show{display:block}
+
+/* MD FORMATTING */
+.msg-bubble strong{color:var(--gold2);font-weight:600}
+.msg-bubble em{color:#a0a0d0;font-style:italic}
+.msg-bubble code{background:#0a0a20;border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:12px;font-family:monospace;color:#86efac}
+.msg-bubble pre{background:#0a0a20;border:1px solid var(--border);border-radius:8px;padding:10px;overflow-x:auto;margin:6px 0}
+.msg-bubble pre code{background:none;border:none;padding:0}
+.msg-bubble ul,.msg-bubble ol{padding-right:18px;margin:6px 0}
+.msg-bubble li{margin:3px 0}
+.msg-bubble h3{color:var(--gold);margin:8px 0 4px;font-size:15px}
 </style>
 </head>
 <body>
-<div id="root">
 
-<!-- شاشة البلوك -->
-<div class="block-modal" id="blockModal">
-  <div class="block-inner">
-    <span class="b-icon">🕌</span>
-    <div class="b-prayer-lbl">حان وقت صلاة</div>
-    <div class="b-prayer-name" id="bName">الفجر</div>
-    <div class="b-cd-lbl">الوقت المتبقي</div>
-    <div class="b-cd" id="bCd">15:00</div>
-    <div class="b-desc">لفك البلوك اكتب العبارة التالية بالضبط:</div>
-    <div class="b-oath-lbl">العبارة المطلوبة:</div>
-    <div class="b-oath-phrase" id="bOathShow">والله صليت</div>
-    <input class="b-inp" type="text" id="bInp" placeholder="اكتب العبارة هنا...">
-    <div class="b-err" id="bErr"></div>
-    <button class="b-btn" onclick="tryUnblock()">تأكيد وفك البلوك</button>
-    <div class="b-hint">ينتهي البلوك تلقائياً بعد انتهاء العداد</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-title">
+    المحادثات
+    <button class="close-sidebar" onclick="closeSidebar()">✕</button>
+  </div>
+  <button class="new-chat-btn" onclick="newChat()">+ محادثة جديدة</button>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="avatar">👑</div>
+  <div class="header-info">
+    <div class="header-name">أحمد الإمبراطور</div>
+    <div class="header-status"><span class="status-dot"></span>متصل الآن</div>
+  </div>
+  <button class="header-menu" onclick="openSidebar()" title="المحادثات">☰</button>
+</div>
+
+<!-- Chat -->
+<div class="chat-area" id="chatArea">
+  <div class="welcome" id="welcomeMsg">
+    <span class="welcome-crown">👑</span>
+    <div class="welcome-title">أحمد الإمبراطور</div>
+    <div class="welcome-sub">ذكاء اصطناعي خاص — اسألني عن أي شيء، أنا هنا لمساعدتك</div>
+    <div class="suggestions">
+      <button class="sug-btn" onclick="sendSuggestion(this)">🌙 ما هي فضائل قيام الليل؟</button>
+      <button class="sug-btn" onclick="sendSuggestion(this)">💡 ساعدني في كتابة خطة دراسية</button>
+      <button class="sug-btn" onclick="sendSuggestion(this)">🤔 ما الفرق بين الذكاء والحكمة؟</button>
+      <button class="sug-btn" onclick="sendSuggestion(this)">😄 احكِ لي نكتة باللهجة الأردنية</button>
+    </div>
   </div>
 </div>
 
-<!-- التطبيق -->
-<div id="mainApp">
-  <div class="nav">
-    <button class="nav-btn active" onclick="goPage('home',this)"><i class="ti ti-calendar"></i>الصلوات</button>
-    <button class="nav-btn" onclick="goPage('quran',this)"><i class="ti ti-book"></i>القرآن</button>
-    <button class="nav-btn" onclick="goPage('adhkar',this)"><i class="ti ti-heart"></i>الأذكار</button>
-    <button class="nav-btn" onclick="goPage('settings',this)"><i class="ti ti-adjustments-alt"></i>الإعدادات</button>
+<!-- Input -->
+<div class="input-area">
+  <div class="input-row">
+    <textarea id="msgInput" placeholder="اكتب رسالتك..." rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
-
-  <!-- الصلوات -->
-  <div id="pg-home" class="page active">
-    <div class="hero">
-      <div class="hero-time" id="hTime">00:00:00</div>
-      <div class="hero-date" id="hDate">الثلاثاء 26 مايو 2026</div>
-      <div class="hero-hijri">9 ذو الحجة 1447</div>
-      <div class="hero-div"></div>
-      <div class="hero-next-lbl">الصلاة القادمة</div>
-      <div class="hero-next-name" id="hNextName">—</div>
-      <div class="hero-cd" id="hCd">--:--</div>
-    </div>
-    <div id="prayerList"></div>
-  </div>
-
-  <!-- القرآن -->
-  <div id="pg-quran" class="page">
-    <div id="quranBrowser">
-      <div class="q-search-row">
-        <input type="text" id="surahSearch" placeholder="ابحث عن سورة..." oninput="filterSurahs()" style="flex:1">
-      </div>
-      <div class="surah-list-grid" id="surahGrid"></div>
-    </div>
-    <div id="quranReader" style="display:none">
-      <button class="back-btn" onclick="closeReader()"><i class="ti ti-arrow-right"></i> رجوع</button>
-      <div id="readerContent"></div>
-    </div>
-  </div>
-
-  <!-- الأذكار -->
-  <div id="pg-adhkar" class="page">
-    <div class="adhkar-tabs">
-      <button class="adhkar-tab active" onclick="showAdhkar('morning',this)">أذكار الصباح</button>
-      <button class="adhkar-tab" onclick="showAdhkar('evening',this)">أذكار المساء</button>
-      <button class="adhkar-tab" onclick="showAdhkar('prayer',this)">أدعية الصلاة</button>
-      <button class="adhkar-tab" onclick="showAdhkar('sleep',this)">أذكار النوم</button>
-      <button class="adhkar-tab" onclick="showAdhkar('daily',this)">أذكار يومية</button>
-      <button class="adhkar-tab" onclick="showAdhkar('quran',this)">أدعية قرآنية</button>
-    </div>
-    <div id="adhkarList"></div>
-  </div>
-
-  <!-- الإعدادات -->
-  <div id="pg-settings" class="page">
-    <div class="s-section">
-      <div class="s-label">أوقات الصلوات</div>
-      <div class="s-card" id="timeInputs"></div>
-      <button class="save-btn" onclick="saveTimes()">حفظ الأوقات</button>
-    </div>
-    <div class="s-section">
-      <div class="s-label">إعدادات البلوك</div>
-      <div class="s-card">
-        <div class="s-row">
-          <div class="s-row-lbl">تفعيل البلوك<small>يظهر عند حلول وقت الصلاة</small></div>
-          <button class="toggle on" id="blockToggle" onclick="this.classList.toggle('on');blockEnabled=this.classList.contains('on')"></button>
-        </div>
-        <div class="s-row">
-          <div class="s-row-lbl">مدة البلوك<small>بالدقائق</small></div>
-          <input class="n-inp" type="number" id="durInp" value="15" min="5" max="60" step="5">
-        </div>
-        <div class="s-row">
-          <div class="s-row-lbl">عبارة فك البلوك<small>اكتبها بالضبط لفك البلوك</small></div>
-          <input class="txt-inp" type="text" id="oathInp" value="والله صليت">
-        </div>
-      </div>
-      <button class="save-btn" onclick="saveBlockConf()">حفظ الإعدادات</button>
-      <button class="test-btn" onclick="triggerBlock('الفجر')">▶ تجربة شاشة البلوك</button>
-    </div>
-  </div>
-</div>
+  <div class="input-hint">أحمد الإمبراطور — ـ </div>
 </div>
 
 <script>
-// =================== البيانات ===================
-const PRAYERS = [
-  {name:'الفجر',  icon:'ti-moon',       time:'03:56'},
-  {name:'الشروق', icon:'ti-sunrise',    time:'05:26', noBlock:true},
-  {name:'الظهر',  icon:'ti-sun',        time:'12:34'},
-  {name:'العصر',  icon:'ti-cloud-sun',  time:'16:15'},
-  {name:'المغرب', icon:'ti-sunset',     time:'19:41'},
-  {name:'العشاء', icon:'ti-moon-stars', time:'21:11'}
-];
+const SYSTEM_PROMPT = `أنت "أحمد الإمبراطور" — ذكاء اصطناعي شخصي وخاص.
+شخصيتك:
+- اسمك أحمد الإمبراطور، وأنت تتكلم بثقة وذكاء
+- تتحدث باللغة العربية الفصحى السهلة أو باللهجة الأردنية إذا كلّمك المستخدم بالعامية
+- شخصيتك دافئة، ذكية، وعملية — لا تكون رسمياً أكثر من اللزوم
+- تهتم بالمستخدم وتحاول تقديم أفضل إجابة ممكنة
+- يمكنك الدعابة والفكاهة بشكل لطيف عند المناسبة
+- إجاباتك منظمة وواضحة، تستخدم النقاط عند الحاجة
+- لا تقل أبداً أنك Claude أو AI من Anthropic — أنت فقط "أحمد الإمبراطور"`;
 
-const SURAH_NAMES = [
-  'الفاتحة','البقرة','آل عمران','النساء','المائدة','الأنعام','الأعراف','الأنفال','التوبة','يونس',
-  'هود','يوسف','الرعد','إبراهيم','الحجر','النحل','الإسراء','الكهف','مريم','طه',
-  'الأنبياء','الحج','المؤمنون','النور','الفرقان','الشعراء','النمل','القصص','العنكبوت','الروم',
-  'لقمان','السجدة','الأحزاب','سبأ','فاطر','يس','الصافات','ص','الزمر','غافر',
-  'فصلت','الشورى','الزخرف','الدخان','الجاثية','الأحقاف','محمد','الفتح','الحجرات','ق',
-  'الذاريات','الطور','النجم','القمر','الرحمن','الواقعة','الحديد','المجادلة','الحشر','الممتحنة',
-  'الصف','الجمعة','المنافقون','التغابن','الطلاق','التحريم','الملك','القلم','الحاقة','المعارج',
-  'نوح','الجن','المزمل','المدثر','القيامة','الإنسان','المرسلات','النبأ','النازعات','عبس',
-  'التكوير','الانفطار','المطففين','الانشقاق','البروج','الطارق','الأعلى','الغاشية','الفجر','البلد',
-  'الشمس','الليل','الضحى','الشرح','التين','العلق','القدر','البينة','الزلزلة','العاديات',
-  'القارعة','التكاثر','العصر','الهمزة','الفيل','قريش','الماعون','الكوثر','الكافرون','النصر',
-  'المسد','الإخلاص','الفلق','الناس'
-];
+let messages = [];
+let chatHistory = JSON.parse(localStorage.getItem('ah_history') || '[]');
+let currentChatId = Date.now().toString();
+let isLoading = false;
 
-const SURAH_AYAHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,43,70,28,28,20,56,40,31,50,40,46,42,29,19,36,25,20,17,19,26,30,20,15,21,11,8,8,3,5,8,8,11,11,18,3,3,5,4,7,3,6,3,5,4,5,6,6,8,3,4,6,6];
-
-const ADHKAR = {
-  morning: [
-    {title:'سيد الاستغفار',count:'مرة واحدة صباحاً',arabic:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',meaning:'من قاله في الصباح موقناً به فمات من يومه دخل الجنة',source:'رواه البخاري'},
-    {title:'آية الكرسي',count:'مرة واحدة',arabic:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',meaning:'من قرأها حين يصبح أُجيرَ من الجن حتى يمسي',source:'رواه الحاكم وصححه الألباني'},
-    {title:'المعوذتان',count:'3 مرات',arabic:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿1﴾ مِنْ شَرِّ مَا خَلَقَ ﴿2﴾ وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿3﴾ وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿4﴾ وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿5﴾\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿1﴾ مَلِكِ النَّاسِ ﴿2﴾ إِلَٰهِ النَّاسِ ﴿3﴾ مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿4﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿5﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿6﴾',meaning:'تكفيك من كل شيء',source:'رواه أبو داود وصححه الألباني'},
-    {title:'ذكر الصباح',count:'3 مرات',arabic:'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',meaning:'ربِّ أسألك خير ما في هذا اليوم وخير ما بعده',source:'رواه مسلم'},
-    {title:'التسبيح والتحميد',count:'100 مرة',arabic:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',meaning:'من قالها في الصباح والمساء لم يجئ أحد يوم القيامة بأفضل مما جاء به إلا أحد قال مثل ما قال أو زاد',source:'رواه مسلم'},
-    {title:'الحماية من البلاء',count:'3 مرات',arabic:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',meaning:'من قالها ثلاثاً حين يصبح لم تصبه فجأة بلاء حتى يمسي',source:'رواه أبو داود والترمذي'},
-    {title:'الرضا بالله',count:'3 مرات',arabic:'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صلى الله عليه وسلم نَبِيًّا',meaning:'كان حقاً على الله أن يرضيه يوم القيامة',source:'رواه أبو داود وابن ماجه'},
-    {title:'الصلاة على النبي',count:'10 مرات',arabic:'اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ',meaning:'من صلى عليَّ صلاة واحدة صلى الله عليه بها عشراً',source:'رواه مسلم'}
-  ],
-  evening: [
-    {title:'سيد الاستغفار مساءً',count:'مرة واحدة مساءً',arabic:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',meaning:'من قاله في المساء موقناً به فمات من ليلته دخل الجنة',source:'رواه البخاري'},
-    {title:'ذكر المساء',count:'3 مرات',arabic:'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',meaning:'ربِّ أسألك خير ما في هذه الليلة وخير ما بعدها',source:'رواه مسلم'},
-    {title:'آية الكرسي مساءً',count:'مرة واحدة',arabic:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',meaning:'من قرأها حين يمسي أُجيرَ من الجن حتى يصبح',source:'رواه الحاكم'},
-    {title:'الاستغفار',count:'100 مرة أو أكثر',arabic:'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',meaning:'تُكفِّر الذنوب وترفع الدرجات',source:'رواه البخاري ومسلم'},
-    {title:'التسبيح والتحميد مساءً',count:'100 مرة',arabic:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',meaning:'تحط الخطايا وإن كانت مثل زبد البحر',source:'رواه مسلم'},
-    {title:'الحماية مساءً',count:'3 مرات',arabic:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',meaning:'من قالها ثلاثاً حين يمسي لم تصبه فجأة بلاء حتى يصبح',source:'رواه أبو داود والترمذي'}
-  ],
-  prayer: [
-    {title:'دعاء الاستفتاح',count:'في بداية الصلاة',arabic:'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ',meaning:'دعاء الاستفتاح المسنون قبل الفاتحة',source:'رواه أبو داود والترمذي'},
-    {title:'دعاء الركوع',count:'3 مرات',arabic:'سُبْحَانَ رَبِّيَ الْعَظِيمِ',meaning:'تسبيح الركوع',source:'رواه مسلم'},
-    {title:'دعاء الرفع من الركوع',count:'مرة واحدة',arabic:'رَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ',meaning:'دعاء الاعتدال من الركوع',source:'رواه البخاري'},
-    {title:'دعاء السجود',count:'3 مرات',arabic:'سُبْحَانَ رَبِّيَ الْأَعْلَى',meaning:'تسبيح السجود — أقرب ما يكون العبد من ربه وهو ساجد',source:'رواه مسلم'},
-    {title:'دعاء بين السجدتين',count:'مرة واحدة',arabic:'رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي',meaning:'دعاء الجلسة بين السجدتين',source:'رواه أبو داود'},
-    {title:'التشهد',count:'مرة في كل تشهد',arabic:'التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',meaning:'التشهد الإبراهيمي',source:'رواه البخاري ومسلم'},
-    {title:'الصلاة الإبراهيمية',count:'في التشهد الأخير',arabic:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ',meaning:'',source:'رواه البخاري ومسلم'},
-    {title:'دعاء قبل السلام',count:'في آخر الصلاة',arabic:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، وَمِنْ عَذَابِ جَهَنَّمَ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ',meaning:'أوصى النبي ﷺ بقراءته',source:'رواه مسلم'},
-    {title:'ذكر بعد السلام',count:'3 مرات',arabic:'أَسْتَغْفِرُ اللَّهَ',meaning:'يُسَنُّ قوله ثلاثاً ثم يقول: اللهم أنت السلام...',source:'رواه مسلم'},
-    {title:'ذكر بعد الصلاة',count:'مرة واحدة',arabic:'اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ',meaning:'',source:'رواه مسلم'},
-    {title:'التسبيح بعد الصلاة',count:'33 مرة لكل',arabic:'سُبْحَانَ اللَّهِ ﴿33﴾ — الْحَمْدُ لِلَّهِ ﴿33﴾ — اللَّهُ أَكْبَرُ ﴿33﴾\nلَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',meaning:'غُفِرت خطاياه وإن كانت مثل زبد البحر',source:'رواه مسلم'}
-  ],
-  sleep: [
-    {title:'آية الكرسي قبل النوم',count:'مرة واحدة',arabic:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...',meaning:'لن يزال عليك من الله حافظ ولا يقربك شيطان حتى تصبح',source:'رواه البخاري'},
-    {title:'سورة الإخلاص والمعوذتان',count:'3 مرات',arabic:'قُلْ هُوَ اللَّهُ أَحَدٌ ﴿1﴾ اللَّهُ الصَّمَدُ ﴿2﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿3﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿4﴾\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ... قُلْ أَعُوذُ بِرَبِّ النَّاسِ...',meaning:'تكفيك من كل شيء',source:'رواه البخاري وأبو داود'},
-    {title:'دعاء النوم',count:'عند النوم',arabic:'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',meaning:'كان النبي ﷺ يقولها عند نومه',source:'رواه البخاري'},
-    {title:'التسبيح قبل النوم',count:'33 و33 و34',arabic:'سُبْحَانَ اللَّهِ ﴿33﴾\nالْحَمْدُ لِلَّهِ ﴿33﴾\nاللَّهُ أَكْبَرُ ﴿34﴾',meaning:'هو خير لكما من خادم',source:'رواه البخاري ومسلم'},
-    {title:'الدعاء عند الاستيقاظ',count:'عند الاستيقاظ',arabic:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',meaning:'',source:'رواه البخاري'},
-    {title:'دعاء الفزع من النوم',count:'عند الفزع',arabic:'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ غَضَبِهِ وَعِقَابِهِ وَشَرِّ عِبَادِهِ وَمِنْ هَمَزَاتِ الشَّيَاطِينِ وَأَنْ يَحْضُرُونِ',meaning:'لا يضره شيء',source:'رواه أبو داود والترمذي'}
-  ],
-  daily: [
-    {title:'الدخول للمنزل',count:'عند الدخول',arabic:'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ، بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا',meaning:'',source:'رواه أبو داود'},
-    {title:'الخروج من المنزل',count:'عند الخروج',arabic:'بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',meaning:'يقال له: كُفيتَ وهُديتَ ووُقيتَ وتنحى عنه الشيطان',source:'رواه أبو داود والترمذي'},
-    {title:'دعاء ركوب السيارة',count:'عند الركوب',arabic:'بِسْمِ اللَّهِ، الْحَمْدُ لِلَّهِ، سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ',meaning:'',source:'رواه أبو داود والترمذي'},
-    {title:'قبل الأكل',count:'عند بدء الأكل',arabic:'بِسْمِ اللَّهِ',meaning:'إن نسيتَ فقل: بسم الله أوله وآخره',source:'رواه أبو داود والترمذي'},
-    {title:'بعد الأكل',count:'بعد الانتهاء',arabic:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',meaning:'',source:'رواه أبو داود والترمذي'},
-    {title:'دخول الخلاء',count:'عند الدخول',arabic:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ',meaning:'',source:'رواه البخاري ومسلم'},
-    {title:'الخروج من الخلاء',count:'عند الخروج',arabic:'غُفْرَانَكَ',meaning:'',source:'رواه أبو داود والترمذي'},
-    {title:'دعاء الكرب',count:'عند الضيق',arabic:'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ',meaning:'',source:'رواه البخاري ومسلم'},
-    {title:'دعاء القنوت',count:'في صلاة الوتر',arabic:'اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ، وَقِنِي شَرَّ مَا قَضَيْتَ، فَإِنَّكَ تَقْضِي وَلَا يُقْضَى عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ، وَلَا يَعِزُّ مَنْ عَادَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ',meaning:'',source:'رواه أبو داود والنسائي'},
-    {title:'لقضاء الحاجة',count:'عند الحاجة',arabic:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا',meaning:'',source:'رواه ابن حبان'},
-    {title:'الاستخارة',count:'ركعتان ثم الدعاء',arabic:'اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ',meaning:'ثم يسمي حاجته',source:'رواه البخاري'}
-  ],
-  quran: [
-    {title:'دعاء سيدنا يونس',count:'دعاء الكرب العظيم',arabic:'لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ',meaning:'ما دعا به مكروب إلا فرَّج الله كربه',source:'سورة الأنبياء: 87'},
-    {title:'دعاء سيدنا أيوب',count:'دعاء الشفاء',arabic:'أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ',meaning:'فاستجبنا له فكشفنا ما به من ضر',source:'سورة الأنبياء: 83'},
-    {title:'دعاء موسى عليه السلام',count:'عند الحاجة',arabic:'رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ',meaning:'دعاء الافتقار إلى الله',source:'سورة القصص: 24'},
-    {title:'ربنا آتنا في الدنيا',count:'دعاء جامع',arabic:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',meaning:'الدعاء الذي لم يكن النبي ﷺ يدعو بشيء أكثر منه',source:'سورة البقرة: 201'},
-    {title:'ربنا لا تؤاخذنا',count:'دعاء المغفرة',arabic:'رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ',meaning:'ختام سورة البقرة',source:'سورة البقرة: 286'},
-    {title:'دعاء الهداية والتثبيت',count:'دعاء دائم',arabic:'رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ',meaning:'',source:'سورة آل عمران: 8'},
-    {title:'ربنا إننا آمنا',count:'دعاء المؤمنين',arabic:'رَبَّنَا إِنَّنَا آمَنَّا فَاغْفِرْ لَنَا ذُنُوبَنَا وَقِنَا عَذَابَ النَّارِ',meaning:'',source:'سورة آل عمران: 16'},
-    {title:'دعاء ختام الكهف',count:'عند قراءة الكهف',arabic:'رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا',meaning:'دعاء أصحاب الكهف',source:'سورة الكهف: 10'},
-    {title:'دعاء زيادة العلم',count:'دعاء الطلاب',arabic:'رَّبِّ زِدْنِي عِلْمًا',meaning:'',source:'سورة طه: 114'},
-    {title:'دعاء التوبة',count:'دعاء الرجوع إلى الله',arabic:'رَبَّنَا ظَلَمْنَا أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ',meaning:'دعاء آدم وحواء',source:'سورة الأعراف: 23'},
-    {title:'دعاء الذرية الصالحة',count:'دعاء المتزوجين',arabic:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا',meaning:'دعاء عباد الرحمن',source:'سورة الفرقان: 74'},
-    {title:'دعاء بر الوالدين',count:'دعاء يومي',arabic:'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',meaning:'',source:'سورة الإسراء: 24'},
-    {title:'حسبنا الله',count:'عند الخوف والشدة',arabic:'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ',meaning:'قالها إبراهيم حين أُلقي في النار وقالها محمد ﷺ حين قيل لهم إن الناس قد جمعوا لكم',source:'سورة آل عمران: 173'}
-  ]
-};
-
-// =================== المتغيرات ===================
-let pTimes = {}, blockEnabled = true, blockDur = 15, oathPhrase = 'والله صليت';
-let bInterval = null, bSecs = 0;
-let firedToday = {};
-let allSurahs = [], filteredSurahs = [];
-
-// =================== التهيئة ===================
-function load() {
-  PRAYERS.forEach(p => { pTimes[p.name] = localStorage.getItem('pt_' + p.name) || p.time; });
-  blockEnabled = localStorage.getItem('bEnabled') !== 'false';
-  blockDur = parseInt(localStorage.getItem('bDur') || '15');
-  oathPhrase = localStorage.getItem('bOath') || 'والله صليت';
-  const dk = new Date().toDateString();
-  try { firedToday = JSON.parse(localStorage.getItem('fired_' + dk) || '{}'); } catch(e) { firedToday = {}; }
-  buildSurahList();
+function getTime() {
+  return new Date().toLocaleTimeString('ar', {hour:'2-digit',minute:'2-digit',hour12:true});
 }
 
-// =================== التنقل ===================
-function goPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('pg-' + id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'settings') renderSettingsInputs();
-  if (id === 'adhkar') showAdhkar('morning', document.querySelector('.adhkar-tab'));
-}
-
-// =================== الساعة والصلوات ===================
-function tm2m(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
-function getNowM() { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
-
-function getStatus() {
-  const nowM = getNowM();
-  const blockablePrayers = PRAYERS.filter(p => !p.noBlock);
-  let cur = null, nxt = null, diff = 0;
-  for (let i = 0; i < PRAYERS.length; i++) {
-    const pt = tm2m(pTimes[PRAYERS[i].name]);
-    const nextPt = i < PRAYERS.length - 1 ? tm2m(pTimes[PRAYERS[i + 1].name]) : 24 * 60;
-    if (nowM >= pt && nowM < nextPt) { cur = PRAYERS[i]; nxt = PRAYERS[i + 1] || PRAYERS[0]; break; }
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!chatHistory.length) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:20px">لا توجد محادثات سابقة</div>';
+    return;
   }
-  if (!cur) nxt = PRAYERS[0];
-  if (nxt) { let nd = tm2m(pTimes[nxt.name]) - nowM; if (nd < 0) nd += 24 * 60; diff = nd; }
-  return { cur, nxt, diff };
-}
-
-function fmtM(m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
-
-function renderPrayers() {
-  const { cur, nxt } = getStatus();
-  document.getElementById('prayerList').innerHTML = PRAYERS.map(p => {
-    const isCur = cur && cur.name === p.name;
-    const isNxt = nxt && nxt.name === p.name && !isCur;
-    return `<div class="prayer-row${isCur ? ' is-cur' : isNxt ? ' is-nxt' : ''}">
-      <div class="p-dot${isCur ? ' cur' : isNxt ? ' nxt' : ''}"></div>
-      <div class="p-name"><i class="ti ${p.icon} p-icon" style="color:${isCur ? '#1a6b3c' : isNxt ? '#d97706' : '#9ca3af'}"></i>${p.name}</div>
-      ${isCur ? '<span class="p-badge cur">الآن</span>' : isNxt ? '<span class="p-badge nxt">التالية</span>' : ''}
-      <div class="p-time">${pTimes[p.name]}</div>
-    </div>`;
-  }).join('');
-}
-
-function updateClock() {
-  const n = new Date();
-  const t = n.toLocaleTimeString('ar', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  document.getElementById('hTime').textContent = t;
-  const { nxt, diff } = getStatus();
-  document.getElementById('hNextName').textContent = nxt ? nxt.name : '—';
-  document.getElementById('hCd').textContent = nxt ? fmtM(diff) : '--:--';
-  renderPrayers();
-  checkFire(n);
-}
-
-function checkFire(n) {
-  if (!blockEnabled) return;
-  const h = n.getHours(), m = n.getMinutes(), s = n.getSeconds();
-  if (s > 4) return;
-  const dk = n.toDateString();
-  PRAYERS.filter(p => !p.noBlock).forEach(p => {
-    const [ph, pm] = pTimes[p.name].split(':').map(Number);
-    if (h === ph && m === pm && !firedToday[p.name]) {
-      firedToday[p.name] = true;
-      localStorage.setItem('fired_' + dk, JSON.stringify(firedToday));
-      triggerBlock(p.name);
-    }
-  });
-}
-
-// =================== البلوك ===================
-function triggerBlock(pName) {
-  bSecs = blockDur * 60;
-  document.getElementById('bName').textContent = pName;
-  document.getElementById('bInp').value = '';
-  document.getElementById('bErr').textContent = '';
-  document.getElementById('bOathShow').textContent = oathPhrase;
-  document.getElementById('blockModal').classList.add('show');
-  updateBCd();
-  if (bInterval) clearInterval(bInterval);
-  bInterval = setInterval(() => { bSecs--; updateBCd(); if (bSecs <= 0) { clearInterval(bInterval); closeBlock(); } }, 1000);
-}
-
-function updateBCd() {
-  const m = Math.floor(bSecs / 60), s = bSecs % 60;
-  document.getElementById('bCd').textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-}
-
-function closeBlock() { document.getElementById('blockModal').classList.remove('show'); }
-
-function tryUnblock() {
-  const val = document.getElementById('bInp').value.trim();
-  if (val === oathPhrase) { clearInterval(bInterval); closeBlock(); }
-  else {
-    document.getElementById('bErr').textContent = 'العبارة غير صحيحة، حاول مجدداً';
-    document.getElementById('bInp').value = '';
-    document.getElementById('bInp').style.borderColor = '#f87171';
-    setTimeout(() => { document.getElementById('bInp').style.borderColor = ''; }, 1500);
-  }
-}
-
-// =================== القرآن من API ===================
-function buildSurahList() {
-  allSurahs = SURAH_NAMES.map((name, i) => ({ num: i + 1, name, ayahs: SURAH_AYAHS[i] }));
-  filteredSurahs = [...allSurahs];
-  renderSurahGrid();
-}
-
-function filterSurahs() {
-  const q = document.getElementById('surahSearch').value.trim();
-  filteredSurahs = q ? allSurahs.filter(s => s.name.includes(q)) : [...allSurahs];
-  renderSurahGrid();
-}
-
-function renderSurahGrid() {
-  document.getElementById('surahGrid').innerHTML = filteredSurahs.map(s =>
-    `<div class="surah-list-item" onclick="openSurah(${s.num},'${s.name}',${s.ayahs})">
-      <div class="surah-list-num">${s.num}</div>
-      <div><div class="surah-list-name">${s.name}</div><div class="surah-list-ayahs">${s.ayahs} آية</div></div>
-    </div>`
+  list.innerHTML = chatHistory.slice().reverse().map(ch =>
+    `<div class="history-item" onclick="loadChat('${ch.id}')" title="${ch.title}">💬 ${ch.title}</div>`
   ).join('');
 }
 
-async function openSurah(num, name, totalAyahs) {
-  document.getElementById('quranBrowser').style.display = 'none';
-  document.getElementById('quranReader').style.display = 'block';
-  document.getElementById('readerContent').innerHTML = `
-    <div class="surah-meta"><h2>سورة ${name}</h2><p>${totalAyahs} آية</p></div>
-    <div class="surah-body"><div class="loading-box"><i class="ti ti-loader"></i>جاري تحميل السورة...</div></div>`;
-  try {
-    const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/ar.alafasy`);
-    if (!res.ok) throw new Error('فشل التحميل');
-    const data = await res.json();
-    const ayahs = data.data.ayahs;
-    const showB = num !== 1 && num !== 9;
-    let html = `<div class="surah-meta"><h2>سورة ${name}</h2><p>${totalAyahs} آية</p></div><div class="surah-body">`;
-    if (showB) html += `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
-    html += ayahs.map(a => `<div class="ayah-row"><div class="ayah-num">${a.numberInSurah}</div><div class="ayah-text">${a.text} ﴿${a.numberInSurah}﴾</div></div>`).join('');
-    html += '</div>';
-    document.getElementById('readerContent').innerHTML = html;
-  } catch(e) {
-    document.getElementById('readerContent').innerHTML = `
-      <div class="surah-meta"><h2>سورة ${name}</h2></div>
-      <div class="err-box"><i class="ti ti-wifi-off" style="font-size:28px;display:block;margin-bottom:8px"></i>تعذّر التحميل. تحقق من الإنترنت ثم اضغط على السورة مجدداً.</div>`;
-  }
+function openSidebar() {
+  renderHistory();
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
 }
 
-function closeReader() {
-  document.getElementById('quranBrowser').style.display = 'block';
-  document.getElementById('quranReader').style.display = 'none';
-}
-
-// =================== الأذكار ===================
-function showAdhkar(cat, btn) {
-  document.querySelectorAll('.adhkar-tab').forEach(t => t.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const items = ADHKAR[cat] || [];
-  document.getElementById('adhkarList').innerHTML = items.map(d => `
-    <div class="dhikr-card">
-      <div class="dhikr-head">
-        <div class="dhikr-title">${d.title}</div>
-        <div class="dhikr-count">${d.count}</div>
-      </div>
-      <div class="dhikr-arabic">${d.arabic}</div>
-      ${d.meaning ? `<div class="dhikr-meaning">${d.meaning}</div>` : ''}
-      <div class="dhikr-source">${d.source}</div>
-    </div>`).join('');
-}
-
-// =================== الإعدادات ===================
-function renderSettingsInputs() {
-  document.getElementById('timeInputs').innerHTML = PRAYERS.map(p => `
-    <div class="s-row">
-      <div class="s-row-lbl"><i class="ti ${p.icon}" style="font-size:16px;margin-left:5px;color:#1a6b3c"></i>${p.name}</div>
-      <input class="t-inp" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}" id="pi_${p.name}" value="${pTimes[p.name]}" placeholder="00:00" maxlength="5">
-    </div>`).join('');
-  document.getElementById('durInp').value = blockDur;
-  document.getElementById('oathInp').value = oathPhrase;
-  const tog = document.getElementById('blockToggle');
-  blockEnabled ? tog.classList.add('on') : tog.classList.remove('on');
-}
-
-function saveTimes() {
-  PRAYERS.forEach(p => {
-    const el = document.getElementById('pi_' + p.name);
-    if (el) { pTimes[p.name] = el.value; localStorage.setItem('pt_' + p.name, el.value); }
+function loadChat(id) {
+  const ch = chatHistory.find(c => c.id === id);
+  if (!ch) return;
+  currentChatId = id;
+  messages = [...ch.messages];
+  const area = document.getElementById('chatArea');
+  area.innerHTML = '';
+  messages.forEach(m => {
+    if (m.role === 'user') appendMsg('user', m.content);
+    else appendMsg('ai', m.content);
   });
-  renderPrayers();
-  alert('✅ تم حفظ أوقات الصلوات');
+  closeSidebar();
 }
 
-function saveBlockConf() {
-  blockDur = parseInt(document.getElementById('durInp').value) || 15;
-  oathPhrase = document.getElementById('oathInp').value.trim() || 'والله صليت';
-  blockEnabled = document.getElementById('blockToggle').classList.contains('on');
-  localStorage.setItem('bDur', blockDur);
-  localStorage.setItem('bOath', oathPhrase);
-  localStorage.setItem('bEnabled', blockEnabled);
-  alert('✅ تم حفظ الإعدادات');
+function newChat() {
+  saveCurrentChat();
+  messages = [];
+  currentChatId = Date.now().toString();
+  document.getElementById('chatArea').innerHTML = document.querySelector('.welcome') 
+    ? '' 
+    : '';
+  location.reload();
 }
 
-// =================== التشغيل ===================
-load();
-updateClock();
-setInterval(updateClock, 1000);
+function saveCurrentChat() {
+  if (!messages.length) return;
+  const firstMsg = messages.find(m => m.role === 'user');
+  const title = firstMsg ? firstMsg.content.substring(0, 40) : 'محادثة';
+  const existing = chatHistory.findIndex(c => c.id === currentChatId);
+  const chatObj = { id: currentChatId, title, messages: [...messages], date: new Date().toISOString() };
+  if (existing >= 0) chatHistory[existing] = chatObj;
+  else chatHistory.push(chatObj);
+  if (chatHistory.length > 30) chatHistory = chatHistory.slice(-30);
+  localStorage.setItem('ah_history', JSON.stringify(chatHistory));
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatMd(text) {
+  let t = escHtml(text);
+  t = t.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  t = t.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  t = t.replace(/^- (.+)$/gm, '<li>$1</li>');
+  t = t.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+  t = t.replace(/\n{2,}/g, '</p><p>');
+  t = t.replace(/\n/g, '<br>');
+  t = '<p>' + t + '</p>';
+  t = t.replace(/<p><\/p>/g, '');
+  return t;
+}
+
+function appendMsg(role, text, isNew = false) {
+  const welcome = document.getElementById('welcomeMsg');
+  if (welcome) welcome.remove();
+
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatarIcon = role === 'ai' ? '👑' : '👤';
+  const bubbleContent = role === 'ai' ? formatMd(text) : `<p>${escHtml(text)}</p>`;
+
+  div.innerHTML = `
+    <div class="msg-avatar">${avatarIcon}</div>
+    <div>
+      <div class="msg-bubble">${bubbleContent}</div>
+      <div class="msg-time">${getTime()}</div>
+    </div>`;
+
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const welcome = document.getElementById('welcomeMsg');
+  if (welcome) welcome.remove();
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="msg-avatar">👑</div>
+    <div class="typing-bubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+async function callAPI(userMsg) {
+  messages.push({ role: 'user', content: userMsg });
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: messages.map(m => ({ role: m.role, content: m.content }))
+    })
+  });
+  if (!response.ok) throw new Error('API error ' + response.status);
+  const data = await response.json();
+  const reply = data.content.map(b => b.text || '').join('');
+  messages.push({ role: 'assistant', content: reply });
+  return reply;
+}
+
+async function sendMessage() {
+  const inp = document.getElementById('msgInput');
+  const text = inp.value.trim();
+  if (!text || isLoading) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  appendMsg('user', text, true);
+  showTyping();
+
+  try {
+    const reply = await callAPI(text);
+    removeTyping();
+    appendMsg('ai', reply, true);
+    saveCurrentChat();
+  } catch(e) {
+    removeTyping();
+    appendMsg('ai', '⚠️ حدث خطأ في الاتصال. تحقق من الإنترنت وحاول مجدداً.', true);
+  }
+
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  inp.focus();
+}
+
+function sendSuggestion(btn) {
+  document.getElementById('msgInput').value = btn.textContent.replace(/^[^\w\u0600-\u06ff]+/, '').trim();
+  sendMessage();
+}
+
+// Auto-resize textarea
+document.getElementById('msgInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+document.getElementById('msgInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
 </script>
 </body>
 </html>
-HTMLEOF
-echo "done"
