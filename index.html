@@ -6,11 +6,7 @@
 <title>أحمد الإمبراطور 👑</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#0a0a0f;--surface:#13131a;--surface2:#1a1a24;--border:#2a2a3a;
-  --gold:#d4af37;--gold2:#f0d060;--text:#e8e8f0;--text2:#9090a8;
-  --user-bubble:#1e1e4a;--ai-bubble:#13131a;--accent:#7c3aed;
-}
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1a1a24;--border:#2a2a3a;--gold:#d4af37;--gold2:#f0d060;--text:#e8e8f0;--text2:#9090a8;--user-bubble:#1e1e4a;--ai-bubble:#13131a;--accent:#7c3aed}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh}
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative}
@@ -112,21 +108,18 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--t
     <textarea id="msgInput" placeholder="اكتب رسالتك..." rows="1"></textarea>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
-  <div class="input-hint">أحمد الإمبراطور 👑</div>
+  <div class="input-hint">أحمد الإمبراطور 👑 — مدعوم بـ Claude AI</div>
 </div>
 
 <script>
-const API_KEY = 'AIzaSyAQ.Ab8RN6LYKb8OpUnV76LAv2LHNUOn2zYGshZBSjp_R3J1PNCl-Q';
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY;
-
 const SYSTEM_PROMPT = `أنت "أحمد الإمبراطور" — ذكاء اصطناعي شخصي وخاص.
 شخصيتك:
 - اسمك أحمد الإمبراطور، وأنت تتكلم بثقة وذكاء
 - تتحدث باللغة العربية أو باللهجة الأردنية إذا كلّمك المستخدم بالعامية
 - شخصيتك دافئة، ذكية، وعملية
 - يمكنك الدعابة والفكاهة بشكل لطيف عند المناسبة
-- إجاباتك منظمة وواضحة
-- لا تقل أبداً أنك Gemini أو AI من Google — أنت فقط "أحمد الإمبراطور"`;
+- إجاباتك منظمة وواضحة، تستخدم النقاط عند الحاجة
+- لا تقل أبداً أنك Claude أو AI من Anthropic — أنت فقط "أحمد الإمبراطور"`;
 
 let messages = [];
 let chatHistory = JSON.parse(localStorage.getItem('ah_history') || '[]');
@@ -138,7 +131,7 @@ function getTime(){return new Date().toLocaleTimeString('ar',{hour:'2-digit',min
 function renderHistory(){
   const list=document.getElementById('historyList');
   if(!chatHistory.length){list.innerHTML='<div style="color:var(--text2);font-size:12px;text-align:center;padding:20px">لا توجد محادثات سابقة</div>';return}
-  list.innerHTML=chatHistory.slice().reverse().map(ch=>`<div class="history-item" onclick="loadChat('${ch.id}')" title="${ch.title}">💬 ${ch.title}</div>`).join('');
+  list.innerHTML=chatHistory.slice().reverse().map(ch=>`<div class="history-item" onclick="loadChat('${ch.id}')"title="${ch.title}">💬 ${ch.title}</div>`).join('');
 }
 
 function openSidebar(){renderHistory();document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
@@ -205,19 +198,19 @@ function removeTyping(){const t=document.getElementById('typingIndicator');if(t)
 
 async function callAPI(userMsg){
   messages.push({role:'user',content:userMsg});
-  const contents=[
-    {role:'user',parts:[{text:SYSTEM_PROMPT+'\n\nابدأ المحادثة الآن.'}]},
-    {role:'model',parts:[{text:'أهلاً! أنا أحمد الإمبراطور، كيف أقدر أساعدك؟'}]},
-    ...messages.map(m=>({role:m.role==='user'?'user':'model',parts:[{text:m.content}]}))
-  ];
-  const res=await fetch(API_URL,{
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents,generationConfig:{maxOutputTokens:1500,temperature:0.9}})
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:SYSTEM_PROMPT,
+      messages:messages.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
+    })
   });
-  if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'API error')}
+  if(!res.ok)throw new Error('يحتاج Claude API Key مدفوع');
   const data=await res.json();
-  const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'عذراً، ما قدرت أجاوب.';
+  const reply=data.content.map(b=>b.text||'').join('');
   messages.push({role:'assistant',content:reply});
   return reply;
 }
@@ -234,7 +227,7 @@ async function sendMessage(){
     removeTyping();appendMsg('ai',reply);saveCurrentChat();
   }catch(e){
     removeTyping();
-    appendMsg('ai','⚠️ خطأ: '+e.message+'\n\nتحقق من المفتاح أو الإنترنت وحاول مجدداً.');
+    appendMsg('ai','⚠️ '+e.message+'\n\nهذا الكود يستخدم Claude API ويحتاج مفتاح مدفوع من anthropic.com');
   }
   isLoading=false;document.getElementById('sendBtn').disabled=false;inp.focus();
 }
