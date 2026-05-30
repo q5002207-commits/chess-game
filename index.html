@@ -3,130 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع الذكاء الاصطناعي الخاص بي</title>
+    <title>AURA AI - النظام الذكي المتقدم</title>
     <style>
+        :root {
+            --bg-main: #0b0c10;
+            --bg-surface: #1f2833;
+            --accent-color: #66fcf1;
+            --accent-hover: #45f3e5;
+            --text-main: #c5c6c7;
+            --text-light: #ffffff;
+            --user-msg-bg: #2f3b4c;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #131314;
-            color: #e3e3e3;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
+        /* الهيدر الحديث المتطور */
         header {
-            padding: 20px;
-            text-align: center;
-            background-color: #1e1f20;
-            border-bottom: 1px solid #2f3032;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(145deg, #11141a, #0b0c10);
+            border-bottom: 1px solid rgba(102, 252, 241, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: pulse 2s infinite;
         }
 
         header h1 {
-            font-size: 1.5rem;
-            color: #a8c7fa;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-light);
+            letter-spacing: 1px;
         }
 
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            background: rgba(102, 252, 241, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 12px;
+        }
+
+        /* حاوية الشات */
         .chat-container {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-width: 800px;
+            gap: 20px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
+            scroll-behavior: smooth;
         }
 
+        /* تخصيص السكرول بار ليناسب التصميم */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(102, 252, 241, 0.2);
+            border-radius: 4px;
+        }
+
+        /* الفقاعات والرسائل */
         .message {
-            max-width: 75%;
-            padding: 12px 16px;
-            border-radius: 18px;
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 20px;
             line-height: 1.6;
-            font-size: 1rem;
+            font-size: 0.95rem;
             word-wrap: break-word;
-            white-space: pre-line; /* عشان يحافظ على أسطر الإجابة المنظمة */
+            white-space: pre-line;
+            animation: fadeIn 0.3s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        /* رسالة المستخدم */
         .user-message {
-            background-color: #2b2a2a;
-            color: #fff;
+            background-color: var(--user-msg-bg);
+            color: var(--text-light);
             align-self: flex-start;
+            border-bottom-right-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* رسالة النظام (الذكاء الاصطناعي) */
         .ai-message {
-            background-color: #1e1f20;
-            color: #e3e3e3;
+            background-color: var(--bg-surface);
+            color: var(--text-main);
             align-self: flex-end;
-            border: 1px solid #2f3032;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(102, 252, 241, 0.05);
         }
 
+        /* تمييز إجابة النظام بلون نص أوضح */
+        .ai-message.ready-text {
+            color: #e2e8f0;
+        }
+
+        /* منطقة الإدخال السفلية كأنها عائمة */
         .input-area {
             padding: 20px;
-            background-color: #131314;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
         }
 
         .input-wrapper {
             display: flex;
-            background-color: #1e1f20;
-            border-radius: 30px;
-            padding: 10px 20px;
-            border: 1px solid #3c4043;
+            background-color: var(--bg-surface);
+            border-radius: 16px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .input-wrapper:focus-within {
-            border-color: #a8c7fa;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
         }
 
         input {
             flex: 1;
             background: none;
             border: none;
-            color: #fff;
+            color: var(--text-light);
             font-size: 1rem;
             outline: none;
-            padding: 5px;
+            padding: 10px;
+        }
+
+        input::placeholder {
+            color: rgba(197, 198, 199, 0.5);
         }
 
         button {
-            background-color: #a8c7fa;
-            color: #042b5c;
+            background-color: var(--accent-color);
+            color: var(--bg-main);
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(102, 252, 241, 0.3);
         }
 
         button:hover {
-            background-color: #c2e7ff;
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* الأنيكيشنز (الحركات) */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--accent-color); }
+            50% { transform: scale(1.2); opacity: 0.6; box-shadow: 0 0 20px var(--accent-color); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--accent-color); }
+        }
+
+        /* ستايل خاص بكلمة "جاري التفكير" */
+        .typing-effect {
+            color: var(--accent-color) !important;
+            font-style: italic;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>مساعد الذكاء الاصطناعي الرهيب 🤖</h1>
+        <div class="logo-area">
+            <div class="logo-dot"></div>
+            <h1>AURA v2.5</h1>
+        </div>
+        <div class="status-badge">النظام متصل ونشط</div>
     </header>
 
     <div class="chat-container" id="chatContainer">
-        <div class="message ai-message">أهلاً بك! أنا مدعوم بنموذج Gemini الحقيقي الآن. اسألني أي شيء وسأجيبك فوراً! 👇</div>
+        <div class="message ai-message ready-text">مرحباً بك في واجهة التحكم بالنظام الذكي المتقدم AURA. كيف يمكنني خدمتك اليوم؟</div>
     </div>
 
     <div class="input-area">
         <div class="input-wrapper">
-            <input type="text" id="userInput" placeholder="اكتب سؤالك هنا..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="أدخل أمرك أو سؤالك هنا..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">إرسال</button>
         </div>
     </div>
@@ -134,13 +235,9 @@
     <script type="module">
         import { GoogleGenAI } from "https://esm.sh/@google/genai";
 
-        // الـ API Key الخاص بك اللي زودتني فيه
         const apiKey = "AQ.Ab8RN6IBfemV7N1SkB7tlqgYyxY_iEyqeJ9qs1bEe4JxFk6Lcw";
-        
-        // تجهيز مكتبة الذكاء الاصطناعي
         const ai = new GoogleGenAI({ apiKey: apiKey });
 
-        // تعريف الوظائف على الـ window عشان تشتغل مع أزرار الـ HTML
         window.sendMessage = async function() {
             const userInput = document.getElementById('userInput');
             const text = userInput.value.trim();
@@ -150,23 +247,33 @@
             appendMessage(text, 'user-message');
             userInput.value = '';
 
-            // 2. إظهار رسالة مؤقتة "جاري التفكير..." للذكاء الاصطناعي
-            const loadingId = appendMessage('جاري التفكير والتحليل... 🧠', 'ai-message');
+            // 2. إظهار "جاري معالجة البيانات..."
+            const loadingId = appendMessage('جاري تحليل البيانات وتوليد الرد...', 'ai-message typing-effect');
 
             try {
-                // 3. إرسال الطلب لـ Gemini (استخدمنا نموذج gemini-2.5-flash الأحدث والأسرع)
+                // 3. الاتصال بالنموذج (مع إضافة تعليمات مخفية في النظام حتى لا يذكر جوجل أو جمناي)
                 const response = await ai.models.generateContent({
                     model: 'gemini-2.5-flash',
                     contents: text,
+                    // وضعنا هذا التوجيه (System Instruction) عشان الذكاء الاصطناعي ينسى إنه من جوجل ويتصرف كأنه الـ AI تبعك!
+                    config: {
+                        systemInstruction: "أنت نظام ذكاء اصطناعي متقدم واسمك هو AURA. تم تطويرك وبرمجتك بواسطة مهندس برمجيات محترف. لا تذكر أبداً شركة Google أو نموذج Gemini أو OpenAI في إجاباتك. إذا سألك المستخدم من أنت، أجب بأنك AURA المساعد الذكي الخاص به."
+                    }
                 });
 
-                // 4. استبدال نص التفكير بالإجابة الحقيقية القادمة من السيرفر
                 const aiResponseText = response.text;
-                document.getElementById(loadingId).innerText = aiResponseText;
+                
+                // 4. تحديث الرسالة بالرد الحقيقي وتغيير التصميم لـ جاهز
+                const targetElement = document.getElementById(loadingId);
+                targetElement.innerText = aiResponseText;
+                targetElement.classList.remove('typing-effect');
+                targetElement.classList.add('ready-text');
 
             } catch (error) {
-                console.error("حدث خطأ:", error);
-                document.getElementById(loadingId).innerText = "عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. تأكد من اتصال الإنترنت أو صلاحية المفتاح.";
+                console.error("خطأ بالنظام:", error);
+                const targetElement = document.getElementById(loadingId);
+                targetElement.innerText = "فشل في معالجة الطلب. يرجى التحقق من اتصالك بالشبكة.";
+                targetElement.style.color = "#ff4a4a";
             }
         };
 
@@ -185,7 +292,6 @@
             messageDiv.innerText = text;
             chatContainer.appendChild(messageDiv);
             
-            // سكرول تلقائي لأسفل المحادثة
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return id;
         }
