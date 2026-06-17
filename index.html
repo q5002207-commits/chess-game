@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أحمد المحترف | ق</title>
+    <title>أحمد المحترف | متجر الأردوينو والإلكترونيات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
             --bg-dark: #0b0f19;
             --bg-card: #151c2c;
             --accent-color: #00ff66; 
+            --whatsapp-color: #25d366;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --border-color: #222f47;
@@ -65,20 +66,28 @@
         .close-modal { position: absolute; top: 1.5rem; left: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
         .cart-title { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
         
-        .cart-items-list { max-height: 180px; overflow-y: auto; margin-bottom: 1rem; list-style: none; }
+        .cart-items-list { max-height: 150px; overflow-y: auto; margin-bottom: 1rem; list-style: none; }
         .cart-item { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; }
         .remove-item { color: #ff4444; cursor: pointer; margin-right: 10px; }
 
-        .cart-summary { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .cart-summary { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
         .cart-summary span:last-child { color: var(--accent-color); }
 
-        .checkout-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; background: #0b0f19; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
+        .checkout-form { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; background: #0b0f19; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
         .checkout-form label { font-size: 0.9rem; color: var(--text-muted); }
+        .checkout-form label span { color: #ff4444; font-weight: bold; }
         .checkout-form input { background: #151c2c; border: 1px solid var(--border-color); padding: 0.6rem; border-radius: 6px; color: #fff; font-size: 1rem; }
         .checkout-form input:focus { border-color: var(--accent-color); outline: none; }
 
-        .checkout-btn { background-color: var(--accent-color); color: #000; width: 100%; padding: 0.8rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s; }
-        .checkout-btn:hover { background-color: #00cc52; }
+        /* Buttons Grid */
+        .buttons-grid { display: flex; flex-direction: column; gap: 0.8rem; }
+        .checkout-btn { width: 100%; padding: 0.8rem; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s; }
+        
+        .btn-telegram { background-color: var(--accent-color); color: #000; }
+        .btn-telegram:hover { background-color: #00cc52; }
+        
+        .btn-whatsapp { background-color: var(--whatsapp-color); color: #fff; }
+        .btn-whatsapp:hover { background-color: #1ebea5; }
 
         footer { border-top: 1px solid var(--border-color); padding: 3rem 2rem; text-align: center; color: var(--text-muted); }
     </style>
@@ -99,8 +108,8 @@
     <!-- البانر -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>اطلب قطع <span>الأردوينو</span> بلمح</h1>
-            <p>تصفح واشترِ مباشرة من الموقع، وستصل طلبيتك لهاتفي فوراً لبدء الشحن التلقائي السريع.</p>
+            <h1>اطلب قطع <span>الأردوينو</span> بلمحة عين</h1>
+            <p>تصفح واشترِ مباشرة من الموقع، واختر طريقة تأكيد الطلب المفضلة لديك لتصلني فوراً.</p>
             <a href="#products" class="cta-btn">تصفح القطع الآن</a>
         </div>
         <div class="hero-image"><i class="fa-solid fa-microchip"></i></div>
@@ -142,10 +151,20 @@
             <div class="cart-summary"><span>المجموع:</span><span id="cartTotal">0.00 د.أ</span></div>
             
             <div class="checkout-form">
-                <label>الاسم الكامل للزبون:</label><input type="text" id="customerName" placeholder="مثال: عمر التميمي">
-                <label>العنوان بالتفصيل ورقم التواصل الثاني:</label><input type="text" id="customerAddress" placeholder="مثال: عمان - شارع الجامعة - 078xxxxxxx">
+                <label>الاسم الكامل: <span>*</span></label>
+                <input type="text" id="customerName" placeholder="مثال: عمر التميمي">
+                
+                <label>رقم الهاتف المعتمد للاتصال: <span>*</span></label>
+                <input type="tel" id="customerPhone" placeholder="مثال: 079xxxxxxx">
+                
+                <label>العنوان بالتفصيل: <span>*</span></label>
+                <input type="text" id="customerAddress" placeholder="المدينة - الشارع - معلم بارز">
             </div>
-            <button class="checkout-btn" onclick="sendOrderViaTelegram()">🎯 تأكيد وشراء من الموقع فوراً</button>
+
+            <div class="buttons-grid">
+                <button class="checkout-btn btn-telegram" onclick="sendOrderViaTelegram()">🎯 تأكيد وشراء عبر الموقع فوراً</button>
+                <button class="checkout-btn btn-whatsapp" onclick="sendOrderViaWhatsApp()"><i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر الواتساب</button>
+            </div>
         </div>
     </div>
 
@@ -154,9 +173,10 @@
     <script>
         let cart = [];
 
-        // بيانات البوت الحقيقية والخاصة بأحمد المحترف والمحمية:
+        // بيانات البوت الخاصة بك والمحمية:
         const TELEGRAM_TOKEN = "8682684838:AAFzLYYoOuSRvYt3tDWO43NOBxw5_ZDrJTk"; 
         const TELEGRAM_CHAT_ID = "6935264255"; 
+        const MY_WHATSAPP_NUMBER = "962790000000"; // ⚠️ ضع رقم الواتساب الخاص بك هنا مع رمز الدوله بدون أصفار (مثال للأردن: 96279...)
 
         function toggleCart() { document.getElementById('cartModal').classList.toggle('active'); renderCart(); }
         function addToCart(name, price) { cart.push({ name, price }); updateCartCount(); }
@@ -175,23 +195,30 @@
             totalEl.innerText = total.toFixed(2) + ' د.أ';
         }
 
-        // إرسال البيانات مباشرة لبوت التيليجرام ثانية بثانية دون مغادرة المتصفح
-        async function sendOrderViaTelegram() {
-            if (cart.length === 0) { alert('سلتك فارغة!'); return; }
-            
+        // دالة لفحص المدخلات والتأكد أنها مش فارغة
+        function validateInputs() {
+            if (cart.length === 0) { alert('سلتك فارغة!'); return false; }
             const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
             const address = document.getElementById('customerAddress').value.trim();
 
-            if (!name || !address) {
-                alert('يرجى ملء الاسم والعنوان للتوصيل.');
-                return;
+            if (!name || !phone || !address) {
+                alert('يرجى تعبئة جميع الخانات الإجبارية (الاسم، رقم الهاتف، والعنوان).');
+                return false;
             }
+            return { name, phone, address };
+        }
 
-            // تجهيز نص الفاتورة المرتبة
+        // الخيار الأول: الإرسال للموقع على طول (تيليجرام)
+        async function sendOrderViaTelegram() {
+            const inputs = validateInputs();
+            if (!inputs) return;
+
             let message = `🛒 *طلب شراء جديد من الموقع!*\n`;
             message += `━━━━━━━━━━━━━━━━━━\n`;
-            message += `👤 *الزبون:* ${name}\n`;
-            message += `📍 *العنوان والاتصال:* ${address}\n`;
+            message += `👤 *الزبون:* ${inputs.name}\n`;
+            message += `📞 *الهاتف:* ${inputs.phone}\n`;
+            message += `📍 *العنوان:* ${inputs.address}\n`;
             message += `━━━━━━━━━━━━━━━━━━\n\n`;
             
             let total = 0;
@@ -210,27 +237,55 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: "Markdown"
-                    })
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "Markdown" })
                 });
 
                 if (response.ok) {
-                    alert("🎯 تم إرسال طلبك بنجاح تام! سنتواصل معك خلال دقائق لتأكيد موعد التوصيل.");
-                    cart = [];
-                    updateCartCount();
-                    toggleCart();
-                    document.getElementById('customerName').value = '';
-                    document.getElementById('customerAddress').value = '';
+                    alert("🎯 تم إرسال طلبك بنجاح تام تلقائياً! سنتواصل معك على رقم هاتفك لتأكيد موعد الشحن.");
+                    clearCartAndInputs();
                 } else {
-                    alert("حدث خطأ أثناء الإرسال للبوت، تأكد من أنك قمت بعمل تفعيل للبوت عبر الضغط على Start.");
+                    alert("حدث خطأ أثناء الإرسال التلقائي، تأكد من عمل تفعيل للبوت.");
                 }
             } catch (err) {
-                console.error(err);
-                alert("مشكلة في شبكة الاتصال، يرجى المحاولة مرة أخرى.");
+                alert("مشكلة في الاتصال بالشبكة.");
             }
+        }
+
+        // الخيار الثاني: تحويل الفاتورة المنسقة للواتساب مباشرة
+        function sendOrderViaWhatsApp() {
+            const inputs = validateInputs();
+            if (!inputs) return;
+
+            let message = `🛒 *طلب شراء جديد من المتجر*\n`;
+            message += `━━━━━━━━━━━━━━━\n`;
+            message += `👤 *الاسم:* ${inputs.name}\n`;
+            message += `📞 *الهاتف:* ${inputs.phone}\n`;
+            message += `📍 *العنوان:* ${inputs.address}\n`;
+            message += `━━━━━━━━━━━━━━━\n\n`;
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                message += `${index + 1}. ${item.name} (${item.price.toFixed(2)} د.أ)\n`;
+                total += item.price;
+            });
+
+            message += `\n━━━━━━━━━━━━━━━\n`;
+            message += `💰 *المجموع:* ${total.toFixed(2)} د.أ`;
+
+            // فتح محادثة الواتساب مع النص المنسق
+            const whatsappUrl = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            clearCartAndInputs();
+        }
+
+        function clearCartAndInputs() {
+            cart = [];
+            updateCartCount();
+            toggleCart();
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
         }
     </script>
 </body>
