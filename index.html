@@ -3,297 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA AI - النظام الذكي المتقدم</title>
+    <title>أحمد المحترف | متجر الأردوينو والإلكترونيات</title>
+    <!-- استيراد خط جيرال من جوجل لتصميم احترافي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* المتغيرات والتصميم العام */
         :root {
-            --bg-main: #0b0c10;
-            --bg-surface: #1f2833;
-            --accent-color: #66fcf1;
-            --accent-hover: #45f3e5;
-            --text-main: #c5c6c7;
-            --text-light: #ffffff;
-            --user-msg-bg: #2f3b4c;
+            --bg-dark: #0b0f19;
+            --bg-card: #151c2c;
+            --accent-color: #00ff66; /* أخضر نيون تكنولوجي */
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: #222f47;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* الهيدر الحديث المتطور */
-        header {
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(145deg, #11141a, #0b0c10);
-            border-bottom: 1px solid rgba(102, 252, 241, 0.1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-color);
-            animation: pulse 2s infinite;
-        }
-
-        header h1 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-light);
-            letter-spacing: 1px;
-        }
-
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            background: rgba(102, 252, 241, 0.1);
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            border-radius: 12px;
-        }
-
-        /* حاوية الشات */
-        .chat-container {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 900px;
-            width: 100%;
-            margin: 0 auto;
+            font-family: 'Cairo', sans-serif;
             scroll-behavior: smooth;
         }
 
-        /* تخصيص السكرول بار ليناسب التصميم */
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-container::-webkit-scrollbar-thumb {
-            background-color: rgba(102, 252, 241, 0.2);
-            border-radius: 4px;
-        }
-
-        /* الفقاعات والرسائل */
-        .message {
-            max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 20px;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            word-wrap: break-word;
-            white-space: pre-line;
-            animation: fadeIn 0.3s ease-in-out;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* رسالة المستخدم */
-        .user-message {
-            background-color: var(--user-msg-bg);
-            color: var(--text-light);
-            align-self: flex-start;
-            border-bottom-right-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* رسالة النظام (الذكاء الاصطناعي) */
-        .ai-message {
-            background-color: var(--bg-surface);
+        body {
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            align-self: flex-end;
-            border-bottom-left-radius: 4px;
-            border: 1px solid rgba(102, 252, 241, 0.05);
+            overflow-x: hidden;
         }
 
-        /* تمييز إجابة النظام بلون نص أوضح */
-        .ai-message.ready-text {
-            color: #e2e8f0;
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
-        /* منطقة الإدخال السفلية كأنها عائمة */
-        .input-area {
-            padding: 20px;
-            max-width: 900px;
+        /* الهيدر وقائمة التنقل */
+        header {
+            background-color: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
             width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .input-wrapper {
+            padding: 1rem 2rem;
             display: flex;
-            background-color: var(--bg-surface);
-            border-radius: 16px;
-            padding: 8px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .input-wrapper:focus-within {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        input {
-            flex: 1;
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 1rem;
-            outline: none;
-            padding: 10px;
+        .logo span {
+            color: var(--accent-color);
         }
 
-        input::placeholder {
-            color: rgba(197, 198, 199, 0.5);
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
         }
 
-        button {
-            background-color: var(--accent-color);
-            color: var(--bg-main);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
+        .nav-links a:hover {
+            color: var(--accent-color);
+            transition: 0.3s;
+        }
+
+        .cart-btn {
+            position: relative;
+            font-size: 1.2rem;
             cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: var(--accent-color);
+            color: #000;
+            font-size: 0.75rem;
             font-weight: bold;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(102, 252, 241, 0.3);
+            padding: 2px 6px;
+            border-radius: 50%;
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-1px);
+        /* القسم الرئيسي (Hero Section) */
+        .hero {
+            padding: 10rem 2rem 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
         }
 
-        button:active {
-            transform: translateY(1px);
+        .hero-content {
+            flex: 1;
         }
 
-        /* الأنيكيشنز (الحركات) */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-content h1 {
+            font-size: 3rem;
+            line-height: 1.3;
+            margin-bottom: 1.5rem;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--accent-color); }
-            50% { transform: scale(1.2); opacity: 0.6; box-shadow: 0 0 20px var(--accent-color); }
-            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 10px var(--accent-color); }
+        .hero-content h1 span {
+            color: var(--accent-color);
         }
 
-        /* ستايل خاص بكلمة "جاري التفكير" */
-        .typing-effect {
-            color: var(--accent-color) !important;
-            font-style: italic;
-            opacity: 0.8;
+        .hero-content p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .cta-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 255, 102, 0.3);
+            transition: 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 255, 102, 0.5);
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image i {
+            font-size: 12rem;
+            color: var(--accent-color);
+            filter: drop-shadow(0 0 30px rgba(0, 255, 102, 0.2));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* الأقسام والميزات */
+        .features {
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* عرض المنتجات */
+        .products-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 50px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .product-img-box {
+            background: #1e293b;
+            padding: 3rem 1rem;
+            text-align: center;
+            font-size: 4rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .product-card:hover .product-img-box {
+            color: var(--accent-color);
+            transition: 0.3s;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-tag {
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .product-meta {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .buy-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .buy-btn:hover {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        /* فوتر الموقع */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            background-color: #070a10;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* شاشات الموبايل */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero { flex-direction: column; text-align: center; padding-top: 8rem; }
+            .hero-content h1 { font-size: 2.2rem; }
+            .hero-content p { margin: 0 auto 2rem auto; }
         }
     </style>
 </head>
 <body>
 
+    <!-- القائمة العلوية -->
     <header>
-        <div class="logo-area">
-            <div class="logo-dot"></div>
-            <h1>AURA v2.5</h1>
-        </div>
-        <div class="status-badge">النظام متصل ونشط</div>
+        <nav class="nav-container">
+            <div class="logo">
+                <i class="fa-solid :microchip"></i>
+                أحمد <span>المحترف</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">الرئيسية</a></li>
+                <li><a href="#products">القطع والمنتجات</a></li>
+                <li><a href="#about">من نحن</a></li>
+            </ul>
+            <div class="cart-btn">
+                <i class="fa-solid fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
     </header>
 
-    <div class="chat-container" id="chatContainer">
-        <div class="message ai-message ready-text">مرحباً بك في واجهة التحكم بالنظام الذكي المتقدم AURA. كيف يمكنني خدمتك اليوم؟</div>
-    </div>
-
-    <div class="input-area">
-        <div class="input-wrapper">
-            <input type="text" id="userInput" placeholder="أدخل أمرك أو سؤالك هنا..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">إرسال</button>
+    <!-- القسم الرئيسي للتسويق والترحيب -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>كل ما تحتاجه لبناء <span>مشروع التخرج</span> والابتكارات الإلكترونية</h1>
+            <p>نوفر لك قطع الأردوينو الأصلية، الحساسات، والـ Kits التعليمية المتكاملة في الأردن بأفضل الأسعار مع توصيل سريع.</p>
+            <a href="#products" class="cta-btn">تصفح القطع الآن <i class="fa-solid fa-arrow-left"></i></a>
         </div>
-    </div>
+        <div class="hero-image">
+            <i class="fa-solid fa-microchip"></i>
+        </div>
+    </section>
 
-    <script type="module">
-        import { GoogleGenAI } from "https://esm.sh/@google/genai";
+    <!-- ميزات المتجر (زي الـ Badges بـ Odoo) -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-truck-fast"></i>
+                <div>
+                    <h3>توصيل سريع</h3>
+                    <p>لكافة محافظات الأردن وعمان</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved"></i>
+                <div>
+                    <h3>قطع مضمونة</h3>
+                    <p>فحص وجودة عالية لجميع الحساسات</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-headset"></i>
+                <div>
+                    <h3>دعم فني للمشاريع</h3>
+                    <p>نساعدك في اختيار القطع المناسبة لكودك</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        const apiKey = "AQ.Ab8RN6IBfemV7N1SkB7tlqgYyxY_iEyqeJ9qs1bEe4JxFk6Lcw";
-        const ai = new GoogleGenAI({ apiKey: apiKey });
-
-        window.sendMessage = async function() {
-            const userInput = document.getElementById('userInput');
-            const text = userInput.value.trim();
-            if (text === '') return;
-
-            // 1. عرض رسالة المستخدم
-            appendMessage(text, 'user-message');
-            userInput.value = '';
-
-            // 2. إظهار "جاري معالجة البيانات..."
-            const loadingId = appendMessage('جاري تحليل البيانات وتوليد الرد...', 'ai-message typing-effect');
-
-            try {
-                // 3. الاتصال بالنموذج (مع إضافة تعليمات مخفية في النظام حتى لا يذكر جوجل أو جمناي)
-                const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
-                    contents: text,
-                    // وضعنا هذا التوجيه (System Instruction) عشان الذكاء الاصطناعي ينسى إنه من جوجل ويتصرف كأنه الـ AI تبعك!
-                    config: {
-                        systemInstruction: "أنت نظام ذكاء اصطناعي متقدم واسمك هو AURA. تم تطويرك وبرمجتك بواسطة مهندس برمجيات محترف. لا تذكر أبداً شركة Google أو نموذج Gemini أو OpenAI في إجاباتك. إذا سألك المستخدم من أنت، أجب بأنك AURA المساعد الذكي الخاص به."
-                    }
-                });
-
-                const aiResponseText = response.text;
-                
-                // 4. تحديث الرسالة بالرد الحقيقي وتغيير التصميم لـ جاهز
-                const targetElement = document.getElementById(loadingId);
-                targetElement.innerText = aiResponseText;
-                targetElement.classList.remove('typing-effect');
-                targetElement.classList.add('ready-text');
-
-            } catch (error) {
-                console.error("خطأ بالنظام:", error);
-                const targetElement = document.getElementById(loadingId);
-                targetElement.innerText = "فشل في معالجة الطلب. يرجى التحقق من اتصالك بالشبكة.";
-                targetElement.style.color = "#ff4a4a";
-            }
-        };
-
-        window.handleKeyPress = function(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        };
-
-        function appendMessage(text, className) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            const id = 'msg-' + Date.now();
-            messageDiv.id = id;
-            messageDiv.className = `message ${className}`;
-            messageDiv.innerText = text;
-            chatContainer.appendChild(messageDiv);
+    <!-- قسم المنتجات -->
+    <section class="products-section" id="products">
+        <h2 class="section-title">الأكثر مبيعاً والـ Kits</h2>
+        
+        <div class="products-grid">
             
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return id;
+            <!-- منتج 1 -->
+            <div class="product-card">
+                <div class="product-img-box">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="product-info">
+                    <span class="product-tag">الحقائب التعليمية</span>
+                    <h3 class="product-title">Arduino Starter Kit (الحقيبة الشاملة)</h3>
+                    <p class="product-desc">تحتوي على بورد Arduino Uno، سلك USB، لوحة تجارب (Breadboard)، أسلاك توصيل، ومجموعة من الحساسات والمقاومات الأساسية للبدء فوراً.</p>
+                    <div class="product-meta">
+                        <span class="product-price">18.00 د.أ</span>
+                        <button class="buy-btn" onclick="addToCart('حقيبة أردوينو الشاملة', 18)">اطلب الآن</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- منتج 2 -->
+            <div class="product-card">
+                <div class="product-img-box">
+                    <i class="fa-solid fa-cpu"></i>
+                </div>
+                <div class="product-info">
+                    <span class="product-tag">المتحكمات</span>
+                    <h3 class="product-title">Arduino Uno R3 (الأصلي/المعدل)</h3>
+                    <p class="product-desc">المتحكم الدقيق الأسهل والأشهر للاستخدام في مشاريع الروبوتكس، السيارات الذكية، وأنظمة التحكم البسيطة والمتقدمة.</p>
+                    <div class="product-meta">
+                        <span class="product-price">6.50 د.أ</span>
+                        <button class="buy-btn" onclick="addToCart('Arduino Uno R3', 6.5)">اطلب الآن</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- منتج 3 -->
+            <div class="product-card">
+                <div class="product-img-box">
+                    <i class="fa-solid fa-rss"></i>
+                </div>
+                <div class="product-info">
+                    <span class="product-tag">حساسات (Sensors)</span>
+                    <h3 class="product-title">Ultrasonic Sensor (HC-SR04)</h3>
+                    <p class="product-desc">حساس الأمواج فوق الصوتية لقياس المسافات بدقة عالية، ممتاز لمشاريع سيارات تجنب العوائق ورادارات القياس.</p>
+                    <div class="product-meta">
+                        <span class="product-price">1.50 د.أ</span>
+                        <button class="buy-btn" onclick="addToCart('Ultrasonic Sensor', 1.5)">اطلب الآن</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- فوتر وفيه روابط التواصل والطلب -->
+    <footer id="about">
+        <div class="footer-content">
+            <p>جميع الحقوق محفوظة © 2026 لمتجر **أحمد المحترف**</p>
+            <p>تواصل معنا مباشرة للطلبات الخاصة وتجهيز مشاريع التخرج بالكامل:</p>
+            <div class="social-links">
+                <!-- استبدل رقم الهاتف برقم الواتساب الخاص بك ليتم إرسال الطلب مباشرة -->
+                <a href="https://wa.me/9627XXXXXXXX" target="_blank" title="تواصل عبر الواتساب"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="#" title="فيسبوك"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" title="إنستغرام"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- سكربت بسيط لتحسين التفاعل وإرسال الطلب للواتساب -->
+    <script>
+        let cart = [];
+        const whatsappNumber = "9627XXXXXXXX"; // حط رقمك هون بدون أصفار بالبداية
+
+        function addToCart(productName, price) {
+            cart.push({name: productName, price: price});
+            document.getElementById('cartCount').innerText = cart.length;
+            
+            // تجهيز نص الرسالة لإرسالها للواتساب مباشرة عند الضغط
+            let message = `مرحباً أحمد المحترف، أريد طلب القطعة التالية:\n- ${productName} بسعر ${price} د.أ`;
+            let encodedMessage = encodeURIComponent(message);
+            
+            // فتح واتساب مباشرة لإتمام عملية البيع
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
         }
     </script>
 </body>
