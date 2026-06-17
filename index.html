@@ -154,8 +154,8 @@
                 <label>الاسم الكامل: <span>*</span></label>
                 <input type="text" id="customerName" placeholder="مثال: عمر التميمي">
                 
-                <label>رقم الهاتف المعتمد للاتصال: <span>*</span></label>
-                <input type="tel" id="customerPhone" placeholder="مثال: 079xxxxxxx">
+                <label>رقم الهاتف المعتمد (10 أرقام تبدأ بـ 07): <span>*</span></label>
+                <input type="tel" id="customerPhone" placeholder="مثال: 0790000000">
                 
                 <label>العنوان بالتفصيل: <span>*</span></label>
                 <input type="text" id="customerAddress" placeholder="المدينة - الشارع - معلم بارز">
@@ -176,7 +176,7 @@
         // بيانات البوت الخاصة بك والمحمية:
         const TELEGRAM_TOKEN = "8682684838:AAFzLYYoOuSRvYt3tDWO43NOBxw5_ZDrJTk"; 
         const TELEGRAM_CHAT_ID = "6935264255"; 
-        const MY_WHATSAPP_NUMBER = "962790000000"; // ⚠️ ضع رقم الواتساب الخاص بك هنا مع رمز الدوله بدون أصفار (مثال للأردن: 96279...)
+        const MY_WHATSAPP_NUMBER = "962790000000"; // ⚠️ لا تنسى تعديل هذا لرقمك الحقيقي بصيغة (96279...)
 
         function toggleCart() { document.getElementById('cartModal').classList.toggle('active'); renderCart(); }
         function addToCart(name, price) { cart.push({ name, price }); updateCartCount(); }
@@ -195,9 +195,10 @@
             totalEl.innerText = total.toFixed(2) + ' د.أ';
         }
 
-        // دالة لفحص المدخلات والتأكد أنها مش فارغة
+        // دالة الفحص الذكي الصارم لمدخلات الزبون ورقم التلفون
         function validateInputs() {
             if (cart.length === 0) { alert('سلتك فارغة!'); return false; }
+            
             const name = document.getElementById('customerName').value.trim();
             const phone = document.getElementById('customerPhone').value.trim();
             const address = document.getElementById('customerAddress').value.trim();
@@ -206,10 +207,19 @@
                 alert('يرجى تعبئة جميع الخانات الإجبارية (الاسم، رقم الهاتف، والعنوان).');
                 return false;
             }
+
+            // فحص كود الأردن: لازم يبلش بـ 07 وبتبعه 7 أو 8 أو 9 ومكون من 10 خانات بالضبط
+            const phoneRegex = /^07[789]\d{7}$/;
+            
+            if (!phoneRegex.test(phone)) {
+                alert('❌ رقم الهاتف غير صحيح! يرجى إدخال رقم هاتف أردني مكون من 10 أرقام ويبدأ بـ (079 أو 078 أو 077).');
+                return false;
+            }
+
             return { name, phone, address };
         }
 
-        // الخيار الأول: الإرسال للموقع على طول (تيليجرام)
+        // الخيار الأول: التليجرام
         async function sendOrderViaTelegram() {
             const inputs = validateInputs();
             if (!inputs) return;
@@ -244,14 +254,14 @@
                     alert("🎯 تم إرسال طلبك بنجاح تام تلقائياً! سنتواصل معك على رقم هاتفك لتأكيد موعد الشحن.");
                     clearCartAndInputs();
                 } else {
-                    alert("حدث خطأ أثناء الإرسال التلقائي، تأكد من عمل تفعيل للبوت.");
+                    alert("حدث خطأ أثناء الإرسال التلقائي، تأكد من عمل تفعيل للبوت عبر الضغط على Start.");
                 }
             } catch (err) {
                 alert("مشكلة في الاتصال بالشبكة.");
             }
         }
 
-        // الخيار الثاني: تحويل الفاتورة المنسقة للواتساب مباشرة
+        // الخيار الثاني: الواتساب
         function sendOrderViaWhatsApp() {
             const inputs = validateInputs();
             if (!inputs) return;
@@ -272,7 +282,6 @@
             message += `\n━━━━━━━━━━━━━━━\n`;
             message += `💰 *المجموع:* ${total.toFixed(2)} د.أ`;
 
-            // فتح محادثة الواتساب مع النص المنسق
             const whatsappUrl = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             
