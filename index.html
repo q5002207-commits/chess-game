@@ -22,33 +22,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; scroll-behavior: smooth; }
         body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
 
-        header {
-            background-color: rgba(11, 15, 25, 0.85);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
+        header { background-color: rgba(11, 15, 25, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); position: fixed; top: 0; width: 100%; z-index: 1000; }
         .nav-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--accent-color); }
         .nav-links { display: flex; gap: 2rem; list-style: none; }
         .nav-links a:hover { color: var(--accent-color); transition: 0.3s; }
 
-        .cart-btn {
-            position: relative;
-            font-size: 1.3rem;
-            cursor: pointer;
-            background: #1e293b;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            transition: 0.3s;
-        }
-
+        .cart-btn { position: relative; font-size: 1.3rem; cursor: pointer; background: #1e293b; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); transition: 0.3s; }
         .cart-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--accent-color); color: #000; font-size: 0.75rem; font-weight: bold; padding: 2px 7px; border-radius: 50%; }
 
@@ -93,7 +74,7 @@
         .add-btn { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.3s; }
         .add-btn:hover { background-color: var(--accent-color); color: #000; }
 
-        /* نافذة السلة (Cart Modal) */
+        /* Cart Modal */
         .cart-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; }
         .cart-modal.active { opacity: 1; pointer-events: auto; }
         .cart-content-box { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 95%; max-width: 500px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -108,7 +89,6 @@
         .cart-summary { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
         .cart-summary span:last-child { color: var(--accent-color); }
 
-        /* فورم بيانات الزبون لسرعة التقفيل */
         .checkout-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; background: #0b0f19; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
         .checkout-form label { font-size: 0.9rem; color: var(--text-muted); }
         .checkout-form input { background: #151c2c; border: 1px solid var(--border-color); padding: 0.6rem; border-radius: 6px; color: #fff; font-size: 1rem; }
@@ -118,24 +98,70 @@
         .checkout-btn:hover { background-color: #00cc52; }
 
         footer { border-top: 1px solid var(--border-color); padding: 3rem 2rem; text-align: center; color: var(--text-muted); background-color: #070a10; }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; }
-        .social-links { display: flex; gap: 1.5rem; font-size: 1.5rem; }
-        .social-links a:hover { color: var(--accent-color); }
-
-        @media (max-width: 768px) { .nav-links { display: none; } .hero { flex-direction: column; text-align: center; padding-top: 8rem; } .hero-content h1 { font-size: 2.2rem; } .hero-content p { margin: 0 auto 2rem auto; } }
     </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // مفاتيح مشروعك الفايربيس (Ahmad-e442a) جاهزة ومفعلة
+        const firebaseConfig = {
+            apiKey: "AIzaSyAlq7wGqzoU414Q3ZQFmqQvyY7UpUHYWjY",
+            authDomain: "ahmad-e442a.firebaseapp.com",
+            projectId: "ahmad-e442a",
+            storageBucket: "ahmad-e442a.firebasestorage.app",
+            messagingSenderId: "921619843690",
+            appId: "1:921619843690:web:5660308178202b7e81d813",
+            measurementId: "G-CFG8DY6M6X"
+        };
+
+        // تهيئة الفايربيس وقاعدة البيانات للعمل
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // دالة إرسال وحفظ الطلبات مباشرة في الـ Cloud Firestore
+        window.sendOrder = async function() {
+            if (cart.length === 0) { alert('سلتك فارغة!'); return; }
+            
+            const name = document.getElementById('customerName').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+
+            if (!name || !address) {
+                alert('يرجى كتابة الاسم والعنوان بالتفصيل.');
+                return;
+            }
+
+            try {
+                // حفظ فوري في الـ Database بدون سيرفر وسيط
+                const docRef = await addDoc(collection(db, "orders"), {
+                    customerName: name,
+                    customerAddress: address,
+                    items: cart.map(item => ({ name: item.name, price: item.price })),
+                    totalAmount: cart.reduce((sum, item) => sum + item.price, 0),
+                    createdAt: serverTimestamp()
+                });
+
+                alert(`🎯 رائع يا أحمد! تم تسجيل طلب الزبون بنجاح بالموقع. كود الطلب بالـ Firebase هو: (${docRef.id.substring(0,6)})`);
+                
+                // تصفير وتنظيف السلة
+                cart = [];
+                updateCartCount();
+                toggleCart();
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerAddress').value = '';
+
+            } catch (error) {
+                console.error("خطأ فايربيس: ", error);
+                alert("حدث خطأ، تأكد من أنك قمت بتغيير الـ Rules لـ true داخل لوحة Firestore التابعة لك.");
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <!-- القائمة العلوية -->
     <header>
         <nav class="nav-container">
             <div class="logo"><i class="fa-solid fa-microchip"></i> أحمد <span>المحترف</span></div>
-            <ul class="nav-links">
-                <li><a href="#home">الرئيسية</a></li>
-                <li><a href="#products">القطع والمنتجات</a></li>
-                <li><a href="#about">من نحن</a></li>
-            </ul>
             <div class="cart-btn" onclick="toggleCart()">
                 <i class="fa-solid fa-shopping-basket"></i> السلة
                 <span class="cart-count" id="cartCount">0</span>
@@ -143,37 +169,24 @@
         </nav>
     </header>
 
-    <!-- الهيرو -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>كل ما تحتاجه لبناء <span>مشروع التخرج</span> والابتكارات الإلكترونية</h1>
-            <p>نوفر لك قطع الأردوينو الأصلية، الحساسات، والـ Kits التعليمية المتكاملة في الأردن بأفضل الأسعار مع توصيل سريع.</p>
-            <a href="#products" class="cta-btn">تصفح القطع الآن <i class="fa-solid fa-arrow-left"></i></a>
+            <h1>كل ما تحتاجه لبناء <span>مشروع التخرج</span></h1>
+            <p>نوفر لك قطع الأردوينو الأصلية في الأردن بأفضل الأسعار مع نظام تخزين فوري وتلقائي للطلبات.</p>
+            <a href="#products" class="cta-btn">تصفح القطع والـ Kits</a>
         </div>
         <div class="hero-image"><i class="fa-solid fa-microchip"></i></div>
     </section>
 
-    <!-- الميزات -->
-    <section class="features">
-        <div class="features-grid">
-            <div class="feature-card"><i class="fa-solid fa-truck-fast"></i><div><h3>توصيل سريع</h3><p>لكافة محافظات الأردن وعمان</p></div></div>
-            <div class="feature-card"><i class="fa-solid fa-shield-halved"></i><div><h3>قطع مضمونة</h3><p>فحص وجودة عالية لجميع الحساسات</p></div></div>
-            <div class="feature-card"><i class="fa-solid fa-headset"></i><div><h3>دعم فني للمشاريع</h3><p>نساعدك في اختيار القطع المناسبة</p></div></div>
-        </div>
-    </section>
-
-    <!-- قسم المنتجات -->
     <section class="products-section" id="products">
-        <h2 class="section-title">الأكثر مبيعاً والـ Kits</h2>
+        <h2 class="section-title">قطع الأردوينو المتاحة</h2>
         <div class="products-grid">
             
-            <!-- منتج 1 -->
             <div class="product-card">
                 <div class="product-img-box"><i class="fa-solid fa-box-open"></i></div>
                 <div class="product-info">
                     <span class="product-tag">الحقائب التعليمية</span>
                     <h3 class="product-title">Arduino Starter Kit (الحقيبة الشاملة)</h3>
-                    <p class="product-desc">تحتوي على بورد Arduino Uno، سلك USB، لوحة تجارب (Breadboard)، أسلاك توصيل، ومجموعة من الحساسات والمقاومات الأساسية.</p>
                     <div class="product-meta">
                         <span class="product-price">18.00 د.أ</span>
                         <button class="add-btn" onclick="addToCart('حقيبة أردوينو الشاملة', 18.00)">إضافة للسلة</button>
@@ -181,13 +194,11 @@
                 </div>
             </div>
 
-            <!-- منتج 2 -->
             <div class="product-card">
                 <div class="product-img-box"><i class="fa-solid fa-cpu"></i></div>
                 <div class="product-info">
                     <span class="product-tag">المتحكمات</span>
-                    <h3 class="product-title">Arduino Uno R3 (معدل عالي الجودة)</h3>
-                    <p class="product-desc">المتحكم الدقيق الأسهل والأشهر للاستخدام في مشاريع الروبوتكس، السيارات الذكية، وأنظمة التحكم المتقدمة.</p>
+                    <h3 class="product-title">Arduino Uno R3</h3>
                     <div class="product-meta">
                         <span class="product-price">6.50 د.أ</span>
                         <button class="add-btn" onclick="addToCart('Arduino Uno R3', 6.50)">إضافة للسلة</button>
@@ -195,143 +206,42 @@
                 </div>
             </div>
 
-            <!-- منتج 3 -->
-            <div class="product-card">
-                <div class="product-img-box"><i class="fa-solid fa-rss"></i></div>
-                <div class="product-info">
-                    <span class="product-tag">حساسات (Sensors)</span>
-                    <h3 class="product-title">Ultrasonic Sensor (HC-SR04)</h3>
-                    <p class="product-desc">حساس الأمواج فوق الصوتية لقياس المسافات بدقة عالية، ممتاز لمشاريع سيارات تجنب العوائق.</p>
-                    <div class="product-meta">
-                        <span class="product-price">1.50 د.أ</span>
-                        <button class="add-btn" onclick="addToCart('Ultrasonic Sensor HC-SR04', 1.50)">إضافة للسلة</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
-    <!-- نافذة السلة المحدثة بالفورم -->
     <div class="cart-modal" id="cartModal">
         <div class="cart-content-box">
             <i class="fa-solid fa-xmark close-modal" onclick="toggleCart()"></i>
-            <h3 class="cart-title"><i class="fa-solid fa-shopping-basket"></i> سلة المشتريات</h3>
-            
+            <h3 class="cart-title">سلة المشتريات</h3>
             <ul class="cart-items-list" id="cartItemsList"></ul>
-
-            <div class="cart-summary">
-                <span>المجموع الإجمالي:</span>
-                <span id="cartTotal">0.00 د.أ</span>
-            </div>
-
-            <!-- فورم البيانات لتأكيد فوري مقفل -->
+            <div class="cart-summary"><span>المجموع الإجمالي:</span><span id="cartTotal">0.00 د.أ</span></div>
+            
             <div class="checkout-form">
-                <label>اسم المستلم الثنائي أو الكامل:</label>
-                <input type="text" id="customerName" placeholder="مثال: أحمد علي">
-                
-                <label>العنوان بالتفصيل (المدينة/المنطقة):</label>
-                <input type="text" id="customerAddress" placeholder="مثال: عمان - شارع الجامعة">
+                <label>الاسم الكامل للزبون:</label><input type="text" id="customerName" placeholder="مثال: محمد أحمد">
+                <label>عنوان التوصيل بالأردن:</label><input type="text" id="customerAddress" placeholder="مثال: إربد - قرب جامعة اليرموك">
             </div>
-
-            <button class="checkout-btn" onclick="sendOrder()">
-                <i class="fa-brands fa-whatsapp"></i> إرسال الطلب المقفل للواتساب
-            </button>
+            <button class="checkout-btn" onclick="window.sendOrder()">🎯 تأكيد وشراء من الموقع فوراً</button>
         </div>
     </div>
 
-    <!-- الفوتر -->
-    <footer id="about">
-        <div class="footer-content">
-            <p>جميع الحقوق محفوظة © 2026 لمتجر **أحمد المحترف**</p>
-            <div class="social-links">
-                <a href="https://wa.me/962770514031" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
-        </div>
-    </footer>
+    <footer><p>جميع الحقوق محفوظة © 2026 لمتجر أحمد المحترف</p></footer>
 
     <script>
         let cart = [];
-        const whatsappNumber = "962770514031";
-
-        function toggleCart() {
-            document.getElementById('cartModal').classList.toggle('active');
-            renderCart();
-        }
-
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            updateCartCount();
-            const cartBtn = document.querySelector('.cart-btn');
-            cartBtn.style.transform = 'scale(1.1)';
-            setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartCount();
-            renderCart();
-        }
-
+        function toggleCart() { document.getElementById('cartModal').classList.toggle('active'); renderCart(); }
+        function addToCart(name, price) { cart.push({ name, price }); updateCartCount(); }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartCount(); renderCart(); }
         function updateCartCount() { document.getElementById('cartCount').innerText = cart.length; }
-
         function renderCart() {
-            const listElement = document.getElementById('cartItemsList');
-            const totalElement = document.getElementById('cartTotal');
-            listElement.innerHTML = '';
-            let total = 0;
-
-            if (cart.length === 0) {
-                listElement.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding: 1rem 0;">السلة فارغة..</li>';
-                totalElement.innerText = '0.00 د.أ';
-                return;
-            }
-
-            cart.forEach((item, index) => {
+            const list = document.getElementById('cartItemsList');
+            const totalEl = document.getElementById('cartTotal');
+            list.innerHTML = ''; let total = 0;
+            if (cart.length === 0) { list.innerHTML = '<li>السلة فارغة..</li>'; totalEl.innerText = '0.00 د.أ'; return; }
+            cart.forEach((item, i) => {
                 total += item.price;
-                listElement.innerHTML += `
-                    <li class="cart-item">
-                        <span>${item.name}</span>
-                        <div>
-                            <span style="font-weight:700; color:var(--accent-color);">${item.price.toFixed(2)} د.أ</span>
-                            <i class="fa-solid fa-trash remove-item" onclick="removeFromCart(${index})"></i>
-                        </div>
-                    </li>`;
+                list.innerHTML += `<li class="cart-item">${item.name} <div><span>${item.price.toFixed(2)} د.أ</span> <i class="fa-solid fa-trash remove-item" onclick="removeFromCart(${i})"></i></div></li>`;
             });
-            totalElement.innerText = total.toFixed(2) + ' د.أ';
-        }
-
-        function sendOrder() {
-            if (cart.length === 0) { alert('سلتك فارغة!'); return; }
-            
-            const name = document.getElementById('customerName').value.trim();
-            const address = document.getElementById('customerAddress').value.trim();
-
-            if (!name || !address) {
-                alert('يرجى كتابة الاسم والعنوان لتجهيز الطلب بشكل أسرع ومنع التعديل.');
-                return;
-            }
-
-            // تجميع النص بالكامل بشكل مرتب وجاهز
-            let message = `⚙️ *طلب شراء جديد - متجر أحمد المحترف*\n`;
-            message += `----------------------------------\n`;
-            message += `👤 *الزبون:* ${name}\n`;
-            message += `📍 *العنوان:* ${address}\n`;
-            message += `----------------------------------\n\n`;
-            
-            let total = 0;
-            cart.forEach((item, index) => {
-                message += `${index + 1}. *${item.name}* -> ${item.price.toFixed(2)} د.أ\n`;
-                total += item.price;
-            });
-            
-            message += `\n----------------------------------\n`;
-            message += `💰 *المجموع النهائي:* ${total.toFixed(2)} د.أ\n`;
-            message += `----------------------------------\n`;
-            message += `الرجاء تأكيد استلام الطلب وبدء الشحن الفوري الفوري 🚀.`;
-
-            let encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+            totalEl.innerText = total.toFixed(2) + ' د.أ';
         }
     </script>
 </body>
