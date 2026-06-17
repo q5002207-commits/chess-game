@@ -23,73 +23,91 @@
         body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
 
         header { background-color: rgba(11, 15, 25, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); position: fixed; top: 0; width: 100%; z-index: 1000; }
-        .nav-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .logo span { color: var(--accent-color); }
 
-        .cart-btn { position: relative; font-size: 1.3rem; cursor: pointer; background: #1e293b; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .cart-btn { position: relative; font-size: 1.1rem; cursor: pointer; background: #1e293b; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); transition: 0.3s; }
         .cart-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
         .cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--accent-color); color: #000; font-size: 0.75rem; font-weight: bold; padding: 2px 7px; border-radius: 50%; }
 
         /* Products Grid */
-        .products-section { max-width: 1200px; margin: 0 auto; padding: 10rem 2rem 5rem 2rem; }
-        .section-title { font-size: 2rem; margin-bottom: 3rem; position: relative; display: inline-block; }
-        .section-title::after { content: ''; position: absolute; bottom: -10px; right: 0; width: 50px; height: 4px; background-color: var(--accent-color); }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .products-section { max-width: 1200px; margin: 0 auto; padding: 7rem 1rem 3rem 1rem; }
+        .section-title { font-size: 1.8rem; margin-bottom: 2rem; position: relative; display: inline-block; }
+        .section-title::after { content: ''; position: absolute; bottom: -8px; right: 0; width: 45px; height: 4px; background-color: var(--accent-color); }
         
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
         .product-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: 0.3s; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
-        .product-img-box { background: #1e293b; padding: 3rem 1rem; text-align: center; font-size: 4rem; color: var(--text-muted); }
-        .product-info { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
-        .product-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .product-card:hover { transform: translateY(-3px); border-color: var(--accent-color); }
+        .product-img-box { background: #1e293b; padding: 2.5rem 1rem; text-align: center; font-size: 3.5rem; color: var(--text-muted); }
+        .product-info { padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 1.1rem; margin-bottom: 0.8rem; min-height: 50px; display: flex; align-items: center; }
         .product-meta { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
-        .product-price { font-size: 1.3rem; font-weight: 700; }
+        .product-price { font-size: 1.2rem; font-weight: 700; color: #fff; }
 
-        .add-btn { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .add-btn { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.3s; font-size: 0.9rem; }
         .add-btn:hover { background-color: var(--accent-color); color: #000; }
 
         /* Cart Modal */
-        .cart-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .cart-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; padding: 10px; }
         .cart-modal.active { opacity: 1; pointer-events: auto; }
-        .cart-content-box { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 95%; max-width: 500px; padding: 2rem; position: relative; }
-        .close-modal { position: absolute; top: 1.5rem; left: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        .cart-title { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .cart-content-box { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 480px; padding: 1.5rem; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 1.2rem; left: 1.2rem; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); }
+        .cart-title { font-size: 1.4rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
         
-        .cart-items-list { max-height: 150px; overflow-y: auto; margin-bottom: 1rem; list-style: none; }
-        .cart-item { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; }
-        .remove-item { color: #ff4444; cursor: pointer; margin-right: 10px; }
+        .cart-items-list { max-height: 140px; overflow-y: auto; margin-bottom: 1rem; list-style: none; }
+        .cart-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; font-size: 0.95rem; }
+        .remove-item { color: #ff4444; cursor: pointer; margin-right: 10px; padding: 5px; }
 
-        .cart-summary { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .cart-summary { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.8rem; }
         .cart-summary span:last-child { color: var(--accent-color); }
 
-        .checkout-form { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; background: #0b0f19; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
-        .checkout-form label { font-size: 0.9rem; color: var(--text-muted); }
+        .checkout-form { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; background: #0b0f19; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); }
+        .checkout-form label { font-size: 0.85rem; color: var(--text-muted); }
         .checkout-form label span { color: #ff4444; font-weight: bold; }
-        .checkout-form input { background: #151c2c; border: 1px solid var(--border-color); padding: 0.6rem; border-radius: 6px; color: #fff; font-size: 1rem; }
+        .checkout-form input { background: #151c2c; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px; color: #fff; font-size: 0.95rem; }
         .checkout-form input:focus { border-color: var(--accent-color); outline: none; }
 
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        .checkout-btn { width: 100%; padding: 0.8rem; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s; background-color: var(--accent-color); color: #000; }
+        .btn-group { display: flex; flex-direction: column; gap: 8px; }
+        .checkout-btn { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.3s; background-color: var(--accent-color); color: #000; }
         .checkout-btn:hover { background-color: #00cc52; }
         
         .whatsapp-btn { background-color: #25D366; color: #fff; }
         .whatsapp-btn:hover { background-color: #128C7E; color: #fff; }
+        
+        /* زر إغلاق السلة الجديد المتناسق */
+        .close-cart-action { background-color: #1e293b; color: #fff; border: 1px solid var(--border-color); }
+        .close-cart-action:hover { background-color: #334155; color: #ff4444; }
 
         /* 🖨️ واجهة الفاتورة الفخمة */
-        #invoice-view { display: none; background: #fff; color: #000; padding: 30px; max-width: 550px; margin: 30px auto; border: 2px solid #000; direction: rtl; }
-        .inv-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 20px; }
-        .inv-store-name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .inv-meta-grid { display: flex; justify-content: space-between; font-size: 13px; color: #000; margin-top: 10px; }
-        .inv-section-title { font-size: 15px; font-weight: 700; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 10px; margin-top: 15px; }
-        .inv-details-row { font-size: 14px; margin-bottom: 6px; line-height: 1.5; }
-        .inv-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; }
-        .inv-table th { background: #f5f5f5; border: 1px solid #000; padding: 8px; text-align: right; font-size: 13px; }
-        .inv-table td { border: 1px solid #000; padding: 8px; font-size: 13px; }
-        .inv-total-box { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; padding-top: 10px; border-top: 2px dashed #000; margin-top: 10px; }
-        .inv-footer { text-align: center; margin-top: 35px; font-size: 12px; border-top: 1px solid #000; padding-top: 15px; }
-        .print-command-btn { background: #000; color: #fff; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 20px; }
+        #invoice-view { display: none; background: #fff; color: #000; padding: 20px; max-width: 100%; width: 500px; margin: 15px auto; border: 2px solid #000; direction: rtl; }
+        .inv-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 12px; margin-bottom: 15px; }
+        .inv-store-name { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .inv-meta-grid { display: flex; justify-content: space-between; font-size: 12px; color: #000; margin-top: 8px; }
+        .inv-section-title { font-size: 14px; font-weight: 700; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 8px; margin-top: 12px; }
+        .inv-details-row { font-size: 13px; margin-bottom: 5px; line-height: 1.4; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; }
+        .inv-table th { background: #f5f5f5; border: 1px solid #000; padding: 6px; text-align: right; font-size: 12px; }
+        .inv-table td { border: 1px solid #000; padding: 6px; font-size: 12px; }
+        .inv-total-box { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding-top: 8px; border-top: 2px dashed #000; margin-top: 8px; }
+        .inv-footer { text-align: center; margin-top: 25px; font-size: 11px; border-top: 1px solid #000; padding-top: 12px; }
+        .print-command-btn { background: #000; color: #fff; border: none; padding: 10px; font-size: 15px; font-weight: bold; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 15px; }
         
-        /* إخفاء الزر والمنطقة الخلفية عند الطباعة الفورية */
+        /* تحسينات الشاشات الصغيرة للموبايل (Media Queries) */
+        @media (max-width: 600px) {
+            .nav-container { padding: 0.8rem; }
+            .logo { font-size: 1.1rem; }
+            .cart-btn { font-size: 0.95rem; padding: 0.4rem 0.7rem; }
+            .products-section { padding-top: 5.5rem; }
+            .section-title { font-size: 1.5rem; }
+            .products-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+            .product-img-box { font-size: 2.5rem; padding: 1.5rem 0.5rem; }
+            .product-title { font-size: 0.95rem; min-height: 40px; margin-bottom: 0.5rem; }
+            .product-price { font-size: 1.05rem; }
+            .add-btn { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+            .cart-content-box { padding: 1rem; }
+        }
+
         @media print {
             body * { display: none !important; }
             #invoice-view, #invoice-view * { display: block !important; }
@@ -112,25 +130,192 @@
         </header>
 
         <section class="products-section" id="products">
-            <h2 class="section-title">قطع الأردوينو المتاحة</h2>
+            <h2 class="section-title">قطع ومتطلبات الأردوينو</h2>
             <div class="products-grid">
+                <!-- المنتج 1 -->
                 <div class="product-card">
                     <div class="product-img-box"><i class="fa-solid fa-box-open"></i></div>
                     <div class="product-info">
                         <h3 class="product-title">Arduino Starter Kit (الحقيبة الشاملة)</h3>
                         <div class="product-meta">
                             <span class="product-price">18.00 د.أ</span>
-                            <button class="add-btn" onclick="addToCart('حقيبة أردوينو الشاملة', 18.00)">إضافة للسلة</button>
+                            <button class="add-btn" onclick="addToCart('حقيبة أردوينو الشاملة', 18.00)">إضافة</button>
                         </div>
                     </div>
                 </div>
+                <!-- المنتج 2 -->
                 <div class="product-card">
                     <div class="product-img-box"><i class="fa-solid fa-cpu"></i></div>
                     <div class="product-info">
-                        <h3 class="product-title">Arduino Uno R3</h3>
+                        <h3 class="product-title">Arduino Uno R3 الأصلي</h3>
                         <div class="product-meta">
                             <span class="product-price">6.50 د.أ</span>
-                            <button class="add-btn" onclick="addToCart('Arduino Uno R3', 6.50)">إضافة للسلة</button>
+                            <button class="add-btn" onclick="addToCart('Arduino Uno R3', 6.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 3 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">ESP32 DevKitC NodeMCU</h3>
+                        <div class="product-meta">
+                            <span class="product-price">7.00 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('ESP32 DevKitC', 7.00)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 4 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-wave-square"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">حساس المسافة Ultrasonic HC-SR04</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('حساس Ultrasonic HC-SR04', 1.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 5 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-compass"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">حساس الحركة والتوازن MPU-6050</h3>
+                        <div class="product-meta">
+                            <span class="product-price">2.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('حساس MPU-6050', 2.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 6 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">High-Power MOSFET Module</h3>
+                        <div class="product-meta">
+                            <span class="product-price">2.00 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('MOSFET Module', 2.00)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 7 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-car-battery"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">شاحن بطاريات ليتيوم مزدوج 18650</h3>
+                        <div class="product-meta">
+                            <span class="product-price">3.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('شاحن بطاريات ليتيوم', 3.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 8 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-table-cells"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">لوحة تجارب Breadboard حجم كبير</h3>
+                        <div class="product-meta">
+                            <span class="product-price">2.00 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('Breadboard كبير', 2.00)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 9 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-network-wired"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">أسلاك توصيل Jumper Wires (60 قطعة)</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('أسلاك توصيل 60 قطعة', 1.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 10 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-gear"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">ماتور سيرفو Servo Motor SG90</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.75 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('Servo Motor SG90', 1.75)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 11 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-gears"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">ماتور تيار مستمر DC Motor 5V مع عجل</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('DC Motor مع عجل', 1.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 12 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-border-all"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">لوحة تحكم المحركات L298N Driver</h3>
+                        <div class="product-meta">
+                            <span class="product-price">3.00 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('L298N Driver Module', 3.00)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 13 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-tv"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">شاشة إل سي دي LCD 16x2 مع I2C</h3>
+                        <div class="product-meta">
+                            <span class="product-price">3.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('LCD 16x2 I2C', 3.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 14 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-thermometer"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">حساس الحرارة والرطوبة DHT11</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.25 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('حساس DHT11', 1.25)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 15 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-toggle-on"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">مرحل كهربائي Relay Module 5V 1-Channel</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.20 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('Relay Module 5V', 1.20)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 16 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-key"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">لوحة مفاتيح غشائية Keypad 4x4</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.50 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('Keypad 4x4', 1.50)">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- المنتج 17 -->
+                <div class="product-card">
+                    <div class="product-img-box"><i class="fa-solid fa-lightbulb"></i></div>
+                    <div class="product-info">
+                        <h3 class="product-title">مجموعة ديودات مشعة RGB LED (5 قطع)</h3>
+                        <div class="product-meta">
+                            <span class="product-price">1.00 د.أ</span>
+                            <button class="add-btn" onclick="addToCart('RGB LED 5 قطع', 1.00)">إضافة</button>
                         </div>
                     </div>
                 </div>
@@ -157,14 +342,18 @@
                 </div>
 
                 <div class="btn-group">
+                    <!-- خيار التيليجرام الأوتوماتيكي -->
                     <button class="checkout-btn" id="submit-order-btn" onclick="processOrderTelegram()">🎯 إرسال وتأكيد الطلب أوتوماتيكياً</button>
+                    <!-- خيار الواتساب (تمت إعادته بنجاح) -->
                     <button class="checkout-btn whatsapp-btn" onclick="processOrderWhatsApp()"><i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر الواتساب</button>
+                    <!-- زر إغلاق السلة الجديد -->
+                    <button class="checkout-btn close-cart-action" onclick="toggleCart()"><i class="fa-solid fa-circle-xmark"></i> ❌ إغلاق السلة ومتابعة التسوق</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 🖨️ هيكل الفاتورة الاحترافية الأوتوماتيكية المعدلة -->
+    <!-- 🖨️ هيكل الفاتورة الاحترافية -->
     <div id="invoice-view">
         <button class="print-command-btn" id="print-action-btn" onclick="triggerSmartPrint()"><i class="fa-solid fa-print"></i> اضغط هنا لطباعة الفاتورة</button>
         <div class="inv-header">
@@ -205,7 +394,7 @@
         
         const TELEGRAM_TOKEN = "8682684838:AAFzLYYoOuSRvYt3tDWO43NOBxw5_ZDrJTk"; 
         const TELEGRAM_CHAT_ID = "6935264255"; 
-        const MY_WHATSAPP_NUMBER = "962790000000"; // رقمك للواتساب
+        const MY_WHATSAPP_NUMBER = "962790000000"; // رقم الواتساب المعتمد لديك
 
         function toggleCart() { document.getElementById('cartModal').classList.toggle('active'); renderCart(); }
         function addToCart(name, price) { cart.push({ name, price }); updateCartCount(); }
@@ -311,19 +500,19 @@
         }
 
         function clearCart() {
-            cart = []; updateCartCount(); toggleCart();
+            cart = []; updateCartCount(); 
+            document.getElementById('cartModal').classList.remove('active');
             document.getElementById('customerName').value = '';
             document.getElementById('customerPhone').value = '';
             document.getElementById('customerAddress').value = '';
         }
 
-        // دالة ذكية لإخفاء الزر برمجياً قبل تشغيل الطباعة لضمان عدم ظهوره في الـ PDF أو الورق
         function triggerSmartPrint() {
             const printBtn = document.getElementById('print-action-btn');
-            printBtn.style.display = 'none'; // إخفاء يدوي فوري
+            printBtn.style.display = 'none'; 
             setTimeout(() => {
                 window.print();
-                printBtn.style.display = 'block'; // إرجاع الزر بعد ظهور شاشة الطباعة
+                printBtn.style.display = 'block'; 
             }, 250);
         }
 
