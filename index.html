@@ -3,105 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الجاسوس</title>
+    <title>لعبة الجاسوس المحترفة 🕵️‍♂️</title>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #f43f5e;
+            --accent-hover: #e11d48;
+            --text-color: #f8fafc;
+            --success-color: #10b981;
+            --info-color: #38bdf8;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a2e;
-            color: #fff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             text-align: center;
-            padding: 20px;
-            margin: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #162447;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        h1 { color: #e43f5a; }
-        input, button {
             padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            margin: 10px 5px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
         }
-        input { width: 60%; background: #fff; color: #000; }
-        button {
-            background-color: #e43f5a;
-            color: white;
-            cursor: pointer;
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #111827;
+            padding: 25px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            color: var(--accent-color); 
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(244, 63, 94, 0.3);
+        }
+
+        h3 {
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input { 
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 2px solid #374151; 
+            background: #1f2937; 
+            color: #fff;
+            outline: none;
             transition: 0.3s;
         }
-        button:hover { background-color: #ff4a68; }
-        .hidden { display: none; }
-        .names-list {
-            margin: 15px 0;
-            text-align: right;
-            background: #1f4068;
-            padding: 10px;
-            border-radius: 8px;
+
+        input:focus {
+            border-color: var(--accent-color);
         }
-        .player-card {
-            background: #1f4068;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
+
+        button {
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
             cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: 0.2s;
+            transition: all 0.2s ease-in-out;
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .player-card:hover { background: #e43f5a; }
+
+        button:hover { 
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .btn-success { background-color: var(--success-color); color: #fff; }
+        .btn-success:hover { background-color: #059669; }
+
+        .btn-secondary { background-color: #4b5563; }
+        .btn-secondary:hover { background-color: #374151; }
+
+        .btn-block { width: 100%; margin-top: 15px; }
+
+        .names-list {
+            margin: 20px 0;
+            text-align: right;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border-right: 4px solid var(--accent-color);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* شبكة الكروت المتجاوبة للكمبيوتر والموبايل */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border: 2px solid #334155;
+            padding: 20px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 90px;
+        }
+
+        .player-card:hover { 
+            border-color: var(--info-color);
+            background: #1e293b;
+            transform: scale(1.03);
+        }
+
+        /* وضعية الكرت المفتوح */
+        .player-card.active-card {
+            grid-column: 1 / -1; /* يتمدد ليأخذ العرض الكامل لمنع تداخل الشاشات */
+            background: #020617;
+            border-color: var(--accent-color);
+            cursor: default;
+            animation: pulse 2s infinite;
+        }
+
+        .player-card.active-card:hover {
+            transform: none;
+        }
+
+        /* وضعية الكرت المقفل تماماً */
+        .player-card.disabled-card {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* الكرت المنتهي */
+        .player-card.viewed {
+            background: #111827;
+            border-color: #1f2937;
+            color: #6b7280;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .word-display {
-            font-size: 24px;
-            color: #00fff0;
-            margin-top: 10px;
+            font-size: 22px;
+            color: var(--info-color);
+            margin: 12px 0;
             font-weight: bold;
         }
-        .timer { font-size: 14px; color: #ff4a68; }
+
+        .timer { 
+            font-size: 13px; 
+            color: var(--accent-color); 
+            font-weight: normal;
+        }
+
+        .hidden { display: none !important; }
+
+        .vote-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        /* تعديلات مخصصة للشاشات الكبيرة جداً */
+        @media (min-width: 600px) {
+            .player-card { font-size: 18px; padding: 25px 15px; }
+            .word-display { font-size: 26px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🕵️‍♂️ لعبة الجاسوس</h1>
-    <hr style="border-color: #e43f5a;">
 
     <!-- شاشة إدخال الأسماء -->
     <div id="setup-screen">
         <h3>أدخل أسماء اللاعبين (3 لاعبين على الأقل):</h3>
-        <input type="text" id="name-input" placeholder="اسم اللاعب...">
-        <button onclick="addPlayer()">إضافة</button>
-        <div class="names-list" id="names-list">الأسماء المضافة: لم يتم إضافة أسماء بعد.</div>
-        <button onclick="startGame()" style="width: 100%; background-color: #4eed50; color: #000; font-weight: bold;">ابدأ اللعبة 🚀</button>
+        <div class="input-group">
+            <input type="text" id="name-input" placeholder="اسم اللاعب...">
+            <button onclick="addPlayer()">إضافة</button>
+        </div>
+        <div class="names-list" id="names-list">👥 الأسماء المضافة: لم يتم إضافة أسماء بعد.</div>
+        <button onclick="startGame()" class="btn-success btn-block">ابدأ اللعبة 🚀</button>
     </div>
 
     <!-- شاشة توزيع الأدوار -->
     <div id="role-screen" class="hidden">
-        <h3>اضغط على اسمك لرؤية مكانك (سيختفي بعد 4 ثوانٍ!)</h3>
-        <div id="players-cards-container"></div>
-        <button id="next-to-vote" class="hidden" onclick="showVoteScreen()" style="width: 100%;">الانتقال إلى التصويت 🗳️</button>
+        <h3>اضغط على اسمك برفق لرؤية دورك (يُسمح بفتح كرت واحد فقط في نفس الوقت)</h3>
+        <div class="cards-grid" id="players-cards-container"></div>
+        <button id="next-to-vote" class="hidden btn-block" onclick="showVoteScreen()">الانتقال إلى التصويت 🗳️</button>
     </div>
 
     <!-- شاشة التصويت ونهاية الدور -->
     <div id="vote-screen" class="hidden">
-        <h2>🗳️ وقت التصويت!</h2>
-        <p>تناقشوا واعرفوا من هو الجاسوس.</p>
-        <button onclick="revealSpy()" style="background-color: #00fff0; color: #000; font-weight: bold;">اكتشف من الجاسوس 👁️</button>
-        <h3 id="spy-reveal" class="hidden" style="color: #4eed50; font-size: 24px;"></h3>
+        <h2>🗳️ وقت التصويت والمناقشة!</h2>
+        <p style="color: #9ca3af; margin-bottom: 25px;">تناقشوا بذكاء واعرفوا من يختبئ خلف قناع الجاسوس.</p>
+        <button onclick="revealSpy()" class="btn-block" style="background-color: var(--info-color); color: #000;">اكتشف من الجاسوس 👁️</button>
+        <h3 id="spy-reveal" class="hidden" style="color: var(--success-color); font-size: 24px; background: #020617; padding: 15px; border-radius: 12px; border: 1px solid #10b981; margin-top: 20px;"></h3>
         
-        <hr style="border-color: #e43f5a; margin-top: 20px;">
-        <button onclick="restartGame(true)" style="background-color: #f39c12; width: 45%;">إعادة بنفس الأسماء 🔄</button>
-        <button onclick="restartGame(false)" style="background-color: #c0392b; width: 45%;">شاشة رئيسية جديدة 🏠</button>
+        <div class="vote-actions">
+            <button onclick="restartGame(true)" class="btn-success" style="flex: 1;">جولة جديدة بنفس الأسماء 🔄</button>
+            <button onclick="restartGame(false)" class="btn-secondary" style="flex: 1;">شاشة رئيسية جديدة 🏠</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // قائمة الـ 40 كلمة المتنوعة
     const wordList = [
         "المستشفى", "المدرسة", "المطعم", "المطار", "محطة القطار", "الفندق", "المتحف", "حديقة الحيوان",
         "السينما", "الشاطئ", "المسبح", "السوبرماركت", "المطبخ", "المكتبة", "المركز التجاري", "الملعب",
@@ -114,6 +260,14 @@
     let spyName = "";
     let selectedWord = "";
     let viewedCount = 0;
+    let isCardOpen = false; // متغير للتحقق إذا كان هناك كرت مفتوح حالياً
+
+    // دعم ضغط زر Enter للإضافة السريعة للأسماء
+    document.getElementById('name-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addPlayer();
+        }
+    });
 
     function addPlayer() {
         const input = document.getElementById('name-input');
@@ -129,9 +283,9 @@
     function updateNamesList() {
         const listDiv = document.getElementById('names-list');
         if(players.length === 0) {
-            listDiv.innerText = "الأسماء المضافة: لم يتم إضافة أسماء بعد.";
+            listDiv.innerText = "👥 الأسماء المضافة: لم يتم إضافة أسماء بعد.";
         } else {
-            listDiv.innerText = "الأسماء المضافة: " + players.join(" ، ");
+            listDiv.innerText = "👥 الأسماء المضافة: " + players.join(" ، ");
         }
     }
 
@@ -141,10 +295,10 @@
             return;
         }
         
-        // اختيار الجاسوس والكلمة
         spyName = players[Math.floor(Math.random() * players.length)];
         selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
         viewedCount = 0;
+        isCardOpen = false;
 
         document.getElementById('setup-screen').classList.add('hidden');
         document.getElementById('role-screen').classList.remove('hidden');
@@ -168,26 +322,45 @@
     }
 
     function revealCard(playerName, cardElement, index) {
-        // حماية حتى لا يضغط اللاعب مرتين
-        if (cardElement.style.pointerEvents === "none") return;
+        // حماية: إذا كان هناك كرت مفتوح بالفعل، أو هذا الكرت تم رؤيته، لا تفعل شيئاً
+        if (isCardOpen || cardElement.classList.contains('viewed')) return;
 
+        // تفعيل قفل الأمان لمنع فتح أي كرت آخر
+        isCardOpen = true;
+
+        // قفل بقية الكروت بصرياً ووظيفياً
+        const allCards = document.querySelectorAll('.player-card');
+        allCards.forEach(c => {
+            if (c.id !== `player-${index}` && !c.classList.contains('viewed')) {
+                c.classList.add('disabled-card');
+            }
+        });
+
+        // إبراز الكرت المفتوح حالياً وتكبيره ليغطي السطر لمنع الفضول
+        cardElement.classList.add('active-card');
         let content = (playerName === spyName) ? "🕵️‍♂️ أنت الجاسوس!" : `📍 المكان: ${selectedWord}`;
         
         cardElement.innerHTML = `
-            <div>${playerName}</div>
+            <div style="font-size: 14px; color: #9ca3af;">اللاعب الحالي</div>
+            <div style="font-size: 22px; margin-top:5px;">${playerName}</div>
             <div class="word-display">${content}</div>
-            <div class="timer" id="timer-${index}">سيختفي بعد 4 ثوانٍ...</div>
+            <div class="timer" id="timer-${index}">⏱️ سيختفي تلقائياً بعد 4 ثوانٍ...</div>
         `;
-        cardElement.style.pointerEvents = "none";
-        cardElement.style.background = "#222";
 
-        // إخفاء الاسم والكلمة تماماً بعد 4 ثوانٍ لمنع الغش
+        // مؤقت الـ 4 ثوانٍ لإخفاء الكرت وإعادة إتاحة الكروت الأخرى
         setTimeout(() => {
-            cardElement.innerHTML = "❌ تم الرؤية";
-            cardElement.style.background = "#333";
+            cardElement.className = "player-card viewed";
+            cardElement.innerHTML = "🔒 تم الرؤية";
             viewedCount++;
             
-            // إذا شافوا كل اللاعبين كروتهم يظهر زر التصويت
+            // فتح القفل والسماح للاعب التالي بالضغط
+            isCardOpen = false;
+            const updatedCards = document.querySelectorAll('.player-card');
+            updatedCards.forEach(c => {
+                c.classList.remove('disabled-card');
+            });
+            
+            // إظهار زر التصويت عند انتهاء الجميع
             if (viewedCount === players.length) {
                 document.getElementById('next-to-vote').classList.remove('hidden');
             }
@@ -214,7 +387,7 @@
             document.getElementById('setup-screen').classList.remove('hidden');
         } else {
             document.getElementById('vote-screen').classList.add('hidden');
-            startGame(); // يعيد تشغيل اللعبة مباشرة بنفس الأسماء الموجودة مسبقاً
+            startGame();
         }
     }
 </script>
