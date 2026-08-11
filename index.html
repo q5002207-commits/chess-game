@@ -424,7 +424,7 @@ function startSpyDist() {
     // اختيار كلمة عشوائية من الفئة
     let place = categoryWords[Math.floor(Math.random() * categoryWords.length)];
     let spyIdx = Math.floor(Math.random() * sPlayers.length);
-    let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! المكان مختلف" : `📍 الكلمة: ${place}`);
+    let roles = sPlayers.map((_, i) => i === spyIdx ? "🕵️ أنت الجاسوس! " : `📍 الكلمة: ${place}`);
     
     $('#spy-setup').hide();
     $('#spy-board').removeClass('hidden');
