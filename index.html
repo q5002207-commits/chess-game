@@ -1722,724 +1722,456 @@
         border: 0;
       }
 
-      @keyframes pulseButton {
-        0%,
-        100% {
-          opacity: 1;
-        }
+      /* ===== NEW GAME STYLES ===== */
+      .game-tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
 
-        50% {
-          opacity: 0.58;
-        }
+      .game-tab-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .game-tab-btn:hover {
+        color: var(--cream);
+        border-color: var(--line-bright);
+      }
+
+      .game-tab-btn.active {
+        color: var(--gold-light);
+        border-color: var(--gold);
+        background: rgba(215, 173, 98, 0.06);
+      }
+
+      .game-panel-content {
+        display: none;
+        animation: reveal 0.3s ease both;
+      }
+
+      .game-panel-content.active {
+        display: block;
+      }
+
+      /* SLOTS */
+      .slot-reels {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 20px 30px;
+        border-radius: 12px;
+        border: 1px solid rgba(215, 173, 98, 0.08);
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .slot-reel {
+        width: 70px;
+        height: 90px;
+        background: #0d1112;
+        border-radius: 8px;
+        border: 2px solid rgba(215, 173, 98, 0.12);
+        display: grid;
+        place-items: center;
+        font-size: 44px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .slot-reel-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.12s linear;
+      }
+
+      .slot-reel-symbol {
+        height: 90px;
+        display: grid;
+        place-items: center;
+        font-size: 44px;
+        flex-shrink: 0;
+        width: 100%;
+      }
+
+      .slot-reel.spinning .slot-reel-inner {
+        animation: reelSpin 0.08s linear infinite;
+      }
+
+      @keyframes reelSpin {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-90px); }
+      }
+
+      .slot-info-row {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 12px;
+        font-family: var(--mono);
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .slot-info-row strong {
+        color: var(--gold-light);
+      }
+
+      .slot-controls-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .slot-controls-row .stake-input {
+        width: 100px;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--line-bright);
+        border-radius: 6px;
+        background: #0f1314;
+        color: var(--cream);
+        font-family: var(--mono);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .slot-controls-row .stake-input:focus {
+        outline: none;
+        border-color: var(--gold);
+      }
+
+      /* WAR */
+      .war-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+
+      .war-player-box {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        padding: 16px 18px 20px;
+        border: 1px solid var(--line);
+        text-align: center;
+      }
+
+      .war-player-box .label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .war-player-box .label strong {
+        color: var(--cream);
+      }
+
+      .war-card-display {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+        gap: 12px;
+      }
+
+      .war-card {
+        width: 72px;
+        height: 100px;
+        border-radius: 8px;
+        background: #eae3d3;
+        display: grid;
+        place-items: center;
+        font-size: 34px;
+        font-weight: 700;
+        color: #1a1a1a;
+        box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .war-card.red {
+        color: #9f3736;
+      }
+      .war-card.black {
+        color: #1a1a1a;
+      }
+      .war-card.hidden {
+        background: #1a2021;
+        color: transparent;
+        border: 2px solid var(--gold);
+      }
+      .war-card.hidden::after {
+        content: "?";
+        color: var(--gold);
+        font-size: 24px;
+        font-weight: 700;
+        position: absolute;
+      }
+
+      .war-result-text {
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 8px;
+        min-height: 22px;
+      }
+
+      .war-result-text.win { color: var(--green); }
+      .war-result-text.loss { color: var(--red-bright); }
+      .war-result-text.draw { color: var(--gold); }
+
+      .war-controls-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      .war-controls-row .stake-input {
+        width: 100px;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--line-bright);
+        border-radius: 6px;
+        background: #0f1314;
+        color: var(--cream);
+        font-family: var(--mono);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .war-controls-row .stake-input:focus {
+        outline: none;
+        border-color: var(--gold);
+      }
+
+      .war-history-row {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        margin-top: 10px;
+      }
+
+      .war-history-row .mini {
+        font-size: 10px;
+        color: var(--muted);
+        font-family: var(--mono);
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+      }
+
+      .war-history-row .mini.win { border-color: rgba(139, 167, 125, 0.3); color: var(--green); }
+      .war-history-row .mini.loss { border-color: rgba(168, 60, 62, 0.3); color: var(--red-bright); }
+      .war-history-row .mini.draw { border-color: rgba(215, 173, 98, 0.3); color: var(--gold); }
+
+      @keyframes pulseButton {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.58; }
       }
 
       @keyframes wheelPulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-
-        50% {
-          opacity: 0.72;
-        }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.72; }
       }
 
       @keyframes cardDraw {
-        0% {
-          opacity: 0.3;
-          transform: translateY(-12px) rotate(-12deg);
-        }
-
-        100% {
-          opacity: 1;
-          transform: rotate(-4deg);
-        }
+        0% { opacity: 0.3; transform: translateY(-12px) rotate(-12deg); }
+        100% { opacity: 1; transform: rotate(-4deg); }
       }
 
       @keyframes reveal {
-        from {
-          opacity: 0;
-          transform: translateY(8px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
-      /* ============================================ */
-      /* 🖥️  تحسينات للاب توب (المقاسات بس) */
-      /* ============================================ */
-
-      /* للشاشات المتوسطة (لاب توب صغير) */
+      /* ===== RESPONSIVE ===== */
       @media (min-width: 769px) and (max-width: 1366px) {
-        .sidebar {
-          width: 190px;
-          padding: 22px 12px 16px;
-        }
-
-        .main {
-          width: calc(100% - 190px);
-          margin-left: 190px;
-          padding: 0 22px 40px;
-        }
-
-        .nav-button {
-          min-height: 38px;
-          padding: 0 10px;
-          gap: 8px;
-        }
-
-        .nav-copy {
-          font-size: 11px;
-        }
-
-        .nav-label {
-          margin: 32px 11px 10px;
-          font-size: 8px;
-        }
-
-        .brand {
-          gap: 7px;
-          padding: 0 8px;
-        }
-
-        .brand-name {
-          font-size: 11px;
-        }
-
-        .brand-sub {
-          margin: 2px 0 0 41px;
-          font-size: 8px;
-        }
-
-        .sync-card {
-          padding: 11px;
-        }
-
-        .sync-copy {
-          font-size: 10px;
-        }
-
-        .sync-note {
-          font-size: 9px;
-        }
-
-        .topbar {
-          min-height: 64px;
-        }
-
-        .crumb {
-          font-size: 9px;
-        }
-
-        .room-status {
-          font-size: 9px;
-          padding: 6px 9px;
-        }
-
-        .button {
-          min-height: 34px;
-          font-size: 10px;
-          padding: 0 12px;
-        }
-
-        .welcome-grid {
-          gap: 14px;
-          padding: 28px 0 16px;
-        }
-
-        .welcome {
-          min-height: 200px;
-          padding: 25px 28px;
-        }
-
-        h1 {
-          font-size: clamp(30px, 3.8vw, 48px);
-        }
-
-        .welcome-copy {
-          font-size: 11px;
-          max-width: 400px;
-        }
-
-        .room-card {
-          min-height: 200px;
-          padding: 18px 20px;
-        }
-
-        .room-code {
-          font-size: 26px;
-        }
-
-        .metrics {
-          gap: 10px;
-          margin-bottom: 22px;
-        }
-
-        .metric {
-          min-height: 78px;
-          padding: 13px 14px;
-        }
-
-        .metric-value {
-          font-size: 20px;
-        }
-
-        .metric-value small {
-          font-size: 9px;
-        }
-
-        .dashboard-grid {
-          grid-template-columns: 1.5fr 0.5fr;
-          gap: 14px;
-        }
-
-        .side-column {
-          gap: 14px;
-        }
-
-        .side-card {
-          padding: 14px;
-        }
-
-        .card-head {
-          padding: 16px 18px 14px;
-        }
-
-        .card-head h2 {
-          font-size: 22px;
-        }
-
-        .card-head p {
-          font-size: 9px;
-        }
-
-        .payout-chip {
-          font-size: 8px;
-          padding: 5px 7px;
-        }
-
-        .roulette-body {
-          padding: 16px 18px 18px;
-        }
-
-        .roulette-layout {
-          grid-template-columns: 1.2fr 0.7fr;
-          gap: 14px;
-        }
-
-        .roulette-table-top,
-        .roulette-grid {
-          gap: 3px;
-        }
-
-        .number-button,
-        .zero-button {
-          height: 28px;
-          font-size: 9px;
-        }
-
-        .wheel-visual {
-          width: 58px;
-          height: 58px;
-        }
-
-        .wheel-ring {
-          width: 40px;
-          height: 40px;
-        }
-
-        .wheel-center {
-          width: 18px;
-          height: 18px;
-          font-size: 6px;
-        }
-
-        .roulette-controls {
-          padding: 12px;
-        }
-
-        .stake-input {
-          height: 32px;
-          font-size: 11px;
-        }
-
-        .chip {
-          min-width: 30px;
-          height: 22px;
-          font-size: 8px;
-        }
-
-        .spin-button {
-          min-height: 36px;
-          font-size: 10px;
-        }
-
-        .bet-button {
-          min-height: 26px;
-          font-size: 8px;
-        }
-
-        .cards-body {
-          padding: 16px 18px 18px;
-          gap: 18px;
-        }
-
-        .playing-card {
-          width: 72px;
-          height: 100px;
-          padding: 8px;
-        }
-
-        .card-rank {
-          font-size: 23px;
-        }
-
-        .card-bottom {
-          font-size: 18px;
-        }
-
-        .card-stage {
-          min-height: 135px;
-        }
-
-        .high-button,
-        .low-button {
-          min-height: 34px;
-          font-size: 9px;
-        }
-
-        .garage-grid {
-          gap: 12px;
-        }
-
-        .car-art {
-          height: 140px;
-        }
-
-        .garage-info h3 {
-          font-size: 17px;
-        }
-
-        .garage-info p {
-          font-size: 8px;
-        }
-
-        .garage-info {
-          padding: 14px;
-        }
-
-        .activity-item {
-          gap: 7px;
-        }
-
-        .activity-text {
-          font-size: 9px;
-        }
-
-        .activity-mark {
-          width: 25px;
-          height: 25px;
-          font-size: 8px;
-        }
-
-        .section-heading {
-          padding: 28px 0 18px;
-        }
-
-        .section-heading h1 {
-          font-size: clamp(28px, 3.5vw, 40px);
-        }
-
-        .section-heading p {
-          font-size: 10px;
-        }
-
-        .activity-page {
-          gap: 14px;
-        }
-
-        .full-feed {
-          padding: 18px;
-          min-height: 220px;
-        }
-
-        .rules {
-          padding: 16px;
-        }
-
-        .rules h3 {
-          font-size: 19px;
-        }
+        .sidebar { width: 190px; padding: 22px 12px 16px; }
+        .main { width: calc(100% - 190px); margin-left: 190px; padding: 0 22px 40px; }
+        .nav-button { min-height: 38px; padding: 0 10px; gap: 8px; }
+        .nav-copy { font-size: 11px; }
+        .nav-label { margin: 32px 11px 10px; font-size: 8px; }
+        .brand { gap: 7px; padding: 0 8px; }
+        .brand-name { font-size: 11px; }
+        .brand-sub { margin: 2px 0 0 41px; font-size: 8px; }
+        .sync-card { padding: 11px; }
+        .sync-copy { font-size: 10px; }
+        .sync-note { font-size: 9px; }
+        .topbar { min-height: 64px; }
+        .crumb { font-size: 9px; }
+        .room-status { font-size: 9px; padding: 6px 9px; }
+        .button { min-height: 34px; font-size: 10px; padding: 0 12px; }
+        .welcome-grid { gap: 14px; padding: 28px 0 16px; }
+        .welcome { min-height: 200px; padding: 25px 28px; }
+        h1 { font-size: clamp(30px, 3.8vw, 48px); }
+        .welcome-copy { font-size: 11px; max-width: 400px; }
+        .room-card { min-height: 200px; padding: 18px 20px; }
+        .room-code { font-size: 26px; }
+        .metrics { gap: 10px; margin-bottom: 22px; }
+        .metric { min-height: 78px; padding: 13px 14px; }
+        .metric-value { font-size: 20px; }
+        .metric-value small { font-size: 9px; }
+        .dashboard-grid { grid-template-columns: 1.5fr 0.5fr; gap: 14px; }
+        .side-column { gap: 14px; }
+        .side-card { padding: 14px; }
+        .card-head { padding: 16px 18px 14px; }
+        .card-head h2 { font-size: 22px; }
+        .card-head p { font-size: 9px; }
+        .payout-chip { font-size: 8px; padding: 5px 7px; }
+        .roulette-body { padding: 16px 18px 18px; }
+        .roulette-layout { grid-template-columns: 1.2fr 0.7fr; gap: 14px; }
+        .roulette-table-top, .roulette-grid { gap: 3px; }
+        .number-button, .zero-button { height: 28px; font-size: 9px; }
+        .wheel-visual { width: 58px; height: 58px; }
+        .wheel-ring { width: 40px; height: 40px; }
+        .wheel-center { width: 18px; height: 18px; font-size: 6px; }
+        .roulette-controls { padding: 12px; }
+        .stake-input { height: 32px; font-size: 11px; }
+        .chip { min-width: 30px; height: 22px; font-size: 8px; }
+        .spin-button { min-height: 36px; font-size: 10px; }
+        .bet-button { min-height: 26px; font-size: 8px; }
+        .cards-body { padding: 16px 18px 18px; gap: 18px; }
+        .playing-card { width: 72px; height: 100px; padding: 8px; }
+        .card-rank { font-size: 23px; }
+        .card-bottom { font-size: 18px; }
+        .card-stage { min-height: 135px; }
+        .high-button, .low-button { min-height: 34px; font-size: 9px; }
+        .garage-grid { gap: 12px; }
+        .car-art { height: 140px; }
+        .garage-info h3 { font-size: 17px; }
+        .garage-info p { font-size: 8px; }
+        .garage-info { padding: 14px; }
+        .activity-item { gap: 7px; }
+        .activity-text { font-size: 9px; }
+        .activity-mark { width: 25px; height: 25px; font-size: 8px; }
+        .section-heading { padding: 28px 0 18px; }
+        .section-heading h1 { font-size: clamp(28px, 3.5vw, 40px); }
+        .section-heading p { font-size: 10px; }
+        .activity-page { gap: 14px; }
+        .full-feed { padding: 18px; min-height: 220px; }
+        .rules { padding: 16px; }
+        .rules h3 { font-size: 19px; }
+        .slot-reel { width: 60px; height: 76px; font-size: 36px; }
+        .slot-reel-symbol { height: 76px; font-size: 36px; }
+        .war-card { width: 62px; height: 86px; font-size: 28px; }
+        .war-grid { gap: 16px; }
       }
 
-      /* للشاشات الكبيرة (لاب توب عريض) */
       @media (min-width: 1367px) and (max-width: 1920px) {
-        .sidebar {
-          width: 220px;
-        }
-
-        .main {
-          width: calc(100% - 220px);
-          margin-left: 220px;
-          padding: 0 35px 50px;
-        }
-
-        .dashboard-grid {
-          grid-template-columns: 1.6fr 0.6fr;
-        }
-
-        .roulette-layout {
-          grid-template-columns: 1.3fr 0.6fr;
-        }
-
-        .number-button,
-        .zero-button {
-          height: 32px;
-          font-size: 10px;
-        }
-
-        .roulette-table-top,
-        .roulette-grid {
-          gap: 4px;
-        }
+        .sidebar { width: 220px; }
+        .main { width: calc(100% - 220px); margin-left: 220px; padding: 0 35px 50px; }
+        .dashboard-grid { grid-template-columns: 1.6fr 0.6fr; }
+        .roulette-layout { grid-template-columns: 1.3fr 0.6fr; }
+        .number-button, .zero-button { height: 32px; font-size: 10px; }
+        .roulette-table-top, .roulette-grid { gap: 4px; }
       }
 
-      /* للشاشات الصغيرة جداً (مثل 1024x600) */
       @media (max-width: 1024px) and (min-width: 769px) {
-        .sidebar {
-          width: 170px;
-          padding: 18px 10px 14px;
-        }
-
-        .main {
-          width: calc(100% - 170px);
-          margin-left: 170px;
-          padding: 0 16px 30px;
-        }
-
-        .nav-button {
-          min-height: 34px;
-          padding: 0 8px;
-          gap: 6px;
-        }
-
-        .nav-copy {
-          font-size: 10px;
-        }
-
-        .nav-label {
-          margin: 24px 8px 8px;
-          font-size: 7px;
-        }
-
-        .brand-name {
-          font-size: 10px;
-        }
-
-        .brand-sub {
-          margin: 2px 0 0 36px;
-          font-size: 7px;
-        }
-
-        .brand-mark {
-          width: 22px;
-          height: 22px;
-        }
-
-        .brand-mark::before {
-          width: 7px;
-          height: 7px;
-        }
-
-        .topbar {
-          min-height: 56px;
-        }
-
-        .welcome-grid {
-          grid-template-columns: 1fr;
-          gap: 12px;
-          padding: 20px 0 12px;
-        }
-
-        .welcome {
-          min-height: 180px;
-          padding: 20px 22px;
-        }
-
-        .welcome::after,
-        .welcome::before {
-          display: none;
-        }
-
-        h1 {
-          font-size: clamp(28px, 4.5vw, 38px);
-        }
-
-        .room-card {
-          min-height: 170px;
-          padding: 16px 18px;
-        }
-
-        .room-code {
-          font-size: 22px;
-        }
-
-        .metrics {
-          grid-template-columns: repeat(3, 1fr);
-          gap: 8px;
-        }
-
-        .metric {
-          min-height: 70px;
-          padding: 10px 12px;
-        }
-
-        .metric-value {
-          font-size: 17px;
-        }
-
-        .metric-top {
-          font-size: 8px;
-        }
-
-        .metric-icon {
-          display: none;
-        }
-
-        .dashboard-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .side-column {
-          grid-template-columns: 1fr 1fr;
-        }
-
-        .roulette-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .roulette-table-top,
-        .roulette-grid {
-          gap: 3px;
-        }
-
-        .number-button,
-        .zero-button {
-          height: 26px;
-          font-size: 8px;
-        }
-
-        .cards-body {
-          grid-template-columns: 1fr;
-          gap: 14px;
-        }
-
-        .card-stage {
-          min-height: 130px;
-        }
-
-        .garage-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .activity-page {
-          grid-template-columns: 1fr;
-        }
-
-        .section-heading {
-          display: block;
-          padding: 22px 0 16px;
-        }
-
-        .section-heading h1 {
-          margin-bottom: 8px;
-        }
+        .sidebar { width: 170px; padding: 18px 10px 14px; }
+        .main { width: calc(100% - 170px); margin-left: 170px; padding: 0 16px 30px; }
+        .nav-button { min-height: 34px; padding: 0 8px; gap: 6px; }
+        .nav-copy { font-size: 10px; }
+        .nav-label { margin: 24px 8px 8px; font-size: 7px; }
+        .brand-name { font-size: 10px; }
+        .brand-sub { margin: 2px 0 0 36px; font-size: 7px; }
+        .brand-mark { width: 22px; height: 22px; }
+        .brand-mark::before { width: 7px; height: 7px; }
+        .topbar { min-height: 56px; }
+        .welcome-grid { grid-template-columns: 1fr; gap: 12px; padding: 20px 0 12px; }
+        .welcome { min-height: 180px; padding: 20px 22px; }
+        .welcome::after, .welcome::before { display: none; }
+        h1 { font-size: clamp(28px, 4.5vw, 38px); }
+        .room-card { min-height: 170px; padding: 16px 18px; }
+        .room-code { font-size: 22px; }
+        .metrics { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .metric { min-height: 70px; padding: 10px 12px; }
+        .metric-value { font-size: 17px; }
+        .metric-top { font-size: 8px; }
+        .metric-icon { display: none; }
+        .dashboard-grid { grid-template-columns: 1fr; }
+        .side-column { grid-template-columns: 1fr 1fr; }
+        .roulette-layout { grid-template-columns: 1fr; }
+        .roulette-table-top, .roulette-grid { gap: 3px; }
+        .number-button, .zero-button { height: 26px; font-size: 8px; }
+        .cards-body { grid-template-columns: 1fr; gap: 14px; }
+        .card-stage { min-height: 130px; }
+        .garage-grid { grid-template-columns: repeat(2, 1fr); }
+        .activity-page { grid-template-columns: 1fr; }
+        .section-heading { display: block; padding: 22px 0 16px; }
+        .section-heading h1 { margin-bottom: 8px; }
+        .war-grid { grid-template-columns: 1fr; }
+        .slot-reel { width: 54px; height: 68px; font-size: 32px; }
+        .slot-reel-symbol { height: 68px; font-size: 32px; }
+        .slot-reels { padding: 14px 18px; gap: 10px; }
+        .war-card { width: 56px; height: 78px; font-size: 24px; }
       }
-
-      /* ============================================ */
-      /* الموبايل (نفسه ما تغير) */
-      /* ============================================ */
 
       @media (max-width: 760px) {
-        .sidebar {
-          display: none;
-        }
-
-        .main {
-          width: 100%;
-          margin: 0;
-          padding: 0 16px 89px;
-        }
-
-        .topbar {
-          min-height: 66px;
-        }
-
-        .crumb {
-          font-size: 9px;
-        }
-
-        .top-actions {
-          gap: 7px;
-        }
-
-        .room-status {
-          padding: 7px 8px;
-          font-size: 8px;
-        }
-
-        .room-status b {
-          display: none;
-        }
-
-        .top-actions .button {
-          width: 34px;
-          min-height: 34px;
-          padding: 0;
-          font-size: 0;
-        }
-
-        .top-actions .button svg {
-          width: 15px;
-          height: 15px;
-        }
-
-        .welcome-grid {
-          padding-top: 22px;
-          gap: 12px;
-        }
-
-        .welcome {
-          min-height: 260px;
-          padding: 25px 22px;
-        }
-
-        h1 {
-          max-width: 330px;
-          font-size: 43px;
-        }
-
-        .welcome-copy {
-          max-width: 300px;
-          font-size: 11px;
-        }
-
-        .room-card {
-          min-height: 188px;
-          padding: 19px;
-        }
-
-        .room-code {
-          font-size: 26px;
-        }
-
-        .metrics {
-          gap: 7px;
-        }
-
-        .metric {
-          min-height: 83px;
-          padding: 12px 11px;
-        }
-
-        .metric-top {
-          font-size: 8px;
-        }
-
-        .metric-icon {
-          display: none;
-        }
-
-        .metric-value {
-          margin-top: 12px;
-          font-size: 17px;
-        }
-
-        .metric-value small {
-          display: block;
-          margin-top: 3px;
-          font-size: 8px;
-        }
-
-        .card-head {
-          padding: 17px 16px 15px;
-        }
-
-        .card-head h2 {
-          font-size: 23px;
-        }
-
-        .card-head p {
-          display: none;
-        }
-
-        .payout-chip {
-          padding: 6px;
-          font-size: 8px;
-        }
-
-        .roulette-body {
-          padding: 15px 14px 16px;
-        }
-
-        .roulette-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .roulette-table-top,
-        .roulette-grid {
-          gap: 3px;
-        }
-
-        .number-button,
-        .zero-button {
-          height: 27px;
-          font-size: 8px;
-        }
-
-        .zero-button {
-          height: auto;
-        }
-
-        .cards-body {
-          grid-template-columns: 1fr;
-          gap: 15px;
-          padding: 15px 14px 16px;
-        }
-
-        .card-stage {
-          min-height: 137px;
-        }
-
-        .side-column {
-          grid-template-columns: 1fr;
-        }
-
-        .section-heading {
-          display: block;
-          padding: 28px 0 19px;
-        }
-
-        .section-heading h1 {
-          margin-bottom: 9px;
-        }
-
-        .garage-grid,
-        .activity-page {
-          grid-template-columns: 1fr;
-        }
-
-        .garage-grid {
-          gap: 12px;
-        }
-
-        .car-art {
-          height: 145px;
-        }
-
+        .sidebar { display: none; }
+        .main { width: 100%; margin: 0; padding: 0 16px 89px; }
+        .topbar { min-height: 66px; }
+        .crumb { font-size: 9px; }
+        .top-actions { gap: 7px; }
+        .room-status { padding: 7px 8px; font-size: 8px; }
+        .room-status b { display: none; }
+        .top-actions .button { width: 34px; min-height: 34px; padding: 0; font-size: 0; }
+        .top-actions .button svg { width: 15px; height: 15px; }
+        .welcome-grid { padding-top: 22px; gap: 12px; }
+        .welcome { min-height: 260px; padding: 25px 22px; }
+        h1 { max-width: 330px; font-size: 43px; }
+        .welcome-copy { max-width: 300px; font-size: 11px; }
+        .room-card { min-height: 188px; padding: 19px; }
+        .room-code { font-size: 26px; }
+        .metrics { gap: 7px; }
+        .metric { min-height: 83px; padding: 12px 11px; }
+        .metric-top { font-size: 8px; }
+        .metric-icon { display: none; }
+        .metric-value { margin-top: 12px; font-size: 17px; }
+        .metric-value small { display: block; margin-top: 3px; font-size: 8px; }
+        .card-head { padding: 17px 16px 15px; }
+        .card-head h2 { font-size: 23px; }
+        .card-head p { display: none; }
+        .payout-chip { padding: 6px; font-size: 8px; }
+        .roulette-body { padding: 15px 14px 16px; }
+        .roulette-layout { grid-template-columns: 1fr; }
+        .roulette-table-top, .roulette-grid { gap: 3px; }
+        .number-button, .zero-button { height: 27px; font-size: 8px; }
+        .zero-button { height: auto; }
+        .cards-body { grid-template-columns: 1fr; gap: 15px; padding: 15px 14px 16px; }
+        .card-stage { min-height: 137px; }
+        .side-column { grid-template-columns: 1fr; }
+        .section-heading { display: block; padding: 28px 0 19px; }
+        .section-heading h1 { margin-bottom: 9px; }
+        .garage-grid, .activity-page { grid-template-columns: 1fr; }
+        .garage-grid { gap: 12px; }
+        .car-art { height: 145px; }
         .mobile-nav {
           position: fixed;
           right: 12px;
@@ -2455,7 +2187,6 @@
           box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
           backdrop-filter: blur(18px);
         }
-
         .mobile-nav button {
           display: grid;
           place-items: center;
@@ -2467,12 +2198,10 @@
           color: #777b75;
           font-size: 8px;
         }
-
         .mobile-nav button.active {
           color: var(--gold-light);
           background: rgba(215, 173, 98, 0.11);
         }
-
         .mobile-nav svg {
           width: 16px;
           height: 16px;
@@ -2482,254 +2211,139 @@
           stroke-linecap: round;
           stroke-linejoin: round;
         }
-
         .toast {
           right: 15px;
           bottom: 78px;
           left: 15px;
           max-width: none;
         }
+        .game-tabs { gap: 4px; }
+        .game-tab-btn { font-size: 9px; padding: 6px 12px; }
+        .slot-reel { width: 48px; height: 60px; font-size: 26px; }
+        .slot-reel-symbol { height: 60px; font-size: 26px; }
+        .slot-reels { padding: 12px 14px; gap: 8px; }
+        .war-grid { grid-template-columns: 1fr; gap: 14px; }
+        .war-card { width: 56px; height: 78px; font-size: 24px; }
+        .slot-controls-row, .war-controls-row { flex-direction: column; }
+        .slot-controls-row .stake-input, .war-controls-row .stake-input { width: 100%; }
       }
     </style>
   </head>
 
   <body>
     <div class="shell">
+      <!-- ===== SIDEBAR ===== -->
       <aside class="sidebar" aria-label="Primary navigation">
         <div>
           <div class="brand" aria-label="Velvet Room">
             <span class="brand-mark" aria-hidden="true"></span>
             <span class="brand-name">Velvet Room</span>
           </div>
-
           <span class="brand-sub">Private casino simulator</span>
-
           <div class="nav-label">The house</div>
-
           <nav class="nav">
             <button class="nav-button active" data-view="lounge" type="button">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="m4 11 8-7 8 7" />
-                  <path d="M6.5 10.5V20h11v-9.5" />
-                  <path d="M10 20v-5h4v5" />
-                </svg>
-              </span>
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m4 11 8-7 8 7" /><path d="M6.5 10.5V20h11v-9.5" /><path d="M10 20v-5h4v5" /></svg></span>
               <span class="nav-copy">The lounge</span>
             </button>
-
             <button class="nav-button" data-view="roulette" type="button">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="8.5" />
-                  <circle cx="12" cy="12" r="2" />
-                  <path d="m12 3.5 2 6.5m6.5 2-6.5 2m-2 6.5-2-6.5m-6.5-2 6.5-2" />
-                </svg>
-              </span>
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="2" /><path d="m12 3.5 2 6.5m6.5 2-6.5 2m-2 6.5-2-6.5m-6.5-2 6.5-2" /></svg></span>
               <span class="nav-copy">Roulette</span>
             </button>
-
             <button class="nav-button" data-view="highlow" type="button">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24">
-                  <rect x="5" y="4" width="11" height="15" rx="1.5" />
-                  <path d="M8 7h5M8 10h3" />
-                  <path d="m16 8 3 3-3 3M19 11h-5" />
-                </svg>
-              </span>
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="11" height="15" rx="1.5" /><path d="M8 7h5M8 10h3" /><path d="m16 8 3 3-3 3M19 11h-5" /></svg></span>
               <span class="nav-copy">High / low</span>
             </button>
-
+            <button class="nav-button" data-view="slots" type="button">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h4" /><circle cx="17" cy="8" r="1" /><circle cx="17" cy="12" r="1" /></svg></span>
+              <span class="nav-copy">Slots</span>
+            </button>
+            <button class="nav-button" data-view="war" type="button">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="6" height="12" rx="1" /><rect x="14" y="6" width="6" height="12" rx="1" /><path d="M7 9h0M17 9h0M7 15h0M17 15h0" /></svg></span>
+              <span class="nav-copy">War</span>
+            </button>
             <button class="nav-button" data-view="garage" type="button">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="m4 14 1.5-5h13l1.5 5v5H4z" />
-                  <path d="m7 9 1.5-3h7L17 9M7 17h.01M17 17h.01" />
-                  <path d="M3 14h18" />
-                </svg>
-              </span>
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m4 14 1.5-5h13l1.5 5v5H4z" /><path d="m7 9 1.5-3h7L17 9M7 17h.01M17 17h.01" /><path d="M3 14h18" /></svg></span>
               <span class="nav-copy">Garage</span>
             </button>
-
             <button class="nav-button" data-view="activity" type="button">
-              <span class="nav-icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M5 19V9M12 19V5M19 19v-7" />
-                  <path d="M3 19h18" />
-                </svg>
-              </span>
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-7" /><path d="M3 19h18" /></svg></span>
               <span class="nav-copy">Activity</span>
             </button>
           </nav>
         </div>
-
         <div class="sidebar-bottom">
           <div class="sync-card">
-            <div class="sync-head">
-              <span>Room connection</span>
-              <i id="sidebar-dot" class="sync-dot"></i>
-            </div>
-
-            <p id="sidebar-sync-copy" class="sync-copy">
-              Local demo is ready.
-            </p>
-
-            <p class="sync-note">
-              PeerJS keeps the host in control of every table result.
-            </p>
+            <div class="sync-head"><span>Room connection</span><i id="sidebar-dot" class="sync-dot"></i></div>
+            <p id="sidebar-sync-copy" class="sync-copy">Local demo is ready.</p>
+            <p class="sync-note">PeerJS keeps the host in control of every table result.</p>
           </div>
         </div>
       </aside>
 
+      <!-- ===== MAIN ===== -->
       <main class="main">
         <header class="topbar">
-          <div class="crumb">
-            <strong>Velvet Room</strong>
-            <span> / </span>
-            <span id="crumb-current">The lounge</span>
-          </div>
-
+          <div class="crumb"><strong>Velvet Room</strong><span> / </span><span id="crumb-current">The lounge</span></div>
           <div class="top-actions">
             <div class="room-status" aria-live="polite">
               <i id="status-dot" class="status-dot"></i>
               <b id="connection-state">Local demo</b>
               <span id="player-count">1 guest</span>
             </div>
-
             <button id="room-action" class="button button-gold" type="button">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
               <span>Room</span>
             </button>
           </div>
         </header>
 
+        <!-- ===== LOUNGE VIEW ===== -->
         <section id="view-lounge" class="view active" aria-label="Lounge">
           <div class="welcome-grid">
             <article class="welcome">
               <p class="eyebrow">Private table · Season 01</p>
-
-              <h1>
-                The night is <em>yours.</em>
-              </h1>
-
-              <p class="welcome-copy">
-                A private room for good friends, bad decisions, and the kind of luck that gets talked about tomorrow. Your table starts with virtual cash.
-              </p>
-
+              <h1>The night is <em>yours.</em></h1>
+              <p class="welcome-copy">A private room for good friends, bad decisions, and the kind of luck that gets talked about tomorrow. Your table starts with virtual cash.</p>
               <div class="welcome-footer">
-                <button class="button button-quiet" data-open-game="roulette" type="button">
-                  Take a seat
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 12h13M13 6l6 6-6 6" />
-                  </svg>
-                </button>
-
-                <span class="micro-copy">
-                  No real money · just bragging rights
-                </span>
+                <button class="button button-quiet" data-open-game="roulette" type="button">Take a seat<svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" /></svg></button>
+                <span class="micro-copy">No real money · just bragging rights</span>
               </div>
             </article>
-
             <article class="room-card">
-              <div class="room-card-top">
-                <span class="room-card-title">Tonight's room</span>
-
-                <span class="live-badge">
-                  <i></i>
-                  <span id="room-mode-label">Local / demo</span>
-                </span>
-              </div>
-
+              <div class="room-card-top"><span class="room-card-title">Tonight's room</span><span class="live-badge"><i></i><span id="room-mode-label">Local / demo</span></span></div>
               <div class="room-code-wrap">
                 <div class="room-code-label">Room code</div>
                 <div id="room-code" class="room-code">DEMO-7A</div>
-
-                <button id="copy-room" class="copy-button" type="button">
-                  <svg viewBox="0 0 24 24">
-                    <rect x="8" y="8" width="11" height="11" rx="1.5" />
-                    <path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8" />
-                  </svg>
-                  Copy invite code
-                </button>
+                <button id="copy-room" class="copy-button" type="button"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="1.5" /><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8" /></svg>Copy invite code</button>
               </div>
-
-              <div class="room-card-bottom">
-                <span>Host status</span>
-                <strong id="host-status">You are hosting</strong>
-              </div>
+              <div class="room-card-bottom"><span>Host status</span><strong id="host-status">You are hosting</strong></div>
             </article>
           </div>
 
           <div class="metrics">
             <article class="metric">
-              <div class="metric-top">
-                <span>Your balance</span>
-                <span class="metric-icon">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="8.5" />
-                    <path d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.5 0-2.5.7-2.5 1.7 0 2.8 5.3 1.2 5.3 4 0 1.1-1.1 2-2.8 2-1.3 0-2.4-.5-2.9-1.4" />
-                    <path d="M12 6v12" />
-                  </svg>
-                </span>
-              </div>
-
-              <div id="metric-balance" class="metric-value">
-                $1,000
-                <small>virtual cash</small>
-              </div>
+              <div class="metric-top"><span>Your balance</span><span class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.5 0-2.5.7-2.5 1.7 0 2.8 5.3 1.2 5.3 4 0 1.1-1.1 2-2.8 2-1.3 0-2.4-.5-2.9-1.4" /><path d="M12 6v12" /></svg></span></div>
+              <div id="metric-balance" class="metric-value">$1,000 <small>virtual cash</small></div>
             </article>
-
             <article class="metric">
-              <div class="metric-top">
-                <span>Tables played</span>
-                <span class="metric-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 18h16M6 18V9h12v9M9 9V6h6v3M8 13h8" />
-                  </svg>
-                </span>
-              </div>
-
-              <div id="metric-played" class="metric-value">
-                0
-                <small>this session</small>
-              </div>
+              <div class="metric-top"><span>Tables played</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9h12v9M9 9V6h6v3M8 13h8" /></svg></span></div>
+              <div id="metric-played" class="metric-value">0 <small>this session</small></div>
             </article>
-
             <article class="metric">
-              <div class="metric-top">
-                <span>Garage value</span>
-                <span class="metric-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 14 6 8h12l2 6v5H4z" />
-                    <path d="m8 8 1-3h6l1 3M7 16h.01M17 16h.01" />
-                  </svg>
-                </span>
-              </div>
-
-              <div id="metric-garage" class="metric-value">
-                $0
-                <small>collected</small>
-              </div>
+              <div class="metric-top"><span>Garage value</span><span class="metric-icon"><svg viewBox="0 0 24 24"><path d="M4 14 6 8h12l2 6v5H4z" /><path d="m8 8 1-3h6l1 3M7 16h.01M17 16h.01" /></svg></span></div>
+              <div id="metric-garage" class="metric-value">$0 <small>collected</small></div>
             </article>
           </div>
 
           <div class="dashboard-grid">
             <div class="game-stack">
+              <!-- ROULETTE -->
               <section id="roulette-section" class="game-card">
                 <div class="card-head">
-                  <div>
-                    <p class="card-kicker">Table 01 · Live</p>
-                    <h2>Roulette</h2>
-                    <p>Pick your side of the wheel. The house is listening.</p>
-                  </div>
-
-                  <span class="payout-chip">
-                    0 = $7,000 grand prize
-                  </span>
+                  <div><p class="card-kicker">Table 01 · Live</p><h2>Roulette</h2><p>Pick your side of the wheel. The house is listening.</p></div>
+                  <span class="payout-chip">0 = $7,000 grand prize</span>
                 </div>
-
                 <div class="roulette-body">
                   <div class="roulette-layout">
                     <div class="roulette-table">
@@ -2737,140 +2351,60 @@
                         <div id="wheel-ring" class="wheel-ring"></div>
                         <div class="wheel-center">VR</div>
                       </div>
-
                       <div class="roulette-table-top">
                         <button class="zero-button" data-number="0" type="button" aria-label="Bet on zero">0</button>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span><span></span>
                       </div>
-
                       <div id="roulette-grid" class="roulette-grid" aria-label="Roulette number board"></div>
-
                       <div class="roulette-quick-bets">
                         <button class="bet-button red-bet" data-bet="red" type="button">Red</button>
                         <button class="bet-button black-bet" data-bet="black" type="button">Black</button>
                         <button class="bet-button" data-bet="even" type="button">Even</button>
                         <button class="bet-button" data-bet="odd" type="button">Odd</button>
                       </div>
-
-                      <div class="roulette-history">
-                        <span>Recent</span>
-                        <div id="roulette-history" style="display: flex; gap: 4px"></div>
-                      </div>
+                      <div class="roulette-history"><span>Recent</span><div id="roulette-history" style="display:flex;gap:4px"></div></div>
                     </div>
-
                     <div class="roulette-controls">
-                      <label class="control-label" for="roulette-stake">
-                        Your stake
-                      </label>
-
-                      <div class="stake-row">
-                        <input
-                          id="roulette-stake"
-                          class="stake-input"
-                          type="number"
-                          min="1"
-                          max="1000"
-                          step="1"
-                          value="50"
-                          aria-label="Roulette stake in virtual dollars"
-                        />
-                      </div>
-
+                      <label class="control-label" for="roulette-stake">Your stake</label>
+                      <div class="stake-row"><input id="roulette-stake" class="stake-input" type="number" min="1" max="1000" step="1" value="50" aria-label="Roulette stake in virtual dollars" /></div>
                       <div class="chip-row">
                         <button class="chip" data-stake="25" type="button">$25</button>
                         <button class="chip" data-stake="50" type="button">$50</button>
                         <button class="chip" data-stake="100" type="button">$100</button>
                         <button class="chip" data-stake="250" type="button">$250</button>
                       </div>
-
-                      <div class="selected-bet">
-                        <span>Selected bet</span>
-                        <strong id="selected-bet-label">Red</strong>
-                      </div>
-
-                      <button id="spin-button" class="button button-gold button-block spin-button" type="button">
-                        Spin the wheel
-                      </button>
-
-                      <div class="recent-result">
-                        <span>Last result</span>
-                        <span id="roulette-result">
-                          <span class="result-number black">—</span>
-                        </span>
-                      </div>
+                      <div class="selected-bet"><span>Selected bet</span><strong id="selected-bet-label">Red</strong></div>
+                      <button id="spin-button" class="button button-gold button-block spin-button" type="button">Spin the wheel</button>
+                      <div class="recent-result"><span>Last result</span><span id="roulette-result"><span class="result-number black">—</span></span></div>
                     </div>
                   </div>
                 </div>
               </section>
 
+              <!-- HIGH/LOW -->
               <section id="highlow-section" class="game-card">
                 <div class="card-head">
-                  <div>
-                    <p class="card-kicker">Table 02 · Quick play</p>
-                    <h2>High / low</h2>
-                    <p>Read the room. Call whether the next card runs high or low.</p>
-                  </div>
-
+                  <div><p class="card-kicker">Table 02 · Quick play</p><h2>High / low</h2><p>Read the room. Call whether the next card runs high or low.</p></div>
                   <span class="payout-chip">1.92× correct call</span>
                 </div>
-
                 <div class="cards-body">
                   <div id="card-stage" class="card-stage">
                     <div id="playing-card" class="playing-card">
                       <span id="card-rank" class="card-rank">8</span>
-                      <span id="card-suit" class="card-center-suit">
-                        <i class="suit-shape diamond"></i>
-                      </span>
+                      <span id="card-suit" class="card-center-suit"><i class="suit-shape diamond"></i></span>
                       <span id="card-bottom" class="card-bottom">8</span>
                     </div>
                   </div>
-
                   <div>
-                    <p class="cards-copy">
-                      The next card is dealt by the host. Ties return your stake. Minimum call is $1.
-                    </p>
-
-                    <label class="control-label" for="card-stake">
-                      Your stake
-                    </label>
-
-                    <div class="stake-row">
-                      <input
-                        id="card-stake"
-                        class="stake-input"
-                        type="number"
-                        min="1"
-                        max="1000"
-                        step="1"
-                        value="50"
-                        aria-label="High or low stake in virtual dollars"
-                      />
-                    </div>
-
+                    <p class="cards-copy">The next card is dealt by the host. Ties return your stake. Minimum call is $1.</p>
+                    <label class="control-label" for="card-stake">Your stake</label>
+                    <div class="stake-row"><input id="card-stake" class="stake-input" type="number" min="1" max="1000" step="1" value="50" aria-label="High or low stake in virtual dollars" /></div>
                     <div class="highlow-actions">
-                      <button id="high-button" class="high-button" type="button">
-                        Call high
-                      </button>
-                      <button id="low-button" class="low-button" type="button">
-                        Call low
-                      </button>
+                      <button id="high-button" class="high-button" type="button">Call high</button>
+                      <button id="low-button" class="low-button" type="button">Call low</button>
                     </div>
-
-                    <div class="recent-result">
-                      <span>Last call</span>
-                      <span id="card-result">Make your call</span>
-                    </div>
+                    <div class="recent-result"><span>Last call</span><span id="card-result">Make your call</span></div>
                   </div>
                 </div>
               </section>
@@ -2878,67 +2412,190 @@
 
             <aside class="side-column">
               <section class="side-card">
-                <div class="side-title">
-                  <h3>Room activity</h3>
-                  <span id="activity-count">0 events</span>
-                </div>
-
+                <div class="side-title"><h3>Room activity</h3><span id="activity-count">0 events</span></div>
                 <div id="activity-list" class="activity-list"></div>
-
-                <button class="button button-quiet button-block" data-view="activity" type="button">
-                  Open activity log
-                </button>
+                <button class="button button-quiet button-block" data-view="activity" type="button">Open activity log</button>
               </section>
-
               <section class="side-card">
-                <div class="side-title">
-                  <h3>At the table</h3>
-                  <span id="roster-count">1 seat</span>
-                </div>
-
+                <div class="side-title"><h3>At the table</h3><span id="roster-count">1 seat</span></div>
                 <div id="roster-list" class="roster-list"></div>
               </section>
             </aside>
           </div>
         </section>
 
+        <!-- ===== ROULETTE VIEW (full page) ===== -->
+        <section id="view-roulette" class="view" aria-label="Roulette full">
+          <div class="section-heading">
+            <div><p class="eyebrow">Table 01</p><h1>Roulette <em>table.</em></h1></div>
+            <p>Pick your side. The house is listening. 0 = Grand Prize.</p>
+          </div>
+          <div class="game-card">
+            <div class="card-head">
+              <div><p class="card-kicker">Live</p><h2>Roulette</h2></div>
+              <span class="payout-chip">0 = $7,000</span>
+            </div>
+            <div class="roulette-body">
+              <div class="roulette-layout">
+                <div class="roulette-table">
+                  <div class="wheel-visual" aria-hidden="true">
+                    <div id="wheel-ring-full" class="wheel-ring"></div>
+                    <div class="wheel-center">VR</div>
+                  </div>
+                  <div class="roulette-table-top">
+                    <button class="zero-button" data-number="0" type="button">0</button>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <div id="roulette-grid-full" class="roulette-grid"></div>
+                  <div class="roulette-quick-bets">
+                    <button class="bet-button red-bet" data-bet="red" type="button">Red</button>
+                    <button class="bet-button black-bet" data-bet="black" type="button">Black</button>
+                    <button class="bet-button" data-bet="even" type="button">Even</button>
+                    <button class="bet-button" data-bet="odd" type="button">Odd</button>
+                  </div>
+                  <div class="roulette-history"><span>Recent</span><div id="roulette-history-full" style="display:flex;gap:4px"></div></div>
+                </div>
+                <div class="roulette-controls">
+                  <label class="control-label" for="roulette-stake-full">Your stake</label>
+                  <div class="stake-row"><input id="roulette-stake-full" class="stake-input" type="number" min="1" max="1000" step="1" value="50" /></div>
+                  <div class="chip-row">
+                    <button class="chip" data-stake="25" type="button">$25</button>
+                    <button class="chip" data-stake="50" type="button">$50</button>
+                    <button class="chip" data-stake="100" type="button">$100</button>
+                    <button class="chip" data-stake="250" type="button">$250</button>
+                  </div>
+                  <div class="selected-bet"><span>Selected bet</span><strong id="selected-bet-label-full">Red</strong></div>
+                  <button id="spin-button-full" class="button button-gold button-block spin-button" type="button">Spin the wheel</button>
+                  <div class="recent-result"><span>Last result</span><span id="roulette-result-full"><span class="result-number black">—</span></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== HIGH/LOW VIEW (full page) ===== -->
+        <section id="view-highlow" class="view" aria-label="High/Low full">
+          <div class="section-heading">
+            <div><p class="eyebrow">Table 02</p><h1>High / <em>low.</em></h1></div>
+            <p>Read the room. Call whether the next card runs high or low.</p>
+          </div>
+          <div class="game-card">
+            <div class="card-head">
+              <div><p class="card-kicker">Quick play</p><h2>High / Low</h2></div>
+              <span class="payout-chip">1.92× correct call</span>
+            </div>
+            <div class="cards-body">
+              <div id="card-stage-full" class="card-stage">
+                <div id="playing-card-full" class="playing-card">
+                  <span id="card-rank-full" class="card-rank">8</span>
+                  <span id="card-suit-full" class="card-center-suit"><i class="suit-shape diamond"></i></span>
+                  <span id="card-bottom-full" class="card-bottom">8</span>
+                </div>
+              </div>
+              <div>
+                <p class="cards-copy">The next card is dealt by the host. Ties return your stake.</p>
+                <label class="control-label" for="card-stake-full">Your stake</label>
+                <div class="stake-row"><input id="card-stake-full" class="stake-input" type="number" min="1" max="1000" step="1" value="50" /></div>
+                <div class="highlow-actions">
+                  <button id="high-button-full" class="high-button" type="button">Call high</button>
+                  <button id="low-button-full" class="low-button" type="button">Call low</button>
+                </div>
+                <div class="recent-result"><span>Last call</span><span id="card-result-full">Make your call</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SLOTS VIEW ===== -->
+        <section id="view-slots" class="view" aria-label="Slots">
+          <div class="section-heading">
+            <div><p class="eyebrow">Machine 01</p><h1>Slot <em>machine.</em></h1></div>
+            <p>Match 3 symbols to win big! Jackpot awaits.</p>
+          </div>
+          <div class="game-card">
+            <div class="card-head">
+              <div><p class="card-kicker">🎰</p><h2>Slots</h2></div>
+              <span class="payout-chip">🎰🎰🎰 = ×100</span>
+            </div>
+            <div style="padding:22px;">
+              <div class="slot-reels" id="slotReels">
+                <div class="slot-reel" id="slotReel1"><div class="slot-reel-inner" id="slotInner1"></div></div>
+                <div class="slot-reel" id="slotReel2"><div class="slot-reel-inner" id="slotInner2"></div></div>
+                <div class="slot-reel" id="slotReel3"><div class="slot-reel-inner" id="slotInner3"></div></div>
+              </div>
+              <div class="slot-info-row">
+                <span>🎯 Last: <strong id="slotLast">-</strong></span>
+                <span>🏆 Jackpot: <strong id="slotJackpot">$0</strong></span>
+                <span>🎰 Spins: <strong id="slotSpins">0</strong></span>
+              </div>
+              <div class="slot-controls-row">
+                <input class="stake-input" id="slotStake" type="number" min="1" max="1000" value="10" />
+                <button class="button button-gold" id="slotSpinBtn">🎰 SPIN</button>
+                <button class="button button-quiet" id="slotAutoBtn">⟳ AUTO</button>
+              </div>
+              <div id="slotMessage" style="color:var(--muted);font-size:12px;min-height:20px;text-align:center;margin-top:10px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== WAR VIEW ===== -->
+        <section id="view-war" class="view" aria-label="War">
+          <div class="section-heading">
+            <div><p class="eyebrow">Table 03</p><h1>War <em>cards.</em></h1></div>
+            <p>Highest card wins! Draw a tie and go to war.</p>
+          </div>
+          <div class="game-card">
+            <div class="card-head">
+              <div><p class="card-kicker">🃏</p><h2>War</h2></div>
+              <span class="payout-chip">Winner ×2</span>
+            </div>
+            <div style="padding:22px;">
+              <div class="war-grid">
+                <div class="war-player-box">
+                  <div class="label">👤 <strong id="warPlayerName">You</strong></div>
+                  <div class="war-card-display">
+                    <div class="war-card hidden" id="warPlayerCard">?</div>
+                  </div>
+                  <div class="war-result-text" id="warPlayerResult">Waiting...</div>
+                </div>
+                <div class="war-player-box">
+                  <div class="label">🤖 <strong id="warOpponentName">Host</strong></div>
+                  <div class="war-card-display">
+                    <div class="war-card hidden" id="warOpponentCard">?</div>
+                  </div>
+                  <div class="war-result-text" id="warOpponentResult">Waiting...</div>
+                </div>
+              </div>
+              <div class="war-controls-row">
+                <input class="stake-input" id="warStake" type="number" min="1" max="1000" value="25" />
+                <button class="button button-gold" id="warDrawBtn">🃏 DRAW</button>
+              </div>
+              <div class="war-history-row" id="warHistory"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== GARAGE VIEW ===== -->
         <section id="view-garage" class="view" aria-label="Garage">
           <div class="section-heading">
-            <div>
-              <p class="eyebrow">The collection · 03</p>
-              <h1>Park something <em>beautiful.</em></h1>
-            </div>
-
-            <p>
-              Spend virtual cash on the collection, or hit zero on roulette to win the Luxury Car worth $7,000. The keys are yours.
-            </p>
+            <div><p class="eyebrow">The collection · 03</p><h1>Park something <em>beautiful.</em></h1></div>
+            <p>Spend virtual cash on the collection, or hit zero on roulette to win the Luxury Car worth $7,000.</p>
           </div>
-
           <div id="garage-grid" class="garage-grid"></div>
         </section>
 
+        <!-- ===== ACTIVITY VIEW ===== -->
         <section id="view-activity" class="view" aria-label="Activity log">
           <div class="section-heading">
-            <div>
-              <p class="eyebrow">House record · Live</p>
-              <h1>Everything on <em>the ledger.</em></h1>
-            </div>
-
-            <p>
-              Room-wide plays, wins, and garage moves. The host signs every result before it reaches the table.
-            </p>
+            <div><p class="eyebrow">House record · Live</p><h1>Everything on <em>the ledger.</em></h1></div>
+            <p>Room-wide plays, wins, and garage moves. The host signs every result before it reaches the table.</p>
           </div>
-
           <div class="activity-page">
             <section class="side-card full-feed">
-              <div class="side-title">
-                <h3>Complete room activity</h3>
-                <span id="full-activity-count">0 events</span>
-              </div>
-
+              <div class="side-title"><h3>Complete room activity</h3><span id="full-activity-count">0 events</span></div>
               <div id="full-activity-list" class="activity-list"></div>
             </section>
-
             <aside class="rules">
               <h3>The house rules</h3>
               <p><strong>01</strong> Every player starts at $1,000 virtual cash.</p>
@@ -2947,86 +2604,33 @@
             </aside>
           </div>
         </section>
+
       </main>
     </div>
 
+    <!-- ===== MOBILE NAV ===== -->
     <nav class="mobile-nav" aria-label="Mobile navigation">
-      <button class="active" data-view="lounge" type="button">
-        <svg viewBox="0 0 24 24">
-          <path d="m4 11 8-7 8 7M6.5 10.5V20h11v-9.5" />
-        </svg>
-        <span>Lounge</span>
-      </button>
-
-      <button data-view="roulette" type="button">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="8.5" />
-          <circle cx="12" cy="12" r="2" />
-          <path d="m12 3.5 2 6.5m6.5 2-6.5 2" />
-        </svg>
-        <span>Roulette</span>
-      </button>
-
-      <button data-view="highlow" type="button">
-        <svg viewBox="0 0 24 24">
-          <rect x="5" y="4" width="11" height="15" rx="1.5" />
-          <path d="M8 7h5M16 8l3 3-3 3" />
-        </svg>
-        <span>High / low</span>
-      </button>
-
-      <button data-view="garage" type="button">
-        <svg viewBox="0 0 24 24">
-          <path d="m4 14 2-6h12l2 6v5H4zM7 17h.01M17 17h.01" />
-        </svg>
-        <span>Garage</span>
-      </button>
-
-      <button data-view="activity" type="button">
-        <svg viewBox="0 0 24 24">
-          <path d="M5 19V9M12 19V5M19 19v-7M3 19h18" />
-        </svg>
-        <span>Activity</span>
-      </button>
+      <button class="active" data-view="lounge" type="button"><svg viewBox="0 0 24 24"><path d="m4 11 8-7 8 7M6.5 10.5V20h11v-9.5" /></svg><span>Lounge</span></button>
+      <button data-view="roulette" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="2" /><path d="m12 3.5 2 6.5m6.5 2-6.5 2" /></svg><span>Roulette</span></button>
+      <button data-view="slots" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 8h4M8 12h8" /><circle cx="17" cy="8" r="1.2" /></svg><span>Slots</span></button>
+      <button data-view="war" type="button"><svg viewBox="0 0 24 24"><rect x="5" y="6" width="5" height="12" rx="1" /><rect x="14" y="6" width="5" height="12" rx="1" /><path d="M7.5 9h0M16.5 9h0" /></svg><span>War</span></button>
+      <button data-view="activity" type="button"><svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-7M3 19h18" /></svg><span>Activity</span></button>
     </nav>
 
+    <!-- ===== DIALOG ===== -->
     <dialog id="room-dialog" aria-labelledby="room-dialog-title">
       <div class="dialog-inner">
         <div class="dialog-top">
-          <div>
-            <h2 id="room-dialog-title">Choose your table.</h2>
-            <p>Invite friends with one code. The host keeps the house honest.</p>
-          </div>
-
-          <button id="close-dialog" class="close-dialog" type="button" aria-label="Close room dialog">
-            ×
-          </button>
+          <div><h2 id="room-dialog-title">Choose your table.</h2><p>Invite friends with one code. The host keeps the house honest.</p></div>
+          <button id="close-dialog" class="close-dialog" type="button" aria-label="Close room dialog">×</button>
         </div>
-
-        <div class="field">
-          <label for="player-name">Your name</label>
-          <input id="player-name" maxlength="18" placeholder="What should the room call you?" value="Alex" />
-        </div>
-
+        <div class="field"><label for="player-name">Your name</label><input id="player-name" maxlength="18" placeholder="What should the room call you?" value="Alex" /></div>
         <div class="dialog-actions">
-          <button id="create-room" class="button button-gold" type="button">
-            Create a room
-          </button>
-
-          <button id="join-room" class="button button-quiet" type="button">
-            Join a room
-          </button>
+          <button id="create-room" class="button button-gold" type="button">Create a room</button>
+          <button id="join-room" class="button button-quiet" type="button">Join a room</button>
         </div>
-
-        <div class="field" style="margin-top: 15px; margin-bottom: 0">
-          <label for="join-code">Room code to join</label>
-          <input id="join-code" maxlength="12" placeholder="Example: NIGHT7" />
-        </div>
-
-        <p class="dialog-note">
-          <strong id="dialog-mode-note">Local / demo mode is always available.</strong>
-          If PeerJS cannot connect, this page stays playable locally and labels every result as a demo.
-        </p>
+        <div class="field" style="margin-top:15px;margin-bottom:0"><label for="join-code">Room code to join</label><input id="join-code" maxlength="12" placeholder="Example: NIGHT7" /></div>
+        <p class="dialog-note"><strong id="dialog-mode-note">Local / demo mode is always available.</strong> If PeerJS cannot connect, this page stays playable locally.</p>
       </div>
     </dialog>
 
@@ -3043,42 +2647,20 @@
 
         const clientId = `player-${Math.random().toString(36).slice(2, 9)}`;
 
-        const numberIsRed = [
-          1, 3, 5, 7, 9, 12, 14, 16, 18,
-          19, 21, 23, 25, 27, 30, 32, 34, 36
-        ];
+        const numberIsRed = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
         const cars = [
-          {
-            id: "nocturne",
-            name: "Nocturne GT",
-            spec: "V8 · 612 hp · obsidian",
-            price: 650,
-            tone: "gold"
-          },
-          {
-            id: "marquis",
-            name: "Marquis 812",
-            spec: "V12 · 789 hp · rosso",
-            price: 875,
-            tone: "red"
-          },
-          {
-            id: "aurelia",
-            name: "Aurelia S",
-            spec: "Hybrid · 718 hp · pearl",
-            price: 1100,
-            tone: "silver"
-          },
-          {
-            id: "luxury",
-            name: "Luxury Car",
-            spec: "Grand prize · 7,000 value · champagne",
-            price: 7000,
-            tone: "gold",
-            grandPrize: true
-          }
+          { id: "nocturne", name: "Nocturne GT", spec: "V8 · 612 hp · obsidian", price: 650, tone: "gold" },
+          { id: "marquis", name: "Marquis 812", spec: "V12 · 789 hp · rosso", price: 875, tone: "red" },
+          { id: "aurelia", name: "Aurelia S", spec: "Hybrid · 718 hp · pearl", price: 1100, tone: "silver" },
+          { id: "luxury", name: "Luxury Car", spec: "Grand prize · 7,000 value · champagne", price: 7000, tone: "gold", grandPrize: true }
         ];
+
+        const slotSymbols = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣', '🎰'];
+        const slotPayouts = {
+          '🍒🍒🍒': 5, '🍋🍋🍋': 8, '🍊🍊🍊': 10, '🍇🍇🍇': 12,
+          '💎💎💎': 20, '7️⃣7️⃣7️⃣': 50, '🎰🎰🎰': 100
+        };
 
         const state = {
           currentView: "lounge",
@@ -3089,15 +2671,8 @@
           isHost: true,
           peer: null,
           connections: [],
-          balances: {
-            [clientId]: 1000
-          },
-          players: {
-            [clientId]: {
-              name: "Alex",
-              role: "Host"
-            }
-          },
+          balances: { [clientId]: 1000 },
+          players: { [clientId]: { name: "Alex", role: "Host" } },
           activity: [],
           played: 0,
           roulette: {
@@ -3105,79 +2680,53 @@
             selectedNumber: null,
             spinning: false,
             rotation: 0,
-            history: [17, 32, 8, 21]
-          },
-          card: {
-            current: 8,
+            history: [17, 32, 8, 21],
             last: null
           },
-          garages: {
-            [clientId]: []
+          card: { current: 8, last: null },
+          garages: { [clientId]: [] },
+          slots: {
+            result: ['🍒', '🍒', '🍒'],
+            spinning: false,
+            spins: 0,
+            lastWin: 0,
+            jackpot: 0,
+            autoMode: false,
+            autoTimer: null
+          },
+          war: {
+            playerCard: null,
+            opponentCard: null,
+            result: null,
+            history: [],
+            inProgress: false
           }
         };
 
         let toastTimer;
 
-        const money = (value) =>
-          `$${Math.max(0, Math.round(value)).toLocaleString("en-US")}`;
+        const money = (value) => `$${Math.max(0, Math.round(value)).toLocaleString("en-US")}`;
 
-        const escapeHtml = (value) =>
-          String(value).replace(
-            /[&<>"']/g,
-            (match) =>
-              ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#039;"
-              })[match]
-          );
+        const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (match) =>
+          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[match]
+        );
 
-        const initials = (name) =>
-          name
-            .split(/\s+/)
-            .map((part) => part[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase() || "VR";
+        const initials = (name) => name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase() || "VR";
 
-        const now = () =>
-          new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
+        const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
         const balance = () => state.balances[state.clientId] ?? 1000;
 
-        const rouletteColor = (number) =>
-          number === 0
-            ? "green"
-            : numberIsRed.includes(number)
-              ? "red"
-              : "black";
+        const rouletteColor = (number) => number === 0 ? "green" : numberIsRed.includes(number) ? "red" : "black";
 
-        const rankLabel = (value) =>
-          value === 14
-            ? "A"
-            : value === 13
-              ? "K"
-              : value === 12
-                ? "Q"
-                : value === 11
-                  ? "J"
-                  : String(value);
+        const rankLabel = (value) => value === 14 ? "A" : value === 13 ? "K" : value === 12 ? "Q" : value === 11 ? "J" : String(value);
 
         const notify = (message, error = false) => {
           const toast = $("#toast");
           toast.textContent = message;
           toast.className = `toast show${error ? " error" : ""}`;
-
           clearTimeout(toastTimer);
-
-          toastTimer = setTimeout(() => {
-            toast.className = "toast";
-          }, 2800);
+          toastTimer = setTimeout(() => { toast.className = "toast"; }, 2800);
         };
 
         const setConnection = (kind, label, copy) => {
@@ -3188,13 +2737,7 @@
         };
 
         const addActivity = (text, mark = "VR", time = now()) => {
-          state.activity.unshift({
-            id: `${Date.now()}-${Math.random()}`,
-            text,
-            mark,
-            time
-          });
-
+          state.activity.unshift({ id: `${Date.now()}-${Math.random()}`, text, mark, time });
           state.activity = state.activity.slice(0, 18);
         };
 
@@ -3206,27 +2749,18 @@
           played: state.played,
           roulette: state.roulette,
           card: state.card,
-          garages: state.garages
+          garages: state.garages,
+          slots: state.slots,
+          war: state.war
         });
 
         const broadcast = (message) => {
-          state.connections = state.connections.filter(
-            (connection) => connection && connection.open
-          );
-
-          state.connections.forEach((connection) => {
-            connection.send(message);
-          });
+          state.connections = state.connections.filter((c) => c && c.open);
+          state.connections.forEach((c) => c.send(message));
         };
 
         const broadcastState = () => {
-          if (state.isHost) {
-            broadcast({
-              type: "state",
-              state: serializable()
-            });
-          }
-
+          if (state.isHost) broadcast({ type: "state", state: serializable() });
           renderAll();
         };
 
@@ -3239,73 +2773,42 @@
             played: remote.played || 0,
             roulette: remote.roulette || state.roulette,
             card: remote.card || state.card,
-            garages: remote.garages || state.garages
+            garages: remote.garages || state.garages,
+            slots: remote.slots || state.slots,
+            war: remote.war || state.war
           });
-
           renderAll();
         };
 
         const ensurePlayer = (id, name, role = "Player") => {
-          if (!state.players[id]) {
-            state.players[id] = {
-              name: name || "Guest",
-              role
-            };
-          }
-
-          if (state.balances[id] == null) {
-            state.balances[id] = 1000;
-          }
-
-          if (!state.garages[id]) {
-            state.garages[id] = [];
-          }
+          if (!state.players[id]) state.players[id] = { name: name || "Guest", role };
+          if (state.balances[id] == null) state.balances[id] = 1000;
+          if (!state.garages[id]) state.garages[id] = [];
         };
 
-        const validStake = (input) =>
-          Math.max(
-            1,
-            Math.min(1000, Math.floor(Number(input.value) || 0))
-          );
+        const validStake = (input) => Math.max(1, Math.min(1000, Math.floor(Number(input.value) || 0)));
 
-        const processAction = (action, sender = state.clientId) => {
+        // ===== ROULETTE =====
+        const processRoulette = (action, sender = state.clientId) => {
           if (!state.isHost) {
             const host = state.connections[0];
-
             if (host && host.open) {
-              host.send({
-                type: "action",
-                id: state.clientId,
-                name: state.userName,
-                action
-              });
+              host.send({ type: "action", id: state.clientId, name: state.userName, action });
             } else {
               notify("The host is not connected.", true);
             }
-
             return;
           }
 
           ensurePlayer(sender, state.players[sender]?.name || "Guest");
-
           const playerName = state.players[sender].name;
           const playerBalance = state.balances[sender];
 
           if (action.type === "roulette") {
-            if (state.roulette.spinning) {
-              return;
-            }
-
-            const amount = Math.max(
-              1,
-              Math.min(1000, Math.floor(Number(action.amount) || 0))
-            );
-
+            if (state.roulette.spinning) return;
+            const amount = Math.max(1, Math.min(1000, Math.floor(Number(action.amount) || 0)));
             if (amount > playerBalance) {
-              if (sender === state.clientId) {
-                notify("That stake is above your balance.", true);
-              }
-
+              if (sender === state.clientId) notify("That stake is above your balance.", true);
               return;
             }
 
@@ -3320,26 +2823,16 @@
               const color = rouletteColor(result);
               const selected = action.bet;
 
-              const won =
-                selected === "straight"
-                  ? result === action.number
-                  : selected === color ||
-                    (selected === "even" &&
-                      result !== 0 &&
-                      result % 2 === 0) ||
-                    (selected === "odd" &&
-                      result % 2 === 1);
+              const won = selected === "straight" ? result === action.number :
+                selected === color ||
+                (selected === "even" && result !== 0 && result % 2 === 0) ||
+                (selected === "odd" && result % 2 === 1);
 
               const payout = selected === "straight" ? 36 : 2;
               const grandPrize = result === 0;
 
               if (grandPrize) {
-                state.garages[sender] = Array.from(
-                  new Set([
-                    ...(state.garages[sender] || []),
-                    "luxury"
-                  ])
-                );
+                state.garages[sender] = Array.from(new Set([...(state.garages[sender] || []), "luxury"]));
               } else if (won) {
                 state.balances[sender] += amount * payout;
               }
@@ -3347,185 +2840,334 @@
               state.roulette = {
                 ...state.roulette,
                 spinning: false,
-                last: {
-                  result,
-                  color,
-                  won,
-                  grandPrize,
-                  amount,
-                  payout,
-                  player: playerName
-                },
+                last: { result, color, won, grandPrize, amount, payout, player: playerName },
                 history: [result, ...state.roulette.history].slice(0, 7)
               };
 
               state.played += 1;
 
               addActivity(
-                grandPrize
-                  ? `${escapeHtml(playerName)} hit the Grand Prize: Luxury Car worth ${money(7000)}`
-                  : `${escapeHtml(playerName)} ${(
-                      won ? "won" : "lost"
-                    )} ${money(
-                      won ? amount * (payout - 1) : amount
-                    )} on ${
-                      selected === "straight"
-                        ? `number ${action.number}`
-                        : selected
-                    }`,
+                grandPrize ? `${escapeHtml(playerName)} hit the Grand Prize: Luxury Car worth ${money(7000)}` :
+                `${escapeHtml(playerName)} ${won ? "won" : "lost"} ${money(won ? amount * (payout - 1) : amount)} on ${selected === "straight" ? `number ${action.number}` : selected}`,
                 grandPrize || won ? "W" : "R"
               );
 
               broadcastState();
             }, 1450);
           }
+        };
+
+        // ===== HIGH/LOW =====
+        const processCard = (action, sender = state.clientId) => {
+          if (!state.isHost) {
+            const host = state.connections[0];
+            if (host && host.open) {
+              host.send({ type: "action", id: state.clientId, name: state.userName, action });
+            } else {
+              notify("The host is not connected.", true);
+            }
+            return;
+          }
+
+          ensurePlayer(sender, state.players[sender]?.name || "Guest");
+          const playerName = state.players[sender].name;
+          const playerBalance = state.balances[sender];
 
           if (action.type === "card") {
-            const amount = Math.max(
-              1,
-              Math.min(1000, Math.floor(Number(action.amount) || 0))
-            );
-
+            const amount = Math.max(1, Math.min(1000, Math.floor(Number(action.amount) || 0)));
             if (amount > playerBalance) {
-              if (sender === state.clientId) {
-                notify("That stake is above your balance.", true);
-              }
-
+              if (sender === state.clientId) notify("That stake is above your balance.", true);
               return;
             }
 
             const previous = state.card.current;
             const next = 2 + Math.floor(Math.random() * 13);
-            const won =
-              action.call === "high"
-                ? next > previous
-                : next < previous;
+            const won = action.call === "high" ? next > previous : next < previous;
             const tie = next === previous;
             const payout = 1.92;
 
             state.balances[sender] -= amount;
-
-            if (won) {
-              state.balances[sender] += amount * payout;
-            }
-
-            if (tie) {
-              state.balances[sender] += amount;
-            }
+            if (won) state.balances[sender] += amount * payout;
+            if (tie) state.balances[sender] += amount;
 
             state.card = {
               current: next,
-              last: {
-                previous,
-                next,
-                call: action.call,
-                won,
-                tie,
-                amount,
-                player: playerName
-              }
+              last: { previous, next, call: action.call, won, tie, amount, player: playerName }
             };
 
             state.played += 1;
 
             addActivity(
-              `${escapeHtml(playerName)} called ${action.call} and ${
-                tie
-                  ? "pushed"
-                  : won
-                    ? `won ${money(amount * (payout - 1))}`
-                    : `lost ${money(amount)}`
-              }`,
+              `${escapeHtml(playerName)} called ${action.call} and ${tie ? "pushed" : won ? `won ${money(amount * (payout - 1))}` : `lost ${money(amount)}`}`,
               won ? "W" : tie ? "P" : "R"
-            );
-
-            broadcastState();
-          }
-
-          if (action.type === "buyCar") {
-            const car = cars.find((item) => item.id === action.carId);
-            const playerGarage = state.garages[sender] || [];
-
-            if (
-              !car ||
-              car.grandPrize ||
-              playerGarage.includes(car.id)
-            ) {
-              return;
-            }
-
-            if (car.price > playerBalance) {
-              if (sender === state.clientId) {
-                notify("Your balance needs a little more luck.", true);
-              }
-
-              return;
-            }
-
-            state.balances[sender] -= car.price;
-            state.garages[sender] = [...playerGarage, car.id];
-
-            addActivity(
-              `${escapeHtml(playerName)} parked a ${car.name} in the garage`,
-              "G"
             );
 
             broadcastState();
           }
         };
 
+        // ===== GARAGE =====
+        const processBuyCar = (action, sender = state.clientId) => {
+          if (!state.isHost) {
+            const host = state.connections[0];
+            if (host && host.open) {
+              host.send({ type: "action", id: state.clientId, name: state.userName, action });
+            } else {
+              notify("The host is not connected.", true);
+            }
+            return;
+          }
+
+          ensurePlayer(sender, state.players[sender]?.name || "Guest");
+          const playerName = state.players[sender].name;
+          const playerBalance = state.balances[sender];
+
+          if (action.type === "buyCar") {
+            const car = cars.find((item) => item.id === action.carId);
+            const playerGarage = state.garages[sender] || [];
+            if (!car || car.grandPrize || playerGarage.includes(car.id)) return;
+            if (car.price > playerBalance) {
+              if (sender === state.clientId) notify("Your balance needs a little more luck.", true);
+              return;
+            }
+
+            state.balances[sender] -= car.price;
+            state.garages[sender] = [...playerGarage, car.id];
+
+            addActivity(`${escapeHtml(playerName)} parked a ${car.name} in the garage`, "G");
+            broadcastState();
+          }
+        };
+
+        // ===== SLOTS =====
+        const renderSlots = () => {
+          const result = state.slots.result;
+          for (let i = 0; i < 3; i++) {
+            const inner = $(`#slotInner${i + 1}`);
+            if (!inner) continue;
+            const symbols = [pick(slotSymbols), pick(slotSymbols), pick(slotSymbols), result[i], pick(slotSymbols), pick(slotSymbols), pick(slotSymbols)];
+            inner.innerHTML = symbols.map(s => `<div class="slot-reel-symbol">${s}</div>`).join('');
+            inner.style.transform = `translateY(-${(symbols.length - 2) * 90}px)`;
+          }
+
+          $('#slotLast').textContent = state.slots.lastWin > 0 ? `+${money(state.slots.lastWin)}` : '-';
+          $('#slotJackpot').textContent = money(state.slots.jackpot);
+          $('#slotSpins').textContent = state.slots.spins;
+          $('#slotSpinBtn').disabled = state.slots.spinning;
+          $('#slotSpinBtn').textContent = state.slots.spinning ? 'SPINNING...' : '🎰 SPIN';
+        };
+
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        const spinSlots = () => {
+          if (state.slots.spinning) return;
+
+          const stake = Math.max(1, Math.min(1000, Math.floor(Number($('#slotStake').value) || 10)));
+          if (stake > balance()) {
+            notify('Not enough balance!', true);
+            return;
+          }
+
+          state.balances[state.clientId] -= stake;
+          state.slots.spinning = true;
+          state.slots.spins++;
+
+          for (let i = 1; i <= 3; i++) {
+            $(`#slotReel${i}`).classList.add('spinning');
+          }
+
+          $('#slotSpinBtn').disabled = true;
+          $('#slotMessage').textContent = '🎰 Spinning...';
+
+          setTimeout(() => {
+            const result = [pick(slotSymbols), pick(slotSymbols), pick(slotSymbols)];
+            state.slots.result = result;
+
+            for (let i = 1; i <= 3; i++) {
+              $(`#slotReel${i}`).classList.remove('spinning');
+            }
+
+            const key = result.join('');
+            const payout = slotPayouts[key] || 0;
+            let winAmount = 0;
+
+            if (payout > 0) {
+              winAmount = stake * payout;
+              state.balances[state.clientId] += winAmount;
+              state.slots.jackpot += winAmount;
+              state.slots.lastWin = winAmount;
+              notify(`🎉 Won ${money(winAmount)}!`, false);
+            } else {
+              state.slots.lastWin = 0;
+              notify(`😞 No match. Try again!`, true);
+            }
+
+            addActivity(
+              `${state.userName} spun slots and ${winAmount > 0 ? `won ${money(winAmount)}` : 'lost'}`,
+              winAmount > 0 ? 'W' : 'R'
+            );
+
+            state.slots.spinning = false;
+            renderSlots();
+            renderAll();
+
+            if (state.slots.autoMode) {
+              state.slots.autoTimer = setTimeout(spinSlots, 600);
+            }
+          }, 400 + Math.random() * 300);
+        };
+
+        // ===== WAR =====
+        const getCard = () => {
+          const rank = Math.floor(Math.random() * 13) + 2;
+          const suits = ['♠', '♥', '♦', '♣'];
+          const suit = pick(suits);
+          const rankNames = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+          const display = rankNames[rank] || rank;
+          const isRed = suit === '♥' || suit === '♦';
+          return { rank, suit, display, isRed };
+        };
+
+        const renderWar = () => {
+          const pc = state.war.playerCard;
+          const oc = state.war.opponentCard;
+
+          const pEl = $('#warPlayerCard');
+          if (pc) {
+            pEl.textContent = pc.display + pc.suit;
+            pEl.className = `war-card ${pc.isRed ? 'red' : 'black'}`;
+          } else {
+            pEl.textContent = '?';
+            pEl.className = 'war-card hidden';
+          }
+
+          const oEl = $('#warOpponentCard');
+          if (oc) {
+            oEl.textContent = oc.display + oc.suit;
+            oEl.className = `war-card ${oc.isRed ? 'red' : 'black'}`;
+          } else {
+            oEl.textContent = '?';
+            oEl.className = 'war-card hidden';
+          }
+
+          const pr = $('#warPlayerResult');
+          const or = $('#warOpponentResult');
+
+          if (state.war.result === 'win') {
+            pr.textContent = '🎉 WIN!'; pr.className = 'war-result-text win';
+            or.textContent = '😞 LOSE'; or.className = 'war-result-text loss';
+          } else if (state.war.result === 'loss') {
+            pr.textContent = '😞 LOSE'; pr.className = 'war-result-text loss';
+            or.textContent = '🎉 WIN!'; or.className = 'war-result-text win';
+          } else if (state.war.result === 'draw') {
+            pr.textContent = '⚔️ WAR!'; pr.className = 'war-result-text draw';
+            or.textContent = '⚔️ WAR!'; or.className = 'war-result-text draw';
+          } else {
+            pr.textContent = 'Waiting...'; pr.className = 'war-result-text';
+            or.textContent = 'Waiting...'; or.className = 'war-result-text';
+          }
+
+          const hist = $('#warHistory');
+          hist.innerHTML = state.war.history.slice(-8).map(h =>
+            `<span class="mini ${h.result}">${h.player} vs ${h.opponent} → ${h.result}</span>`
+          ).join('');
+
+          $('#warDrawBtn').disabled = state.war.inProgress;
+        };
+
+        const drawWar = () => {
+          if (state.war.inProgress) return;
+
+          const stake = Math.max(1, Math.min(1000, Math.floor(Number($('#warStake').value) || 25)));
+          if (stake > balance()) {
+            notify('Not enough balance!', true);
+            return;
+          }
+
+          state.war.inProgress = true;
+          state.balances[state.clientId] -= stake;
+          renderAll();
+
+          state.war.playerCard = null;
+          state.war.opponentCard = null;
+          state.war.result = null;
+          renderWar();
+
+          setTimeout(() => {
+            const pCard = getCard();
+            const oCard = getCard();
+            state.war.playerCard = pCard;
+            state.war.opponentCard = oCard;
+
+            let result = 'draw';
+            if (pCard.rank > oCard.rank) {
+              result = 'win';
+              const winAmount = stake * 2;
+              state.balances[state.clientId] += winAmount;
+              state.war.lastWin = winAmount;
+              notify(`🎉 You win ${money(winAmount)}!`, false);
+            } else if (pCard.rank < oCard.rank) {
+              result = 'loss';
+              state.war.lastWin = 0;
+              notify(`😞 You lose ${money(stake)}`, true);
+            } else {
+              result = 'draw';
+              state.balances[state.clientId] += stake;
+              state.war.lastWin = 0;
+              notify(`⚔️ WAR! It's a draw!`, false);
+            }
+
+            state.war.result = result;
+            state.war.history.push({
+              player: `${pCard.display}${pCard.suit}`,
+              opponent: `${oCard.display}${oCard.suit}`,
+              result
+            });
+
+            addActivity(
+              `${state.userName} played War: ${pCard.display}${pCard.suit} vs ${oCard.display}${oCard.suit} → ${result}`,
+              result === 'win' ? 'W' : result === 'loss' ? 'R' : 'P'
+            );
+
+            state.war.inProgress = false;
+            renderWar();
+            renderAll();
+          }, 800);
+        };
+
+        // ===== PEERJS =====
         const setupConnection = (connection) => {
           state.connections.push(connection);
 
           connection.on("open", () => {
             if (state.isHost) {
-              connection.send({
-                type: "state",
-                state: serializable()
-              });
+              connection.send({ type: "state", state: serializable() });
             } else {
-              connection.send({
-                type: "hello",
-                id: state.clientId,
-                name: state.userName
-              });
+              connection.send({ type: "hello", id: state.clientId, name: state.userName });
             }
           });
 
           connection.on("data", (message) => {
-            if (!message) {
-              return;
-            }
+            if (!message) return;
 
             if (state.isHost && message.type === "hello") {
               ensurePlayer(message.id, message.name);
-
-              state.players[message.id] = {
-                name: message.name || "Guest",
-                role: "Player"
-              };
-
-              addActivity(
-                `${escapeHtml(message.name || "Guest")} joined the room`,
-                "IN"
-              );
-
+              state.players[message.id] = { name: message.name || "Guest", role: "Player" };
+              addActivity(`${escapeHtml(message.name || "Guest")} joined the room`, "IN");
               broadcastState();
             } else if (state.isHost && message.type === "action") {
-              processAction(
-                message.action,
-                message.id || connection.peer
-              );
+              const action = message.action;
+              const sender = message.id || connection.peer;
+              if (action.type === "roulette") processRoulette(action, sender);
+              else if (action.type === "card") processCard(action, sender);
+              else if (action.type === "buyCar") processBuyCar(action, sender);
             } else if (!state.isHost && message.type === "state") {
               applyRemote(message.state);
             }
           });
 
           connection.on("close", () => {
-            state.connections = state.connections.filter(
-              (item) => item !== connection
-            );
-
+            state.connections = state.connections.filter((item) => item !== connection);
             renderAll();
           });
 
@@ -3534,53 +3176,30 @@
           });
         };
 
+        // ===== ROOM =====
         const generateCode = () => {
           const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
           let code = "";
-
-          for (let index = 0; index < 6; index += 1) {
-            code += letters[
-              Math.floor(Math.random() * letters.length)
-            ];
-          }
-
+          for (let i = 0; i < 6; i++) code += letters[Math.floor(Math.random() * letters.length)];
           return code;
         };
 
         const resetRoom = (code, name) => {
           state.roomCode = code;
           state.userName = name || "Alex";
-          state.balances = {
-            [state.clientId]: 1000
-          };
-          state.players = {
-            [state.clientId]: {
-              name: state.userName,
-              role: "Host"
-            }
-          };
+          state.balances = { [state.clientId]: 1000 };
+          state.players = { [state.clientId]: { name: state.userName, role: "Host" } };
           state.activity = [];
           state.played = 0;
-          state.garages = {
-            [state.clientId]: []
-          };
-          state.roulette = {
-            selected: "red",
-            selectedNumber: null,
-            spinning: false,
-            rotation: 0,
-            history: [17, 32, 8, 21]
-          };
-          state.card = {
-            current: 8,
-            last: null
-          };
+          state.garages = { [state.clientId]: [] };
+          state.roulette = { selected: "red", selectedNumber: null, spinning: false, rotation: 0, history: [17, 32, 8, 21], last: null };
+          state.card = { current: 8, last: null };
+          state.slots = { result: ['🍒', '🍒', '🍒'], spinning: false, spins: 0, lastWin: 0, jackpot: 0, autoMode: false, autoTimer: null };
+          state.war = { playerCard: null, opponentCard: null, result: null, history: [], inProgress: false };
         };
 
         const createRoom = () => {
-          const name =
-            ($("#player-name").value.trim() || "Alex").slice(0, 18);
-
+          const name = ($("#player-name").value.trim() || "Alex").slice(0, 18);
           state.userName = name;
           state.isHost = true;
           state.mode = "local";
@@ -3592,57 +3211,25 @@
             try {
               const peer = new window.Peer(state.roomCode);
               state.peer = peer;
-
-              setConnection(
-                "",
-                "Connecting",
-                "Opening a private PeerJS room…"
-              );
-
+              setConnection("", "Connecting", "Opening a private PeerJS room…");
               peer.on("open", () => {
                 state.mode = "peer";
-
-                setConnection(
-                  "live",
-                  "Live P2P",
-                  "PeerJS room is live and host-authoritative."
-                );
-
+                setConnection("live", "Live P2P", "PeerJS room is live and host-authoritative.");
                 renderAll();
                 notify(`Room ${state.roomCode} is ready.`);
               });
-
               peer.on("connection", setupConnection);
-
               peer.on("error", () => {
                 state.mode = "local";
-
-                setConnection(
-                  "",
-                  "Local demo",
-                  "PeerJS could not open; local demo is active."
-                );
-
-                notify(
-                  "PeerJS unavailable. Local demo mode is ready.",
-                  true
-                );
-
+                setConnection("", "Local demo", "PeerJS could not open; local demo is active.");
+                notify("PeerJS unavailable. Local demo mode is ready.", true);
                 renderAll();
               });
             } catch (error) {
-              setConnection(
-                "",
-                "Local demo",
-                "PeerJS could not open; local demo is active."
-              );
+              setConnection("", "Local demo", "PeerJS could not open; local demo is active.");
             }
           } else {
-            setConnection(
-              "",
-              "Local demo",
-              "PeerJS is unavailable; local demo is active."
-            );
+            setConnection("", "Local demo", "PeerJS is unavailable; local demo is active.");
           }
 
           $("#room-dialog").close();
@@ -3650,13 +3237,8 @@
         };
 
         const joinRoom = () => {
-          const name =
-            ($("#player-name").value.trim() || "Guest").slice(0, 18);
-
-          const code = $("#join-code").value
-            .trim()
-            .toUpperCase()
-            .replace(/[^A-Z0-9-]/g, "");
+          const name = ($("#player-name").value.trim() || "Guest").slice(0, 18);
+          const code = $("#join-code").value.trim().toUpperCase().replace(/[^A-Z0-9-]/g, "");
 
           if (!code) {
             notify("Enter a room code first.", true);
@@ -3669,15 +3251,8 @@
             state.mode = "local";
             state.isHost = true;
             resetRoom(code, name);
-
-            setConnection(
-              "",
-              "Local demo",
-              "PeerJS is unavailable; this is a local fallback."
-            );
-
+            setConnection("", "Local demo", "PeerJS is unavailable; this is a local fallback.");
             notify("PeerJS unavailable. You are playing a local demo.");
-
             $("#room-dialog").close();
             renderAll();
             return;
@@ -3685,33 +3260,19 @@
 
           try {
             const peer = new window.Peer();
-
             state.peer = peer;
             state.isHost = false;
             state.mode = "peer";
             state.roomCode = code;
             state.connections = [];
 
-            setConnection(
-              "",
-              "Joining",
-              `Calling host ${code}…`
-            );
+            setConnection("", "Joining", `Calling host ${code}…`);
 
             peer.on("open", () => {
-              const connection = peer.connect(code, {
-                reliable: true
-              });
-
+              const connection = peer.connect(code, { reliable: true });
               setupConnection(connection);
-
               connection.on("open", () => {
-                setConnection(
-                  "live",
-                  "Live P2P",
-                  "Connected to the host; results are synchronized."
-                );
-
+                setConnection("live", "Live P2P", "Connected to the host; results are synchronized.");
                 notify(`Joined room ${code}.`);
                 renderAll();
               });
@@ -3720,491 +3281,284 @@
             peer.on("error", () => {
               state.isHost = true;
               state.mode = "local";
-
               resetRoom(code, name);
-
-              setConnection(
-                "error",
-                "Local fallback",
-                "Host could not be reached; local demo is active."
-              );
-
-              notify(
-                "Could not reach that room. Local demo mode is ready.",
-                true
-              );
-
+              setConnection("error", "Local fallback", "Host could not be reached; local demo is active.");
+              notify("Could not reach that room. Local demo mode is ready.", true);
               renderAll();
             });
           } catch (error) {
             state.isHost = true;
             state.mode = "local";
-
             resetRoom(code, name);
-
-            setConnection(
-              "error",
-              "Local fallback",
-              "Host could not be reached; local demo is active."
-            );
+            setConnection("error", "Local fallback", "Host could not be reached; local demo is active.");
           }
 
           $("#room-dialog").close();
           renderAll();
         };
 
+        // ===== VIEW =====
         const showView = (view) => {
           state.currentView = view;
 
-          const loungeTarget =
-            view === "roulette"
-              ? "roulette-section"
-              : view === "highlow"
-                ? "highlow-section"
-                : null;
-
-          const actualView = loungeTarget ? "lounge" : view;
-
-          $$(".view").forEach((element) => {
-            element.classList.toggle(
-              "active",
-              element.id === `view-${actualView}`
-            );
-          });
-
-          $$(".nav-button, .mobile-nav button").forEach((button) => {
-            button.classList.toggle(
-              "active",
-              button.dataset.view === view
-            );
-          });
-
           const names = {
-            lounge: "The lounge",
-            roulette: "Roulette",
-            highlow: "High / low",
-            garage: "Garage",
-            activity: "Activity"
+            lounge: "The lounge", roulette: "Roulette", highlow: "High / low",
+            slots: "Slots", war: "War", garage: "Garage", activity: "Activity"
           };
 
-          $("#crumb-current").textContent = names[view];
+          const isGameView = ['roulette', 'highlow', 'slots', 'war'].includes(view);
+          const actualView = isGameView ? view : view;
 
-          if (loungeTarget) {
-            setTimeout(() => {
-              document
-                .getElementById(loungeTarget)
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start"
-                });
-            }, 20);
-          } else {
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth"
-            });
-          }
-        };
-
-        const renderActivity = (target) => {
-          const list = target;
-
-          if (!state.activity.length) {
-            list.innerHTML =
-              '<div class="empty-feed">The room ledger is quiet. Your first play will leave a mark here.</div>';
-            return;
-          }
-
-          list.innerHTML = state.activity
-            .map(
-              (item) => `
-                <div class="activity-item">
-                  <span class="activity-mark">${escapeHtml(item.mark)}</span>
-                  <span class="activity-text">${item.text}</span>
-                  <span class="activity-time">${escapeHtml(item.time)}</span>
-                </div>
-              `
-            )
-            .join("");
-        };
-
-        const renderRoulette = () => {
-          const grid = $("#roulette-grid");
-
-          const rows = [1, 2, 3]
-            .map(() =>
-              Array.from(
-                {
-                  length: 12
-                },
-                (_, index) => index * 3 + 1
-              )
-            )
-            .flat();
-
-          grid.innerHTML = rows
-            .map(
-              (number) => `
-                <button
-                  class="number-button ${rouletteColor(number)} ${
-                    state.roulette.selected === "straight" &&
-                    state.roulette.selectedNumber === number
-                      ? "selected"
-                      : ""
-                  }"
-                  data-number="${number}"
-                  type="button"
-                  aria-label="Bet on number ${number}"
-                >
-                  ${number}
-                </button>
-              `
-            )
-            .join("");
-
-          $$(".bet-button").forEach((button) => {
-            button.classList.toggle(
-              "active",
-              button.dataset.bet === state.roulette.selected
-            );
+          $$(".view").forEach((el) => {
+            el.classList.toggle("active", el.id === `view-${actualView}`);
           });
 
-          $("#selected-bet-label").textContent =
-            state.roulette.selected === "straight"
-              ? `Number ${state.roulette.selectedNumber}`
-              : state.roulette.selected[0].toUpperCase() +
-                state.roulette.selected.slice(1);
+          $$(".nav-button, .mobile-nav button").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.view === view);
+          });
 
-          const last = state.roulette.last;
+          $("#crumb-current").textContent = names[view] || view;
 
-          $("#roulette-result").innerHTML = last
-            ? last.grandPrize
-              ? `
-                <span class="result-number green">${last.result}</span>
-                <span class="result-win">Luxury Car · ${money(7000)}</span>
-              `
-              : `
-                <span class="result-number ${last.color}">${last.result}</span>
-                <span class="${last.won ? "result-win" : "result-loss"}">
-                  ${
-                    last.won
-                      ? `+${money(last.amount * (last.payout - 1))}`
-                      : `-${money(last.amount)}`
-                  }
-                </span>
-              `
-            : `<span class="result-number black">—</span>`;
-
-          $("#spin-button").classList.toggle(
-            "spinning",
-            state.roulette.spinning
-          );
-
-          $("#spin-button").disabled = state.roulette.spinning;
-
-          $("#spin-button").textContent = state.roulette.spinning
-            ? "Wheel is turning…"
-            : "Spin the wheel";
-
-          $("#spin-button").setAttribute(
-            "aria-label",
-            state.roulette.spinning
-              ? "Roulette wheel is spinning"
-              : "Spin roulette wheel"
-          );
-
-          $("#wheel-ring").style.transform = `rotate(${state.roulette.rotation}deg)`;
-
-          $("#wheel-ring").classList.toggle(
-            "spinning",
-            state.roulette.spinning
-          );
-
-          $("#roulette-history").innerHTML = state.roulette.history
-            .slice(0, 5)
-            .map(
-              (number) =>
-                `<span class="history-number ${rouletteColor(number)}">${number}</span>`
-            )
-            .join("");
+          window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
-        const renderCard = () => {
-          $("#card-rank").textContent = rankLabel(state.card.current);
-          $("#card-bottom").textContent = rankLabel(state.card.current);
+        // ===== RENDER =====
+        const renderActivity = (target) => {
+          const list = target;
+          if (!state.activity.length) {
+            list.innerHTML = '<div class="empty-feed">The room ledger is quiet. Your first play will leave a mark here.</div>';
+            return;
+          }
+          list.innerHTML = state.activity.map((item) =>
+            `<div class="activity-item"><span class="activity-mark">${escapeHtml(item.mark)}</span><span class="activity-text">${item.text}</span><span class="activity-time">${escapeHtml(item.time)}</span></div>`
+          ).join("");
+        };
 
-          $("#playing-card").classList.toggle(
-            "red-card",
-            state.card.current % 2 === 0
-          );
+        const renderRoulette = (prefix = "") => {
+          const grid = $(`#roulette-grid${prefix}`);
+          if (!grid) return;
 
-          $("#playing-card").classList.toggle(
-            "draw",
-            Boolean(state.card.last)
-          );
+          const rows = [1, 2, 3].map(() => Array.from({ length: 12 }, (_, i) => i * 3 + 1)).flat();
 
-          $("#card-result").textContent = state.card.last
-            ? state.card.last.tie
-              ? `Push · ${money(state.card.last.amount)} returned`
-              : `${(
-                  state.card.last.call === "high" ? "High" : "Low"
-                )} · ${
-                  state.card.last.won
-                    ? `+${money(state.card.last.amount * 0.92)}`
-                    : `-${money(state.card.last.amount)}`
-                }`
-            : "Make your call";
+          grid.innerHTML = rows.map((number) =>
+            `<button class="number-button ${rouletteColor(number)} ${state.roulette.selected === "straight" && state.roulette.selectedNumber === number ? "selected" : ""}" data-number="${number}" type="button">${number}</button>`
+          ).join("");
 
-          $("#card-result").className = state.card.last
-            ? state.card.last.won
-              ? "result-win"
-              : state.card.last.tie
-                ? ""
-                : "result-loss"
-            : "";
+          const bets = prefix ? $$(`#view-roulette .bet-button`) : $$(".bet-button");
+          bets.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.bet === state.roulette.selected);
+          });
+
+          const label = $(`#selected-bet-label${prefix}`);
+          if (label) {
+            label.textContent = state.roulette.selected === "straight" ?
+              `Number ${state.roulette.selectedNumber}` :
+              state.roulette.selected[0].toUpperCase() + state.roulette.selected.slice(1);
+          }
+
+          const last = state.roulette.last;
+          const resultEl = $(`#roulette-result${prefix}`);
+          if (resultEl) {
+            resultEl.innerHTML = last ?
+              last.grandPrize ?
+              `<span class="result-number green">${last.result}</span><span class="result-win">Luxury Car · ${money(7000)}</span>` :
+              `<span class="result-number ${last.color}">${last.result}</span><span class="${last.won ? "result-win" : "result-loss"}">${last.won ? `+${money(last.amount * (last.payout - 1))}` : `-${money(last.amount)}`}</span>` :
+              `<span class="result-number black">—</span>`;
+          }
+
+          const spinBtn = $(`#spin-button${prefix}`);
+          if (spinBtn) {
+            spinBtn.classList.toggle("spinning", state.roulette.spinning);
+            spinBtn.disabled = state.roulette.spinning;
+            spinBtn.textContent = state.roulette.spinning ? "Wheel is turning…" : "Spin the wheel";
+          }
+
+          const wheelRing = prefix ? $(`#wheel-ring-full`) : $(`#wheel-ring`);
+          if (wheelRing) {
+            wheelRing.style.transform = `rotate(${state.roulette.rotation}deg)`;
+            wheelRing.classList.toggle("spinning", state.roulette.spinning);
+          }
+
+          const historyEl = $(`#roulette-history${prefix}`);
+          if (historyEl) {
+            historyEl.innerHTML = state.roulette.history.slice(0, 5).map((number) =>
+              `<span class="history-number ${rouletteColor(number)}">${number}</span>`
+            ).join("");
+          }
+        };
+
+        const renderCard = (prefix = "") => {
+          const rank = $(`#card-rank${prefix}`);
+          const bottom = $(`#card-bottom${prefix}`);
+          const card = $(`#playing-card${prefix}`);
+          const result = $(`#card-result${prefix}`);
+
+          if (rank) rank.textContent = rankLabel(state.card.current);
+          if (bottom) bottom.textContent = rankLabel(state.card.current);
+          if (card) {
+            card.classList.toggle("red-card", state.card.current % 2 === 0);
+            card.classList.toggle("draw", Boolean(state.card.last));
+          }
+          if (result) {
+            result.textContent = state.card.last ?
+              state.card.last.tie ?
+              `Push · ${money(state.card.last.amount)} returned` :
+              `${state.card.last.call === "high" ? "High" : "Low"} · ${state.card.last.won ? `+${money(state.card.last.amount * 0.92)}` : `-${money(state.card.last.amount)}`}` :
+              "Make your call";
+            result.className = state.card.last ?
+              state.card.last.won ? "result-win" : state.card.last.tie ? "" : "result-loss" :
+              "";
+          }
         };
 
         const renderGarage = () => {
-          const playerGarage =
-            state.garages[state.clientId] || [];
+          const playerGarage = state.garages[state.clientId] || [];
 
-          $("#garage-grid").innerHTML = cars
-            .map((car) => {
-              const owned = playerGarage.includes(car.id);
+          $("#garage-grid").innerHTML = cars.map((car) => {
+            const owned = playerGarage.includes(car.id);
+            const action = owned ?
+              `<div class="owned-label">In your garage<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></svg></div>` :
+              car.grandPrize ?
+              `<div class="grand-prize-label">Roulette grand prize · 1 in 37</div>` :
+              `<button class="button button-quiet button-block buy-car" data-car="${car.id}" type="button">Unlock for ${money(car.price)}</button>`;
 
-              const action = owned
-                ? `
-                  <div class="owned-label">
-                    In your garage
-                    <svg viewBox="0 0 24 24">
-                      <path d="m5 12 4 4L19 6" />
-                    </svg>
-                  </div>
-                `
-                : car.grandPrize
-                  ? `
-                    <div class="grand-prize-label">
-                      Roulette grand prize · 1 in 37
-                    </div>
-                  `
-                  : `
-                    <button
-                      class="button button-quiet button-block buy-car"
-                      data-car="${car.id}"
-                      type="button"
-                    >
-                      Unlock for ${money(car.price)}
-                    </button>
-                  `;
+            return `<article class="garage-card"><div class="car-art ${owned ? "" : "locked"} ${car.tone}">${owned ? "" : '<span class="lock-badge">Vault locked</span>'}<span class="car-line"></span><span class="car-wheel left"></span><span class="car-wheel right"></span></div><div class="garage-info"><h3>${car.name}</h3><p>${car.spec}</p>${action}</div></article>`;
+          }).join("");
 
-              return `
-                <article class="garage-card">
-                  <div class="car-art ${owned ? "" : "locked"} ${car.tone}">
-                    ${
-                      owned
-                        ? ""
-                        : '<span class="lock-badge">Vault locked</span>'
-                    }
-                    <span class="car-line"></span>
-                    <span class="car-wheel left"></span>
-                    <span class="car-wheel right"></span>
-                  </div>
-
-                  <div class="garage-info">
-                    <h3>${car.name}</h3>
-                    <p>${car.spec}</p>
-                    ${action}
-                  </div>
-                </article>
-              `;
-            })
-            .join("");
-
-          $$(".buy-car").forEach((button) => {
-            button.addEventListener("click", () => {
-              processAction({
-                type: "buyCar",
-                carId: button.dataset.car
-              });
+          $$(".buy-car").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              processBuyCar({ type: "buyCar", carId: btn.dataset.car });
             });
           });
         };
 
         const renderRoster = () => {
           const entries = Object.entries(state.players);
+          $("#roster-count").textContent = `${entries.length} ${entries.length === 1 ? "seat" : "seats"}`;
+          $("#player-count").textContent = `${entries.length} ${entries.length === 1 ? "guest" : "guests"}`;
 
-          $("#roster-count").textContent =
-            `${entries.length} ${
-              entries.length === 1 ? "seat" : "seats"
-            }`;
-
-          $("#player-count").textContent =
-            `${entries.length} ${
-              entries.length === 1 ? "guest" : "guests"
-            }`;
-
-          $("#roster-list").innerHTML = entries
-            .map(
-              ([id, player]) => `
-                <div class="roster-item">
-                  <div class="person">
-                    <span class="avatar">${escapeHtml(initials(player.name))}</span>
-                    <div>
-                      <div class="person-name">
-                        ${escapeHtml(player.name)}
-                        ${id === state.clientId ? "(you)" : ""}
-                      </div>
-                      <div class="person-role">${escapeHtml(player.role)}</div>
-                    </div>
-                  </div>
-
-                  <span class="person-balance">
-                    ${money(state.balances[id] || 0)}
-                  </span>
-                </div>
-              `
-            )
-            .join("");
+          $("#roster-list").innerHTML = entries.map(([id, player]) =>
+            `<div class="roster-item"><div class="person"><span class="avatar">${escapeHtml(initials(player.name))}</span><div><div class="person-name">${escapeHtml(player.name)}${id === state.clientId ? " (you)" : ""}</div><div class="person-role">${escapeHtml(player.role)}</div></div></div><span class="person-balance">${money(state.balances[id] || 0)}</span></div>`
+          ).join("");
         };
 
         const renderAll = () => {
-          $("#metric-balance").innerHTML =
-            `${money(balance())} <small>virtual cash</small>`;
+          $("#metric-balance").innerHTML = `${money(balance())} <small>virtual cash</small>`;
+          $("#metric-played").innerHTML = `${state.played} <small>this session</small>`;
 
-          $("#metric-played").innerHTML =
-            `${state.played} <small>this session</small>`;
-
-          const garageValue = (
-            state.garages[state.clientId] || []
-          ).reduce(
-            (sum, id) =>
-              sum +
-              (cars.find((car) => car.id === id)?.price || 0),
-            0
+          const garageValue = (state.garages[state.clientId] || []).reduce(
+            (sum, id) => sum + (cars.find((car) => car.id === id)?.price || 0), 0
           );
-
-          $("#metric-garage").innerHTML =
-            `${money(garageValue)} <small>collected</small>`;
+          $("#metric-garage").innerHTML = `${money(garageValue)} <small>collected</small>`;
 
           $("#room-code").textContent = state.roomCode;
+          $("#room-mode-label").textContent = state.mode === "peer" ? "Live P2P" : "Local / demo";
+          $("#host-status").textContent = state.isHost ? "You are hosting" : "Host controls table";
 
-          $("#room-mode-label").textContent =
-            state.mode === "peer"
-              ? "Live P2P"
-              : "Local / demo";
+          $("#activity-count").textContent = `${state.activity.length} ${state.activity.length === 1 ? "event" : "events"}`;
+          $("#full-activity-count").textContent = `${state.activity.length} ${state.activity.length === 1 ? "event" : "events"}`;
 
-          $("#host-status").textContent = state.isHost
-            ? "You are hosting"
-            : "Host controls table";
-
-          $("#activity-count").textContent =
-            `${state.activity.length} ${
-              state.activity.length === 1 ? "event" : "events"
-            }`;
-
-          $("#full-activity-count").textContent =
-            `${state.activity.length} ${
-              state.activity.length === 1 ? "event" : "events"
-            }`;
-
-          renderRoulette();
-          renderCard();
+          renderRoulette("");
+          renderRoulette("-full");
+          renderCard("");
+          renderCard("-full");
           renderGarage();
           renderRoster();
           renderActivity($("#activity-list"));
           renderActivity($("#full-activity-list"));
+          renderSlots();
+          renderWar();
           showView(state.currentView);
         };
 
-        $$(".nav-button, .mobile-nav button").forEach((button) => {
-          button.addEventListener("click", () => {
-            showView(button.dataset.view);
-          });
+        // ===== EVENTS =====
+        $$(".nav-button, .mobile-nav button").forEach((btn) => {
+          btn.addEventListener("click", () => showView(btn.dataset.view));
         });
 
-        $$("[data-open-game]").forEach((button) => {
-          button.addEventListener("click", () => {
-            showView(button.dataset.openGame);
-          });
+        $$("[data-open-game]").forEach((btn) => {
+          btn.addEventListener("click", () => showView(btn.dataset.openGame));
         });
 
-        $$(".bet-button").forEach((button) => {
-          button.addEventListener("click", () => {
-            state.roulette.selected = button.dataset.bet;
+        // Roulette events
+        $$(".bet-button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.roulette.selected = btn.dataset.bet;
             state.roulette.selectedNumber = null;
-            renderRoulette();
+            renderAll();
           });
         });
 
         document.addEventListener("click", (event) => {
-          const numberButton = event.target.closest(
-            ".number-button, .zero-button"
-          );
-
-          if (!numberButton) {
-            return;
-          }
-
+          const numberButton = event.target.closest(".number-button, .zero-button");
+          if (!numberButton) return;
           state.roulette.selected = "straight";
-          state.roulette.selectedNumber = Number(
-            numberButton.dataset.number
-          );
-
-          renderRoulette();
+          state.roulette.selectedNumber = Number(numberButton.dataset.number);
+          renderAll();
         });
 
-        $$(".chip").forEach((button) => {
-          button.addEventListener("click", () => {
-            $("#roulette-stake").value = button.dataset.stake;
+        $$(".chip").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const stakeInput = $("#roulette-stake") || $("#roulette-stake-full");
+            if (stakeInput) stakeInput.value = btn.dataset.stake;
           });
         });
 
-        $("#spin-button").addEventListener("click", () => {
-          const amount = validStake($("#roulette-stake"));
-
+        const spinHandler = (prefix = "") => {
+          const stakeInput = $(`#roulette-stake${prefix}`);
+          if (!stakeInput) return;
+          const amount = validStake(stakeInput);
           if (amount > balance()) {
             notify("That stake is above your balance.", true);
             return;
           }
-
-          processAction({
+          processRoulette({
             type: "roulette",
             amount,
             bet: state.roulette.selected,
             number: state.roulette.selectedNumber
           });
-        });
+        };
 
-        $("#high-button").addEventListener("click", () => {
-          const amount = validStake($("#card-stake"));
+        $("#spin-button").addEventListener("click", () => spinHandler(""));
+        $("#spin-button-full").addEventListener("click", () => spinHandler("-full"));
 
+        // High/Low events
+        const cardHandler = (call) => {
+          const stakeInput = $("#card-stake") || $("#card-stake-full");
+          const amount = validStake(stakeInput);
           if (amount > balance()) {
             notify("That stake is above your balance.", true);
             return;
           }
+          processCard({ type: "card", amount, call });
+        };
 
-          processAction({
-            type: "card",
-            amount,
-            call: "high"
-          });
+        $("#high-button").addEventListener("click", () => cardHandler("high"));
+        $("#low-button").addEventListener("click", () => cardHandler("low"));
+        $("#high-button-full").addEventListener("click", () => cardHandler("high"));
+        $("#low-button-full").addEventListener("click", () => cardHandler("low"));
+
+        // Slots events
+        $('#slotSpinBtn').addEventListener('click', spinSlots);
+        $('#slotAutoBtn').addEventListener('click', () => {
+          state.slots.autoMode = !state.slots.autoMode;
+          $('#slotAutoBtn').textContent = state.slots.autoMode ? '⏹ STOP' : '⟳ AUTO';
+          $('#slotAutoBtn').style.borderColor = state.slots.autoMode ? 'var(--gold)' : '';
+          if (state.slots.autoMode) spinSlots();
+          else clearTimeout(state.slots.autoTimer);
         });
 
-        $("#low-button").addEventListener("click", () => {
-          const amount = validStake($("#card-stake"));
+        // War events
+        $('#warDrawBtn').addEventListener('click', drawWar);
 
-          if (amount > balance()) {
-            notify("That stake is above your balance.", true);
-            return;
-          }
-
-          processAction({
-            type: "card",
-            amount,
-            call: "low"
-          });
+        // Enter key on stake inputs
+        ['#slotStake', '#warStake', '#roulette-stake', '#roulette-stake-full', '#card-stake', '#card-stake-full'].forEach((sel) => {
+          const el = $(sel);
+          if (el) el.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.closest('.game-card')?.querySelector('.button-gold')?.click(); });
         });
 
+        // Room
         $("#copy-room").addEventListener("click", async () => {
           try {
             await navigator.clipboard.writeText(state.roomCode);
@@ -4216,24 +3570,14 @@
             document.execCommand("copy");
             helper.remove();
           }
-
           notify(`Room code ${state.roomCode} copied.`);
         });
 
         const dialog = $("#room-dialog");
-
-        $("#room-action").addEventListener("click", () => {
-          dialog.showModal();
-        });
-
-        $("#close-dialog").addEventListener("click", () => {
-          dialog.close();
-        });
-
+        $("#room-action").addEventListener("click", () => dialog.showModal());
+        $("#close-dialog").addEventListener("click", () => dialog.close());
         dialog.addEventListener("click", (event) => {
-          if (event.target === dialog) {
-            dialog.close();
-          }
+          if (event.target === dialog) dialog.close();
         });
 
         $("#create-room").addEventListener("click", createRoom);
@@ -4243,14 +3587,11 @@
           state.userName = event.target.value.trim() || "Alex";
         });
 
-        setConnection(
-          "",
-          "Local demo",
-          "Local demo is ready. Create a room to invite friends."
-        );
-
+        // ===== INIT =====
+        setConnection("", "Local demo", "Local demo is ready. Create a room to invite friends.");
         addActivity("The room opened with $1,000 virtual cash", "IN");
         renderAll();
+
       })();
     </script>
   </body>
