@@ -2,417 +2,307 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>منصة جفال التعليمية</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلعة السبت</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-:root {
-  --primary: #1e40af;
-  --primary-light: #3b82f6;
-  --accent: #f59e0b;
-  --dark: #0f172a;
-  --gray: #64748b;
-  --light: #f1f5f9;
-}
-body { background: var(--light); color: var(--dark); min-height: 100vh; overflow-x: hidden; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1a0b2e, #2d1b4e, #0f0c29);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #fff;
+  }
+  .container {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 40px 32px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    text-align: center;
+  }
 
-/* Header */
-header {
-  background: white;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-  position: sticky; top: 0; z-index: 100;
-}
-.header-content {
-  max-width: 1200px; margin: 0 auto;
-  padding: 12px 20px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 900; color: var(--primary); }
-.logo-icon {
-  width: 42px; height: 42px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-size: 22px;
-  box-shadow: 0 6px 15px rgba(30,64,175,0.25);
-  flex-shrink: 0;
-}
-.nav-btn {
-  background: var(--primary); color: white;
-  border: none; padding: 10px 20px;
-  border-radius: 10px; font-weight: 700;
-  cursor: pointer; font-family: 'Cairo', sans-serif;
-  font-size: 14px; transition: 0.3s; whitespace: nowrap;
-}
-.nav-btn:hover { background: var(--primary-light); transform: translateY(-2px); }
+  /* ===== شاشة الترحيب ===== */
+  .welcome-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .welcome h1 {
+    font-size: 26px;
+    color: #b388ff;
+    margin-bottom: 10px;
+  }
+  .welcome .subtitle {
+    color: #b8c1cc;
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+  .explain {
+    background: rgba(255,255,255,0.06);
+    border-right: 4px solid #b388ff;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: right;
+    font-size: 15px;
+    line-height: 2;
+    color: #d5dbe3;
+    margin-bottom: 25px;
+  }
+  .explain strong { color: #b388ff; }
 
-/* Hero */
-.hero {
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-  color: white; padding: 60px 20px;
-  text-align: center; position: relative; overflow: hidden;
-}
-.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
-.hero h1 { font-size: clamp(26px, 5vw, 44px); font-weight: 900; margin-bottom: 15px; line-height: 1.3; }
-.hero p { font-size: clamp(15px, 2.5vw, 18px); opacity: 0.95; margin-bottom: 28px; line-height: 1.7; }
-.hero-btn {
-  background: var(--accent); color: white;
-  border: none; padding: 15px 35px;
-  border-radius: 12px; font-weight: 700; font-size: 16px;
-  cursor: pointer; font-family: 'Cairo', sans-serif;
-  transition: 0.3s; box-shadow: 0 12px 25px rgba(245,158,11,0.35);
-  width: 100%; max-width: 280px;
-}
-.hero-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(245,158,11,0.45); }
+  /* ===== شاشة السؤال ===== */
+  .progress {
+    font-size: 13px;
+    color: #9aa5b1;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #b388ff, #7c4dff);
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 10px;
+  }
+  .riddle {
+    font-size: 19px;
+    line-height: 1.9;
+    margin-bottom: 25px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    transition: 0.3s;
+  }
+  input:focus { border-color: #b388ff; }
+  button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 14px;
+    border: none;
+    border-radius: 14px;
+    background: #b388ff;
+    color: #1a0b2e;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { background: #9c6bff; transform: translateY(-2px); }
+  .msg {
+    margin-top: 15px;
+    font-size: 15px;
+    min-height: 22px;
+    font-weight: bold;
+  }
+  .wrong { color: #ff6b6b; }
+  .right { color: #6bffb8; }
 
-/* Container */
-.container { max-width: 1200px; margin: 0 auto; padding: 45px 20px; }
-.section-title { text-align: center; font-size: clamp(22px, 4vw, 32px); font-weight: 900; margin-bottom: 8px; }
-.section-subtitle { text-align: center; color: var(--gray); font-size: 15px; margin-bottom: 35px; }
+  /* ===== الشاشة الأولى (المقلب) ===== */
+  .prank { animation: pop 0.7s ease; }
+  .prank .emoji { font-size: 70px; margin-bottom: 15px; }
+  .prank h2 {
+    font-size: 38px;
+    color: #ff6b6b;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    text-shadow: 0 0 25px rgba(255,107,107,0.5);
+  }
+  .prank p { color: #b8c1cc; font-size: 15px; }
 
-/* Features */
-.features { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-  gap: 20px; 
-}
-.feature-card {
-  background: white; padding: 30px 20px;
-  border-radius: 20px; text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.04);
-  transition: 0.3s; border: 2px solid transparent;
-}
-.feature-card:hover { transform: translateY(-6px); border-color: var(--primary-light); box-shadow: 0 15px 30px rgba(30,64,175,0.12); }
-.feature-icon {
-  width: 65px; height: 65px; margin: 0 auto 18px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 18px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; box-shadow: 0 8px 20px rgba(30,64,175,0.2);
-}
-.feature-card h3 { font-size: 18px; margin-bottom: 10px; font-weight: 700; }
-.feature-card p { color: var(--gray); line-height: 1.7; font-size: 14px; }
+  /* ===== الشاشة النهائية ===== */
+  .final { animation: pop 0.7s ease; }
+  .final .trophy { font-size: 70px; margin-bottom: 15px; }
+  .final h2 {
+    font-size: 34px;
+    color: #00e676;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    text-shadow: 0 0 25px rgba(0,230,118,0.5);
+  }
+  .final p { color: #b8c1cc; font-size: 15px; }
 
-/* Modal */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(15,23,42,0.75);
-  backdrop-filter: blur(6px);
-  display: none; align-items: center; justify-content: center;
-  z-index: 1000; padding: 15px;
-}
-.modal-overlay.active { display: flex; }
-.modal {
-  background: white; border-radius: 24px;
-  padding: 35px 25px; width: 100%; max-width: 420px;
-  text-align: center; animation: slideUp 0.3s ease;
-  position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-}
-.close-modal-btn {
-  position: absolute; top: 15px; left: 18px;
-  background: #f1f5f9; border: none; font-size: 18px;
-  width: 32px; height: 32px; border-radius: 50%;
-  cursor: pointer; color: var(--gray); font-weight: bold;
-}
-.close-modal-btn:hover { background: #e2e8f0; color: var(--dark); }
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.modal-icon {
-  width: 70px; height: 70px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; margin: 0 auto 20px;
-  box-shadow: 0 10px 25px rgba(30,64,175,0.3);
-}
-.modal h2 { font-size: 24px; margin-bottom: 8px; font-weight: 900; }
-.modal p { color: var(--gray); margin-bottom: 22px; font-size: 14px; }
-.code-input {
-  width: 100%; padding: 16px;
-  font-size: 20px; text-align: center;
-  letter-spacing: 2px; border: 2px solid #e2e8f0;
-  border-radius: 14px; outline: none;
-  transition: 0.3s; font-weight: 700;
-  text-transform: uppercase; font-family: 'Cairo', sans-serif;
-  background: var(--light);
-}
-.code-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(59,130,246,0.12); }
-.modal-btn {
-  width: 100%; margin-top: 18px; padding: 16px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  color: white; border: none; border-radius: 14px;
-  font-size: 17px; font-weight: 700;
-  cursor: pointer; font-family: 'Cairo', sans-serif;
-  transition: 0.3s;
-}
-.modal-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(30,64,175,0.3); }
-.msg { margin-top: 15px; font-weight: 700; font-size: 14px; padding: 12px; border-radius: 10px; display: none; }
-.msg.error { display: block; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-.msg.success { display: block; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-
-/* Pages */
-.page-view { display: none; }
-.page-view.active { display: block; }
-
-.page-header { background: white; padding: 20px; border-bottom: 1px solid #e2e8f0; }
-.page-header-content {
-  max-width: 1000px; margin: 0 auto;
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 10px;
-}
-.page-header h2 { font-size: 20px; font-weight: 900; }
-
-/* Video */
-.video-container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
-.video-player {
-  position: relative; padding-bottom: 56.25%; height: 0;
-  border-radius: 18px; overflow: hidden;
-  background: #000;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.18);
-}
-.video-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-.video-info {
-  background: white; padding: 25px;
-  border-radius: 18px; margin-top: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.04);
-}
-.video-info h3 { font-size: 20px; margin-bottom: 10px; font-weight: 900; color: var(--dark); }
-.video-info p { color: var(--gray); line-height: 1.8; font-size: 15px; }
-
-.logout-btn {
-  background: #ef4444; color: white;
-  border: none; padding: 10px 18px;
-  border-radius: 10px; font-weight: 700;
-  cursor: pointer; font-family: 'Cairo', sans-serif;
-  font-size: 13px; transition: 0.3s;
-}
-.logout-btn:hover { background: #dc2626; }
-
-footer {
-  background: var(--dark); color: white;
-  text-align: center; padding: 25px 15px; margin-top: 50px;
-}
-footer p { opacity: 0.7; font-size: 13px; }
-
-@media (max-width: 480px) {
-  .header-content { padding: 10px 15px; }
-  .logo { font-size: 17px; }
-  .logo-icon { width: 36px; height: 36px; font-size: 18px; }
-  .nav-btn { padding: 8px 14px; font-size: 13px; }
-  .hero { padding: 40px 15px; }
-  .container { padding: 30px 15px; }
-  .modal { padding: 25px 18px; }
-  .modal-icon { width: 60px; height: 60px; font-size: 26px; }
-  .code-input { font-size: 18px; padding: 14px; }
-  .video-info { padding: 18px; }
-}
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 
-<!-- الرئيسية -->
-<div id="homePage" class="page-view active">
-  <header>
-    <div class="header-content">
-      <div class="logo">
-        <div class="logo-icon">📚</div>
-        <span>منصة جفال</span>
-      </div>
-      <button class="nav-btn" onclick="openLogin()">تسجيل الدخول</button>
-    </div>
-  </header>
+<div class="container">
 
-  <section class="hero">
-    <div class="hero-content">
-      <h1>منصة جفال التعليمية 🎓</h1>
-      <p>طريقك نحو التفوق يبدأ من هنا. دروس مصورة بجودة عالية، شرح مبسط، وتجربة تعليمية سلسة.</p>
-      <button class="hero-btn" onclick="openLogin()">ابدأ الآن 🚀</button>
-    </div>
-  </section>
+  <!-- ===== شاشة الترحيب ===== -->
+  <div id="welcome" class="welcome">
+    <div class="welcome-icon">📅</div>
+    <h1>طلعة السبت 🎉</h1>
+    <p class="subtitle">قبل ما تعرف إذا في طلعة أو لأ... لازم تجاوب على كم سؤال</p>
 
-  <div class="container">
-    <h2 class="section-title">لماذا منصة جفال؟</h2>
-    <p class="section-subtitle">كل ما تحتاجه للنجاح في مكان واحد</p>
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon">🎬</div>
-        <h3>دروس مصورة</h3>
-        <p>شرح مبسط وواضح لأهم الدروس والمواضيع في المنهج.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⏰</div>
-        <h3>تعلّم بأي وقت</h3>
-        <p>ادرس وقتما تشاء ومن أي مكان، بدون أي قيود.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
-        <h3>من أي جهاز</h3>
-        <p>افتح المنصة من الجوال، التابلت، أو اللابتوب.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔑</div>
-        <h3>دخول سهل</h3>
-        <p>بس كود تفعيل وبتصير داخل، بدون أي تعقيدات.</p>
-      </div>
+    <div class="explain">
+      <strong>شو الموضوع؟</strong><br>
+      قدامك مجموعة أسئلة عن عالم الألعاب. جاوب عليهم كلهم صح... وبعدها رح تعرف جوابك.<br>
+      <strong>القوانين بسيطة:</strong><br>
+      • جاوب صح لتنتقل للسؤال اللي بعده<br>
+      • اكتب بالعربي أو الإنجليزي، عادي<br>
+      • خذ راحتك، ما في وقت محدد<br>
+      • بعد آخر سؤال... رح تشوف الجواب 😏
     </div>
+
+    <button onclick="startQuiz()">يلا نبدأ 🚀</button>
   </div>
 
-  <footer>
-    <p>© 2025 منصة جفال التعليمية — جميع الحقوق محفوظة</p>
-  </footer>
-</div>
-
-<!-- الفيديوهات -->
-<div id="videosPage" class="page-view">
-  <header>
-    <div class="header-content">
-      <div class="logo">
-        <div class="logo-icon">📚</div>
-        <span>منصة جفال</span>
-      </div>
-      <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-    </div>
-  </header>
-
-  <div class="page-header">
-    <div class="page-header-content">
-      <h2>📹 الدرس المتوفر</h2>
-      <span style="color: var(--gray); font-size: 13px;" id="userCodeDisplay"></span>
-    </div>
+  <!-- ===== شاشة السؤال ===== -->
+  <div id="quiz" class="hidden">
+    <div class="progress" id="progress"></div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <div class="riddle" id="riddle"></div>
+    <input type="text" id="answer" placeholder="اكتب جوابك هنا..." autocomplete="off">
+    <button onclick="checkAnswer()">تحقق</button>
+    <div class="msg" id="msg"></div>
   </div>
 
-  <div class="video-container">
-    <div class="video-player" id="videoPlayer"></div>
-    <div class="video-info">
-      <h3 id="videoTitle"></h3>
-      <p id="videoDescription"></p>
-    </div>
+  <!-- ===== الشاشة الأولى: المقلب ===== -->
+  <div id="prank" class="prank hidden">
+    <div class="emoji">😬</div>
+    <h2>لا مش رايح</h2>
+    <p>...</p>
   </div>
 
-  <footer>
-    <p>© 2025 منصة جفال التعليمية — جميع الحقوق محفوظة</p>
-  </footer>
-</div>
-
-<!-- نافذة الدخول -->
-<div class="modal-overlay" id="loginModal">
-  <div class="modal">
-    <button class="close-modal-btn" onclick="closeLogin()">✕</button>
-    <div class="modal-icon">🔑</div>
-    <h2>تسجيل الدخول</h2>
-    <p>أدخل كود التفعيل الخاص بك</p>
-    <input type="text" id="codeInput" class="code-input" placeholder="JFAL-XXXX" maxlength="20" autocomplete="off">
-    <button class="modal-btn" type="button" onclick="handleLogin()">دخول</button>
-    <div class="msg" id="loginMsg"></div>
+  <!-- ===== الشاشة النهائية ===== -->
+  <div id="final" class="final hidden">
+    <div class="trophy">🏆</div>
+    <h2>✨ اه إن شاء الله ✨</h2>
+    <p>مبروك، طلعة السبت ثابتة 🎉</p>
   </div>
+
 </div>
 
 <script>
-const VALID_CODES = ["JFAL-1001","JFAL-1002","JFAL-1003","JFAL-1004","JFAL-1005"];
-const VIDEO_URL = "https://drive.google.com/file/d/1uaM9KA9RsaIP-kGl4k4WieSU1JDf7N6R/preview";
-const VIDEO_TITLE = "تعليم الشخرة";
-const VIDEO_DESCRIPTION = "شرح عملي ومبسط حول كيفية التحكم بالتنفس والتقنيات الخاصة بالدرس.";
+  const riddles = [
+    {
+      q: "شو الاسم القديم للعبة EA FC قبل ما تتغير؟",
+      answers: ["fifa", "فيفا"]
+    },
+    {
+      q: "شو اسم اللعبة اللي فيها بناء بالمكعبات وعالم مفتوح بلا نهاية؟",
+      answers: ["minecraft", "ماينكرافت", "ماين كرافت"]
+    },
+    {
+      q: "شو اسم اللعبة اللي فيها سرقة سيارات ومهمات وعالم مفتوح، وبطلها اسمه CJ؟",
+      answers: ["gta", "gta san andreas", "جي تي ايه", "سان اندرياس", "جي تي أي"]
+    },
+    {
+      q: "شو اسم اللعبة الشهيرة اللي فيها تصويب 5 ضد 5 وحدة منها CS؟",
+      answers: ["counter strike", "csgo", "cs", "كاونتر سترايك", "كاونتر"]
+    },
+    {
+      q: "شو اسم اللعبة اللي بيطيحوا فيها من الطيارة وتلعب 100 لاعب ضد بعض؟",
+      answers: ["pubg", "ببجي", "playerunknown"]
+    }
+  ];
 
-function getUsedCodes() {
-  try { return JSON.parse(localStorage.getItem('jfal_used_codes') || '[]'); }
-  catch { return []; }
-}
-function markCodeAsUsed(code) {
-  const used = getUsedCodes();
-  if (!used.includes(code)) {
-    used.push(code);
-    localStorage.setItem('jfal_used_codes', JSON.stringify(used));
-  }
-}
-function isCodeUsed(code) { return getUsedCodes().includes(code); }
-function isLoggedIn() { return localStorage.getItem('jfal_logged_in') === 'true'; }
+  let current = 0;
 
-function showPage(id) {
-  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
+  const welcomeEl = document.getElementById('welcome');
+  const quizEl = document.getElementById('quiz');
+  const prankEl = document.getElementById('prank');
+  const finalEl = document.getElementById('final');
+  const riddleEl = document.getElementById('riddle');
+  const progressEl = document.getElementById('progress');
+  const barFillEl = document.getElementById('barFill');
+  const msgEl = document.getElementById('msg');
+  const inputEl = document.getElementById('answer');
 
-function openLogin() {
-  document.getElementById('loginModal').classList.add('active');
-  document.getElementById('loginMsg').className = 'msg';
-  document.getElementById('codeInput').value = '';
-  setTimeout(() => document.getElementById('codeInput').focus(), 100);
-}
-
-function closeLogin() {
-  document.getElementById('loginModal').classList.remove('active');
-}
-
-function handleLogin() {
-  const input = document.getElementById('codeInput');
-  const msg = document.getElementById('loginMsg');
-  const code = input.value.trim().toUpperCase();
-  
-  msg.className = 'msg';
-
-  if (!code) {
-    msg.textContent = '❌ الرجاء إدخال الكود';
-    msg.classList.add('error');
-    return;
-  }
-  if (!VALID_CODES.includes(code)) {
-    msg.textContent = '❌ الكود غير صحيح';
-    msg.classList.add('error');
-    input.value = '';
-    return;
-  }
-  if (isCodeUsed(code)) {
-    msg.textContent = '❌ هذا الكود مستخدم من قبل';
-    msg.classList.add('error');
-    input.value = '';
-    return;
+  function normalize(str) {
+    return str.trim().toLowerCase()
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+      .replace(/^ال/, '')
+      .replace(/\s+/g, ' ')
+      .replace(/[-_]/g, ' ');
   }
 
-  markCodeAsUsed(code);
-  localStorage.setItem('jfal_logged_in', 'true');
-  localStorage.setItem('jfal_user_code', code);
+  function startQuiz() {
+    welcomeEl.classList.add('hidden');
+    quizEl.classList.remove('hidden');
+    showRiddle();
+  }
 
-  msg.textContent = '✅ تم التحقق بنجاح!';
-  msg.classList.add('success');
+  function showRiddle() {
+    riddleEl.textContent = riddles[current].q;
+    progressEl.textContent = `السؤال ${current + 1} من ${riddles.length}`;
+    barFillEl.style.width = ((current) / riddles.length * 100) + '%';
+    inputEl.value = '';
+    msgEl.textContent = '';
+    inputEl.focus();
+  }
 
-  setTimeout(() => {
-    closeLogin();
-    showVideosPage();
-  }, 600);
-}
+  function checkAnswer() {
+    const userAns = normalize(inputEl.value);
+    const correct = riddles[current].answers.some(a => normalize(a) === userAns);
 
-function logout() {
-  localStorage.removeItem('jfal_logged_in');
-  localStorage.removeItem('jfal_user_code');
-  document.getElementById('videoPlayer').innerHTML = '';
-  showPage('homePage');
-}
+    if (correct) {
+      msgEl.textContent = '✅ صح!';
+      msgEl.className = 'msg right';
+      current++;
+      barFillEl.style.width = (current / riddles.length * 100) + '%';
+      setTimeout(() => {
+        if (current < riddles.length) {
+          showRiddle();
+        } else {
+          quizEl.classList.add('hidden');
+          prankEl.classList.remove('hidden');
+          // بعد 2.5 ثانية يطلع الجواب الحقيقي
+          setTimeout(() => {
+            prankEl.classList.add('hidden');
+            finalEl.classList.remove('hidden');
+          }, 2500);
+        }
+      }, 700);
+    } else {
+      msgEl.textContent = '❌ غلط، جرّب مرة ثانية';
+      msgEl.className = 'msg wrong';
+      inputEl.value = '';
+      inputEl.focus();
+    }
+  }
 
-function showVideosPage() {
-  showPage('videosPage');
-  const code = localStorage.getItem('jfal_user_code') || '';
-  document.getElementById('userCodeDisplay').textContent = '👤 الكود: ' + code;
-  document.getElementById('videoPlayer').innerHTML =
-    '<iframe src="' + VIDEO_URL + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-  document.getElementById('videoTitle').textContent = '📹 ' + VIDEO_TITLE;
-  document.getElementById('videoDescription').textContent = VIDEO_DESCRIPTION;
-}
-
-document.getElementById('loginModal').addEventListener('click', (e) => {
-  if (e.target.id === 'loginModal') closeLogin();
-});
-
-document.getElementById('codeInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleLogin();
-});
-
-window.addEventListener('load', () => {
-  if (isLoggedIn()) showVideosPage();
-});
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
 </script>
 
 </body>
